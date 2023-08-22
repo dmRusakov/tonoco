@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  monkeyMoonAdminDB:
+    container_name: 'AdminDB'
+    image: 'postgres:14.2'
+    ports:
+      - "5432:5432"
+    deploy:
+      mode: replicated
+      replicas: 1
+    # user: 1000:1000
+    env_file:
+      - ./dev.adminDb.postgres.env
+    volumes:
+      - './dbData/admin/data/:/var/lib/postgres-db/data'
+      - './dbData/admin/init/:/docker-entrypoint-initdb.d/'
+    networks:
+      - monkeyMoon
+networks:
+  monkeyMoon:
+    name: 'Monkey moon'
+    driver: bridge
