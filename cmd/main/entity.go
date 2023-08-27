@@ -1,7 +1,9 @@
 package main
 
+import "github.com/dmRusakov/monkeysmoon-admin/internal/config"
+
 type App struct {
-	Name string
+	cfg *config.Config
 }
 
 var app App = App{}

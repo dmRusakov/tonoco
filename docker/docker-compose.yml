@@ -10,14 +10,21 @@ services:
       mode: replicated
       replicas: 1
     # user: 1000:1000
-    env_file:
-      - ./dev.adminDb.postgres.env
+    environment:
+      HOST: ${ADMIN_DB_HOST}
+      POSTGRES_USER: ${ADMIN_DB_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${ADMIN_DB_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${ADMIN_DB_POSTGRES_DB}
+      PORT: ${ADMIN_DB_PORT}
+      SSL_MODE: ${ADMIN_DB_SSL_MODE}
+      TZ: ${ADMIN_DB_TZ}
+      CONNECT_TIMEOUT: ${ADMIN_DB_CONNECT_TIMEOUT}
     volumes:
-      - './dbData/admin/data/:/var/lib/postgres-db/data'
-      - './dbData/admin/init/:/docker-entrypoint-initdb.d/'
+      - './dbData/adminDb/data/:/var/lib/postgres-db/data'
+      - './dbData/adminDb/init/:/docker-entrypoint-initdb.d/'
     networks:
       - monkeyMoon
 networks:
   monkeyMoon:
-    name: 'Monkey moon'
+    name: 'monkeyMoon'
     driver: bridge

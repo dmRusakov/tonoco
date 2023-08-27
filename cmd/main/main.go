@@ -3,5 +3,5 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Print(app)
+	fmt.Print(app.cfg)
 }
