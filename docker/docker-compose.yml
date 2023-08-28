@@ -9,7 +9,6 @@ services:
     deploy:
       mode: replicated
       replicas: 1
-    # user: 1000:1000
     environment:
       HOST: ${ADMIN_DB_HOST}
       POSTGRES_USER: ${ADMIN_DB_POSTGRES_USER}
