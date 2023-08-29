@@ -1,0 +1,4 @@
+#!/bin/bash
+
+redis-cli -h PermissionStorageRedis -a ${AUTH_STORAGE_PASSWORD} SET 06eacb159b780a35d7fbe5e88c6bc4eef5302f1aad4a3df198c6c97b8d85ed1c '{"id": "SystemLog", "name": "SystemLog", "type": "s", "accesses": {"systemLog": {"log": [3, 0, 0, 0, 0, 0], "level": [0, 0, 0, 0, 0, 0], "status": [0, 0, 0, 0, 0, 0]}}}'
+redis-cli -h PermissionStorageRedis -a ${AUTH_STORAGE_PASSWORD} SET 06eacb159b780a35d7fbe5e88c6bc4eef5302f1aad4a3df198c6c97b8d85ed1d '{"id": "SystemLog", "name": "SystemLog", "type": "s", "accesses": {"systemLog": {"log": [3, 3, 3, 2, 3, 2], "level": [3, 3, 3, 2, 3, 2], "status": [3, 3, 3, 2, 3, 2]}}}'
