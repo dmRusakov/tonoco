@@ -25,7 +25,7 @@ services:
       - monkeyMoon
 
   AuthStorage:
-    container_name: 'AuthStorage'
+    container_name: 'authStorage'
     image: 'redis:latest'
     ports:
       - "6379:6379"
@@ -34,7 +34,7 @@ services:
       mode: replicated
       replicas: 1
     volumes:
-      - ./dbData/AuthStorage/data:/data
+      - ./dbData/authStorage/data:/data
     environment:
       REDIS_PASSWORD: ${AUTH_STORAGE_PASSWORD}
       REDIS_MAXMEMORY: ${AUTH_STORAGE_MAXMEMORY}
@@ -48,7 +48,7 @@ services:
     depends_on:
       - AuthStorage
     volumes:
-      - './dbData/AuthStorage/init/init.sh:/init.sh:ro'
+      - './dbData/authStorage/init/init.sh:/init.sh:ro'
     command: sh /init.sh
     environment:
       REDIS_PASSWORD: ${AUTH_STORAGE_PASSWORD}
