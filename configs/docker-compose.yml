@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  DataStorage:
+    container_name: 'DataStorage'
+    image: 'postgres:14.2'
+    ports:
+      - "5432:5432"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      HOST: ${DATA_STORAGE_HOST}
+      POSTGRES_USER: ${DATA_STORAGE_POSTGRES_USER}f
+      POSTGRES_PASSWORD: ${DATA_STORAGE_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${DATA_STORAGE_POSTGRES_DB}
+      PORT: ${DATA_STORAGE_PORT}
+      SSL_MODE: ${DATA_STORAGE_SSL_MODE}
+      TZ: ${DATA_STORAGE_TZ}
+      CONNECT_TIMEOUT: ${DATA_STORAGE_CONNECT_TIMEOUT}
+    volumes:
+      - './dbData/DataStorage/data/:/var/lib/postgres-db/data'
+      - './dbData/DataStorage/init/:/configs-entrypoint-initdb.d/'
+    networks:
+      - monkeyMoon
+
+networks:
+  monkeyMoon:
+    name: 'monkeyMoon'
+    driver: bridge

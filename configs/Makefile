@@ -17,9 +17,7 @@ restart:
 
 delete:
 	docker-compose --env-file ./dev.env down --volumes
-	cd ../${SERVICE_PATH}/dbData/dataStorage/ \
+	cd ../${SERVICE_PATH}/dbData/DataStorage/ \
 	&& sudo chown -R 1000:1000 data/ \
-	&& rm -rf data/
-	cd ../${SERVICE_PATH}/dbData/authStorage/ \
 	&& rm -rf data/
 	@echo "Deleted"

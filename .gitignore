@@ -15,5 +15,5 @@ data_*/
 mono_crash.*.json
 
 .idea
-docker/dbData/authStorage/data
-docker/dbData/dataStorage/data
+configs/dbData/authStorage/data
+configs/dbData/DataStorage/data
