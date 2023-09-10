@@ -1,5 +1,8 @@
 SERVICE_PATH=`basename $(CURDIR)`
 
+admin:
+
+
 up:
 	docker-compose --env-file ./dev.env up -d
 	@echo "Started"
@@ -8,7 +11,7 @@ down:
 	docker-compose --env-file ./dev.env down --volumes
 	@echo "Stopped"
 
-reset: down delete up
+reset: down delete up down up
 	@echo "Reseted"
 
 restart:
