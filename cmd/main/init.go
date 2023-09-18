@@ -1,24 +1,27 @@
 package main
 
 import (
-	appData "github.com/dmRusakov/monkeysmoon-admin/internal/app"
 	"github.com/dmRusakov/monkeysmoon-admin/internal/config"
+	"github.com/dmRusakov/monkeysmoon-admin/internal/controller/web"
 	"github.com/dmRusakov/monkeysmoon-admin/pkg/logrus"
 )
 
-var app = appData.AppData{}
+var App = AppData{}
 
 func init() {
 	//var err error
 
 	// get config (read ENV variables)
-	app.Cfg = config.GetConfig()
+	App.Cfg = config.GetConfig()
 
 	// make logger (logrus)
 	logrus.Init()
 	logger := logrus.GetLogrus()
-	app.Logger = &logger
-	app.Logger.Info("logger initialized")
+	App.Logger = &logger
+	App.Logger.Info("logger initialized")
+
+	// web router
+	App.Router.Web, _ = web.NewWebServer(App.Logger)
 
 	// connect to DataStorage (postgres)
 	//app.DataStorage, err = postgresdb.Connect(context.Background(), app.Cfg)
