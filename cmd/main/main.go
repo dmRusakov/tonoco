@@ -8,6 +8,12 @@ import (
 
 func main() {
 	// start web router
+
+	// static files
+	fs := http.FileServer(http.Dir("assets"))
+	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
+
+	// dynamic files
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		App.Router.Web.Render(w, "test.page.gohtml")
 	})
@@ -17,6 +23,4 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
-
-	fmt.Print(App)
 }

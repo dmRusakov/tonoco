@@ -11,28 +11,31 @@ var _ Server = &server{}
 
 func NewWebServer(log *logrus.Logrus) (*server, error) {
 	return &server{
-		log: log,
+		log:           log,
+		tmlFolderPath: "./assets/templates/",
 	}, nil
 }
 
 type server struct {
-	log *logrus.Logrus
+	log           *logrus.Logrus
+	tmlFolderPath string
 }
 
 type Server interface {
 	Render(w http.ResponseWriter, t string)
 }
 
-func (s server) Render(w http.ResponseWriter, t string) {
+func (s server) Render(w http.ResponseWriter, pageTemplate string) {
 
 	partials := []string{
 		"./assets/templates/base.layout.gohtml",
+		"./assets/templates/js.partial.gohtml",
 		"./assets/templates/header.partial.gohtml",
 		"./assets/templates/footer.partial.gohtml",
 	}
 
 	var templateSlice []string
-	templateSlice = append(templateSlice, fmt.Sprintf("./assets/templates/%s", t))
+	templateSlice = append(templateSlice, fmt.Sprintf("./assets/templates/%s", pageTemplate))
 
 	for _, x := range partials {
 		templateSlice = append(templateSlice, x)
