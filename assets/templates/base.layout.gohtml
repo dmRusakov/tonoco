@@ -1,20 +1,16 @@
 {{define "base" }}
     <!doctype html>
     <html lang="en">
-    {{template "header" .}}
-    <body>
+        {{template "head" .}}
+        <body>
 
-    {{block "content" .}}
+            {{block "header" .}}{{end}}
 
-    {{end}}
+            {{block "content" .}}{{end}}
 
-    {{block "js" .}}
+            {{template "footer" .}}
 
-    {{end}}
-
-    {{template "footer" .}}
-
-    </body>
+        </body>
     </html>
 
 {{end}}

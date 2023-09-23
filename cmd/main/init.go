@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/dmRusakov/monkeysmoon-admin/controllers/web"
 	"github.com/dmRusakov/monkeysmoon-admin/internal/config"
-	"github.com/dmRusakov/monkeysmoon-admin/internal/controller/web"
 	"github.com/dmRusakov/monkeysmoon-admin/pkg/logrus"
 )
 

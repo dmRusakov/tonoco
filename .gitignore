@@ -15,5 +15,5 @@ data_*/
 mono_crash.*.json
 
 .idea
-configs/dbData/authStorage/data
-configs/dbData/DataStorage/data
+config/dbData/authStorage/data
+config/dbData/DataStorage/data

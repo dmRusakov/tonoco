@@ -29,7 +29,7 @@ func (s server) Render(w http.ResponseWriter, pageTemplate string) {
 
 	partials := []string{
 		"./assets/templates/base.layout.gohtml",
-		"./assets/templates/js.partial.gohtml",
+		"./assets/templates/head.partial.gohtml",
 		"./assets/templates/header.partial.gohtml",
 		"./assets/templates/footer.partial.gohtml",
 	}

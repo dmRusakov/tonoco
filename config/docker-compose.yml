@@ -20,7 +20,7 @@ services:
       CONNECT_TIMEOUT: ${DATA_STORAGE_CONNECT_TIMEOUT}
     volumes:
       - './dbData/DataStorage/data/:/var/lib/postgres-db/data'
-      - './dbData/DataStorage/init/:/configs-entrypoint-initdb.d/'
+      - './dbData/DataStorage/init/:/config-entrypoint-initdb.d/'
     networks:
       - monkeyMoon
 

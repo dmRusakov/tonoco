@@ -1,0 +1,52 @@
+/* Header styles */
+
+.mmHeader {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.mmLogo {
+    font-size: 24px;
+}
+
+.mmMenu {
+    display: none; /* Hide the desktop menu by default */
+}
+
+.mmNav {
+    list-style: none;
+    padding: 0;
+    display: flex;
+}
+
+.mmNavItem {
+    margin-right: 20px;
+}
+
+.mmNavLink {
+    text-decoration: none;
+    color: white;
+}
+
+/* Mobile menu styles */
+.mmMobileMenuIcon {
+    display: none; /* Hide the mobile menu icon by default */
+}
+
+@media (max-width: 768px) {
+    .mmMenu {
+        display: block; /* Show the desktop menu for screens <= 768px wide */
+    }
+
+    .mmMobileMenuIcon {
+        display: block; /* Show the mobile menu icon for screens <= 768px wide */
+        cursor: pointer;
+    }
+
+    .mmNav {
+        flex-direction: column;
+    }
+}
