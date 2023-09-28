@@ -11,14 +11,14 @@ var _ Server = &server{}
 
 func NewWebServer(log *logrus.Logrus) (*server, error) {
 	return &server{
-		log:           log,
-		tmlFolderPath: "./assets/templates/",
+		log:     log,
+		tmlPath: "./assets/templates/",
 	}, nil
 }
 
 type server struct {
-	log           *logrus.Logrus
-	tmlFolderPath string
+	log     *logrus.Logrus
+	tmlPath string
 }
 
 type Server interface {
@@ -28,17 +28,17 @@ type Server interface {
 func (s server) Render(w http.ResponseWriter, pageTemplate string) {
 	// page template
 	var templateSlice []string
-	templateSlice = append(templateSlice, fmt.Sprintf("./assets/templates/%s", pageTemplate))
+	templateSlice = append(templateSlice, fmt.Sprintf("%s%s", s.tmlPath, pageTemplate))
 
 	// static templates
 	partials := []string{
-		"./assets/templates/base.layout.gohtml",
-		"./assets/templates/head.partial.gohtml",
-		"./assets/templates/header.partial.gohtml",
-		"./assets/templates/footer.partial.gohtml",
+		"base.layout.gohtml",
+		"head.partial.gohtml",
+		"header.partial.gohtml",
+		"footer.partial.gohtml",
 	}
 	for _, x := range partials {
-		templateSlice = append(templateSlice, x)
+		templateSlice = append(templateSlice, fmt.Sprintf("%s%s", s.tmlPath, x))
 	}
 
 	// parse templates
@@ -52,4 +52,6 @@ func (s server) Render(w http.ResponseWriter, pageTemplate string) {
 	if err := tmpl.Execute(w, nil); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	return
 }
