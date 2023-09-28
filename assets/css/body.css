@@ -1,10 +1,21 @@
-/* varietals */
-
-
-
 body {
     margin: 0;
     padding: 0;
+    color: var(--textColor);
     font-family: Arial, sans-serif;
 }
 
+a {
+    color: var(--textColor);
+    text-decoration: none;
+}
+
+a:hover, a:focus {
+    text-decoration: none;
+}
+
+svg {
+    fill: var(--iconColor);
+    fill-rule: evenodd;
+    clip-rule: evenodd;
+}

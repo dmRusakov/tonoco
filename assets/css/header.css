@@ -2,14 +2,14 @@
     display: flex;
     justify-content: space-between;
     padding: 5px 20px;
-    background-color: #333;
-    color: #fff;
+    background-color: var(--accentBG1);
+
 }
 
 .mmHeader {
     display: flex;
     justify-content: space-between;
-    background-color: #444;
+    background-color: var(--accentBG2);
 
     .logo svg {
         width: 200px;
@@ -19,17 +19,13 @@
     }
 
     .mmMobileMenu {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 50px;
-        width: 50px;
-        cursor: pointer;
+        display: none;
     }
 
     .menu {
         display: flex;
         flex-direction: column;
+        padding-right: 10px;
 
         & ul {
             display: flex;
@@ -40,9 +36,7 @@
 
         & a {
             display: block;
-            text-decoration: none;
-            color: #fff;
-            transition: background-color 0.3s;
+            transition: background-color .3s;
             padding: 10px;
 
             & svg {
@@ -51,62 +45,78 @@
                 display: block;
                 margin-right: auto !important;
                 margin-left: auto !important;
-                fill: var(--iconColor);
-                fill-rule: evenodd;
-                clip-rule: evenodd;
             }
         }
     }
 
-
     .menu a:hover, .menu a:focus, .menu a.active {
-        background-color: #555;
+        background-color: var(--accentBG3);
     }
 }
 
+@media (max-width: 1200px) {
+    .mmTopHeader {
+        font-size: 80%;
+    }
 
-
-
-@media only screen and (max-width: 768px) {
     .mmHeader {
-        flex-direction: column;
-    }
+        .logo svg {
+            width: 120px;
+            padding: 12px 10px 8px;
 
-    .menu {
-        display: none;
-    }
+        }
 
-    .mmMobileMenu {
-        display: block;
+        .menu {
+            padding-right: 0;
+
+            & a {
+                font-size: 80%;
+                padding: 5px;
+
+                & svg {
+                    width: 20px;
+                    padding-bottom: 5px;
+                    padding-top: 3px;
+                }
+            }
+        }
     }
 }
 
-/*.menu {*/
-/*    position: absolute;*/
-/*    top: 100%;*/
-/*    left: 0;*/
-/*    width: 100%;*/
-/*    background-color: #444;*/
-/*    border-top: 1px solid #555;*/
-/*    z-index: 1000; !* Ensures the dropdown appears over other elements *!*/
-/*    box-shadow: 0 5px 10px rgba(0,0,0,0.2);*/
-/*}*/
-
-/*.mmHeader {*/
-/*    position: relative; !* To position the menu absolutely with respect to this container *!*/
-/*}*/
-
 @media only screen and (max-width: 768px) {
-    .menu {
-        display: none;
-        position: static; /* Resets positioning for mobile */
+    .mmTopHeader {
+        font-size: 70%;
+        padding: 5px;
+
+        .statistic {
+            display: none;
+        }
     }
 
-    .menu a {
-        display: flex;
-    }
+    .mmHeader {
+        .mmMobileMenu {
+            display: block;
+            width: 45px;
+            padding: 2px 5px;
+            cursor: pointer;
+        }
 
-    .mmMobileMenu {
-        display: flex; /* Display the mobile menu icon */
+        .menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 75px;
+            background-color: var(--accentBG2);
+
+            & ul {
+                display: block;
+
+                & li {
+                    & a svg {
+                        display: none;
+                    }
+                }
+            }
+        }
     }
 }

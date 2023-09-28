@@ -1,59 +1,81 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    appData.header = {}
+    ad.hd = {} //hd == header
 
     /** Dom **/
-    appData.header.dom = {}
-    appData.header.dom.header = document.querySelector(".mmHeader")
-    appData.header.dom.topHeader = document.querySelector(".mmTopHeader")
-    appData.header.dom.menu = appData.header.dom.header.querySelector("nav.menu")
-    appData.header.dom.dashboardTab = appData.header.dom.menu.querySelector("a#mmDashboard")
-    appData.header.dom.orderTab = appData.header.dom.menu.querySelector("a#mmOrders")
-    appData.header.dom.productTab = appData.header.dom.menu.querySelector("a#mmProducts")
-    appData.header.dom.categoryTab = appData.header.dom.menu.querySelector("a#mmCategories")
-    appData.header.dom.pagesTab = appData.header.dom.menu.querySelector("a#mmPages")
-    appData.header.dom.integrationTab = appData.header.dom.menu.querySelector("a#mmIntegration")
-    appData.header.dom.cuponTab = appData.header.dom.menu.querySelector("a#mmCoupon")
-    appData.header.dom.mediaTab = appData.header.dom.menu.querySelector("a#mmMedia")
-    appData.header.dom.settingsTab = appData.header.dom.menu.querySelector("a#mmSettings")
+    ad.hd.dom = {}
+    ad.hd.dom.header = document.querySelector(".mmHeader")
+    ad.hd.dom.topHeader = document.querySelector(".mmTopHeader")
+    ad.hd.dom.mobileMenu = ad.hd.dom.header.querySelector(".mmMobileMenu")
+    ad.hd.dom.menu = ad.hd.dom.header.querySelector("nav.menu")
+    ad.hd.dom.dashboardTab = ad.hd.dom.menu.querySelector("a#mmDashboard")
+    ad.hd.dom.orderTab = ad.hd.dom.menu.querySelector("a#mmOrders")
+    ad.hd.dom.productTab = ad.hd.dom.menu.querySelector("a#mmProducts")
+    ad.hd.dom.categoryTab = ad.hd.dom.menu.querySelector("a#mmCategories")
+    ad.hd.dom.pagesTab = ad.hd.dom.menu.querySelector("a#mmPages")
+    ad.hd.dom.integrationTab = ad.hd.dom.menu.querySelector("a#mmIntegration")
+    ad.hd.dom.cuponTab = ad.hd.dom.menu.querySelector("a#mmCoupon")
+    ad.hd.dom.mediaTab = ad.hd.dom.menu.querySelector("a#mmMedia")
+    ad.hd.dom.settingsTab = ad.hd.dom.menu.querySelector("a#mmSettings")
 
     /** Functions **/
-    appData.header.func = {}
+    ad.hd.func = {}
 
     // make header element active
-    appData.header.func.activePage = async () => {
-        switch (appData.param.url.pathname) {
+    ad.hd.func.activePage = async () => {
+        switch (ad.param.url.pathname) {
             case '/':
-                appData.header.dom.dashboardTab.classList.add("active")
-                break;
+                ad.hd.dom.dashboardTab.classList.add("active")
+                break
             case '/orders':
-                appData.header.dom.orderTab.classList.add("active")
-                break;
+                ad.hd.dom.orderTab.classList.add("active")
+                break
             case '/products':
-                appData.header.dom.productTab.classList.add("active")
-                break;
+                ad.hd.dom.productTab.classList.add("active")
+                break
             case '/categories':
-                appData.header.dom.categoryTab.classList.add("active")
-                break;
+                ad.hd.dom.categoryTab.classList.add("active")
+                break
             case '/pages':
-                appData.header.dom.pagesTab.classList.add("active")
-                break;
+                ad.hd.dom.pagesTab.classList.add("active")
+                break
             case '/integration':
-                appData.header.dom.integrationTab.classList.add("active")
-                break;
+                ad.hd.dom.integrationTab.classList.add("active")
+                break
             case '/coupon':
-                appData.header.dom.cuponTab.classList.add("active")
-                break;
+                ad.hd.dom.cuponTab.classList.add("active")
+                break
             case '/media':
-                appData.header.dom.mediaTab.classList.add("active")
-                break;
+                ad.hd.dom.mediaTab.classList.add("active")
+                break
             case '/settings':
-                appData.header.dom.settingsTab.classList.add("active")
-                break;
+                ad.hd.dom.settingsTab.classList.add("active")
+                break
+        }
+    }
+
+    // toggle mobile menu
+    ad.hd.func.toggleMobileMenu = async (action = null) => {
+        switch (action) {
+            case "show":
+                ad.hd.dom.menu.style.display = "block"
+                ad.hd.dom.mobileMenu.classList.add("active")
+                break
+            case "hide":
+                ad.hd.dom.menu.style.display = "none"
+                ad.hd.dom.mobileMenu.classList.remove("active")
+                break
+            default:
+                if (ad.hd.dom.menu.style.display == "none") {
+                    ad.hd.func.toggleMobileMenu("show")
+                } else {
+                    ad.hd.func.toggleMobileMenu("hide")
+                }
         }
     }
 
     /** Actions **/
     // add active class to header element
-    appData.header.func.activePage()
+    ad.hd.func.activePage()
+    ad.hd.dom.mobileMenu.addEventListener("click", ad.hd.func.toggleMobileMenu, false)
 
 }, false);

@@ -1,5 +1,15 @@
 /* varietals */
 :root {
+    /* icons */
     --logoColor: #fff;
     --iconColor: #fff;
+
+    /* background */
+    --accentBG1: #333;
+    --accentBG2: #444;
+    --accentBG3: #555;
+
+    /* text */
+    --textColor: #fff;
+
 }

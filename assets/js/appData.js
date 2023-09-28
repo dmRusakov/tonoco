@@ -1,5 +1,5 @@
-const appData = {}
+const ad = {}
 
 // param
-appData.param = {}
-appData.param.url  = new URL(window.location.href)
+ad.param = {}
+ad.param.url  = new URL(window.location.href)
