@@ -32,13 +32,13 @@ func (s server) Render(w http.ResponseWriter, pageTemplate string) {
 
 	// static templates
 	partials := []string{
-		"base.layout.gohtml",
-		"head.partial.gohtml",
-		"header.partial.gohtml",
-		"footer.partial.gohtml",
+		"base.layout",
+		"head.partial",
+		"header.partial",
+		"footer.partial",
 	}
 	for _, x := range partials {
-		templateSlice = append(templateSlice, fmt.Sprintf("%s%s", s.tmlPath, x))
+		templateSlice = append(templateSlice, fmt.Sprintf("%s%s.gohtml", s.tmlPath, x))
 	}
 
 	// parse templates

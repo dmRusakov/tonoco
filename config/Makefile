@@ -3,7 +3,7 @@ SERVICE_PATH=`basename $(CURDIR)`
 admin:
 
 
-up:
+up: down
 	docker-compose --env-file ./dev.env up -d
 	@echo "Started"
 
