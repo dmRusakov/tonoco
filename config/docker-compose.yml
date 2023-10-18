@@ -19,8 +19,8 @@ services:
       TZ: ${DATA_STORAGE_TZ}
       CONNECT_TIMEOUT: ${DATA_STORAGE_CONNECT_TIMEOUT}
     volumes:
-      - './dbData/DataStorage/data/:/var/lib/postgres-db/data'
-      - './dbData/DataStorage/init/:/config-entrypoint-initdb.d/'
+      - './dbData/DataStorage/data/:/var/lib/postgres/data'
+      - './dbData/DataStorage/init/:/docker-entrypoint-initdb.d/'
     networks:
       - monkeyMoon
 

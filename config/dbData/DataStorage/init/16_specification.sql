@@ -55,14 +55,12 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380107','Mounting Type','mounting-type',1
        ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380137','Item Weight','item-weight',30, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
        ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380138','Diameter','diameter',31, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
        ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380139','Additional Lighting','additional-lighting',32, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380140','Filter Stage 1','filter-stage-1',33, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380141','Filter Stage 2','filter-stage-2',34, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380142','Filter – Color','filter-color',35, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380143','Filter – Material','filter-material',36, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380144','Filter – Exhaust Type','filter-exhaust-type',37, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380145','Filter – Design','filter-design',38, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380146','Length','max-usable-length',39, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380147','Filter – Accessories','filter-accessories',40, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13');
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380142','Filter – Color','filter-color',33, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380143','Filter – Material','filter-material',34, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380144','Filter – Exhaust Type','filter-exhaust-type',35, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380145','Filter – Design','filter-design',36, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380146','Length','max-usable-length',37, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380147','Filter – Accessories','filter-accessories',38, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13');
 
 
 -- get data 
