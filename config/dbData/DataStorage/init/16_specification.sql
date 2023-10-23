@@ -62,7 +62,6 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380107','Mounting Type','mounting-type',1
        ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380146','Length','max-usable-length',37, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
        ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380147','Filter – Accessories','filter-accessories',38, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13');
 
-
 -- get data 
 select * from public.specification;
 
@@ -74,3 +73,6 @@ select * from public.specification;
 --     attribute_id as sort_order,
 --     'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13' as type
 -- from wp_woocommerce_attribute_taxonomies;
+
+
+(select id from public.specification where slug = 'mounting-type');

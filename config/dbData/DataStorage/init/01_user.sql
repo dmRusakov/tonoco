@@ -24,10 +24,13 @@ CREATE UNIQUE INDEX email ON public.user (email);
 
 -- insert test data
 INSERT INTO "public"."user" (id, email, first_name, last_name, password, active)
-VALUES ('0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1', 'mike@yaronia.com', 'Mike', 'Ross',
+VALUES ('0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1', 'mike@yaronia.com', 'Tonoco', 'Ross',
         '$2a$12$1zGLuYDDNvATh4RA4avbKuheAMpb1svexSzrQm7up.bnpwQHs0jNe', true)
 ON CONFLICT (email) DO UPDATE
     SET first_name = EXCLUDED.first_name,
         last_name  = EXCLUDED.last_name,
         password   = EXCLUDED.password,
         active     = EXCLUDED.active;
+
+-- get data
+select * from public.user;

@@ -32,3 +32,5 @@ VALUES ('1f484cda-c00e-4ed8-a325-9c5e035f9920', 'island-range-hoods', 'Island Ra
        ('1f484cda-c00e-4ed8-a325-9c5e035f9924', 'discontinued-range-hoods', 'Discontinued', 'Some text', 'Some text',
         5);
 
+-- get data
+select * from public.category;

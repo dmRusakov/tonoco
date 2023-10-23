@@ -87,3 +87,6 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382500', 'IS48LUXOR', '48″ Luxor Island
         10, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 2650, 1795, 10, NULL, NULL, NULL, NULL, '703168132766',
         '36-linea-wall-range-hood', 684, 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12');
+
+-- get data
+select * from public.product;
