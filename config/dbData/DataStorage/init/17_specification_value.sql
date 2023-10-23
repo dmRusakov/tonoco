@@ -439,3 +439,23 @@ VALUES
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381653',(select id from public.specification where slug = 'width-group'),'25″-30″','up-to-30','1653'),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381600',(select id from public.specification where slug = 'width-group'),'32″-40″','up-to-36','1600'),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381585',(select id from public.specification where slug = 'width-group'),'42″-84″','up-to-48','1585');
+
+-- get data
+select * from public.specification_value;
+
+-- get data form WooCommerce DB
+-- SELECT
+--     CONCAT('a0eebc99-9c0b-4ef8-bb6d-6bb9bd38', tt.term_id) as id,
+--     CONCAT('(select id from public.specification where slug = ''', SUBSTRING(tt.taxonomy FROM 4), ''')') as specification_id,
+--     t.name as name,
+--     t.slug as slug,
+--     tt.term_id as "order"
+-- FROM wp_posts p
+--          JOIN wp_term_relationships tr ON p.ID = tr.object_id
+--          JOIN wp_term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id AND tt.taxonomy LIKE 'pa_%'
+--          JOIN wp_terms t ON tt.term_id = t.term_id
+-- WHERE p.post_type = 'product'
+-- GROUP BY
+--     tt.taxonomy, t.name
+-- ORDER BY
+--     tt.taxonomy;
