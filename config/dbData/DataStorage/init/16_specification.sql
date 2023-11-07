@@ -21,6 +21,13 @@ ALTER TABLE public.specification
     OWNER TO postgres;
 COMMENT ON TABLE public.specification IS 'Product Specification';
 
+-- auto update updated_at
+CREATE TRIGGER specification_updated_at
+    BEFORE UPDATE
+    ON public.user
+    FOR EACH ROW
+EXECUTE FUNCTION update_update_at_column();
+
 -- insert data
 INSERT INTO public.specification (id, name, slug, "order", type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380107','Mounting Type','mounting-type',1, 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),

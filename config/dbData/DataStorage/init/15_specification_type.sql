@@ -20,6 +20,13 @@ ALTER TABLE public.specification_type
     OWNER TO postgres;
 COMMENT ON TABLE public.specification_type IS 'Specification Types';
 
+-- auto update updated_at
+CREATE TRIGGER specification_type_updated_at
+    BEFORE UPDATE
+    ON public.user
+    FOR EACH ROW
+EXECUTE FUNCTION update_update_at_column();
+
 -- insert data
 INSERT INTO public.specification_type (id, name, slug, unit, "order")
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a11', 'Inch', 'inch', '″', 1),

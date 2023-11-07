@@ -16,9 +16,15 @@ CREATE TABLE IF NOT EXISTS public.specification_value
 );
 
 CREATE UNIQUE INDEX specification_value_id ON public.specification_value (id);
-ALTER TABLE public.specification_value
-    OWNER TO postgres;
+ALTER TABLE public.specification_value OWNER TO postgres;
 COMMENT ON TABLE public.specification_value IS 'Product Specification values';
+
+-- auto update updated_at
+CREATE TRIGGER specification_value_updated_at
+    BEFORE UPDATE
+    ON public.user
+    FOR EACH ROW
+EXECUTE FUNCTION update_update_at_column();
 
 -- insert data
 INSERT INTO public.specification_value (id, specification_id, name, slug, "order")

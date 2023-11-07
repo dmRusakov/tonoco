@@ -22,8 +22,14 @@ ALTER TABLE public.user
 CREATE UNIQUE INDEX user_id ON public.user (id);
 CREATE UNIQUE INDEX email ON public.user (email);
 
+-- auto update updated_at
+CREATE TRIGGER user_set_updated_at
+    BEFORE UPDATE ON public.user
+    FOR EACH ROW
+EXECUTE FUNCTION update_update_at_column();
+
 -- insert test data
-INSERT INTO "public"."user" (id, email, first_name, last_name, password, active)
+INSERT INTO public.user (id, email, first_name, last_name, password, active)
 VALUES ('0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1', 'mike@yaronia.com', 'Tonoco', 'Ross',
         '$2a$12$1zGLuYDDNvATh4RA4avbKuheAMpb1svexSzrQm7up.bnpwQHs0jNe', true)
 ON CONFLICT (email) DO UPDATE

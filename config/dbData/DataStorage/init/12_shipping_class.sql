@@ -21,6 +21,13 @@ ALTER TABLE public.shipping_class
 CREATE UNIQUE INDEX shipping_class_id ON public.shipping_class (id);
 COMMENT ON TABLE public.shipping_class IS 'Table of shipping classes.';
 
+-- auto update updated_at
+CREATE TRIGGER shipping_class_updated_at
+    BEFORE UPDATE
+    ON public.user
+    FOR EACH ROW
+EXECUTE FUNCTION update_update_at_column();
+
 -- demo data
 INSERT INTO public.shipping_class (id, name, slug,"order")
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Freight', 'freight', 1),

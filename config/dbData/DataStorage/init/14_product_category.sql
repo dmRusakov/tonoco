@@ -21,6 +21,14 @@ CREATE UNIQUE INDEX category_slug ON public.category (slug);
 ALTER TABLE public.category
     OWNER TO postgres;
 COMMENT ON TABLE public.category IS 'Product categories';
+
+-- auto update updated_at
+CREATE TRIGGER product_category_updated_at
+    BEFORE UPDATE
+    ON public.user
+    FOR EACH ROW
+EXECUTE FUNCTION update_update_at_column();
+
 -- insert data
 INSERT INTO public.category (id, slug, name, short_description, description, "order")
 VALUES ('1f484cda-c00e-4ed8-a325-9c5e035f9920', 'island-range-hoods', 'Island Range Hoods', 'Some text', 'Some text ',
