@@ -4,13 +4,13 @@ CREATE TABLE IF NOT EXISTS public.specification_value
     specification_id UUID         NOT NULL REFERENCES public.specification (id),
     name             VARCHAR(255) NOT NULL,
     slug             VARCHAR(255) NOT NULL,
-    active           BOOLEAN     DEFAULT TRUE,
-    "order"          INTEGER     DEFAULT 9999,
+    active           BOOLEAN      DEFAULT TRUE,
+    "order"          INTEGER      DEFAULT null,
 
-    created_at       TIMESTAMP   DEFAULT NOW(),
-    created_by       UUID        DEFAULT NULL REFERENCES public.user (id),
-    updated_at       TIMESTAMP   DEFAULT NOW(),
-    updated_by       UUID        DEFAULT NULL REFERENCES public.user (id),
+    created_at       TIMESTAMP    DEFAULT NOW(),
+    created_by       UUID         DEFAULT NULL REFERENCES public.user (id),
+    updated_at       TIMESTAMP    DEFAULT NOW(),
+    updated_by       UUID         DEFAULT NULL REFERENCES public.user (id),
 
     CONSTRAINT specification_value_pkey PRIMARY KEY (id)
 );
@@ -25,6 +25,20 @@ CREATE TRIGGER specification_value_updated_at
     ON public.user
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();
+
+-- auto set "order" column
+CREATE OR REPLACE FUNCTION set_order_column_to_specification_value()
+    RETURNS TRIGGER AS $$
+BEGIN
+    NEW.order = (SELECT COALESCE(MAX("order"), 0) + 1 FROM specification_value);
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER specification_value_order
+    BEFORE INSERT
+    ON public.specification_type
+    FOR EACH ROW EXECUTE FUNCTION set_order_column_to_specification_value();
 
 -- insert data
 INSERT INTO public.specification_value (id, specification_id, name, slug, "order")

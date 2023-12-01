@@ -27,12 +27,26 @@ CREATE TRIGGER specification_type_updated_at
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();
 
+-- auto set "order" column
+CREATE OR REPLACE FUNCTION set_order_column_to_specification_type()
+    RETURNS TRIGGER AS $$
+BEGIN
+    NEW.order = (SELECT COALESCE(MAX("order"), 0) + 1 FROM specification_type);
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER specification_type_order
+    BEFORE INSERT
+    ON public.specification_type
+    FOR EACH ROW EXECUTE FUNCTION set_order_column_to_specification_type();
+
 -- insert data
-INSERT INTO public.specification_type (id, name, slug, unit, "order")
-VALUES ('a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a11', 'Inch', 'inch', '″', 1),
-       ('a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a12', 'Pound', 'pound', 'lb', 2),
-       ('a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13', 'Select', 'select', null, 3),
-       ('a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a14', 'Text', 'text',  null, 4);
+INSERT INTO public.specification_type (id, name, slug, unit)
+VALUES ('a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a11', 'Inch', 'inch', '″'),
+       ('a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a12', 'Pound', 'pound', 'lb'),
+       ('a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13', 'Select', 'select', null),
+       ('a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a14', 'Text', 'text',  null);
 
 -- get data
 select * from public.specification_type;

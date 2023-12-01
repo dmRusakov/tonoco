@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS public.folder
     name       varchar(255) not null,
     slug       varchar(255) not null,
     parent_id  uuid        default null REFERENCES public.folder (id),
+    active           BOOLEAN      DEFAULT TRUE,
+    "order"          INTEGER      DEFAULT null,
 
     created_at TIMESTAMP   DEFAULT NOW(),
     created_by UUID        DEFAULT NULL REFERENCES public.user (id),
@@ -19,6 +21,20 @@ CREATE UNIQUE INDEX folder_id ON public.folder (id);
 ALTER TABLE public.folder
     OWNER TO postgres;
 COMMENT ON TABLE public.folder IS 'File Folders table';
+
+-- auto set "order" column
+CREATE OR REPLACE FUNCTION set_order_column_to_folder()
+    RETURNS TRIGGER AS $$
+BEGIN
+    NEW.order = (SELECT COALESCE(MAX("order"), 0) + 1 FROM folder);
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER folder_order
+    BEFORE INSERT
+    ON public.folder
+    FOR EACH ROW EXECUTE FUNCTION set_order_column_to_folder();
 
 -- auto update updated_at
 CREATE TRIGGER update_folder_updated_at

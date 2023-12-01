@@ -54,6 +54,19 @@ CREATE TRIGGER product_updated_at
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();
 
+-- auto set "order" column
+CREATE OR REPLACE FUNCTION set_order_column_to_product()
+    RETURNS TRIGGER AS $$
+BEGIN
+    NEW.order = (SELECT COALESCE(MAX("order"), 0) + 1 FROM product);
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER product_order
+    BEFORE INSERT
+    ON public.product
+    FOR EACH ROW EXECUTE FUNCTION set_order_column_to_product();
 
 -- demo data
 INSERT INTO public.product(id, sku, name, short_description, description, "order", status_id, slug, regular_price, sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width, shipping_height, seo_title, seo_description, gtin, google_product_category, google_product_type) VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382500', 'IS48LUXOR', '48″ Luxor Island Range Hood', 'Radiant, lustrous, and on the cutting edge of modernity, the Luxor Island Range Hood will make a striking statement in any kitchen.', '-Radiant, lustrous, and on the cutting edge of modernity, the Futuro Futuro 48 inch Luxor Island Range Hood will make a striking statement in any kitchen. With its sleek, gleaming exterior and bright white perimeter light, this luxury range hood is reminiscent of an extraterrestrial spacecraft- and it has the advanced technology to boot. This unique range hood is composed of an illuminated glass perimeter that is lit entirely from within, and specialized stainless steel that prevents smudging or streaks and leaves only a glossy, finger-print free finish. This unique range hood possesses cutting-edge industrial technology that optimizes air filtration performance. This suspended range hood will keep your kitchen cool and contaminant free with its exclusive perimeter suction system, which redirects the airflow from the center of the unit to the mesh filters along the edges of the exhaust hood, providing a cleaner look, increasing suction, and cutting ambient noise. This professional style range hood further improves upon its superb performance by entrapping airborne grease and other culinary contaminants with its designer grease filters, which are concealed behind its illuminated glass panels to provide a clean, streamlined design. This unique range hood possesses four different airflow speeds, energy efficient fluorescent lights, and an extendable chimney that can be easily lengthened between 25 and 48 inches for perfect placement over any kitchen island range. This unique range hood makes regular maintenance easy with its automated reminders that indicate when it’s time to clean the grease filters in the dishwasher to maintain optimal performance. This Italian range hood also possesses a delayed shut-off function, which keeps the ventilation hood on even after you have finished cooking until the removal of odors, grease, and impurities from the air has been completed. Customers may purchase this kitchen range hood with the choice of a ducted or ductless exhaust vent, and all Futuro Futuro ventilation hoods come with a one year US standard and two year parts warranty. Show-stoppingly gorgeous and expertly crafted, the Italian made 36 inch Luxor island mount range hood is perfect for kitchen owners seeking a powerful kitchen accessory with exclusive style. sku: IS48LUXOR', 1040, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '48-luxor-island-range-hood', '4000', '2695', '5', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '140', '51', '40', '26', 'Range Hood 48-inch Luxor Island by Futuro Futuro', 'Futuro Futuro Luxor 48 Inch Island-mount Range Hood, Unique Illuminated Glass Body, Ultra-Quiet, with Blower', '022099539230', '684', 'Kitchen Range Hood > Island Mount > Glass > 48-inch');

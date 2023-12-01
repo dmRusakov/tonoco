@@ -29,13 +29,27 @@ CREATE TRIGGER product_status_updated_at
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();
 
+-- auto set "order" column
+CREATE OR REPLACE FUNCTION set_order_column_to_product_status()
+    RETURNS TRIGGER AS $$
+BEGIN
+    NEW.order = (SELECT COALESCE(MAX("order"), 0) + 1 FROM product_status);
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER product_status_order
+    BEFORE INSERT
+    ON public.product_status
+    FOR EACH ROW EXECUTE FUNCTION set_order_column_to_product_status();
+
 -- demo data
-INSERT INTO public.product_status (id, name, slug, "order")
-VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Public', 'public', 1),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', 'Privet', 'private', 2),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', 'Out of stock', 'out-of-stock', 3),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14', 'Discontinued', 'discontinued', 4),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15', 'Archived', 'archived', 5);
+INSERT INTO public.product_status (id, name, slug)
+VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Public', 'public'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', 'Privet', 'private'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', 'Out of stock', 'out-of-stock'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14', 'Discontinued', 'discontinued'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15', 'Archived', 'archived');
 
 -- get data
 select *

@@ -28,11 +28,25 @@ CREATE TRIGGER shipping_class_updated_at
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();
 
+-- auto set "order" column
+CREATE OR REPLACE FUNCTION set_order_column_to_shipping_class()
+    RETURNS TRIGGER AS $$
+BEGIN
+    NEW.order = (SELECT COALESCE(MAX("order"), 0) + 1 FROM shipping_class);
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER shipping_class_order
+    BEFORE INSERT
+    ON public.shipping_class
+    FOR EACH ROW EXECUTE FUNCTION set_order_column_to_shipping_class();
+
 -- demo data
-INSERT INTO public.shipping_class (id, name, slug,"order")
-VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Freight', 'freight', 1),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', 'Ground', 'ground', 2),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', 'Ground - small', 'ground-small', 3);
+INSERT INTO public.shipping_class (id, name, slug)
+VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Freight', 'freight'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', 'Ground', 'ground'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', 'Ground - small', 'ground-small');
 
 -- get data
 select * from public.shipping_class;

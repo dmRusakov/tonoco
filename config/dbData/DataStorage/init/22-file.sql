@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS public.file
     id         uuid unique DEFAULT uuid_generate_v4(),
     name       varchar(255) not null,
     slug       varchar(255) not null,
+    active           BOOLEAN      DEFAULT TRUE,
+    "order"          INTEGER      DEFAULT null,
 
     created_at TIMESTAMP   DEFAULT NOW(),
     created_by UUID        DEFAULT NULL REFERENCES public.user (id),
@@ -24,3 +26,17 @@ CREATE TRIGGER update_file_updated_at
     ON public.file
     FOR EACH ROW
 EXECUTE PROCEDURE update_update_at_column();
+
+-- auto set "order" column
+CREATE OR REPLACE FUNCTION set_order_column_to_file()
+    RETURNS TRIGGER AS $$
+BEGIN
+    NEW.order = (SELECT COALESCE(MAX("order"), 0) + 1 FROM file);
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER file_order
+    BEFORE INSERT
+    ON public.file
+    FOR EACH ROW EXECUTE FUNCTION set_order_column_to_file();
