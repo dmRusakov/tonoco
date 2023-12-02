@@ -16,10 +16,9 @@ CREATE TABLE IF NOT EXISTS public.folder
     CONSTRAINT folder_pkey PRIMARY KEY (id)
 );
 
--- -- index, constraint and ownership
-CREATE UNIQUE INDEX folder_id ON public.folder (id);
-ALTER TABLE public.folder
-    OWNER TO postgres;
+-- index, constraint and ownership
+CREATE INDEX folder_id ON public.folder (id);
+ALTER TABLE public.folder OWNER TO postgres;
 COMMENT ON TABLE public.folder IS 'File Folders table';
 
 -- auto set "order" column

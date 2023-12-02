@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS public.product_category
     CONSTRAINT product_category_pkey PRIMARY KEY (id)
 );
 
-CREATE UNIQUE INDEX category_id ON public.product_category (id);
-CREATE UNIQUE INDEX category_slug ON public.product_category (slug);
+CREATE INDEX category_id ON public.product_category (id);
+CREATE INDEX category_slug ON public.product_category (slug);
 ALTER TABLE public.product_category
     OWNER TO postgres;
 COMMENT ON TABLE public.product_category IS 'Product categories';

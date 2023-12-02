@@ -16,9 +16,8 @@ CREATE TABLE IF NOT EXISTS public.shipping_class
 );
 
 -- ownership, index and comment
-ALTER TABLE public.shipping_class
-    OWNER TO postgres;
-CREATE UNIQUE INDEX shipping_class_id ON public.shipping_class (id);
+ALTER TABLE public.shipping_class OWNER TO postgres;
+CREATE INDEX shipping_class_id ON public.shipping_class (id);
 COMMENT ON TABLE public.shipping_class IS 'Table of shipping classes.';
 
 -- auto update updated_at

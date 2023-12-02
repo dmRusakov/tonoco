@@ -40,11 +40,10 @@ CREATE TABLE IF NOT EXISTS public.product
 );
 
 -- ownership, index and comment
-ALTER TABLE public.product
-    OWNER TO postgres;
-CREATE UNIQUE INDEX product_id ON public.product (id);
-CREATE UNIQUE INDEX product_sku ON public.product (sku);
-CREATE UNIQUE INDEX product_slug ON public.product (slug);
+ALTER TABLE public.product OWNER TO postgres;
+CREATE INDEX product_id ON public.product (id);
+CREATE INDEX product_sku ON public.product (sku);
+CREATE INDEX product_slug ON public.product (slug);
 COMMENT ON TABLE public.product IS 'Product information';
 
 -- auto update updated_at

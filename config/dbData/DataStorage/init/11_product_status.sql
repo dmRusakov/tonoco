@@ -16,10 +16,9 @@ CREATE TABLE IF NOT EXISTS public.product_status
 );
 
 -- ownership, index and comment
-ALTER TABLE public.product_status
-    OWNER TO postgres;
-CREATE UNIQUE INDEX product_status_id ON public.product_status (id);
-CREATE UNIQUE INDEX product_status_slug ON public.product_status (slug);
+ALTER TABLE public.product_status OWNER TO postgres;
+CREATE INDEX product_status_id ON public.product_status (id);
+CREATE INDEX product_status_slug ON public.product_status (slug);
 COMMENT ON TABLE public.product_status IS 'Product Statuses';
 
 -- auto update updated_at

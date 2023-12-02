@@ -15,10 +15,9 @@ CREATE TABLE IF NOT EXISTS public.specification
     CONSTRAINT specification_pkey PRIMARY KEY (id)
 );
 
-CREATE UNIQUE INDEX specification_id ON public.specification (id);
-CREATE UNIQUE INDEX specification_slug ON public.specification (slug);
-ALTER TABLE public.specification
-    OWNER TO postgres;
+CREATE INDEX specification_id ON public.specification (id);
+CREATE INDEX specification_slug ON public.specification (slug);
+ALTER TABLE public.specification OWNER TO postgres;
 COMMENT ON TABLE public.specification IS 'Product Specification';
 
 -- auto update updated_at

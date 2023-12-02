@@ -15,9 +15,8 @@ CREATE TABLE IF NOT EXISTS public.specification_type
     CONSTRAINT specification_type_pkey PRIMARY KEY (id)
 );
 
-CREATE UNIQUE INDEX specification_type_id ON public.specification_type (id);
-ALTER TABLE public.specification_type
-    OWNER TO postgres;
+CREATE INDEX specification_type_id ON public.specification_type (id);
+ALTER TABLE public.specification_type OWNER TO postgres;
 COMMENT ON TABLE public.specification_type IS 'Specification Types';
 
 -- auto update updated_at

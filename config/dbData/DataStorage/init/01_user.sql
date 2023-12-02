@@ -17,10 +17,9 @@ CREATE TABLE IF NOT EXISTS public.user
 );
 
 -- index, constraint and ownership
-ALTER TABLE public.user
-    OWNER TO postgres;
-CREATE UNIQUE INDEX user_id ON public.user (id);
-CREATE UNIQUE INDEX email ON public.user (email);
+ALTER TABLE public.user OWNER TO postgres;
+CREATE INDEX user_user_id ON public.user (id);
+CREATE INDEX user_email ON public.user (email);
 
 -- auto update updated_at
 CREATE TRIGGER user_set_updated_at

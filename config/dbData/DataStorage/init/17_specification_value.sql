@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS public.specification_value
     CONSTRAINT specification_value_pkey PRIMARY KEY (id)
 );
 
-CREATE UNIQUE INDEX specification_value_id ON public.specification_value (id);
+CREATE INDEX specification_value_id ON public.specification_value (id);
 ALTER TABLE public.specification_value OWNER TO postgres;
 COMMENT ON TABLE public.specification_value IS 'Product Specification values';
 

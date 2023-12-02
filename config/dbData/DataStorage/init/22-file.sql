@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS public.file
 );
 
 -- -- index, constraint and ownership
-CREATE UNIQUE INDEX file_id ON public.file (id);
+CREATE INDEX file_id ON public.file (id);
 ALTER TABLE public.file OWNER TO postgres;
 COMMENT ON TABLE public.file IS 'File table';
 
