@@ -2,7 +2,7 @@ package web
 
 import (
 	"fmt"
-	"github.com/dmRusakov/monkeysmoon-admin/pkg/logrus"
+	"github.com/dmRusakov/tonoco/pkg/logrus"
 	"html/template"
 	"net/http"
 )

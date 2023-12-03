@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/dmRusakov/monkeysmoon-admin/controllers/web"
-	"github.com/dmRusakov/monkeysmoon-admin/internal/config"
-	"github.com/dmRusakov/monkeysmoon-admin/pkg/logrus"
+	"github.com/dmRusakov/tonoco/internal/config"
+	"github.com/dmRusakov/tonoco/internal/controllers/web"
+	"github.com/dmRusakov/tonoco/pkg/logrus"
 )
 
 type AppData struct {
