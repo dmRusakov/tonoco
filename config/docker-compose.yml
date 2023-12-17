@@ -41,6 +41,25 @@ services:
     networks:
       - tonoco
 
+  MqBroker:
+    container_name: 'MqBroker'
+    image: 'rabbitmq:3.9.15-alpine'
+    ports:
+      - "5672:5672"
+    deploy:
+      mode: replicated
+      replicas: 1
+    volumes:
+      - ./dbData/MqBroker/data/:/var/lib/rabbitmq/
+    environment:
+      MQ_URL: ${MQ_BROKER_URL}
+      MQ_HOST: ${MQ_BROKER_HOST}
+      MQ_PORT: ${MQ_BROKER_PORT}
+      MQ_USERNAME: ${MQ_BROKER_USERNAME}
+      MQ_PASSWORD: ${MQ_BROKER_PASSWORD}
+    networks:
+      - tonoco
+
 networks:
   tonoco:
     name: 'tonoco'

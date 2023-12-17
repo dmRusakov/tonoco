@@ -21,8 +21,11 @@ delete:
 	docker-compose --env-file ./dev.env down --volumes
 	cd ../${SERVICE_PATH}/dbData/DataStorage/ \
 	&& sudo chown -R 1000:1000 data/ \
-	&& rm -rf data/
+	&& sudo rm -rf data/*
 	cd ../${SERVICE_PATH}/dbData/CacheStorage/ \
 	&& sudo chown -R 1000:1000 data/ \
-	&& rm -rf data/
+	&& sudo rm -rf data/
+	cd ../${SERVICE_PATH}/dbData/MqBroker/ \
+	&& sudo chown -R 1000:1000 data/ \
+	&& sudo rm -rf data/
 	@echo "Deleted"

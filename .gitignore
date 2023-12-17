@@ -17,8 +17,9 @@ mono_crash.*.json
 .idea
 
 # data
-config/dbData/authStorage/data
 config/dbData/DataStorage/data
+config/dbData/CacheStorage/data
+config/dbData/MqBroker/data
 
 # log
 log
