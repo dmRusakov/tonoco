@@ -1,6 +1,9 @@
 package main
 
 import (
+	"context"
+	"github.com/dmRusakov/tonoco/pkg/redisdb"
+
 	"github.com/dmRusakov/tonoco/internal/config"
 	"github.com/dmRusakov/tonoco/internal/controllers/web"
 	"github.com/dmRusakov/tonoco/pkg/logrus"
@@ -9,7 +12,7 @@ import (
 var App = AppData{}
 
 func init() {
-	//var err error
+	var err error
 
 	// get config (read ENV variables)
 	App.Cfg = config.GetConfig()
@@ -20,10 +23,14 @@ func init() {
 	App.Logger = &logger
 	App.Logger.Info("logger initialized")
 
+	// cache storage
+	App.CacheStorage, err = redisdb.Connect(context.Background(), App.Cfg.CacheStorage.ToRedisConfig())
+	if err != nil {
+		App.Logger.Fatal(err)
+	}
+	App.Logger.Info("CacheStorage initialized")
+
 	// web router
 	App.Router.Web, _ = web.NewWebServer(App.Logger)
-
-	// connect to DataStorage (postgres)
-	//app.DataStorage, err = postgresdb.Connect(context.Background(), app.Cfg)
 
 }

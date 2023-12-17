@@ -22,9 +22,26 @@ services:
       - './dbData/DataStorage/data/:/var/lib/postgres/data'
       - './dbData/DataStorage/init/:/docker-entrypoint-initdb.d/'
     networks:
-      - monkeyMoon
+      - tonoco
+
+  CacheStorage:
+    container_name: 'CacheStorage'
+    image: 'redis:latest'
+    ports:
+      - "6379:6379"
+    command: [ "sh", "-c", "redis-server --requirepass ${CACHE_STORAGE_PASSWORD} --appendonly yes" ]
+    deploy:
+      mode: replicated
+      replicas: 1
+    volumes:
+      - './dbData/CacheStorage/data:/data'
+    environment:
+      REDIS_PASSWORD: ${CACHE_STORAGE_PASSWORD}
+      REDIS_MAXMEMORY: ${CACHE_STORAGE_MAXMEMORY}
+    networks:
+      - tonoco
 
 networks:
-  monkeyMoon:
-    name: 'monkeyMoon'
+  tonoco:
+    name: 'tonoco'
     driver: bridge
