@@ -1,1 +1,5 @@
 go get github.com/go-redis/redis/v8
+
+go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
+npm install -g protoc-gen-javascript

@@ -22,3 +22,10 @@ delete:
 	sudo ./deleteDbData.sh
 	sleep 1 # wait 1 sec for db to be deleted
 	@echo "Deleted"
+
+generate_grpc:
+	@$(GOPATH)/bin/buf generate
+	@for dir in $(CURDIR)/$$dir/gen/go/*/; do \
+	  cd $$dir && \
+	  go mod init && go mod tidy; \
+	done
