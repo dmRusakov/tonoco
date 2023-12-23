@@ -1,5 +1,24 @@
 package config
 
+import (
+	"github.com/dmRusakov/tonoco/internal/controllers/web"
+	"github.com/dmRusakov/tonoco/pkg/logrus"
+	"github.com/go-redis/redis/v8"
+)
+
+type AppData struct {
+	Cfg    *Config
+	Logger *logrus.Logrus
+	Router *Router
+
+	// cache
+	CacheStorage *redis.Client
+}
+
+type Router struct {
+	Web web.Server
+}
+
 type Config struct {
 	Name         string `env:"ADMIN_NAME" env-default:"MonkeysMoonAdmin"`
 	IsProd       bool   `env:"ADMIN_IS_PROD" env-default:"true"`

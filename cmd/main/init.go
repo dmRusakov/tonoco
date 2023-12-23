@@ -5,11 +5,10 @@ import (
 	"github.com/dmRusakov/tonoco/pkg/redisdb"
 
 	"github.com/dmRusakov/tonoco/internal/config"
-	"github.com/dmRusakov/tonoco/internal/controllers/web"
 	"github.com/dmRusakov/tonoco/pkg/logrus"
 )
 
-var App = AppData{}
+var App = config.AppData{}
 
 func init() {
 	var err error
@@ -30,7 +29,9 @@ func init() {
 	}
 	App.Logger.Info("CacheStorage initialized")
 
+	// app cache service
+
 	// web router
-	App.Router.Web, _ = web.NewWebServer(App.Logger)
+	// App.Router.Web, _ = web.NewWebServer(App.Logger)
 
 }
