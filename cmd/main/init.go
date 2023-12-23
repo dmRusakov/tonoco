@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/dmRusakov/tonoco/internal/controllers/web"
 	"github.com/dmRusakov/tonoco/pkg/redisdb"
 
 	"github.com/dmRusakov/tonoco/internal/config"
@@ -32,6 +33,6 @@ func init() {
 	// app cache service
 
 	// web router
-	// App.Router.Web, _ = web.NewWebServer(App.Logger)
+	App.Router.Web, _ = web.NewWebServer(App.Logger)
 
 }

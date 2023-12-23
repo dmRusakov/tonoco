@@ -9,7 +9,7 @@ import (
 type AppData struct {
 	Cfg    *Config
 	Logger *logrus.Logrus
-	Router *Router
+	Router Router
 
 	// cache
 	CacheStorage *redis.Client
