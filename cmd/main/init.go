@@ -14,10 +14,10 @@ var App = AppData{}
 func init() {
 	var err error
 
-	// get config (read ENV variables)
+	// config (read ENV variables)
 	App.Cfg = config.GetConfig()
 
-	// make logger (logrus)
+	// logger (logrus)
 	logrus.Init()
 	logger := logrus.GetLogrus()
 	App.Logger = &logger
