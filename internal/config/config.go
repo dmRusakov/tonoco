@@ -16,7 +16,7 @@ func GetConfig() *Config {
 		instance = &Config{}
 
 		if err := cleanenv.ReadEnv(instance); err != nil {
-			helpText := "MonkeysMoonAdmin"
+			helpText := "TonocoAdmin"
 			help, _ := cleanenv.GetDescription(instance, &helpText)
 			log.Print(help)
 			log.Fatal(err)
