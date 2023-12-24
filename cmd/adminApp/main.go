@@ -15,7 +15,7 @@ func main() {
 
 	// dynamic files
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		App.Router.Web.Render(w, "test.page.gohtml")
+		app.webServer.Render(w, "test.page.gohtml")
 	})
 
 	fmt.Printf("Starting front end service on port 8080\n")

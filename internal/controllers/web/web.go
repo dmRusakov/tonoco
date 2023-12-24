@@ -2,22 +2,19 @@ package web
 
 import (
 	"fmt"
-	"github.com/dmRusakov/tonoco/pkg/logrus"
 	"html/template"
 	"net/http"
 )
 
 var _ Server = &server{}
 
-func NewWebServer(log *logrus.Logrus) (*server, error) {
+func NewWebServer() (*server, error) {
 	return &server{
-		log:     log,
 		tmlPath: "./assets/templates/",
 	}, nil
 }
 
 type server struct {
-	log     *logrus.Logrus
 	tmlPath string
 }
 
