@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 var _ Server = &server{}
 
 func NewWebServer() (*server, error) {
+
 	return &server{
 		tmlPath: "./assets/templates/",
 	}, nil
@@ -20,6 +22,7 @@ type server struct {
 
 type Server interface {
 	Render(w http.ResponseWriter, t string)
+	Start(ctx context.Context) error
 }
 
 func (s server) Render(w http.ResponseWriter, pageTemplate string) {
@@ -51,4 +54,22 @@ func (s server) Render(w http.ResponseWriter, pageTemplate string) {
 	}
 
 	return
+}
+
+func (s server) Start(ctx context.Context) error {
+	// static files
+	fs := http.FileServer(http.Dir("assets"))
+	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
+
+	// dynamic files
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "test.page.gohtml")
+	})
+
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

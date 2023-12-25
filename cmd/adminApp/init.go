@@ -17,7 +17,7 @@ func init() {
 
 	// config
 	logging.L(ctx).Info("config initializing")
-	app.cfg = config.GetConfig()
+	app.cfg = config.GetConfig(ctx)
 
 	// save logger to context
 	ctx = logging.ContextWithLogger(ctx, logging.NewLogger())
@@ -46,5 +46,4 @@ func init() {
 
 	// web router
 	app.webServer, err = web.NewWebServer()
-
 }

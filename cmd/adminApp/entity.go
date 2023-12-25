@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/dmRusakov/tonoco/internal/config"
 	"github.com/dmRusakov/tonoco/internal/controllers/web"
 	"github.com/dmRusakov/tonoco/pkg/appCacheService"
@@ -11,6 +12,7 @@ import (
 
 var app App = App{}
 var err error
+var ctx context.Context
 
 type App struct {
 	cfg       *config.Config

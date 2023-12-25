@@ -1,26 +1,11 @@
 package main
 
-import (
-	"fmt"
-	"log"
-	"net/http"
-)
+import "github.com/dmRusakov/tonoco/pkg/common/logging"
 
 func main() {
-	// start web router
-
-	// static files
-	fs := http.FileServer(http.Dir("assets"))
-	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
-
-	// dynamic files
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		app.webServer.Render(w, "test.page.gohtml")
-	})
-
-	fmt.Printf("Starting front end service on port 8080\n")
-	err := http.ListenAndServe(":8080", nil)
+	// start web server
+	err = app.webServer.Start(ctx)
 	if err != nil {
-		log.Panic(err)
+		logging.WithError(ctx, err).Fatal("webServer.Start")
 	}
 }

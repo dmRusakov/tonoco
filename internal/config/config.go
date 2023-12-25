@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"github.com/ilyakaznacheev/cleanenv"
 	"log"
 	"sync"
@@ -9,10 +10,9 @@ import (
 var instance *Config
 var once sync.Once
 
-func GetConfig() *Config {
+// GetConfig read config and returns a pointer to the Config struct
+func GetConfig(ctx context.Context) *Config {
 	once.Do(func() {
-		log.Print("Read config")
-
 		instance = &Config{}
 
 		if err := cleanenv.ReadEnv(instance); err != nil {
@@ -22,5 +22,6 @@ func GetConfig() *Config {
 			log.Fatal(err)
 		}
 	})
+
 	return instance
 }

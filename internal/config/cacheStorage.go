@@ -9,6 +9,7 @@ type CacheStorage struct {
 	MaxMemory string `env:"CACHE_STORAGE_MAXMEMORY" env-required:"true"`
 }
 
+// ToRedisConfig - convert CacheStorage to redisdb.Config
 func (cacheStorage *CacheStorage) ToRedisConfig() *redisdb.Config {
 	return &redisdb.Config{
 		Host:      cacheStorage.Host,
