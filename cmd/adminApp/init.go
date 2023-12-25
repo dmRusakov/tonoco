@@ -22,9 +22,9 @@ func init() {
 	// save logger to context
 	ctx = logging.ContextWithLogger(ctx, logging.NewLogger())
 
-	// cache storage
+	// cache storage (Redis)
 	logging.L(ctx).Info("cache storage initializing")
-	app.cacheStorage, err = redisdb.Connect(context.Background(), app.cfg.CacheStorage.ToRedisConfig())
+	cacheStorage, err := redisdb.Connect(context.Background(), app.cfg.CacheStorage.ToRedisConfig())
 	if err != nil {
 		logging.WithError(ctx, err).Fatal("redisdb.Connect")
 	}
@@ -32,17 +32,21 @@ func init() {
 	// appCacheService
 	logging.L(ctx).Info("appCacheService initializing")
 
-	app.appCacheService, err = appCacheService.NewCacheService("app")
+	app.appCacheService, err = appCacheService.NewCacheService(cacheStorage, "app")
 	if err != nil {
 		logging.WithError(ctx, err).Fatal("appCacheService.NewCacheService")
 	}
 
-	// UserCacheService
+	// userCacheService
 	logging.L(ctx).Info("UserCacheService initializing")
-	app.userCacheService, err = userCacheService.NewCacheService("user")
+	app.userCacheService, err = userCacheService.NewCacheService(cacheStorage, "user")
 	if err != nil {
 		logging.WithError(ctx, err).Fatal("userCacheService.NewCacheService")
 	}
+
+	// data storage (PostgreSQL)
+	//logging.L(ctx).Info("data storage initializing")
+	//app.dataStorage, err = postgresql.Connect(context.Background(), app.cfg.DataStorage.ToPostgreSQLConfig())
 
 	// web router
 	app.webServer, err = web.NewWebServer()

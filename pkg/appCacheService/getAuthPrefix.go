@@ -1,6 +1,6 @@
 package appCacheService
 
-func (c appCacheService) GetAuthPrefix() string {
+func (c AppCacheService) GetAuthPrefix() string {
 	//TODO implement me
 	panic("implement me")
 }

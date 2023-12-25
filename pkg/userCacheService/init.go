@@ -1,17 +1,19 @@
 package userCacheService
 
-var _ UserCacheService = &userCacheService{}
+import "github.com/go-redis/redis/v8"
 
-type userCacheService struct {
-	authPrefix *string
+type UserCacheService struct {
+	client     *redis.Client
+	authPrefix string
 }
 
-type UserCacheService interface {
+type userCacheService interface {
 	GetAuthPrefix() string
 }
 
-func NewCacheService(authPrefix string) (*userCacheService, error) {
-	return &userCacheService{
-		&authPrefix,
+func NewCacheService(client *redis.Client, authPrefix string) (*UserCacheService, error) {
+	return &UserCacheService{
+		client:     client,
+		authPrefix: authPrefix,
 	}, nil
 }

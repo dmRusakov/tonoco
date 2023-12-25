@@ -1,4 +1,4 @@
-package psql
+package postgresql
 
 import (
 	"github.com/dmRusakov/tonoco/pkg/common/errors"

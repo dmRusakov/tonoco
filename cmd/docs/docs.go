@@ -13,7 +13,7 @@ const docTemplate = `{
         "contact": {},
         "version": "{{.Version}}"
     },
-    "host": "{{.Host}}",
+    "host": "{{.host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
         "/api/heartbeat": {

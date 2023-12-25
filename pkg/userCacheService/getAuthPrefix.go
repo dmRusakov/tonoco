@@ -1,6 +1,6 @@
 package userCacheService
 
-func (s userCacheService) GetAuthPrefix() string {
+func (s UserCacheService) GetAuthPrefix() string {
 	//TODO implement me
 	panic("implement me")
 }

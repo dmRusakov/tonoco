@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"github.com/dmRusakov/tonoco/internal/config"
 	"github.com/dmRusakov/tonoco/internal/controllers/web"
 	"github.com/dmRusakov/tonoco/pkg/appCacheService"
 	"github.com/dmRusakov/tonoco/pkg/userCacheService"
-	"github.com/go-redis/redis/v8"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -20,7 +20,9 @@ type App struct {
 	webServer web.Server
 
 	// cache
-	cacheStorage     *redis.Client
-	appCacheService  appCacheService.AppCacheService
-	userCacheService userCacheService.UserCacheService
+	appCacheService  *appCacheService.AppCacheService
+	userCacheService *userCacheService.UserCacheService
+
+	// data storage
+	dataStorage *sql.DB
 }

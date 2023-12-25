@@ -1,4 +1,4 @@
-package psql
+package postgresql
 
 import (
 	"context"
@@ -22,14 +22,6 @@ type Client interface {
 	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
 	Begin(ctx context.Context) (pgx.Tx, error)
 	BeginTx(ctx context.Context, txOptions pgx.TxOptions) (pgx.Tx, error)
-}
-
-type PgConfig struct {
-	username string
-	password string
-	host     string
-	port     string
-	database string
 }
 
 // NewClient creates new postgres client.
@@ -89,18 +81,18 @@ func DoWithAttempts(fn func() error, maxAttempts int, delay time.Duration) error
 	return err
 }
 
-func (c *PgConfig) ConnStringFromCfg() string {
+func (c *Config) ConnStringFromCfg() string {
 	url := strings.Builder{}
 	url.WriteString("postgresql://")
-	url.WriteString(c.username)
+	url.WriteString(c.User)
 	url.WriteString(":")
-	url.WriteString(c.password)
+	url.WriteString(c.Password)
 	url.WriteString("@")
-	url.WriteString(c.host)
+	url.WriteString(c.Host)
 	url.WriteString(":")
-	url.WriteString(c.port)
+	url.WriteString(c.Port)
 	url.WriteString("/")
-	url.WriteString(c.database)
+	url.WriteString(c.DB)
 
 	return url.String()
 }
