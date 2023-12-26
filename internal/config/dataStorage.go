@@ -2,7 +2,7 @@ package config
 
 import "github.com/dmRusakov/tonoco/pkg/postgresql"
 
-type dataStorage struct {
+type DataStorage struct {
 	Host     string `env:"DATA_STORAGE_HOST" env-required:"true"`
 	Port     string `env:"DATA_STORAGE_PORT" env-required:"true"`
 	User     string `env:"DATA_STORAGE_USER" env-required:"true"`
@@ -11,12 +11,12 @@ type dataStorage struct {
 }
 
 // ToPostgreSQLConfig - convert DataStorage to PostgreSQLConfig
-func (dataStorage *dataStorage) ToPostgreSQLConfig() *postgresql.Config {
+func (config *DataStorage) ToPostgreSQLConfig() *postgresql.Config {
 	return &postgresql.Config{
-		Host:     dataStorage.Host,
-		Port:     dataStorage.Port,
-		User:     dataStorage.User,
-		Password: dataStorage.Password,
-		DB:       dataStorage.DB,
+		Host:     config.Host,
+		Port:     config.Port,
+		User:     config.User,
+		Password: config.Password,
+		DB:       config.DB,
 	}
 }
