@@ -6,6 +6,9 @@ import (
 	"github.com/dmRusakov/tonoco/internal/config"
 	"github.com/dmRusakov/tonoco/internal/controllers/web"
 	"github.com/dmRusakov/tonoco/pkg/appCacheService"
+	"github.com/dmRusakov/tonoco/pkg/common/core/clock"
+	"github.com/dmRusakov/tonoco/pkg/common/core/closer"
+	"github.com/dmRusakov/tonoco/pkg/common/core/identity"
 	"github.com/dmRusakov/tonoco/pkg/common/logging"
 	"github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/redisdb"
@@ -49,8 +52,18 @@ func init() {
 
 	// data storage (PostgreSQL)
 	logging.L(ctx).Info("data storage initializing")
-	dataStorage, err := postgresql.NewClient(ctx, 5, 3*time.Second, app.cfg.DataStorage.ToPostgreSQLConfig(), false)
-	fmt.Println(dataStorage)
+	dataClient, err := postgresql.NewClient(ctx, 5, 3*time.Second, app.cfg.DataStorage.ToPostgreSQLConfig(), false)
+	if err != nil {
+		logging.WithError(ctx, err).Fatal("postgresql.NewClient")
+	}
+
+	closer.AddN(dataClient)
+
+	cl := clock.New()
+	generator := identity.NewGenerator()
+
+	fmt.Println(cl)
+	fmt.Println(generator)
 
 	// web router
 	app.webServer, err = web.NewWebServer()
