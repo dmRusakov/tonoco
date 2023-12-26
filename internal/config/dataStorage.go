@@ -10,7 +10,7 @@ type dataStorage struct {
 	DB       string `env:"DATA_STORAGE_DB" env-required:"true"`
 }
 
-// ToPostgreSQLConfig - convert dataStorage to PostgreSQLConfig
+// ToPostgreSQLConfig - convert DataStorage to PostgreSQLConfig
 func (dataStorage *dataStorage) ToPostgreSQLConfig() *postgresql.Config {
 	return &postgresql.Config{
 		Host:     dataStorage.Host,

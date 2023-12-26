@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"github.com/dmRusakov/tonoco/internal/config"
 	"github.com/dmRusakov/tonoco/internal/controllers/web"
 	"github.com/dmRusakov/tonoco/pkg/appCacheService"
@@ -23,6 +22,5 @@ type App struct {
 	appCacheService  *appCacheService.AppCacheService
 	userCacheService *userCacheService.UserCacheService
 
-	// data storage
-	dataStorage *sql.DB
+	// data
 }

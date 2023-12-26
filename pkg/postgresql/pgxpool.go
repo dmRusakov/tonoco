@@ -29,9 +29,11 @@ func NewClient(
 	ctx context.Context,
 	maxAttempts int,
 	maxDelay time.Duration,
-	dsn string,
+	config *Config,
 	binary bool,
 ) (pool *pgxpool.Pool, err error) {
+	dsn := config.ConnStringFromCfg()
+
 	pgxCfg, parseConfigErr := pgxpool.ParseConfig(dsn)
 	if parseConfigErr != nil {
 		log.Printf("Unable to parse config: %v\n", parseConfigErr)

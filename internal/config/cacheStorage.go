@@ -2,15 +2,15 @@ package config
 
 import "github.com/dmRusakov/tonoco/pkg/redisdb"
 
-type CacheStorage struct {
+type cacheStorage struct {
 	Host      string `env:"CACHE_STORAGE_HOST" env-required:"true"`
 	Port      string `env:"CACHE_STORAGE_PORT" env-required:"true"`
 	Password  string `env:"CACHE_STORAGE_PASSWORD" env-required:"true"`
 	MaxMemory string `env:"CACHE_STORAGE_MAXMEMORY" env-required:"true"`
 }
 
-// ToRedisConfig - convert CacheStorage to redisdb.Config
-func (cacheStorage *CacheStorage) ToRedisConfig() *redisdb.Config {
+// ToRedisConfig - convert cacheStorage to redisdb.Config
+func (cacheStorage *cacheStorage) ToRedisConfig() *redisdb.Config {
 	return &redisdb.Config{
 		Host:      cacheStorage.Host,
 		Port:      cacheStorage.Port,

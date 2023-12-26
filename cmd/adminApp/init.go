@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/dmRusakov/tonoco/internal/config"
 	"github.com/dmRusakov/tonoco/internal/controllers/web"
 	"github.com/dmRusakov/tonoco/pkg/appCacheService"
 	"github.com/dmRusakov/tonoco/pkg/common/logging"
+	"github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/redisdb"
 	"github.com/dmRusakov/tonoco/pkg/userCacheService"
+	"time"
 )
 
 func init() {
@@ -45,8 +48,9 @@ func init() {
 	}
 
 	// data storage (PostgreSQL)
-	//logging.L(ctx).Info("data storage initializing")
-	//app.dataStorage, err = postgresql.Connect(context.Background(), app.cfg.DataStorage.ToPostgreSQLConfig())
+	logging.L(ctx).Info("data storage initializing")
+	dataStorage, err := postgresql.NewClient(ctx, 5, 3*time.Second, app.cfg.DataStorage.ToPostgreSQLConfig(), false)
+	fmt.Println(dataStorage)
 
 	// web router
 	app.webServer, err = web.NewWebServer()
