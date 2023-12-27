@@ -1,4 +1,4 @@
-package main
+package appInit
 
 import (
 	"context"
@@ -9,18 +9,15 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-var app App = App{}
-var err error
-var ctx context.Context
-
 type App struct {
-	cfg       *config.Config
-	router    *httprouter.Router
-	webServer web.Server
+	Ctx       *context.Context
+	Cfg       *config.Config
+	Router    *httprouter.Router
+	WebServer web.Server
 
 	// cache
-	appCacheService  *appCacheService.AppCacheService
-	userCacheService *userCacheService.UserCacheService
+	AppCacheService  *appCacheService.AppCacheService
+	UserCacheService *userCacheService.UserCacheService
 
 	// data
 }
