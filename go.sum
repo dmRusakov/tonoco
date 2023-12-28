@@ -16,6 +16,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f h1:lO4WD4F/rVNCu3HqELle0jiPLLBs70cWOduZpkS1E78=
 github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f/go.mod h1:cuUVRXasLTGF7a8hSLbxyZXjz+1KgoB3wDUb6vlszIc=
+github.com/dmRusakov/tonoco-grpc v0.0.0-20231225222302-a11b5b3e2b9f h1:boHBLe9FWMuzRSPNeWJR2vxPDtKw4MNQDlEoBOZ989A=
+github.com/dmRusakov/tonoco-grpc v0.0.0-20231225222302-a11b5b3e2b9f/go.mod h1:KeP9fDmPqsPsvPrsJxm8M0PiMv/Ptvc4rmDKsCVe5iM=
 github.com/dmRusakov/tonoco-grpc/gen/go/proto v0.0.0-20231225222302-a11b5b3e2b9f h1:16c5GbBV/A1P8sh5LkSiDftoTImqqkUyDP8qqlzLlsE=
 github.com/dmRusakov/tonoco-grpc/gen/go/proto v0.0.0-20231225222302-a11b5b3e2b9f/go.mod h1:kxVdw3gFY1Ze34L+15Xw/iPtfdBzDL/t4iQnM9JIOO0=
 github.com/felixge/httpsnoop v1.0.4 h1:NFTV2Zj1bL4mc9sqWACXbQFVBBg2W3GPvqp8/ESS2Wg=
