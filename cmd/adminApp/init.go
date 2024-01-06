@@ -16,38 +16,39 @@ func init() {
 	// make context
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	logging.L(ctx).Info("Init App")
 
 	// config
-	logging.L(ctx).Info("config initializing")
 	cfg := config.GetConfig(ctx)
+	logging.L(ctx).Info("config initialized")
 
 	// save logger to context
 	ctx = logging.ContextWithLogger(ctx, logging.NewLogger())
 
 	// new app init
-	logging.L(ctx).Info("app initializing")
 	app = appInit.NewAppInit(ctx, cfg)
+	logging.L(ctx).Info("app initialized")
 
 	// appCacheService
-	logging.L(ctx).Info("appCacheService initializing")
 	err = app.AppCacheServiceInit()
 	if err != nil {
 		logging.WithError(ctx, err).Fatal("app.AppCacheServiceInit")
 	}
+	logging.L(ctx).Info("appCacheService initialized")
 
 	// userCacheService
-	logging.L(ctx).Info("UserCacheService initializing")
 	err = app.UserCacheServiceInit()
 	if err != nil {
 		logging.WithError(ctx, err).Fatal("app.UserCacheServiceInit")
 	}
+	logging.L(ctx).Info("UserCacheService initialized")
 
 	// productPolicy
-	logging.L(ctx).Info("product API initializing")
-	//err = app.ProductAPIInit()
-	//if err != nil {
-	//	logging.WithError(ctx, err).Fatal("app.ProductPolicyInit")
-	//}
+	err = app.ProductPolicyInit()
+	if err != nil {
+		logging.WithError(ctx, err).Fatal("app.ProductPolicyInit")
+	}
+	logging.L(ctx).Info("product API initialized")
 
 	//fmt.Println(productPolicy)
 

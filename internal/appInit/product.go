@@ -7,7 +7,7 @@ import (
 )
 
 // ProductPolicyInit - product policies initialization
-func (a *App) productPolicyInit() (err error) {
+func (a *App) ProductPolicyInit() (err error) {
 	// check sqlDB
 	if a.sqlDB == nil {
 		err = a.productDBInit()
@@ -40,7 +40,6 @@ func (a *App) productPolicyInit() (err error) {
 	return nil
 }
 
-//
 //// ProductAPIInit - product API initialization
 //func (a *App) ProductAPIInit() (err error) {
 //	// check product policy_product
@@ -51,10 +50,12 @@ func (a *App) productPolicyInit() (err error) {
 //		}
 //	}
 //
-//	a.ProductApi = grpc_v1_product.NewServer(
+//	tmp := grpc_v1_product.NewServer(
 //		a.productPolicy,
 //		pb_prod_products.UnimplementedTonocoProductServiceServer{},
 //	)
+//
+//	fmt.Println(tmp)
 //
 //	return nil
 //}
