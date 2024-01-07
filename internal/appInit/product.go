@@ -40,11 +40,12 @@ func (a *App) ProductPolicyInit() (err error) {
 	return nil
 }
 
+//
 //// ProductAPIInit - product API initialization
 //func (a *App) ProductAPIInit() (err error) {
 //	// check product policy_product
 //	if a.productPolicy == nil {
-//		err = a.productPolicyInit()
+//		err = a.ProductPolicyInit()
 //		if err != nil {
 //			return err
 //		}

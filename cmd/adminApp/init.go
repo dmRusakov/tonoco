@@ -44,11 +44,12 @@ func init() {
 	logging.L(ctx).Info("UserCacheService initialized")
 
 	// productPolicy
+
 	err = app.ProductPolicyInit()
 	if err != nil {
 		logging.WithError(ctx, err).Fatal("app.ProductPolicyInit")
 	}
-	logging.L(ctx).Info("product API initialized")
+	logging.L(ctx).Info("product API initializing")
 
 	//fmt.Println(productPolicy)
 
