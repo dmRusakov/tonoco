@@ -11,7 +11,9 @@ type Server struct {
 	pb_prod_products.UnimplementedTonocoProductServiceServer
 }
 
-func NewServer(policy *product.Policy, srv pb_prod_products.UnimplementedTonocoProductServiceServer) *Server {
+func NewServer(
+	policy *product.Policy,
+	srv pb_prod_products.UnimplementedTonocoProductServiceServer) *Server {
 	return &Server{
 		policy:                                  policy,
 		UnimplementedTonocoProductServiceServer: srv,

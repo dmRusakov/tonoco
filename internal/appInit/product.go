@@ -1,6 +1,9 @@
 package appInit
 
 import (
+	"fmt"
+	tonoco_product_v1 "github.com/dmRusakov/tonoco-grpc/gen/go/proto/tonoco/product/v1"
+	grpc_v1_product "github.com/dmRusakov/tonoco/internal/controllers/api/v1/product"
 	policy_product "github.com/dmRusakov/tonoco/internal/domain/policy/product"
 	"github.com/dmRusakov/tonoco/internal/domain/product/dao"
 	"github.com/dmRusakov/tonoco/internal/domain/product/service"
@@ -36,6 +39,12 @@ func (a *App) ProductPolicyInit() (err error) {
 	productStorage := dao.NewProductStorage(a.sqlDB)
 	productService := service.NewProductService(productStorage)
 	a.productPolicy = policy_product.NewProductPolicy(productService, a.generator, a.clock)
+	productServiceServer := grpc_v1_product.NewServer(
+		a.productPolicy,
+		tonoco_product_v1.UnimplementedTonocoProductServiceServer{},
+	)
+
+	fmt.Println(productServiceServer)
 
 	return nil
 }
