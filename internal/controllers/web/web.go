@@ -33,9 +33,11 @@ func (s server) Render(w http.ResponseWriter, pageTemplate string) {
 	// static templates
 	partials := []string{
 		"base.layout",
+		"head_file_imports.partial",
 		"head.partial",
 		"header.partial",
 		"footer.partial",
+		"footer_file_imports.partial",
 	}
 	for _, x := range partials {
 		templateSlice = append(templateSlice, fmt.Sprintf("%s%s.gohtml", s.tmlPath, x))
@@ -60,6 +62,12 @@ func (s server) Start(ctx context.Context) error {
 	// static files
 	fs := http.FileServer(http.Dir("assets"))
 	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
+
+	// Set up a custom HTTP server to handle .wasm.js files
+	http.HandleFunc("/assets/wasm/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/wasm")
+		http.ServeFile(w, r, r.URL.Path[1:])
+	})
 
 	// dynamic files
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
