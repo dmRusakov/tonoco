@@ -62,5 +62,5 @@ services:
 
 networks:
   tonoco:
-    name: 'v1'
+    name: 'tonoco'
     driver: bridge

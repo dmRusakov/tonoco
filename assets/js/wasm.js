@@ -1,5 +1,6 @@
 const folderPath = "/assets/wasm/";
-const appFileName = "cf2d0457.wasm";
+const appFileName = "adminApp.wasm";
+const appFileVersion = "1.007";
 
 if (!WebAssembly.instantiateStreaming) { // polyfill
     WebAssembly.instantiateStreaming = async (resp, importObject) => {
@@ -10,9 +11,10 @@ if (!WebAssembly.instantiateStreaming) { // polyfill
 
 const go = new Go();
 let mod, inst;
-WebAssembly.instantiateStreaming(fetch(folderPath + appFileName), go.importObject).then((result) => {
+WebAssembly.instantiateStreaming(fetch(folderPath + appFileName + "?v=" + appFileVersion), go.importObject).then( async (result) => {
     mod = result.module;
     inst = result.instance;
+    await run();
     document.getElementById("runButton").disabled = false;
 }).catch((err) => {
     console.error(err);

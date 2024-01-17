@@ -22,7 +22,7 @@ func registerCallbacks() {
 func main() {
 	c := make(chan struct{}, 0)
 
-	println("WASM Go Initialized")
+	println("WASM Go Initialized@")
 	// register functions
 	registerCallbacks()
 	<-c

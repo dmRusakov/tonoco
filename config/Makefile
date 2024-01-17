@@ -27,22 +27,19 @@ webAssembly: makeWebAssembly minJSFiles
 	@echo "WebAssembly builded"
 
 makeWebAssembly:
-	# get string with YY.MM.DD:HH:MM:SS for versioning
-	$(eval VERSION := $(shell date +"%y.%m.%d:%H:%M:%S"))
-	#get hash on the string in the variable VERSION
-	$(eval VERSION := $(shell echo -n "adminAppApi$(VERSION)pieceOfLove" | sha256sum | awk '{print $$1}'))
-	# get first 8 symbols of hash
-	$(eval VERSION := $(shell echo $(VERSION) | cut -c1-8))
 	# build wasm
 	GOOS=js GOARCH=wasm go build -o ./../bin/adminApp.wasm ./../cmd/adminAppWebAssembly/main.go
-	# name file name with version
-	$(eval FILENAME := $(VERSION).wasm)
-	#clear folder assets/wasm
-	rm -rf ./../assets/wasm/*
-	# move file to assets/wasm and rename with version
-	mv ./../bin/adminApp.wasm './../assets/wasm/./$(FILENAME)'
-	# open assets/js/wasm.js, fine variable appFileName and change value to versioned file name
-	sed -i "s/appFileName = .*/appFileName = \"$(FILENAME)\";/g" ./../assets/js/wasm.js
+	if cmp -s ./../bin/adminApp.wasm ./../assets/wasm/adminApp.wasm; then \
+		echo "same size"; \
+		rm ./../bin/adminApp.wasm; \
+	else \
+		mv ./../bin/adminApp.wasm ./../assets/wasm/adminApp.wasm; \
+		$(eval VERSION := $(shell grep 'appFileVersion' ./../assets/js/wasm.js | sed -n 's/.*appFileVersion = "\(.*\)";/\1/p'))\
+		$(if $(VERSION),,$(eval VERSION := 1.0))\
+		$(eval VERSION := $(shell echo "$(VERSION) + 0.001" | bc))\
+		sed -i "s/appFileVersion = .*/appFileVersion = \"$(VERSION)\";/g" ./../assets/js/wasm.js ; \
+	fi
+
 
 minJSFiles:
 	# minify all js files in the assets/js folder
@@ -97,3 +94,10 @@ updateCssVersion:
 	sed -i 's/\(link id=$(ID).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/head_file_imports.partial.gohtml
 	sed -i 's/\(link id=$(ID).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/prod_head_file_imports.partial.gohtml
 	sed -i 's/\(link id=$(ID).*href="\)[^"]*"/\1'"\/assets\/css\/"$(FILENAME)".min.css?v="$(VERSION)'"/' ./../assets/templates/prod_head_file_imports.partial.gohtml
+	$(eval VERSION := $(shell grep '<link.*id=$(ID)' "./../assets/templates/footer_file_imports.partial.gohtml" | sed -n 's/.*version="\([^"]*\)".*/\1/p'))
+	$(if $(VERSION),,$(eval VERSION := 1.0))
+	$(eval VERSION := $(shell echo "$(VERSION) + 0.001" | bc))
+	@echo $(VERSION)
+	sed -i 's/\(link id=$(ID).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/footer_file_imports.partial.gohtml
+	sed -i 's/\(link id=$(ID).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/prod_footer_file_imports.partial.gohtml
+	sed -i 's/\(link id=$(ID).*href="\)[^"]*"/\1'"\/assets\/css\/"$(FILENAME)".min.css?v="$(VERSION)'"/' ./../assets/templates/prod_footer_file_imports.partial.gohtml
