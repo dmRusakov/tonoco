@@ -10,7 +10,6 @@ import (
 var _ Server = &server{}
 
 func NewWebServer() (*server, error) {
-
 	return &server{
 		tmlPath: "./assets/templates/",
 	}, nil
@@ -33,11 +32,11 @@ func (s server) Render(w http.ResponseWriter, pageTemplate string) {
 	// static templates
 	partials := []string{
 		"base.layout",
-		"head_file_imports.partial",
-		"head.partial",
-		"header.partial",
-		"footer.partial",
-		"footer_file_imports.partial",
+		"element/head_file_imports.partial",
+		"element/head.partial",
+		"element/menu.partial",
+		"element/footer.partial",
+		"element/footer_file_imports.partial",
 	}
 	for _, x := range partials {
 		templateSlice = append(templateSlice, fmt.Sprintf("%s%s.gohtml", s.tmlPath, x))
@@ -69,9 +68,54 @@ func (s server) Start(ctx context.Context) error {
 		http.ServeFile(w, r, r.URL.Path[1:])
 	})
 
-	// dynamic files
+	// pages
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		s.Render(w, "test.page.gohtml")
+		s.Render(w, "dashboard.page.gohtml")
+	})
+	http.HandleFunc("/order/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "order.page.gohtml")
+	})
+	http.HandleFunc("/orders/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "orders.page.gohtml")
+	})
+	http.HandleFunc("/product/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "product.page.gohtml")
+	})
+	http.HandleFunc("/products/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "products.page.gohtml")
+	})
+	http.HandleFunc("/category/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "category.page.gohtml")
+	})
+	http.HandleFunc("/categories/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "categories.page.gohtml")
+	})
+	http.HandleFunc("/specification/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "specification.page.gohtml")
+	})
+	http.HandleFunc("/specifications/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "specifications.page.gohtml")
+	})
+	http.HandleFunc("/page/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "page.page.gohtml")
+	})
+	http.HandleFunc("/pages/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "pages.page.gohtml")
+	})
+	http.HandleFunc("/integration/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "integration.page.gohtml")
+	})
+	http.HandleFunc("/coupon/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "coupon.page.gohtml")
+	})
+	http.HandleFunc("/coupons/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "coupons.page.gohtml")
+	})
+	http.HandleFunc("/media/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "media.page.gohtml")
+	})
+	http.HandleFunc("/settings/", func(w http.ResponseWriter, r *http.Request) {
+		s.Render(w, "settings.page.gohtml")
 	})
 
 	err := http.ListenAndServe(":8080", nil)
