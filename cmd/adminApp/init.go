@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/appInit"
 	"github.com/dmRusakov/tonoco/internal/config"
-	"github.com/dmRusakov/tonoco/internal/controllers/web"
+	web_v1 "github.com/dmRusakov/tonoco/internal/controllers/web/v1"
 	"github.com/dmRusakov/tonoco/pkg/common/logging"
 )
 
@@ -45,14 +45,11 @@ func init() {
 
 	// productPolicy
 
-	err = app.ProductPolicyInit()
-	if err != nil {
-		logging.WithError(ctx, err).Fatal("app.ProductPolicyInit")
-	}
-	logging.L(ctx).Info("product API initializing")
-
 	//fmt.Println(productPolicy)
 
 	// web router
-	app.WebServer, err = web.NewWebServer()
+	app.WebServer, err = web_v1.NewWebServer()
+	if err != nil {
+		logging.WithError(ctx, err).Fatal("web_v1.NewWebServer")
+	}
 }
