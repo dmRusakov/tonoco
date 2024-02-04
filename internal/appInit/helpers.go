@@ -7,6 +7,12 @@ import (
 
 // clockInit - clock initialization
 func (a *App) clockInit() (err error) {
+	// if clock already initialized
+	if a.clock != nil {
+		return nil
+	}
+
+	// new clock
 	a.clock = clock.New()
 	return nil
 
@@ -14,6 +20,12 @@ func (a *App) clockInit() (err error) {
 
 // generatorInit - generator initialization
 func (a *App) generatorInit() (err error) {
+	// if generator already initialized
+	if a.generator != nil {
+		return nil
+	}
+
+	// new generator
 	a.generator = identity.NewGenerator()
 	return nil
 }

@@ -1,4 +1,4 @@
-package v1
+package web_v1
 
 import (
 	"context"

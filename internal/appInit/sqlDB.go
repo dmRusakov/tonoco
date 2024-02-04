@@ -7,7 +7,13 @@ import (
 )
 
 // productDBInit - product database initialization
-func (a *App) productDBInit() (err error) {
+func (a *App) ProductDBInit() (err error) {
+	// if already initialized
+	if a.sqlDB != nil {
+		return nil
+	}
+
+	// new sqlDB
 	a.sqlDB, err = postgresql.NewClient(a.Ctx, 5, 3*time.Second, a.Cfg.DataStorage.ToPostgreSQLConfig(), false)
 	if err != nil {
 		return err
