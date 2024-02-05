@@ -14,15 +14,15 @@ type Clock interface {
 	Now() time.Time
 }
 
-type Policy struct {
+type UseCase struct {
 	productService *service.ProductService
 
 	identity IdentityGenerator
 	clock    Clock
 }
 
-func NewProductPolicy(productService *service.ProductService, identity IdentityGenerator, clock clock.Clock) *Policy {
-	return &Policy{
+func NewProductUseCase(productService *service.ProductService, identity IdentityGenerator, clock clock.Clock) *UseCase {
+	return &UseCase{
 		productService: productService,
 
 		identity: identity,
