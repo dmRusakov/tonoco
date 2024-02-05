@@ -43,10 +43,10 @@ func init() {
 	}
 	logging.L(ctx).Info("UserCacheService initialized")
 
-	// product database (sqlDB) (postgresql)
-	err := app.ProductDBInit()
+	// application database (sqlDB) (postgresql)
+	err := app.SqlDBInit()
 	if err != nil {
-		logging.WithError(ctx, err).Fatal("app.ProductDBInit")
+		logging.WithError(ctx, err).Fatal("app.SqlDBInit")
 	}
 	logging.L(ctx).Info("Product DB initialized")
 

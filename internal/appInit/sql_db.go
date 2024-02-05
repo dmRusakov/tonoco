@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-// productDBInit - product database initialization
-func (a *App) ProductDBInit() (err error) {
+// SqlDBInit - sql database initialization
+func (a *App) SqlDBInit() (err error) {
 	// if already initialized
 	if a.sqlDB != nil {
 		return nil

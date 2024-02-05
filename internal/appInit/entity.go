@@ -5,6 +5,7 @@ import (
 	"github.com/dmRusakov/tonoco/internal/config"
 	apiController "github.com/dmRusakov/tonoco/internal/controllers/api/v1"
 	webController "github.com/dmRusakov/tonoco/internal/controllers/web/v1"
+	policy_product "github.com/dmRusakov/tonoco/internal/domain/policy/product"
 	"github.com/dmRusakov/tonoco/pkg/appCacheService"
 	"github.com/dmRusakov/tonoco/pkg/common/core/clock"
 	"github.com/dmRusakov/tonoco/pkg/common/core/identity"
@@ -32,6 +33,9 @@ type App struct {
 	AppCacheService  *appCacheService.AppCacheService
 	UserCacheService *userCacheService.UserCacheService
 
-	// product
+	// policy
+	ProductPolicy *policy_product.Policy
+
+	// api controllers
 	ProductController *apiController.ProductController
 }
