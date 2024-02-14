@@ -1,11 +1,11 @@
 -- create table
 CREATE TABLE IF NOT EXISTS public.shipping_class
 (
-    id         UUID UNIQUE DEFAULT uuid_generate_v4() NOT NULL,
-    name       VARCHAR(255)                           NULL,
-    slug       VARCHAR(255)                           NULL,
-    "order"    INTEGER                                NULL,
-    active     BOOLEAN     DEFAULT TRUE               NOT NULL,
+    id          UUID UNIQUE DEFAULT uuid_generate_v4() NOT NULL,
+    name        VARCHAR(255)                           NULL,
+    slug        VARCHAR(255)                           NULL,
+    sort_order  INTEGER                                NULL,
+    active      BOOLEAN     DEFAULT TRUE               NOT NULL,
 
     created_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
     created_by UUID        DEFAULT NULL REFERENCES public.user (id),
@@ -27,11 +27,11 @@ CREATE TRIGGER shipping_class_updated_at
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();
 
--- auto set "order" column
+-- auto set sort_order column
 CREATE OR REPLACE FUNCTION set_order_column_to_shipping_class()
     RETURNS TRIGGER AS $$
 BEGIN
-    NEW.order = (SELECT COALESCE(MAX("order"), 0) + 1 FROM shipping_class);
+    NEW.sort_order = (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM shipping_class);
     RETURN NEW;
 END;
 $$ language 'plpgsql';

@@ -20,7 +20,7 @@ func init() {
 
 	// config
 	cfg := config.GetConfig(ctx)
-	logging.L(ctx).Info("Config initialized")
+	logging.L(ctx).Info("PublicAppConfig initialized")
 
 	// save logger to context
 	ctx = logging.ContextWithLogger(ctx, logging.NewLogger())
@@ -57,17 +57,11 @@ func init() {
 	}
 	logging.L(ctx).Info("Product UseCase initialized")
 
-	// product api server (controller, getter)
-	err = app.ProductControllerGetterInit()
-	if err != nil {
-		logging.WithError(ctx, err).Fatal("app.ProductControllerGetterInit")
-	}
-	logging.L(ctx).Info("Product Controller (Getter) initialized")
-
 	// adminAppWeb server
 	app.WebServer, err = web_v1.NewWebServer()
 	if err != nil {
 		logging.WithError(ctx, err).Fatal("web_v1.NewWebServer")
 	}
 	logging.L(ctx).Info("Web Server initialized")
+
 }

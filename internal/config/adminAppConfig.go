@@ -7,11 +7,11 @@ import (
 	"sync"
 )
 
-var instance *Config
-var once sync.Once
-
 // GetConfig read config and returns a pointer to the Config struct
 func GetConfig(ctx context.Context) *Config {
+	var instance *Config
+	var once sync.Once
+
 	once.Do(func() {
 		instance = &Config{}
 

@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS public.product_status
     id         UUID UNIQUE DEFAULT uuid_generate_v4() NOT NULL,
     name       VARCHAR(255)                           NULL,
     slug       VARCHAR(255)                           NULL,
-    "order"    INTEGER                                NULL,
+    sort_order INTEGER                                NULL,
     active     BOOLEAN     DEFAULT TRUE               NOT NULL,
 
     created_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS public.product_status
 );
 
 -- ownership, index and comment
-ALTER TABLE public.product_status OWNER TO postgres;
+ALTER TABLE public.product_status
+    OWNER TO postgres;
 CREATE INDEX product_status_id ON public.product_status (id);
 CREATE INDEX product_status_slug ON public.product_status (slug);
 COMMENT ON TABLE public.product_status IS 'Product Statuses';
@@ -28,11 +29,12 @@ CREATE TRIGGER product_status_updated_at
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();
 
--- auto set "order" column
+-- auto set sort_order column
 CREATE OR REPLACE FUNCTION set_order_column_to_product_status()
-    RETURNS TRIGGER AS $$
+    RETURNS TRIGGER AS
+$$
 BEGIN
-    NEW.order = (SELECT COALESCE(MAX("order"), 0) + 1 FROM product_status);
+    NEW.sort_order = (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM product_status);
     RETURN NEW;
 END;
 $$ language 'plpgsql';
@@ -40,7 +42,8 @@ $$ language 'plpgsql';
 CREATE TRIGGER product_status_order
     BEFORE INSERT
     ON public.product_status
-    FOR EACH ROW EXECUTE FUNCTION set_order_column_to_product_status();
+    FOR EACH ROW
+EXECUTE FUNCTION set_order_column_to_product_status();
 
 -- demo data
 INSERT INTO public.product_status (id, name, slug)

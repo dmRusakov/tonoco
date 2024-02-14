@@ -9,17 +9,17 @@ import (
 // SqlDBInit - sql database initialization
 func (a *App) SqlDBInit() (err error) {
 	// if already initialized
-	if a.sqlDB != nil {
+	if a.SqlDB != nil {
 		return nil
 	}
 
-	// new sqlDB
-	a.sqlDB, err = postgresql.NewClient(a.Ctx, 5, 3*time.Second, a.Cfg.DataStorage.ToPostgreSQLConfig(), false)
+	// new SqlDB
+	a.SqlDB, err = postgresql.NewClient(a.Ctx, 5, 3*time.Second, a.Cfg.DataStorage.ToPostgreSQLConfig(), false)
 	if err != nil {
 		return err
 	}
 
-	closer.AddN(a.sqlDB)
+	closer.AddN(a.SqlDB)
 
 	return nil
 }

@@ -2,9 +2,9 @@ package appInit
 
 import (
 	"context"
+	productServire "github.com/dmRusakov/tonoco-grpc/gen/go/proto/service/v1"
 	"github.com/dmRusakov/tonoco/internal/config"
-	apiController "github.com/dmRusakov/tonoco/internal/controllers/api/v1"
-	webController "github.com/dmRusakov/tonoco/internal/controllers/web/v1"
+	webController "github.com/dmRusakov/tonoco/internal/controllers/adminAppWeb/v1"
 	productUsecase "github.com/dmRusakov/tonoco/internal/domain/useCase/product"
 	"github.com/dmRusakov/tonoco/pkg/appCacheService"
 	"github.com/dmRusakov/tonoco/pkg/common/core/clock"
@@ -26,8 +26,8 @@ type App struct {
 	generator *identity.Generator
 
 	// db
-	cacheDB *redis.Client
-	sqlDB   *pgxpool.Pool
+	CacheDB *redis.Client
+	SqlDB   *pgxpool.Pool
 
 	// cache
 	AppCacheService  *appCacheService.AppCacheService
@@ -37,5 +37,5 @@ type App struct {
 	ProductUseCase *productUsecase.UseCase
 
 	// api controllers
-	ProductController *apiController.ProductController
+	ProductController *productServire.ProductServiceServer
 }

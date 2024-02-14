@@ -3,6 +3,6 @@ package main
 import "fmt"
 
 func main() {
-	// start web router
+	// start adminAppWeb router
 	fmt.Println("TODO implement me")
 }

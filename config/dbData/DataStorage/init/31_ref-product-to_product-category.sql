@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS public.ref_product_to_product_category (
     product_id uuid NOT NULL,
     product_category_id uuid NOT NULL,
     active           BOOLEAN      DEFAULT TRUE,
-    "order"          INTEGER      DEFAULT null,
+    sort_order          INTEGER      DEFAULT null,
     created_at TIMESTAMP   DEFAULT NOW(),
     created_by UUID        DEFAULT NULL REFERENCES public.user (id),
     updated_at TIMESTAMP   DEFAULT NOW(),
@@ -21,7 +21,7 @@ ALTER TABLE public.ref_product_to_product_category ADD CONSTRAINT ref_product_to
 ALTER TABLE public.ref_product_to_product_category ADD CONSTRAINT ref_product_to_product_category_product_category_id_fkey FOREIGN KEY (product_category_id) REFERENCES public.product_category(id);
 COMMENT ON TABLE public.ref_product_to_product_category IS 'Reference table for product and product category';
 
--- auto set "order" column by product_category_id (Order of product in product category)
+-- auto set sort_order column by product_category_id (Order of product in product category)
 CREATE OR REPLACE FUNCTION public.ref_product_to_product_category_set_order()
     RETURNS trigger
     LANGUAGE 'plpgsql'
@@ -30,7 +30,7 @@ CREATE OR REPLACE FUNCTION public.ref_product_to_product_category_set_order()
 AS $BODY$
 BEGIN
     UPDATE public.ref_product_to_product_category
-    SET "order" = (SELECT COUNT(*) FROM public.ref_product_to_product_category WHERE product_category_id = NEW.product_category_id) + 1
+    SET sort_order = (SELECT COUNT(*) FROM public.ref_product_to_product_category WHERE product_category_id = NEW.product_category_id) + 1
     WHERE id = NEW.id;
     RETURN NEW;
 END;

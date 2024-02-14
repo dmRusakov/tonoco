@@ -10,12 +10,12 @@ import (
 // redisClientInit - redis client initialization
 func (a *App) redisClientInit() (err error) {
 	// check if redis client already initialized
-	if a.cacheDB == nil {
+	if a.CacheDB == nil {
 		return nil
 	}
 
 	// connect to redis
-	a.cacheDB, err = redisdb.Connect(context.Background(), a.Cfg.CacheStorage.ToRedisConfig())
+	a.CacheDB, err = redisdb.Connect(context.Background(), a.Cfg.CacheStorage.ToRedisConfig())
 	if err != nil {
 		return err
 	}
@@ -36,7 +36,7 @@ func (a *App) AppCacheServiceInit() (err error) {
 		return err
 	}
 
-	a.AppCacheService, err = appCacheService.NewCacheService(a.cacheDB, "app")
+	a.AppCacheService, err = appCacheService.NewCacheService(a.CacheDB, "app")
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func (a *App) UserCacheServiceInit() (err error) {
 		return err
 	}
 
-	a.UserCacheService, err = userCacheService.NewCacheService(a.cacheDB, "user")
+	a.UserCacheService, err = userCacheService.NewCacheService(a.CacheDB, "user")
 	if err != nil {
 		return err
 	}

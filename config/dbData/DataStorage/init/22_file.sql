@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS public.file
     id         uuid unique DEFAULT uuid_generate_v4(),
     name       varchar(255) not null,
     slug       varchar(255) not null,
-    active           BOOLEAN      DEFAULT TRUE,
-    "order"          INTEGER      DEFAULT null,
+    active     BOOLEAN     DEFAULT TRUE,
+    sort_order INTEGER     DEFAULT null,
 
     created_at TIMESTAMP   DEFAULT NOW(),
     created_by UUID        DEFAULT NULL REFERENCES public.user (id),
@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS public.file
 
 -- -- index, constraint and ownership
 CREATE INDEX file_id ON public.file (id);
-ALTER TABLE public.file OWNER TO postgres;
+ALTER TABLE public.file
+    OWNER TO postgres;
 COMMENT ON TABLE public.file IS 'File table';
 
 -- auto update updated_at
@@ -27,11 +28,12 @@ CREATE TRIGGER update_file_updated_at
     FOR EACH ROW
 EXECUTE PROCEDURE update_update_at_column();
 
--- auto set "order" column
+-- auto set sort_order column
 CREATE OR REPLACE FUNCTION set_order_column_to_file()
-    RETURNS TRIGGER AS $$
+    RETURNS TRIGGER AS
+$$
 BEGIN
-    NEW.order = (SELECT COALESCE(MAX("order"), 0) + 1 FROM file);
+    NEW.sort_order = (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM file);
     RETURN NEW;
 END;
 $$ language 'plpgsql';
@@ -39,4 +41,5 @@ $$ language 'plpgsql';
 CREATE TRIGGER file_order
     BEFORE INSERT
     ON public.file
-    FOR EACH ROW EXECUTE FUNCTION set_order_column_to_file();
+    FOR EACH ROW
+EXECUTE FUNCTION set_order_column_to_file();

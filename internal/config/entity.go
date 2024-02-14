@@ -1,8 +1,11 @@
 package config
 
 type Config struct {
-	Name            string `env:"ADMIN_NAME" env-default:"TonocoAdmin"`
-	IsProd          bool   `env:"ADMIN_IS_PROD" env-default:"true"`
+	Id      string `env:"ID" env-required:"true"`
+	IsProd  bool   `env:"IS_PROD" env-required:"true"`
+	IsDebug bool   `env:"IS_DEBUG" env-required:"true"`
+	WebPort string `env:"WEB_PORT" env-required:"true"`
+
 	CacheStorage    CacheStorage
 	DataStorage     DataStorage
 	ProductListener ServerProductListener

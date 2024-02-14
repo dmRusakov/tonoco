@@ -6,8 +6,8 @@ import (
 	productPolicy "github.com/dmRusakov/tonoco/internal/domain/useCase/product"
 )
 
-func (a *App) ProductPolicyInit() (err error) {
-	productStorage := model.NewProductStorage(a.sqlDB)
+func (a *App) ProductUseCaseInit() (err error) {
+	productStorage := model.NewProductStorage(a.SqlDB)
 	productService := service.NewProductService(productStorage)
 	a.ProductUseCase = productPolicy.NewProductUseCase(productService, a.generator, a.clock)
 
