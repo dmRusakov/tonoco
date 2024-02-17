@@ -6,60 +6,10 @@ import (
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"strconv"
-	"time"
 )
 
-const table = "public.product"
-
-// ProductDAO is a struct that contains the SQL statement builder and the PostgreSQL client.
-type ProductDAO struct {
-	qb     sq.StatementBuilderType
-	client psql.Client
-}
-
-// ProductStorage is a struct that maps to the 'public.product' table in the PostgreSQL database.
-type ProductStorage struct {
-	ID                    string    `db:"id"`
-	SKU                   string    `db:"sku"`
-	Name                  string    `db:"name"`
-	ShortDescription      string    `db:"short_description"`
-	Description           string    `db:"description"`
-	SortOrder             int       `db:"sort_order"`
-	StatusID              string    `db:"status_id"`
-	Slug                  string    `db:"slug"`
-	RegularPrice          float64   `db:"regular_price"`
-	SalePrice             float64   `db:"sale_price"`
-	FactoryPrice          float64   `db:"factory_price"`
-	IsTaxable             bool      `db:"is_taxable"`
-	Quantity              int       `db:"quantity"`
-	ReturnToStockDate     time.Time `db:"return_to_stock_date"`
-	IsTrackStock          bool      `db:"is_track_stock"`
-	ShippingClassID       string    `db:"shipping_class_id"`
-	ShippingWeight        float64   `db:"shipping_weight"`
-	ShippingWidth         float64   `db:"shipping_width"`
-	ShippingHeight        float64   `db:"shipping_height"`
-	ShippingLength        float64   `db:"shipping_length"`
-	SeoTitle              string    `db:"seo_title"`
-	SeoDescription        string    `db:"seo_description"`
-	GTIN                  string    `db:"gtin"`
-	GoogleProductCategory string    `db:"google_product_category"`
-	GoogleProductType     string    `db:"google_product_type"`
-	CreatedAt             time.Time `db:"created_at"`
-	CreatedBy             string    `db:"created_by"`
-	UpdatedAt             time.Time `db:"updated_at"`
-	UpdatedBy             string    `db:"updated_by"`
-}
-
-// NewProductStorage is a constructor function that returns a new instance of ProductDAO.
-func NewProductStorage(client psql.Client) *ProductDAO {
-	return &ProductDAO{
-		qb:     sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
-		client: client,
-	}
-}
-
-// Get is a method on the ProductDAO struct that retrieves a product from the database by its ID.
-func (repo *ProductDAO) Get(ctx context.Context, id string) (*ProductStorage, error) {
+// Get is a method on the ProductModel struct that retrieves a product from the database by its ID.
+func (repo *ProductModel) Get(ctx context.Context, id string) (*ProductStorage, error) {
 	// build query
 	statement := repo.qb.
 		Select(
