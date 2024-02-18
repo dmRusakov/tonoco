@@ -333,7 +333,7 @@ func TestUpdate(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Update method
-			err := dao.Update(context.Background(), tc.id, tc.product, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+			_, err := dao.Update(context.Background(), tc.product, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
 
 			// Assert that there was no error
 			assert.NoError(t, err)

@@ -1,9 +1,17 @@
 package model
 
 import (
+	"context"
 	sq "github.com/Masterminds/squirrel"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 )
+
+type ProductStorage interface {
+	Create(ctx context.Context, product *Product, by string) (*Product, error)
+	Get(ctx context.Context, id string) (*Product, error)
+	Update(ctx context.Context, product *Product, by string) (*Product, error)
+	Delete(ctx context.Context, id string) error
+}
 
 // ProductModel is a struct that contains the SQL statement builder and the PostgreSQL client.
 type ProductModel struct {

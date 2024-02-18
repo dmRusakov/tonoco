@@ -8,7 +8,7 @@ import (
 )
 
 // Update is a method on the ProductModel struct that updates a Product in the database by its ID.
-func (repo *ProductModel) Update(ctx context.Context, id string, product *Product, by string) error {
+func (repo *ProductModel) Update(ctx context.Context, product *Product, by string) (*Product, error) {
 	// build query
 	statement := repo.qb.
 		Update(repo.table).
@@ -38,7 +38,7 @@ func (repo *ProductModel) Update(ctx context.Context, id string, product *Produc
 		Set(fieldMap["GoogleProductType"], product.GoogleProductType).
 		Set(fieldMap["UpdatedAt"], "NOW()").
 		Set(fieldMap["UpdatedBy"], by).
-		Where(fieldMap["ID"]+" = ?", id)
+		Where(fieldMap["ID"]+" = ?", product.ID)
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()
@@ -46,7 +46,7 @@ func (repo *ProductModel) Update(ctx context.Context, id string, product *Produc
 		err = psql.ErrCreateQuery(err)
 		tracing.Error(ctx, err)
 
-		return err
+		return nil, err
 	}
 
 	tracing.SpanEvent(ctx, "Update Product")
@@ -66,8 +66,8 @@ func (repo *ProductModel) Update(ctx context.Context, id string, product *Produc
 		err = psql.ErrExec(err)
 		tracing.Error(ctx, err)
 
-		return err
+		return nil, err
 	}
 
-	return nil
+	return repo.Get(ctx, product.ID)
 }
