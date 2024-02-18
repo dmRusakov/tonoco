@@ -5,10 +5,9 @@ import (
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 )
 
-const table = "public.product"
-
 // ProductModel is a struct that contains the SQL statement builder and the PostgreSQL client.
 type ProductModel struct {
+	table  string
 	qb     sq.StatementBuilderType
 	client psql.Client
 }
@@ -18,5 +17,6 @@ func NewProductStorage(client psql.Client) *ProductModel {
 	return &ProductModel{
 		qb:     sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		client: client,
+		table:  "public.Product",
 	}
 }

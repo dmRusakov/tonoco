@@ -8,43 +8,43 @@ import (
 	"strconv"
 )
 
-// Get is a method on the ProductModel struct that retrieves a product from the database by its ID.
-func (repo *ProductModel) Get(ctx context.Context, id string) (*ProductStorage, error) {
+// Get is a method on the ProductModel struct that retrieves a Product from the database by its ID.
+func (repo *ProductModel) Get(ctx context.Context, id string) (*Product, error) {
 	// build query
 	statement := repo.qb.
 		Select(
-			"id",
-			"sku",
-			"name",
-			"short_description",
-			"description",
-			"sort_order",
-			"status_id",
-			"slug",
-			"regular_price",
-			"sale_price",
-			"factory_price",
-			"is_taxable",
-			"quantity",
-			"return_to_stock_date",
-			"is_track_stock",
-			"shipping_class_id",
-			"shipping_weight",
-			"shipping_width",
-			"shipping_height",
-			"shipping_length",
-			"seo_title",
-			"seo_description",
-			"gtin",
-			"google_product_category",
-			"google_product_type",
-			"created_at",
-			"created_by",
-			"updated_at",
-			"updated_by",
+			fieldMap["ID"],
+			fieldMap["SKU"],
+			fieldMap["Name"],
+			fieldMap["ShortDescription"],
+			fieldMap["Description"],
+			fieldMap["SortOrder"],
+			fieldMap["StatusID"],
+			fieldMap["Slug"],
+			fieldMap["RegularPrice"],
+			fieldMap["SalePrice"],
+			fieldMap["FactoryPrice"],
+			fieldMap["IsTaxable"],
+			fieldMap["Quantity"],
+			fieldMap["ReturnToStockDate"],
+			fieldMap["IsTrackStock"],
+			fieldMap["ShippingClassID"],
+			fieldMap["ShippingWeight"],
+			fieldMap["ShippingWidth"],
+			fieldMap["ShippingHeight"],
+			fieldMap["ShippingLength"],
+			fieldMap["SeoTitle"],
+			fieldMap["SeoDescription"],
+			fieldMap["GTIN"],
+			fieldMap["GoogleProductCategory"],
+			fieldMap["GoogleProductType"],
+			fieldMap["CreatedAt"],
+			fieldMap["CreatedBy"],
+			fieldMap["UpdatedAt"],
+			fieldMap["UpdatedBy"],
 		).
-		From(table + " p").
-		Where(sq.Eq{"id": id})
+		From(repo.table + " p").
+		Where(sq.Eq{fieldMap["ID"]: id})
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()
@@ -72,8 +72,8 @@ func (repo *ProductModel) Get(ctx context.Context, id string) (*ProductStorage, 
 
 	defer rows.Close()
 
-	// scan the result set into a slice of ProductStorage structs
-	product := &ProductStorage{}
+	// scan the result set into a slice of Product structs
+	product := &Product{}
 	for rows.Next() {
 		if err = rows.Scan(
 			&product.ID,

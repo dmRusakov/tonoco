@@ -7,38 +7,38 @@ import (
 	"strconv"
 )
 
-// Update is a method on the ProductModel struct that updates a product in the database by its ID.
-func (repo *ProductModel) Update(ctx context.Context, id string, product *ProductStorage) error {
+// Update is a method on the ProductModel struct that updates a Product in the database by its ID.
+func (repo *ProductModel) Update(ctx context.Context, id string, product *Product, by string) error {
 	// build query
 	statement := repo.qb.
-		Update(table).
-		Set("sku", product.SKU).
-		Set("name", product.Name).
-		Set("short_description", product.ShortDescription).
-		Set("description", product.Description).
-		Set("sort_order", product.SortOrder).
-		Set("status_id", product.StatusID).
-		Set("slug", product.Slug).
-		Set("regular_price", product.RegularPrice).
-		Set("sale_price", product.SalePrice).
-		Set("factory_price", product.FactoryPrice).
-		Set("is_taxable", product.IsTaxable).
-		Set("quantity", product.Quantity).
-		Set("return_to_stock_date", product.ReturnToStockDate).
-		Set("is_track_stock", product.IsTrackStock).
-		Set("shipping_class_id", product.ShippingClassID).
-		Set("shipping_weight", product.ShippingWeight).
-		Set("shipping_width", product.ShippingWidth).
-		Set("shipping_height", product.ShippingHeight).
-		Set("shipping_length", product.ShippingLength).
-		Set("seo_title", product.SeoTitle).
-		Set("seo_description", product.SeoDescription).
-		Set("gtin", product.GTIN).
-		Set("google_product_category", product.GoogleProductCategory).
-		Set("google_product_type", product.GoogleProductType).
-		Set("updated_at", product.UpdatedAt).
-		Set("updated_by", product.UpdatedBy).
-		Where("id = ?", id)
+		Update(repo.table).
+		Set(fieldMap["SKU"], product.SKU).
+		Set(fieldMap["Name"], product.Name).
+		Set(fieldMap["ShortDescription"], product.ShortDescription).
+		Set(fieldMap["Description"], product.Description).
+		Set(fieldMap["SortOrder"], product.SortOrder).
+		Set(fieldMap["StatusID"], product.StatusID).
+		Set(fieldMap["Slug"], product.Slug).
+		Set(fieldMap["RegularPrice"], product.RegularPrice).
+		Set(fieldMap["SalePrice"], product.SalePrice).
+		Set(fieldMap["FactoryPrice"], product.FactoryPrice).
+		Set(fieldMap["IsTaxable"], product.IsTaxable).
+		Set(fieldMap["Quantity"], product.Quantity).
+		Set(fieldMap["ReturnToStockDate"], product.ReturnToStockDate).
+		Set(fieldMap["IsTrackStock"], product.IsTrackStock).
+		Set(fieldMap["ShippingClassID"], product.ShippingClassID).
+		Set(fieldMap["ShippingWeight"], product.ShippingWeight).
+		Set(fieldMap["ShippingWidth"], product.ShippingWidth).
+		Set(fieldMap["ShippingHeight"], product.ShippingHeight).
+		Set(fieldMap["ShippingLength"], product.ShippingLength).
+		Set(fieldMap["SeoTitle"], product.SeoTitle).
+		Set(fieldMap["SeoDescription"], product.SeoDescription).
+		Set(fieldMap["GTIN"], product.GTIN).
+		Set(fieldMap["GoogleProductCategory"], product.GoogleProductCategory).
+		Set(fieldMap["GoogleProductType"], product.GoogleProductType).
+		Set(fieldMap["UpdatedAt"], "NOW()").
+		Set(fieldMap["UpdatedBy"], by).
+		Where(fieldMap["ID"]+" = ?", id)
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()

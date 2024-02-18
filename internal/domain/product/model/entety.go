@@ -2,8 +2,8 @@ package model
 
 import "time"
 
-// ProductStorage is a struct that maps to the 'public.product' table in the PostgreSQL database.
-type ProductStorage struct {
+// Product is a struct that maps to the 'public.Product' table in the PostgreSQL database.
+type Product struct {
 	ID                    string
 	SKU                   string
 	Name                  string

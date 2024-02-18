@@ -5,13 +5,67 @@ import (
 	"github.com/dmRusakov/tonoco/internal/appInit"
 	"github.com/dmRusakov/tonoco/internal/config"
 	"github.com/dmRusakov/tonoco/internal/domain/product/model"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
 
-// product for test
-var product2500 = model.ProductStorage{
+// Product for test
+var productNew1 = model.Product{
+	ID:                    "f0eebc99-9c0b-4ef8-bb6d-6bb9bd382503",
+	SKU:                   "TESTSKU",
+	Name:                  "Test Product",
+	ShortDescription:      "Test Short Description",
+	Description:           "Test Description",
+	StatusID:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+	Slug:                  "test-product",
+	RegularPrice:          100,
+	SalePrice:             50,
+	FactoryPrice:          0,
+	IsTaxable:             true,
+	Quantity:              10,
+	ReturnToStockDate:     time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC),
+	IsTrackStock:          true,
+	ShippingClassID:       "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+	ShippingWeight:        10,
+	ShippingWidth:         10,
+	ShippingHeight:        10,
+	ShippingLength:        10,
+	SeoTitle:              "Test Product",
+	SeoDescription:        "Test Product",
+	GTIN:                  "1234567890",
+	GoogleProductCategory: "123",
+	GoogleProductType:     "Test Product",
+}
+
+var productNew2 = model.Product{
+	SKU:                   "TESTSKU2",
+	Name:                  "Test Product 2",
+	ShortDescription:      "Test Short Description 2",
+	Description:           "Test Description 2",
+	StatusID:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+	Slug:                  "test-product-2",
+	RegularPrice:          200,
+	SalePrice:             100,
+	FactoryPrice:          0,
+	IsTaxable:             true,
+	Quantity:              20,
+	ReturnToStockDate:     time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC),
+	IsTrackStock:          true,
+	ShippingClassID:       "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+	ShippingWeight:        20,
+	ShippingWidth:         20,
+	ShippingHeight:        20,
+	ShippingLength:        20,
+	SeoTitle:              "Test Product 2",
+	SeoDescription:        "Test Product 2",
+	GTIN:                  "1234567891",
+	GoogleProductCategory: "124",
+	GoogleProductType:     "Test Product 2",
+}
+
+var product2500 = model.Product{
 	ID:                    "a0eebc99-9c0b-4ef8-bb6d-6bb9bd382500",
 	SKU:                   "IS48LUXOR",
 	Name:                  "48″ Luxor Island Range Hood",
@@ -43,7 +97,7 @@ var product2500 = model.ProductStorage{
 	UpdatedBy:             "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1",
 }
 
-var product2501 = model.ProductStorage{
+var product2501 = model.Product{
 	ID:                    "a0eebc99-9c0b-4ef8-bb6d-6bb9bd382501",
 	SKU:                   "WL36MELARA",
 	Name:                  "36″ Melara Wall Range Hood",
@@ -75,7 +129,7 @@ var product2501 = model.ProductStorage{
 	UpdatedBy:             "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1",
 }
 
-var product2502 = model.ProductStorage{
+var product2502 = model.Product{
 	ID:                    "a0eebc99-9c0b-4ef8-bb6d-6bb9bd382502",
 	SKU:                   "IS48POSITANO",
 	Name:                  "48″ Positano Island Range Hood",
@@ -107,7 +161,7 @@ var product2502 = model.ProductStorage{
 	UpdatedBy:             "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1",
 }
 
-var product5681 = model.ProductStorage{
+var product5681 = model.Product{
 	ID:                    "a0eebc99-9c0b-4ef8-bb6d-6bb9bd325681",
 	SKU:                   "WL46SLIDE",
 	Name:                  "46″ Slide Insert Range Hood",
@@ -137,7 +191,7 @@ var product5681 = model.ProductStorage{
 	UpdatedBy:             "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1",
 }
 
-var product6730 = model.ProductStorage{
+var product6730 = model.Product{
 	ID:                    "a0eebc99-9c0b-4ef8-bb6d-6bb9bd326730",
 	SKU:                   "WL36POSITANO-BLK",
 	Name:                  "36″ Positano Black Wall Range Hood",
@@ -171,13 +225,7 @@ var product6730 = model.ProductStorage{
 
 func TestGet(t *testing.T) {
 	// Create a real database client
-	cfg := config.GetConfig(context.Background())
-	app := appInit.NewAppInit(context.Background(), cfg)
-	err := app.SqlDBInit()
-	if err != nil {
-		t.Fatalf("Failed to initialize database: %v", err)
-	}
-	pgClient := app.SqlDB
+	pgClient := initDB(t)
 
 	// Initialize a new instance of ProductModel with a real database client
 	dao := model.NewProductStorage(pgClient)
@@ -186,7 +234,7 @@ func TestGet(t *testing.T) {
 	testCases := []struct {
 		name     string
 		id       string
-		expected *model.ProductStorage
+		expected *model.Product
 	}{
 		{
 			name:     "Test Case 1: Valid ID",
@@ -250,13 +298,7 @@ func TestGet(t *testing.T) {
 // test update
 func TestUpdate(t *testing.T) {
 	// Create a real database client
-	cfg := config.GetConfig(context.Background())
-	app := appInit.NewAppInit(context.Background(), cfg)
-	err := app.SqlDBInit()
-	if err != nil {
-		t.Fatalf("Failed to initialize database: %v", err)
-	}
-	pgClient := app.SqlDB
+	pgClient := initDB(t)
 
 	// Initialize a new instance of ProductModel with a real database client
 	dao := model.NewProductStorage(pgClient)
@@ -271,8 +313,8 @@ func TestUpdate(t *testing.T) {
 	testCases := []struct {
 		name     string
 		id       string
-		product  *model.ProductStorage
-		expected *model.ProductStorage
+		product  *model.Product
+		expected *model.Product
 	}{
 		{
 			name:     "Test Case 1: Valid ID",
@@ -291,7 +333,7 @@ func TestUpdate(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Update method
-			err := dao.Update(context.Background(), tc.id, tc.product)
+			err := dao.Update(context.Background(), tc.id, tc.product, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -330,20 +372,15 @@ func TestUpdate(t *testing.T) {
 	}
 }
 
+// TestPatch
 func TestPatch(t *testing.T) {
 	// Create a real database client
-	cfg := config.GetConfig(context.Background())
-	app := appInit.NewAppInit(context.Background(), cfg)
-	err := app.SqlDBInit()
-	if err != nil {
-		t.Fatalf("Failed to initialize database: %v", err)
-	}
-	pgClient := app.SqlDB
+	pgClient := initDB(t)
 
 	// Initialize a new instance of ProductModel with a real database client
 	dao := model.NewProductStorage(pgClient)
 
-	// Prepare the test product
+	// Prepare the test Product
 	name := "48″ Luxor Island Range Hood Updated"
 	factoryPrice := float32(2000.32)
 	isTaxable := false
@@ -358,7 +395,7 @@ func TestPatch(t *testing.T) {
 		name     string
 		id       string
 		fields   map[string]interface{}
-		expected *model.ProductStorage
+		expected *model.Product
 	}{
 		{
 			name: "Test Case 1: Valid ID",
@@ -385,7 +422,7 @@ func TestPatch(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Patch method
-			result, err := dao.Patch(context.Background(), tc.id, tc.fields)
+			result, err := dao.Patch(context.Background(), tc.id, tc.fields, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -416,4 +453,177 @@ func TestPatch(t *testing.T) {
 			assert.NotEqual(t, tc.expected.UpdatedAt, result.UpdatedAt)
 		})
 	}
+}
+
+// TestCreateWithID
+func TestCreateWithID(t *testing.T) {
+	// Create a real database client
+	pgClient := initDB(t)
+
+	// Initialize a new instance of ProductModel with a real database client
+	dao := model.NewProductStorage(pgClient)
+
+	// Define the test cases
+	testCases := []struct {
+		name     string
+		product  *model.Product
+		expected *model.Product
+	}{
+		{
+			name:     "Test Case 1: Valid Product",
+			product:  &productNew1,
+			expected: &productNew1,
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call the Create method
+			result, err := dao.Create(context.Background(), tc.product, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result matches the expected value
+			assert.Equal(t, tc.expected.ID, result.ID)
+			assert.Equal(t, tc.expected.SKU, result.SKU)
+			assert.Equal(t, tc.expected.Name, result.Name)
+			assert.Equal(t, tc.expected.ShortDescription, result.ShortDescription)
+			assert.Equal(t, tc.expected.Description, result.Description)
+			assert.Equal(t, tc.expected.StatusID, result.StatusID)
+			assert.Equal(t, tc.expected.Slug, result.Slug)
+			assert.Equal(t, tc.expected.RegularPrice, result.RegularPrice)
+			assert.Equal(t, tc.expected.SalePrice, result.SalePrice)
+			assert.Equal(t, tc.expected.FactoryPrice, result.FactoryPrice)
+			assert.Equal(t, tc.expected.IsTaxable, result.IsTaxable)
+			assert.Equal(t, tc.expected.Quantity, result.Quantity)
+			assert.Equal(t, tc.expected.ReturnToStockDate, result.ReturnToStockDate)
+			assert.Equal(t, tc.expected.IsTrackStock, result.IsTrackStock)
+			assert.Equal(t, tc.expected.ShippingClassID, result.ShippingClassID)
+			assert.Equal(t, tc.expected.ShippingWeight, result.ShippingWeight)
+			assert.Equal(t, tc.expected.ShippingWidth, result.ShippingWidth)
+			assert.Equal(t, tc.expected.ShippingHeight, result.ShippingHeight)
+			assert.Equal(t, tc.expected.ShippingLength, result.ShippingLength)
+			assert.Equal(t, tc.expected.SeoTitle, result.SeoTitle)
+			assert.Equal(t, tc.expected.GTIN, result.GTIN)
+			assert.Equal(t, tc.expected.GoogleProductCategory, result.GoogleProductCategory)
+			assert.Equal(t, tc.expected.GoogleProductType, result.GoogleProductType)
+		})
+	}
+}
+
+// TestCreateWithoutID
+func TestCreateWithoutID(t *testing.T) {
+	// Create a real database client
+	pgClient := initDB(t)
+
+	// Initialize a new instance of ProductModel with a real database client
+	dao := model.NewProductStorage(pgClient)
+
+	// Define the test cases
+	testCases := []struct {
+		name     string
+		product  *model.Product
+		expected *model.Product
+	}{
+		{
+			name:     "Test Case 1: Valid Product",
+			product:  &productNew2,
+			expected: &productNew2,
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call the Create method
+			result, err := dao.Create(context.Background(), tc.product, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+
+			// update ID
+			productNew2.ID = result.ID
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result matches the expected value
+			assert.Equal(t, tc.expected.SKU, result.SKU)
+			assert.Equal(t, tc.expected.Name, result.Name)
+			assert.Equal(t, tc.expected.ShortDescription, result.ShortDescription)
+			assert.Equal(t, tc.expected.Description, result.Description)
+			assert.Equal(t, tc.expected.StatusID, result.StatusID)
+			assert.Equal(t, tc.expected.Slug, result.Slug)
+			assert.Equal(t, tc.expected.RegularPrice, result.RegularPrice)
+			assert.Equal(t, tc.expected.SalePrice, result.SalePrice)
+			assert.Equal(t, tc.expected.FactoryPrice, result.FactoryPrice)
+			assert.Equal(t, tc.expected.IsTaxable, result.IsTaxable)
+			assert.Equal(t, tc.expected.Quantity, result.Quantity)
+			assert.Equal(t, tc.expected.ReturnToStockDate, result.ReturnToStockDate)
+			assert.Equal(t, tc.expected.IsTrackStock, result.IsTrackStock)
+			assert.Equal(t, tc.expected.ShippingClassID, result.ShippingClassID)
+			assert.Equal(t, tc.expected.ShippingWeight, result.ShippingWeight)
+			assert.Equal(t, tc.expected.ShippingWidth, result.ShippingWidth)
+			assert.Equal(t, tc.expected.ShippingHeight, result.ShippingHeight)
+			assert.Equal(t, tc.expected.ShippingLength, result.ShippingLength)
+			assert.Equal(t, tc.expected.SeoTitle, result.SeoTitle)
+			assert.Equal(t, tc.expected.GTIN, result.GTIN)
+			assert.Equal(t, tc.expected.GoogleProductCategory, result.GoogleProductCategory)
+			assert.Equal(t, tc.expected.GoogleProductType, result.GoogleProductType)
+		})
+	}
+}
+
+// TestDelete
+func TestDelete(t *testing.T) {
+	// Create a real database client
+	pgClient := initDB(t)
+
+	// Initialize a new instance of ProductModel with a real database client
+	dao := model.NewProductStorage(pgClient)
+
+	// Define the test cases
+	testCases := []struct {
+		name    string
+		id      string
+		success bool
+	}{
+		{
+			name:    "Test Case 1: Valid ID",
+			id:      productNew1.ID,
+			success: true,
+		},
+		{
+			name:    "Test Case 2: Invalid ID",
+			id:      productNew2.ID,
+			success: true,
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call the Delete method
+			err := dao.Delete(context.Background(), tc.id)
+
+			// Assert that there was no error
+			if tc.success {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err)
+			}
+		})
+	}
+}
+
+// initDB
+func initDB(t *testing.T) *pgxpool.Pool {
+	// Create a real database client
+	cfg := config.GetConfig(context.Background())
+	app := appInit.NewAppInit(context.Background(), cfg)
+	err := app.SqlDBInit()
+	if err != nil {
+		t.Fatalf("Failed to initialize database: %v", err)
+	}
+	pgClient := app.SqlDB
+	return pgClient
 }
