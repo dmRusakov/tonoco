@@ -4,6 +4,10 @@ import (
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
 )
 
+var (
+	ErrNothingInserted = errors.New("nothing inserted")
+)
+
 func ErrCommit(err error) error {
 	return errors.Wrap(err, "failed to commit Tx")
 }
