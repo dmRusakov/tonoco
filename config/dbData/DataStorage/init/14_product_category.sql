@@ -3,16 +3,16 @@ CREATE TABLE IF NOT EXISTS public.product_category
     id                UUID UNIQUE   DEFAULT uuid_generate_v4(),
     name              VARCHAR(255)                NOT NULL,
     slug              VARCHAR(255) UNIQUE         NOT NULL,
-    short_description VARCHAR(255)  DEFAULT NULL,
-    description       VARCHAR(4000) DEFAULT NULL,
+    short_description VARCHAR(255)  DEFAULT ''    NOT NULL,
+    description       VARCHAR(4000) DEFAULT ''    NOT NULL,
     sort_order        INTEGER       DEFAULT NULL,
     prime             BOOLEAN       DEFAULT TRUE,
     active            BOOLEAN       DEFAULT TRUE,
 
     created_at        TIMESTAMP     default NOW() NOT NULL,
-    created_by        UUID          DEFAULT NULL REFERENCES public.user (id),
+    created_by        UUID          DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
     updated_at        TIMESTAMP     default NOW() NOT NULL,
-    updated_by        UUID          DEFAULT NULL REFERENCES public.user (id),
+    updated_by        UUID          DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
 
     CONSTRAINT product_category_pkey PRIMARY KEY (id)
 );

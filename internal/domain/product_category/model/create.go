@@ -16,10 +16,10 @@ func (repo *ProductCategoryModel) Create(ctx context.Context, productCategory *P
 
 	// build query
 	statement := repo.qb.Insert(repo.table).Columns(
-		fieldMap["ID"], fieldMap["Name"], fieldMap["Slug"], fieldMap["SortDescription"], fieldMap["Description"],
+		fieldMap["ID"], fieldMap["Name"], fieldMap["Slug"], fieldMap["ShortDescription"], fieldMap["Description"],
 		fieldMap["SortOrder"], fieldMap["Prime"], fieldMap["Active"], fieldMap["CreatedAt"], fieldMap["CreatedBy"],
 		fieldMap["UpdatedAt"], fieldMap["UpdatedBy"]).Values(productCategory.ID, productCategory.Name, productCategory.Slug,
-		productCategory.SortDescription, productCategory.Description, productCategory.SortOrder, productCategory.Prime,
+		productCategory.ShortDescription, productCategory.Description, productCategory.SortOrder, productCategory.Prime,
 		productCategory.Active, "NOW()", by, "NOW()", by)
 
 	// convert the SQL statement to a string

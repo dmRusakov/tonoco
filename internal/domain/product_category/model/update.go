@@ -13,7 +13,7 @@ func (repo *ProductCategoryModel) Update(ctx context.Context, product *ProductCa
 		Update(repo.table).
 		Set(fieldMap["Name"], product.Name).
 		Set(fieldMap["Slug"], product.Slug).
-		Set(fieldMap["SortDescription"], product.SortDescription).
+		Set(fieldMap["ShortDescription"], product.ShortDescription).
 		Set(fieldMap["Description"], product.Description).
 		Set(fieldMap["SortOrder"], product.SortOrder).
 		Set(fieldMap["Prime"], product.Prime).

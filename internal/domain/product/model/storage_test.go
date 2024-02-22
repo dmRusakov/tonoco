@@ -223,6 +223,7 @@ var product6730 = model.Product{
 	UpdatedBy:             "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1",
 }
 
+// test get
 func TestGet(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
@@ -372,7 +373,7 @@ func TestUpdate(t *testing.T) {
 	}
 }
 
-// TestPatch
+// test patch
 func TestPatch(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
@@ -455,7 +456,7 @@ func TestPatch(t *testing.T) {
 	}
 }
 
-// TestCreateWithID
+// test create with id
 func TestCreateWithID(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
@@ -513,7 +514,7 @@ func TestCreateWithID(t *testing.T) {
 	}
 }
 
-// TestCreateWithoutID
+// test create without id
 func TestCreateWithoutID(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
@@ -573,7 +574,7 @@ func TestCreateWithoutID(t *testing.T) {
 	}
 }
 
-// TestDelete
+// test delete
 func TestDelete(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
