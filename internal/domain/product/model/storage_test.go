@@ -229,7 +229,7 @@ func TestGet(t *testing.T) {
 	pgClient := initDB(t)
 
 	// Initialize a new instance of ProductModel with a real database client
-	dao := model.NewProductStorage(pgClient)
+	storage := model.NewProductStorage(pgClient)
 
 	// Define the test cases
 	testCases := []struct {
@@ -264,7 +264,7 @@ func TestGet(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Get method
-			result, err := dao.Get(context.Background(), tc.id)
+			result, err := storage.Get(context.Background(), tc.id)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -302,7 +302,7 @@ func TestUpdate(t *testing.T) {
 	pgClient := initDB(t)
 
 	// Initialize a new instance of ProductModel with a real database client
-	dao := model.NewProductStorage(pgClient)
+	storage := model.NewProductStorage(pgClient)
 
 	// create new variable from product2500 and modify it
 	testProduct1 := product2500
@@ -314,18 +314,18 @@ func TestUpdate(t *testing.T) {
 	testCases := []struct {
 		name     string
 		id       string
-		product  *model.Product
+		sent     *model.Product
 		expected *model.Product
 	}{
 		{
 			name:     "Test Case 1: Valid ID",
 			id:       "a0eebc99-9c0b-4ef8-bb6d-6bb9bd382500",
-			product:  &testProduct1,
+			sent:     &testProduct1,
 			expected: &testProduct1,
 		}, {
 			name:     "Test Case 2: Valid ID",
 			id:       "a0eebc99-9c0b-4ef8-bb6d-6bb9bd382500",
-			product:  &product2500,
+			sent:     &product2500,
 			expected: &product2500,
 		},
 	}
@@ -334,13 +334,13 @@ func TestUpdate(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Update method
-			_, err := dao.Update(context.Background(), tc.product, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+			_, err := storage.Update(context.Background(), tc.sent, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
 
 			// Assert that there was no error
 			assert.NoError(t, err)
 
 			// Call the Get method
-			result, err := dao.Get(context.Background(), tc.id)
+			result, err := storage.Get(context.Background(), tc.id)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -379,17 +379,13 @@ func TestPatch(t *testing.T) {
 	pgClient := initDB(t)
 
 	// Initialize a new instance of ProductModel with a real database client
-	dao := model.NewProductStorage(pgClient)
+	storage := model.NewProductStorage(pgClient)
 
 	// Prepare the test Product
-	name := "48″ Luxor Island Range Hood Updated"
-	factoryPrice := float32(2000.32)
-	isTaxable := false
-
 	testProduct1 := product2500
-	testProduct1.Name = name
-	testProduct1.FactoryPrice = factoryPrice
-	testProduct1.IsTaxable = isTaxable
+	testProduct1.Name = "48″ Luxor Island Range Hood Updated"
+	testProduct1.FactoryPrice = float32(2000.32)
+	testProduct1.IsTaxable = false
 
 	// Define the test cases
 	testCases := []struct {
@@ -402,9 +398,9 @@ func TestPatch(t *testing.T) {
 			name: "Test Case 1: Valid ID",
 			id:   "a0eebc99-9c0b-4ef8-bb6d-6bb9bd382500",
 			fields: map[string]interface{}{
-				"Name":         name,
-				"FactoryPrice": factoryPrice,
-				"IsTaxable":    isTaxable,
+				"Name":         testProduct1.Name,
+				"FactoryPrice": testProduct1.FactoryPrice,
+				"IsTaxable":    testProduct1.IsTaxable,
 			},
 			expected: &testProduct1,
 		}, {
@@ -423,7 +419,7 @@ func TestPatch(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Patch method
-			result, err := dao.Patch(context.Background(), tc.id, tc.fields, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+			result, err := storage.Patch(context.Background(), tc.id, tc.fields, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -462,17 +458,17 @@ func TestCreateWithID(t *testing.T) {
 	pgClient := initDB(t)
 
 	// Initialize a new instance of ProductModel with a real database client
-	dao := model.NewProductStorage(pgClient)
+	storage := model.NewProductStorage(pgClient)
 
 	// Define the test cases
 	testCases := []struct {
 		name     string
-		product  *model.Product
+		sent     *model.Product
 		expected *model.Product
 	}{
 		{
 			name:     "Test Case 1: Valid Product",
-			product:  &productNew1,
+			sent:     &productNew1,
 			expected: &productNew1,
 		},
 	}
@@ -481,7 +477,7 @@ func TestCreateWithID(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Create method
-			result, err := dao.Create(context.Background(), tc.product, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+			result, err := storage.Create(context.Background(), tc.sent, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -520,17 +516,17 @@ func TestCreateWithoutID(t *testing.T) {
 	pgClient := initDB(t)
 
 	// Initialize a new instance of ProductModel with a real database client
-	dao := model.NewProductStorage(pgClient)
+	storage := model.NewProductStorage(pgClient)
 
 	// Define the test cases
 	testCases := []struct {
 		name     string
-		product  *model.Product
+		sent     *model.Product
 		expected *model.Product
 	}{
 		{
 			name:     "Test Case 1: Valid Product",
-			product:  &productNew2,
+			sent:     &productNew2,
 			expected: &productNew2,
 		},
 	}
@@ -539,7 +535,7 @@ func TestCreateWithoutID(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Create method
-			result, err := dao.Create(context.Background(), tc.product, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+			result, err := storage.Create(context.Background(), tc.sent, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
 
 			// update ID
 			productNew2.ID = result.ID
@@ -580,7 +576,7 @@ func TestDelete(t *testing.T) {
 	pgClient := initDB(t)
 
 	// Initialize a new instance of ProductModel with a real database client
-	dao := model.NewProductStorage(pgClient)
+	storage := model.NewProductStorage(pgClient)
 
 	// Define the test cases
 	testCases := []struct {
@@ -604,7 +600,7 @@ func TestDelete(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Delete method
-			err := dao.Delete(context.Background(), tc.id)
+			err := storage.Delete(context.Background(), tc.id)
 
 			// Assert that there was no error
 			if tc.success {

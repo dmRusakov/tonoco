@@ -35,3 +35,7 @@ func ErrExec(err error) error {
 func ErrDoQuery(err error) error {
 	return errors.Wrap(err, "failed to query")
 }
+
+func ErrNoRows(err error) error {
+	return errors.Wrap(err, "no rows returned")
+}

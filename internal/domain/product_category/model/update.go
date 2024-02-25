@@ -7,20 +7,20 @@ import (
 	"strconv"
 )
 
-func (repo *ProductCategoryModel) Update(ctx context.Context, product *ProductCategory, by string) (*ProductCategory, error) {
+func (repo *ProductCategoryModel) Update(ctx context.Context, productCategory *ProductCategory, by string) (*ProductCategory, error) {
 	// build query
 	statement := repo.qb.
 		Update(repo.table).
-		Set(fieldMap["Name"], product.Name).
-		Set(fieldMap["Slug"], product.Slug).
-		Set(fieldMap["ShortDescription"], product.ShortDescription).
-		Set(fieldMap["Description"], product.Description).
-		Set(fieldMap["SortOrder"], product.SortOrder).
-		Set(fieldMap["Prime"], product.Prime).
-		Set(fieldMap["Active"], product.Active).
+		Set(fieldMap["Name"], productCategory.Name).
+		Set(fieldMap["Slug"], productCategory.Slug).
+		Set(fieldMap["ShortDescription"], productCategory.ShortDescription).
+		Set(fieldMap["Description"], productCategory.Description).
+		Set(fieldMap["SortOrder"], productCategory.SortOrder).
+		Set(fieldMap["Prime"], productCategory.Prime).
+		Set(fieldMap["Active"], productCategory.Active).
 		Set(fieldMap["UpdatedAt"], "NOW()").
 		Set(fieldMap["UpdatedBy"], by).
-		Where(fieldMap["ID"]+" = ?", product.ID)
+		Where(fieldMap["ID"]+" = ?", productCategory.ID)
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()
@@ -51,5 +51,5 @@ func (repo *ProductCategoryModel) Update(ctx context.Context, product *ProductCa
 		return nil, err
 	}
 
-	return repo.Get(ctx, product.ID)
+	return repo.Get(ctx, productCategory.ID)
 }

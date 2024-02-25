@@ -128,6 +128,258 @@ func TestProductCategoryGet(t *testing.T) {
 	}
 }
 
+// test update
+func TestProductCategoryUpdate(t *testing.T) {
+	// Create a real database client
+	pgClient := initDB(t)
+
+	// Initialize a new instance of the model
+	storage := model.NewProductStorage(pgClient)
+
+	// create new variable from productCategory01
+	productCategory01New := productCategory01
+	productCategory01New.Name = "Island Range Hoods New"
+	productCategory01New.Slug = "island-new"
+	productCategory01New.Prime = false
+
+	// Define the test cases
+	testCases := []struct {
+		name   string
+		id     string
+		sent   *model.ProductCategory
+		update *model.ProductCategory
+	}{
+		{
+			name:   "Update product category 01",
+			id:     productCategory01.ID,
+			sent:   &productCategory01New,
+			update: &productCategory01New,
+		}, {
+			name:   "Update product category 02",
+			id:     productCategory01.ID,
+			sent:   &productCategory01,
+			update: &productCategory01,
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call the Update method
+			_, err := storage.Update(context.Background(), tc.sent, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Call the Get method
+			result, err := storage.Get(context.Background(), tc.id)
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result matches the expected value
+			assert.Equal(t, tc.update.ID, result.ID)
+			assert.Equal(t, tc.update.Name, result.Name)
+			assert.Equal(t, tc.update.Slug, result.Slug)
+			assert.Equal(t, tc.update.ShortDescription, result.ShortDescription)
+			assert.Equal(t, tc.update.Description, result.Description)
+			assert.Equal(t, tc.update.Prime, result.Prime)
+			assert.Equal(t, tc.update.Active, result.Active)
+		})
+	}
+}
+
+// test patch
+func TestProductCategoryPatch(t *testing.T) {
+	// Create a real database client
+	pgClient := initDB(t)
+
+	// Initialize a new instance of the model
+	storage := model.NewProductStorage(pgClient)
+
+	// create new variable from productCategory01
+	productCategory01New := productCategory01
+	productCategory01New.Name = "Island Range Hoods New"
+	productCategory01New.Slug = "island-new"
+	productCategory01New.Prime = false
+
+	// Define the test cases
+	testCases := []struct {
+		name     string
+		id       string
+		fields   map[string]interface{}
+		expected *model.ProductCategory
+	}{
+		{
+			name: "Patch product category 01",
+			id:   productCategory01.ID,
+			fields: map[string]interface{}{
+				"Name":  productCategory01New.Name,
+				"Slug":  productCategory01New.Slug,
+				"Prime": productCategory01New.Prime,
+			},
+			expected: &productCategory01New,
+		}, {
+			name: "Patch product category 02",
+			id:   productCategory01.ID,
+			fields: map[string]interface{}{
+				"Name":  productCategory01.Name,
+				"Slug":  productCategory01.Slug,
+				"Prime": productCategory01.Prime,
+			},
+			expected: &productCategory01,
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call the Patch method
+			_, err := storage.Patch(context.Background(), tc.id, tc.fields, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Call the Get method
+			result, err := storage.Get(context.Background(), tc.id)
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result matches the expected value
+			assert.Equal(t, tc.expected.ID, result.ID)
+			assert.Equal(t, tc.expected.Name, result.Name)
+			assert.Equal(t, tc.expected.Slug, result.Slug)
+			assert.Equal(t, tc.expected.ShortDescription, result.ShortDescription)
+			assert.Equal(t, tc.expected.Description, result.Description)
+			assert.Equal(t, tc.expected.Prime, result.Prime)
+			assert.Equal(t, tc.expected.Active, result.Active)
+		})
+	}
+}
+
+// test create with id
+func TestProductCategoryCreateWithId(t *testing.T) {
+	// Create a real database client
+	pgClient := initDB(t)
+
+	// Initialize a new instance of the model
+	storage := model.NewProductStorage(pgClient)
+
+	// Define the test cases
+	testCases := []struct {
+		name     string
+		sent     *model.ProductCategory
+		expected *model.ProductCategory
+	}{
+		{
+			name:     "Create product category with id",
+			sent:     &productCategoryNewWithId,
+			expected: &productCategoryNewWithId,
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call the Create method
+			result, err := storage.Create(context.Background(), tc.sent, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result matches the expected value
+			assert.Equal(t, tc.expected.ID, result.ID)
+			assert.Equal(t, tc.expected.Name, result.Name)
+			assert.Equal(t, tc.expected.Slug, result.Slug)
+			assert.Equal(t, tc.expected.ShortDescription, result.ShortDescription)
+			assert.Equal(t, tc.expected.Description, result.Description)
+			assert.Equal(t, tc.expected.Prime, result.Prime)
+			assert.Equal(t, tc.expected.Active, result.Active)
+		})
+	}
+}
+
+// test create without id
+func TestProductCategoryCreateWithoutId(t *testing.T) {
+	// Create a real database client
+	pgClient := initDB(t)
+
+	// Initialize a new instance of the model
+	storage := model.NewProductStorage(pgClient)
+
+	// Define the test cases
+	testCases := []struct {
+		name     string
+		sent     *model.ProductCategory
+		expected *model.ProductCategory
+	}{
+		{
+			name:     "Create product category without id",
+			sent:     &productCategoryNewWithoutId,
+			expected: &productCategoryNewWithoutId,
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call the Create method
+			result, err := storage.Create(context.Background(), tc.sent, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+
+			// update ID
+			tc.expected.ID = result.ID
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result matches the expected value
+			assert.Equal(t, tc.expected.Name, result.Name)
+			assert.Equal(t, tc.expected.Slug, result.Slug)
+			assert.Equal(t, tc.expected.ShortDescription, result.ShortDescription)
+			assert.Equal(t, tc.expected.Description, result.Description)
+			assert.Equal(t, tc.expected.Prime, result.Prime)
+			assert.Equal(t, tc.expected.Active, result.Active)
+		})
+	}
+}
+
+// test delete
+func TestProductCategoryDelete(t *testing.T) {
+	// Create a real database client
+	pgClient := initDB(t)
+
+	// Initialize a new instance of the model
+	storage := model.NewProductStorage(pgClient)
+
+	// Define the test cases
+	testCases := []struct {
+		name string
+		id   string
+	}{
+		{
+			name: "Delete product category 01",
+			id:   productCategoryNewWithId.ID,
+		}, {
+			name: "Delete product category 02",
+			id:   productCategoryNewWithoutId.ID,
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call the Delete method
+			err := storage.Delete(context.Background(), tc.id)
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+		})
+	}
+
+}
+
+// initDB
 func initDB(t *testing.T) *pgxpool.Pool {
 	// Create a real database client
 	cfg := config.GetConfig(context.Background())
