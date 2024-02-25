@@ -9,6 +9,7 @@ type repository interface {
 	Create(ctx context.Context, product *model.Product, by string) (*model.Product, error)
 	Get(ctx context.Context, id string) (*model.Product, error)
 	Update(ctx context.Context, product *model.Product, by string) (*model.Product, error)
+	Patch(ctx context.Context, id string, fields map[string]interface{}, by string) (*model.Product, error)
 	Delete(ctx context.Context, id string) error
 }
 
@@ -30,6 +31,10 @@ func (s *ProductService) Get(ctx context.Context, id string) (*model.Product, er
 
 func (s *ProductService) Update(ctx context.Context, product *model.Product, by string) (*model.Product, error) {
 	return s.repository.Update(ctx, product, by)
+}
+
+func (s *ProductService) Patch(ctx context.Context, id string, fields map[string]interface{}, by string) (*model.Product, error) {
+	return s.repository.Patch(ctx, id, fields, by)
 }
 
 func (s *ProductService) Delete(ctx context.Context, id string) error {

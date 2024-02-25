@@ -6,7 +6,7 @@ import (
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 )
 
-type ProductStorage interface {
+type ProductCategoryStorage interface {
 	Create(ctx context.Context, productCategory *ProductCategory, by string) (*ProductCategory, error)
 	Get(ctx context.Context, id string) (*ProductCategory, error)
 	Update(ctx context.Context, product *ProductCategory, by string) (*ProductCategory, error)
@@ -21,8 +21,8 @@ type ProductCategoryModel struct {
 	client psql.Client
 }
 
-// NewProductCategoryStorage is a constructor function that returns a new instance of the ProductCategoryModel.
-func NewProductStorage(client psql.Client) *ProductCategoryModel {
+// ProductCategoryStorage is a constructor function that returns a new instance of the ProductCategoryModel.
+func NewProductCategoryStorage(client psql.Client) *ProductCategoryModel {
 	return &ProductCategoryModel{
 		qb:     sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		client: client,
