@@ -61,7 +61,7 @@ func (repo *ProductModel) Update(ctx context.Context, product *Product, by strin
 	}
 
 	// execute the query
-	_, err = repo.client.Exec(ctx, query, args...)
+	cmd, err := repo.client.Exec(ctx, query, args...)
 	if err != nil {
 		err = psql.ErrExec(err)
 		tracing.Error(ctx, err)
@@ -69,5 +69,13 @@ func (repo *ProductModel) Update(ctx context.Context, product *Product, by strin
 		return nil, err
 	}
 
+	if cmd.RowsAffected() == 0 {
+		err = psql.ErrNothingInserted
+		tracing.Error(ctx, err)
+
+		return nil, err
+	}
+
+	// return the updated product
 	return repo.Get(ctx, product.ID)
 }

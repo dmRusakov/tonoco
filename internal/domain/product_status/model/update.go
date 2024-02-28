@@ -2,25 +2,22 @@ package model
 
 import (
 	"context"
+	"fmt"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"strconv"
 )
 
-func (repo *ProductCategoryModel) Update(ctx context.Context, productCategory *ProductCategory, by string) (*ProductCategory, error) {
+func (repo *ProductStatusModel) Update(ctx context.Context, product *ProductStatus, by string) (*ProductStatus, error) {
 	// build query
-	statement := repo.qb.
-		Update(repo.table).
-		Set(fieldMap["Name"], productCategory.Name).
-		Set(fieldMap["Slug"], productCategory.Slug).
-		Set(fieldMap["ShortDescription"], productCategory.ShortDescription).
-		Set(fieldMap["Description"], productCategory.Description).
-		Set(fieldMap["SortOrder"], productCategory.SortOrder).
-		Set(fieldMap["Prime"], productCategory.Prime).
-		Set(fieldMap["Active"], productCategory.Active).
+	statement := repo.qb.Update(repo.table).
+		Set(fieldMap["Name"], product.Name).
+		Set(fieldMap["Slug"], product.Slug).
+		Set(fieldMap["SortOrder"], product.SortOrder).
+		Set(fieldMap["Active"], product.Active).
 		Set(fieldMap["UpdatedAt"], "NOW()").
 		Set(fieldMap["UpdatedBy"], by).
-		Where(fieldMap["ID"]+" = ?", productCategory.ID)
+		Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), product.ID)
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()
@@ -31,7 +28,8 @@ func (repo *ProductCategoryModel) Update(ctx context.Context, productCategory *P
 		return nil, err
 	}
 
-	tracing.SpanEvent(ctx, "Update Product")
+	// Add tracing
+	tracing.SpanEvent(ctx, "Update ProductStatus")
 	tracing.TraceVal(ctx, "SQL", query)
 	for i, arg := range args {
 		argStr, ok := arg.(string)
@@ -45,9 +43,6 @@ func (repo *ProductCategoryModel) Update(ctx context.Context, productCategory *P
 	// execute the query
 	cmd, err := repo.client.Exec(ctx, query, args...)
 	if err != nil {
-		err = psql.ErrExec(err)
-		tracing.Error(ctx, err)
-
 		return nil, err
 	}
 
@@ -58,5 +53,11 @@ func (repo *ProductCategoryModel) Update(ctx context.Context, productCategory *P
 		return nil, err
 	}
 
-	return repo.Get(ctx, productCategory.ID)
+	// retrieve the updated Product
+	productStatus, err := repo.Get(ctx, product.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return productStatus, nil
 }

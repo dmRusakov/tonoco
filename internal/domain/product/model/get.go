@@ -72,45 +72,47 @@ func (repo *ProductModel) Get(ctx context.Context, id string) (*Product, error) 
 
 	defer rows.Close()
 
+	if !rows.Next() {
+		return nil, psql.ErrNoRowForID(id)
+	}
+
 	// scan the result set into a slice of Product structs
 	product := &Product{}
-	for rows.Next() {
-		if err = rows.Scan(
-			&product.ID,
-			&product.SKU,
-			&product.Name,
-			&product.ShortDescription,
-			&product.Description,
-			&product.SortOrder,
-			&product.StatusID,
-			&product.Slug,
-			&product.RegularPrice,
-			&product.SalePrice,
-			&product.FactoryPrice,
-			&product.IsTaxable,
-			&product.Quantity,
-			&product.ReturnToStockDate,
-			&product.IsTrackStock,
-			&product.ShippingClassID,
-			&product.ShippingWeight,
-			&product.ShippingWidth,
-			&product.ShippingHeight,
-			&product.ShippingLength,
-			&product.SeoTitle,
-			&product.SeoDescription,
-			&product.GTIN,
-			&product.GoogleProductCategory,
-			&product.GoogleProductType,
-			&product.CreatedAt,
-			&product.CreatedBy,
-			&product.UpdatedAt,
-			&product.UpdatedBy,
-		); err != nil {
-			err = psql.ErrScan(psql.ParsePgError(err))
-			tracing.Error(ctx, err)
+	if err = rows.Scan(
+		&product.ID,
+		&product.SKU,
+		&product.Name,
+		&product.ShortDescription,
+		&product.Description,
+		&product.SortOrder,
+		&product.StatusID,
+		&product.Slug,
+		&product.RegularPrice,
+		&product.SalePrice,
+		&product.FactoryPrice,
+		&product.IsTaxable,
+		&product.Quantity,
+		&product.ReturnToStockDate,
+		&product.IsTrackStock,
+		&product.ShippingClassID,
+		&product.ShippingWeight,
+		&product.ShippingWidth,
+		&product.ShippingHeight,
+		&product.ShippingLength,
+		&product.SeoTitle,
+		&product.SeoDescription,
+		&product.GTIN,
+		&product.GoogleProductCategory,
+		&product.GoogleProductType,
+		&product.CreatedAt,
+		&product.CreatedBy,
+		&product.UpdatedAt,
+		&product.UpdatedBy,
+	); err != nil {
+		err = psql.ErrScan(psql.ParsePgError(err))
+		tracing.Error(ctx, err)
 
-			return product, err
-		}
+		return nil, err
 	}
 
 	return product, nil

@@ -26,10 +26,17 @@ func (repo *ProductModel) Delete(ctx context.Context, id string) error {
 	}
 
 	// execute the query
-	_, execErr := repo.client.Exec(ctx, query, args...)
-	if execErr != nil {
-		tracing.Error(ctx, execErr)
-		return execErr
+	cmd, err := repo.client.Exec(ctx, query, args...)
+	if err != nil {
+		tracing.Error(ctx, err)
+		return err
+	}
+
+	// check if any rows were affected
+	if cmd.RowsAffected() == 0 {
+		err := fmt.Errorf("no rows affected")
+		tracing.Error(ctx, err)
+		return err
 	}
 
 	return nil

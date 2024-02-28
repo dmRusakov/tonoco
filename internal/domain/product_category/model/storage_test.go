@@ -81,7 +81,7 @@ func TestProductCategoryGet(t *testing.T) {
 	pgClient := initDB(t)
 
 	// Initialize a new instance of the model
-	storage := model.NewProductStorage(pgClient)
+	storage := model.NewProductCategoryStorage(pgClient)
 
 	// Define the test cases
 	testCases := []struct {
@@ -134,7 +134,7 @@ func TestProductCategoryUpdate(t *testing.T) {
 	pgClient := initDB(t)
 
 	// Initialize a new instance of the model
-	storage := model.NewProductStorage(pgClient)
+	storage := model.NewProductCategoryStorage(pgClient)
 
 	// create new variable from productCategory01
 	productCategory01New := productCategory01
@@ -195,7 +195,7 @@ func TestProductCategoryPatch(t *testing.T) {
 	pgClient := initDB(t)
 
 	// Initialize a new instance of the model
-	storage := model.NewProductStorage(pgClient)
+	storage := model.NewProductCategoryStorage(pgClient)
 
 	// create new variable from productCategory01
 	productCategory01New := productCategory01
@@ -264,7 +264,7 @@ func TestProductCategoryCreateWithId(t *testing.T) {
 	pgClient := initDB(t)
 
 	// Initialize a new instance of the model
-	storage := model.NewProductStorage(pgClient)
+	storage := model.NewProductCategoryStorage(pgClient)
 
 	// Define the test cases
 	testCases := []struct {
@@ -306,7 +306,7 @@ func TestProductCategoryCreateWithoutId(t *testing.T) {
 	pgClient := initDB(t)
 
 	// Initialize a new instance of the model
-	storage := model.NewProductStorage(pgClient)
+	storage := model.NewProductCategoryStorage(pgClient)
 
 	// Define the test cases
 	testCases := []struct {
@@ -350,7 +350,7 @@ func TestProductCategoryDelete(t *testing.T) {
 	pgClient := initDB(t)
 
 	// Initialize a new instance of the model
-	storage := model.NewProductStorage(pgClient)
+	storage := model.NewProductCategoryStorage(pgClient)
 
 	// Define the test cases
 	testCases := []struct {

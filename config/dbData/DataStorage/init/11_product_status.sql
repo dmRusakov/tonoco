@@ -2,15 +2,15 @@
 CREATE TABLE IF NOT EXISTS public.product_status
 (
     id         UUID UNIQUE DEFAULT uuid_generate_v4() NOT NULL,
-    name       VARCHAR(255)                           NULL,
-    slug       VARCHAR(255)                           NULL,
-    sort_order INTEGER                                NULL,
+    name       VARCHAR(255)                           NOT NULL,
+    slug       VARCHAR(255)                           NOT NULL,
+    sort_order INTEGER                                NOT NULL,
     active     BOOLEAN     DEFAULT TRUE               NOT NULL,
 
     created_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
-    created_by UUID        DEFAULT NULL REFERENCES public.user (id),
+    created_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
     updated_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
-    updated_by UUID        DEFAULT NULL REFERENCES public.user (id),
+    updated_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
 
     CONSTRAINT product_status_pkey PRIMARY KEY (id)
 );

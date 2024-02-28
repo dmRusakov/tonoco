@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func (repo *ProductCategoryModel) Delete(ctx context.Context, id string) error {
+func (repo *ProductStatusModel) Delete(ctx context.Context, id string) error {
 	// build query
 	statement := repo.qb.Delete(repo.table).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), id)
 
@@ -19,7 +19,7 @@ func (repo *ProductCategoryModel) Delete(ctx context.Context, id string) error {
 	}
 
 	// trace the SQL query and arguments
-	tracing.SpanEvent(ctx, "Delete ProductCategory query")
+	tracing.SpanEvent(ctx, "Delete ProductStatus query")
 	tracing.TraceVal(ctx, "sql", query)
 	for i, arg := range args {
 		tracing.TraceIVal(ctx, "arg-"+strconv.Itoa(i), arg)

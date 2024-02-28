@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func (repo *ProductCategoryModel) Patch(ctx context.Context, id string, fields map[string]interface{}, by string) (*ProductCategory, error) {
+func (repo *ProductStatusModel) Patch(ctx context.Context, id string, fields map[string]interface{}, by string) (*ProductStatus, error) {
 	// build query
 	statement := repo.qb.Update(repo.table).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), id)
 
@@ -52,14 +52,15 @@ func (repo *ProductCategoryModel) Patch(ctx context.Context, id string, fields m
 	if cmd.RowsAffected() == 0 {
 		err = psql.ErrNothingInserted
 		tracing.Error(ctx, err)
+
 		return nil, err
 	}
 
 	// retrieve the updated Product
-	productCategory, err := repo.Get(ctx, id)
+	productStatus, err := repo.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return productCategory, nil
+	return productStatus, nil
 }

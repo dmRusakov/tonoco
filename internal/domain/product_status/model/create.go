@@ -8,10 +8,10 @@ import (
 	"strconv"
 )
 
-func (repo *ProductCategoryModel) Create(ctx context.Context, productCategory *ProductCategory, by string) (*ProductCategory, error) {
+func (repo *ProductStatusModel) Create(ctx context.Context, productStatus *ProductStatus, by string) (*ProductStatus, error) {
 	// if ID is not set, generate a new UUID
-	if productCategory.ID == "" {
-		productCategory.ID = uuid.New().String()
+	if productStatus.ID == "" {
+		productStatus.ID = uuid.New().String()
 	}
 
 	// build query
@@ -20,24 +20,18 @@ func (repo *ProductCategoryModel) Create(ctx context.Context, productCategory *P
 			fieldMap["ID"],
 			fieldMap["Name"],
 			fieldMap["Slug"],
-			fieldMap["ShortDescription"],
-			fieldMap["Description"],
 			fieldMap["SortOrder"],
-			fieldMap["Prime"],
 			fieldMap["Active"],
 			fieldMap["CreatedAt"],
 			fieldMap["CreatedBy"],
 			fieldMap["UpdatedAt"],
 			fieldMap["UpdatedBy"]).
 		Values(
-			productCategory.ID,
-			productCategory.Name,
-			productCategory.Slug,
-			productCategory.ShortDescription,
-			productCategory.Description,
-			productCategory.SortOrder,
-			productCategory.Prime,
-			productCategory.Active,
+			productStatus.ID,
+			productStatus.Name,
+			productStatus.Slug,
+			productStatus.SortOrder,
+			productStatus.Active,
 			"NOW()",
 			by,
 			"NOW()",
@@ -72,5 +66,5 @@ func (repo *ProductCategoryModel) Create(ctx context.Context, productCategory *P
 		return nil, psql.ErrNothingInserted
 	}
 
-	return productCategory, nil
+	return productStatus, nil
 }

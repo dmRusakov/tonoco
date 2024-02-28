@@ -8,17 +8,14 @@ import (
 	"strconv"
 )
 
-func (repo *ProductCategoryModel) Get(ctx context.Context, id string) (*ProductCategory, error) {
+func (repo *ProductStatusModel) Get(ctx context.Context, id string) (*ProductStatus, error) {
 	// build query
 	statement := repo.qb.
 		Select(
 			fieldMap["ID"],
 			fieldMap["Name"],
 			fieldMap["Slug"],
-			fieldMap["ShortDescription"],
-			fieldMap["Description"],
 			fieldMap["SortOrder"],
-			fieldMap["Prime"],
 			fieldMap["Active"],
 			fieldMap["CreatedAt"],
 			fieldMap["CreatedBy"],
@@ -58,27 +55,24 @@ func (repo *ProductCategoryModel) Get(ctx context.Context, id string) (*ProductC
 		return nil, psql.ErrNoRowForID(id)
 	}
 
-	// scan the result set into a slice of Product structs
-	productCategory := &ProductCategory{}
+	// scan the result set into a ProductStatus struct
+	productStatus := &ProductStatus{}
 	if err = rows.Scan(
-		&productCategory.ID,
-		&productCategory.Name,
-		&productCategory.Slug,
-		&productCategory.ShortDescription,
-		&productCategory.Description,
-		&productCategory.SortOrder,
-		&productCategory.Prime,
-		&productCategory.Active,
-		&productCategory.CreatedAt,
-		&productCategory.CreatedBy,
-		&productCategory.UpdatedAt,
-		&productCategory.UpdatedBy,
+		&productStatus.ID,
+		&productStatus.Name,
+		&productStatus.Slug,
+		&productStatus.SortOrder,
+		&productStatus.Active,
+		&productStatus.CreatedAt,
+		&productStatus.CreatedBy,
+		&productStatus.UpdatedAt,
+		&productStatus.UpdatedBy,
 	); err != nil {
-		err = psql.ErrScan(err)
+		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
 
 		return nil, err
 	}
 
-	return productCategory, nil
+	return productStatus, nil
 }

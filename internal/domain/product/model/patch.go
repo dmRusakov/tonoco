@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"fmt"
+	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"strconv"
 )
@@ -40,10 +41,16 @@ func (repo *ProductModel) Patch(ctx context.Context, id string, fields map[strin
 	}
 
 	// execute the query
-	_, execErr := repo.client.Exec(ctx, query, args...)
-	if execErr != nil {
-		tracing.Error(ctx, execErr)
-		return nil, execErr
+	cmd, err := repo.client.Exec(ctx, query, args...)
+	if err != nil {
+		tracing.Error(ctx, err)
+		return nil, err
+	}
+
+	if cmd.RowsAffected() == 0 {
+		err = psql.ErrNothingInserted
+		tracing.Error(ctx, err)
+		return nil, err
 	}
 
 	// retrieve the updated Product
