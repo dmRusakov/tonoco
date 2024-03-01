@@ -6,7 +6,7 @@ import (
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 )
 
-type ProductCategoryStorage interface {
+type ProductStatusStorage interface {
 	All(ctx context.Context, filter *Filter) ([]*ProductStatus, error)
 	Create(ctx context.Context, productCategory *ProductStatus, by string) (*ProductStatus, error)
 	Get(ctx context.Context, id string) (*ProductStatus, error)
