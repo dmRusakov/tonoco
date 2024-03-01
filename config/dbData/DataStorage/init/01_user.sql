@@ -16,6 +16,14 @@ CREATE TABLE IF NOT EXISTS public.user
     CONSTRAINT user_pkey PRIMARY KEY (id)
 );
 
+-- comment on columns
+COMMENT ON COLUMN public.user.id IS 'Unique identifier';
+COMMENT ON COLUMN public.user.email IS 'Email address';
+COMMENT ON COLUMN public.user.first_name IS 'First name';
+COMMENT ON COLUMN public.user.last_name IS 'Last name';
+COMMENT ON COLUMN public.user.password IS 'Hash of Password';
+COMMENT ON COLUMN public.user.active IS 'Active status';
+
 -- index, constraint and ownership
 ALTER TABLE public.user OWNER TO postgres;
 CREATE INDEX user_user_id ON public.user (id);

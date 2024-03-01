@@ -1,14 +1,14 @@
--- create table
+-- ownership, index and comment
 CREATE TABLE IF NOT EXISTS public.product
 (
-    id                      UUID UNIQUE         DEFAULT uuid_generate_v4(),
+    id                      UUID UNIQUE                  DEFAULT uuid_generate_v4(),
     sku                     VARCHAR(100) UNIQUE NOT NULL,
     name                    VARCHAR(255)        NOT NULL,
     short_description       VARCHAR(1000)       NOT NULL DEFAULT '',
     description             VARCHAR(4000)       NOT NULL DEFAULT '',
     sort_order              INTEGER             NOT NULL,
     status_id               UUID                NOT NULL REFERENCES public.product_status (id),
-    slug                    VARCHAR(255) UNIQUE NOT NULL,
+    url                     VARCHAR(255) UNIQUE NOT NULL,
 
     regular_price           REAL                NOT NULL,
     sale_price              REAL                NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS public.product
     is_track_stock          BOOLEAN             NOT NULL DEFAULT TRUE,
 
     shipping_class_id       UUID                NOT NULL REFERENCES public.shipping_class (id),
-    shipping_weight         REAL                NOT NULL DEFAULT 0,
+    shipping_weight         REAL                NOT NULL DEFAULT 0 ,
     shipping_width          REAL                NOT NULL DEFAULT 0,
     shipping_height         REAL                NOT NULL DEFAULT 0,
     shipping_length         REAL                NOT NULL DEFAULT 0,
@@ -31,21 +31,54 @@ CREATE TABLE IF NOT EXISTS public.product
     google_product_category VARCHAR(50)         NOT NULL DEFAULT '',
     google_product_type     VARCHAR(100)        NOT NULL DEFAULT '',
 
-    created_at              TIMESTAMP           DEFAULT NOW() NOT NULL,
-    created_by              UUID                NOT NULL REFERENCES public.user (id) DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
-    updated_at              TIMESTAMP           DEFAULT NOW() NOT NULL,
-    updated_by              UUID                NOT NULL REFERENCES public.user (id) DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
+    created_at              TIMESTAMP           NOT NULL DEFAULT NOW(),
+    created_by              UUID                         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    updated_at              TIMESTAMP           NOT NULL DEFAULT NOW(),
+    updated_by              UUID                         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
 
     CONSTRAINT product_id_pkey PRIMARY KEY (id)
 );
 
--- ownership, index and comment
+-- create table
 ALTER TABLE public.product
     OWNER TO postgres;
+
+
 CREATE INDEX product_id ON public.product (id);
 CREATE INDEX product_sku ON public.product (sku);
-CREATE INDEX product_slug ON public.product (slug);
+CREATE INDEX product_url ON public.product (url);
+
+-- add comments
 COMMENT ON TABLE public.product IS 'Product information';
+COMMENT ON COLUMN public.product.id IS 'Unique identifier';
+COMMENT ON COLUMN public.product.sku IS 'SKU on the product';
+COMMENT ON COLUMN public.product.name IS 'Product name';
+COMMENT ON COLUMN public.product.short_description IS 'Short description of the product';
+COMMENT ON COLUMN public.product.description IS 'Detailed description of the product';
+COMMENT ON COLUMN public.product.sort_order IS 'Order of the product in the list';
+COMMENT ON COLUMN public.product.status_id IS 'Status of the product';
+COMMENT ON COLUMN public.product.url IS 'URL of the product';
+COMMENT ON COLUMN public.product.regular_price IS 'Regular price of the product';
+COMMENT ON COLUMN public.product.sale_price IS 'Sale price of the product';
+COMMENT ON COLUMN public.product.factory_price IS 'Factory price of the product';
+COMMENT ON COLUMN public.product.is_taxable IS 'Whether the product is taxable or not';
+COMMENT ON COLUMN public.product.quantity IS 'Quantity of the product in stock';
+COMMENT ON COLUMN public.product.return_to_stock_date IS 'Date when the product will return to stock';
+COMMENT ON COLUMN public.product.is_track_stock IS 'Whether to track the stock of the product or not';
+COMMENT ON COLUMN public.product.shipping_class_id IS 'Shipping class of the product';
+COMMENT ON COLUMN public.product.shipping_weight IS 'Weight of the product for shipping';
+COMMENT ON COLUMN public.product.shipping_width IS 'Width of the product for shipping';
+COMMENT ON COLUMN public.product.shipping_height IS 'Height of the product for shipping';
+COMMENT ON COLUMN public.product.shipping_length IS 'Length of the product for shipping';
+COMMENT ON COLUMN public.product.seo_title IS 'SEO title of the product';
+COMMENT ON COLUMN public.product.seo_description IS 'SEO description of the product';
+COMMENT ON COLUMN public.product.gtin IS 'Global Trade Item Number of the product';
+COMMENT ON COLUMN public.product.google_product_category IS 'Google product category of the product';
+COMMENT ON COLUMN public.product.google_product_type IS 'Google product type of the product';
+COMMENT ON COLUMN public.product.created_at IS 'Timestamp when the product was created';
+COMMENT ON COLUMN public.product.created_by IS 'User who created the product';
+COMMENT ON COLUMN public.product.updated_at IS 'Timestamp when the product was last updated';
+COMMENT ON COLUMN public.product.updated_by IS 'User who last updated the product';
 
 -- auto update updated_at
 CREATE TRIGGER product_updated_at
@@ -71,7 +104,7 @@ CREATE TRIGGER product_order
 EXECUTE FUNCTION set_order_column_to_product();
 
 -- demo data
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -83,7 +116,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382500', 'IS48LUXOR', '48″ Luxor Island
         'Range Hood 48-inch Luxor Island by Futuro Futuro',
         'Futuro Futuro Luxor 48 Inch Island-mount Range Hood, Unique Illuminated Glass Body, Ultra-Quiet, with Blower',
         '022099539230', '684', 'Kitchen Range Hood > Island Mount > Glass > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -95,7 +128,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382501', 'WL36MELARA', '36″ Melara Wall
         'Range Hood 36-inch Melara Wall-Mount by Futuro Futuro',
         'Futuro Futuro Melara 36 Inch Wall-mount Range Hood, Classic Design, Painted Steel and Wood, Ultra-Quiet, with Blower',
         '022099539612', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -107,7 +140,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382502', 'IS48POSITANO', '48″ Positano 
         'Range Hood 48-inch Positano Island by Futuro Futuro',
         'Futuro Futuro Positano 48 Inch Island-mount Range Hood, Stainless Steel, Modern Style, LED, Ultra-Quiet, with Blower',
         '022099539247', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -119,7 +152,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382503', 'IS48STREAMLINE-WHT', '48″ Str
         'Range Hood 48-inch Streamline Island by Futuro Futuro',
         'Futuro Futuro Streamline 48 Inch Island-mount Range Hood, Slim Contemporary Design, Ultra-Quiet, with Blower',
         '022099539261', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -131,7 +164,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382504', 'IS42ACQUA-GLS', '42″ Acqualin
         'Range Hood 42-inch Acqualina Glass Island by Futuro Futuro',
         'Futuro Futuro Acqualina Glass 42 Inch Island-mount Range Hood, Contemporary Curved Steel and Glass, LED, Ultra-Quiet, w/ Blower',
         '022099538615', '684', 'Kitchen Range Hood > Island Mount > Glass > 42-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -143,7 +176,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382505', 'IS36INTEGRA-WHT', '36″ Integr
         'Range Hood 36-inch Integra White Island by Futuro Futuro',
         'Futuro Futuro Integra White 36 Inch Island-mount Range Hood, Stainless Steel and White Glass, Ultra-Quiet, with Blower',
         '022099538509', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -155,7 +188,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382506', 'IS36LUXOR', '36″ Luxor Island
         'Range Hood 36-inch Luxor Island by Futuro Futuro',
         'Futuro Futuro Luxor 36 Inch Island-mount Range Hood, Unique Illuminated Glass Body, Ultra-Quiet, with Blower',
         '022099531548', '684', 'Kitchen Range Hood > Island Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -171,7 +204,7 @@ SKU: IS36LOMBARDY-WHT', 150, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '36-lombard
         'Range Hood 36-inch Lombardy White Island by Futuro Futuro',
         'Futuro Futuro Lombardy White 36 Inch Island-mount Range Hood, Stainless Steel and White Glass, LED, Ultra-Quiet, with Blower',
         '022099538554', '684', 'Kitchen Range Hood > Island Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -186,7 +219,7 @@ sku: IS36LOMBARDY-BLK', 140, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '36-lombard
         'Range Hood 36-inch Lombardy Black Island by Futuro Futuro',
         'Futuro Futuro Lombardy Black 36 Inch Island-mount Range Hood, Stainless Steel and Black Glass, LED, Ultra-Quiet, with Blower',
         '022099538530', '684', 'Kitchen Range Hood > Island Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -198,7 +231,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382512', 'IS36JUPITER-GLS', '36″ Jupite
         'Range Hood 36-inch Jupiter Glass Island by Futuro Futuro',
         'Futuro Futuro Jupiter Glass 36 Inch Island-mount Range Hood, Stainless Steel and Glass, Sleek, LED, Ultra-Quiet, with Blower',
         '022099539148', '684', 'Kitchen Range Hood > Island Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -210,7 +243,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382513', 'IS36STREAMLINE-WHT', '36″ Str
         'Range Hood 36-inch Streamline Island by Futuro Futuro',
         'Futuro Futuro Streamline 36 Inch Island-mount Range Hood, Slim Contemporary Design, Ultra-Quiet, with Blower',
         '022099539209', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -222,7 +255,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382514', 'IS36POSITANO', '36″ Positano 
         'Range Hood 36-inch Positano Island by Futuro Futuro',
         'Futuro Futuro Positano 36 Inch Island-mount Range Hood, Stainless Steel, Modern Style, LED, Ultra-Quiet, with Blower',
         '022099539186', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -234,7 +267,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382516', 'IS48EUROPE', '48″ Europe Isla
         'Range Hood 48-inch Europe Island by Futuro Futuro',
         'Futuro Futuro Europe 48 Inch Island-mount Range Hood, Contemporary Stainless Steel Design, LED, Ultra-Quiet, with Blower',
         '022099538639', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -246,7 +279,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382517', 'IS36LOFT', '36″ Loft Inox Isl
         'Range Hood 36-inch Loft Inox Island by Futuro Futuro',
         'Futuro Futuro Loft Inox 36 Inch Island-mount Range Hood, Stainless Steel, Contemporary Style, LED, Ultra-Quiet, with Blower',
         '022099538523', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -258,7 +291,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382518', 'IS34MUR-ALFA', '34″ Murano Al
         'Range Hood 34-inch Murano Alfa Island by Futuro Futuro',
         'Futuro Futuro Murano Alfa 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538318', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -270,7 +303,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382519', 'IS34MUR-FORTUNA', '34″ Murano
         'Range Hood 34-inch Murano Fortuna Island by Futuro Futuro',
         'Futuro Futuro Murano Fortuna 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099539902', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -282,7 +315,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382520', 'IS34MUR-SNOW', '34″ Murano Sn
         'Range Hood 34-inch Murano Snow Island by Futuro Futuro',
         'Futuro Futuro Murano Snow 34 Inch Island-mount Range Hood with Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538455', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -294,7 +327,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382521', 'IS36CONNECTICUT', '36″ Connec
         'Range Hood 36-inch Connecticut Island by Futuro Futuro',
         'Futuro Futuro Connecticut 36 Inch Island-mount Range Hood, White Steel and Wood Trim, Classic Style, Ultra-Quiet, with Blower',
         '022099539940', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -306,7 +339,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382522', 'IS28ELLIPSO', '28″ Ellipso Is
         'Range Hood 28-inch Ellipso Island by Futuro Futuro',
         'Futuro Futuro Ellipso 28 Inch Island-mount Range Hood, Unique Oval Shape, Stainless Steel, Ultra-Quiet, with Blower',
         '022099538288', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 28-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -318,7 +351,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382523', 'IS28MODERNO', '28″ Moderno Is
         'Range Hood 28-inch Moderno Island by Futuro Futuro',
         'Futuro Futuro Moderno 28 Inch Island-mount Range Hood, Stainless Steel w/Modern Design, Ultra-Quiet, with Blower',
         '022099539063', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 28-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -330,7 +363,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382524', 'IS27MUR-AUTUMN', '27″ Murano 
         'Range Hood 27-inch Murano Autumn Island by Futuro Futuro',
         'Futuro Futuro Murano Autumn 27 Inch Island-mount Range Hood with Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099539018', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -342,7 +375,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382525', 'IS24LOMBARDY-BLK', '24″ Lomba
         'Range Hood 24-inch Lombardy Black Island by Futuro Futuro',
         'Futuro Futuro Lombardy Black 24 Inch Island-mount Range Hood, Stainless Steel and Black Glass, LED, Ultra-Quiet, w/Blower',
         '703168131509', '684', 'Kitchen Range Hood > Island Mount > Glass > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -354,7 +387,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382526', 'IS24LOMBARDY-WHT', '24″ Lomba
         'Range Hood 24-inch Lombardy White Island by Futuro Futuro',
         'Futuro Futuro Lombardy White 24 Inch Island-mount Range Hood, Stainless Steel and White Glass, LED, Ultra-Quiet, w/Blower',
         '022099538073', '684', 'Kitchen Range Hood > Island Mount > Glass > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -366,7 +399,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382529', 'IS16LOFTCTM', '16″ Loft CTM I
         'Range Hood 16-inch Loft CTM Island by Futuro Futuro',
         'Futuro Futuro Loft CTM Customizable 16 Inch Island-mount Range Hood, Stainless Steel, LED, Ultra-Quiet, with Blower',
         '022099539001', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 16-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -378,7 +411,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382530', 'IS16LOFT', '16″ Loft Island R
         'Range Hood 16-inch Loft Island by Futuro Futuro',
         'Futuro Futuro Loft 16 Inch Island-mount Range Hood, Sleek, Modern, Stainless Steel, Ultra-Quiet, with Blower',
         '022099538035', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 16-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -390,7 +423,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382531', 'IS27MUR-ZEBRA', '27″ Murano Z
         'Range Hood 27-inch Murano Zebra Island by Futuro Futuro',
         'Futuro Futuro Murano Zebra 27 Inch Island-mount Range Hood with Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538264', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -402,7 +435,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382532', 'IS27MUR-ORION', '27″ Murano O
         'Range Hood 27-inch Murano Orion Island by Futuro Futuro',
         'Futuro Futuro Murano Orion 27 Inch Island-mount Range Hood with Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538233', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -414,7 +447,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382533', 'IS27MUR-NEWYORK', '27″ Murano
         'Range Hood 27-inch Murano New York Island by Futuro Futuro',
         'Futuro Futuro Murano New York 27 Inch Island-mount Range Hood with Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099539049', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -426,7 +459,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382534', 'IS27MUR-MOTION', '27″ Murano 
         'Range Hood 27-inch Murano Motion Island by Futuro Futuro',
         'Futuro Futuro Murano Motion 27 Inch Island-mount Range Hood with Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099539032', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -438,7 +471,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382535', 'IS27MUR-FROST', '27″ Murano F
         'Range Hood 27-inch Murano Frost Island by Futuro Futuro',
         'Futuro Futuro Murano Frost 27 Inch Island-mount Range Hood with Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538172', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -450,7 +483,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382536', 'IS27MUR-SNOW', '27″ Murano Sn
         'Range Hood 27-inch Murano Snow Island by Futuro Futuro',
         'Futuro Futuro Murano Snow 27 Inch Island-mount Range Hood with Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538257', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -462,7 +495,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382537', 'IS54SKYLIGHT', '54″ Skylight 
         'Range Hood 54-inch Skylight Ceiling/Soffit Built-in by Futuro Futuro',
         'Futuro Futuro Skylight 54 Inch Ceiling Range Hood, Unique In-Ceiling Design, Remote Control, Ultra-Quiet, with Blower',
         '022099539278', '684', 'Kitchen Range Hood > Island Mount > Glass > 54-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -474,7 +507,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382538', 'IS84EUROPE-STN', '84″ Europe 
         'Range Hood 84-inch Europe Station Island by Futuro Futuro',
         'Futuro Futuro Europe Station 84 Inch Island-mount Range Hood, Contemporary Stainless Steel Design, LED, Ultra-Quiet, w/ Blower',
         '022099538653', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 84-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -486,7 +519,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382539', 'WL48STREAMLINE-WHT', '48″ Str
         'Range Hood 48-inch Streamline Wall-Mount by Futuro Futuro',
         'Futuro Futuro Streamline White 48 Inch Wall-mount Range Hood, Slim Contemporary Design, Ultra-Quiet, with Blower',
         '022099539858', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -498,7 +531,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382540', 'WL48POSITANO', '48″ Positano 
         'Range Hood 48-inch Positano Wall-Mount by Futuro Futuro',
         'Futuro Futuro Positano 48 Inch Wall-mount Range Hood, Modern Slim Stainless Steel Design, LED, Ultra-Quiet, with Blower',
         '022099531586', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -510,7 +543,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382541', 'WL48MAGNUS', '48″ Magnus Wall
         'Range Hood 48-inch Magnus Wall-Mount by Futuro Futuro',
         'Futuro Futuro Magnus 48 Inch Wall-mount Range Hood, Professional-Style Design w/Extra Filters, LED, Ultra-Quiet, with Blower',
         '022099539803', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -522,7 +555,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382542', 'WL48LUXOR', '48″ Luxor Wall R
         'Range Hood 48-inch Luxor Wall-Mount by Futuro Futuro',
         'Futuro Futuro Luxor 48 Inch Wall-mount Range Hood, Unique Illuminated Glass Body, Ultra-Quiet, with Blower',
         '022099539797', '684', 'Kitchen Range Hood > Wall Mount > Glass > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -534,7 +567,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382543', 'WL48QUEST-BLK', '48″ Quest Bl
         'Range Hood 48-inch Quest Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Quest Black 48 Inch Wall-mount Range Hood, Angled Design, Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '022099539827', '684', 'Kitchen Range Hood > Wall Mount > Glass > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -546,7 +579,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382544', 'WL48QUEST-WHT', '48″ Quest Wh
         'Range Hood 48-inch Quest White Wall-Mount by Futuro Futuro',
         'Futuro Futuro Quest White 48 Inch Wall-mount Range Hood, Angled Design, Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '022099539834', '684', 'Kitchen Range Hood > Wall Mount > Glass > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -558,7 +591,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382545', 'WL48CAPRI', '48″ Capri Wall R
         'Range Hood 48-inch Capri Wall-Mount by Futuro Futuro',
         'Futuro Futuro Capri 48 Inch Wall-mount Range Hood, Slim Modern Angled Design, Stainless Steel, LED, Ultra-Quiet, with Blower',
         '022099539773', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -570,7 +603,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382546', 'WL36SOLARIS', '36″ Solaris Wa
         'Range Hood 36-inch Solaris Wall-Mount by Futuro Futuro',
         'Futuro Futuro Solaris 36 Inch Wall-mount Range Hood, Contemporary Geometric Design w/LED Accent, Ultra-Quiet, with Blower',
         '703168131417', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -582,7 +615,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382547', 'WL36ACQUA-GLS', '36″ Acqualin
         'Range Hood 36-inch Acqualina Glass Wall-Mount by Futuro Futuro',
         'Futuro Futuro Acqualina Glass 36 Inch Wall-mount Range Hood, Modern Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '022099531579', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -594,7 +627,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382548', 'WL36EDGE-WHT', '36″ Edge Whit
         'Range Hood 36-inch Edge White Wall-Mount by Futuro Futuro',
         'Futuro Futuro Edge White 36 Inch Wall-mount Range Hood, Contemporary Stainless Steel and Glass, Ultra-Quiet, with Blower',
         '022099539513', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -606,7 +639,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382549', 'WL36LOMBARDY-BLK', '36″ Lomba
         'Range Hood 36-inch Lombardy Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Lombardy Black 36 Inch Wall-mount Range Hood, Stainless Steel and Black Glass, LED, Ultra-Quiet, with Blower',
         '022099539582', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -618,7 +651,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382550', 'WL36LOMBARDY-WHT', '36″ Lomba
         'Range Hood 36-inch Lombardy White Wall-Mount by Futuro Futuro',
         'Futuro Futuro Lombardy White 36 Inch Wall-mount Range Hood, Stainless Steel and White Glass, LED, Ultra-Quiet, with Blower',
         '022099539599', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -630,7 +663,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382551', 'WL36ACQUA-INOX', '36″ Acquali
         'Range Hood 36-inch Acqualina Inox Wall-Mount by Futuro Futuro',
         'Futuro Futuro Acqualina Inox 36 Inch Wall-mount Range Hood, Modern Stainless Steel Design, LED, Ultra-Quiet, with Blower',
         '022099538912', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -642,7 +675,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382556', 'WL36MYSTIC-GLS', '36″ Mystic 
         'Range Hood 36-inch Mystic Glass Wall-Mount by Futuro Futuro',
         'Futuro Futuro Mystic Glass 36 Inch Wall-mount Range Hood, Modern Stainless Steel and Curved Glass, LED, Ultra-Quiet, with Blower',
         '022099539629', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -654,7 +687,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382559', 'WL36JUPITER-GLS', '36″ Jupite
         'Range Hood 36-inch Jupiter Glass Wall-Mount by Futuro Futuro',
         'Futuro Futuro Jupiter Glass 36 Inch Wall-mount Range Hood, Modern Stainless Steel and Glass Design, Ultra-Quiet, with Blower',
         '022099539575', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -666,7 +699,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382562', 'WL36WAVEBLK', '36″ Wave Black
         'Range Hood 36-inch Wave Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Wave Black 36 Inch Wall-mount Range Hood, Unique Angled Curved Design, Steel and Glass, Ultra-Quiet, with Blower',
         '022099539995', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -676,7 +709,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382563', 'WL36DIAMOND', '36″ Diamond Wa
         2147483647, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '36-diamond-wall-range-hood', '2500', '1695', '-99',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '78', '48', '40', '25',
         'Range Hood 36-inch Diamond Wall-Mount by Futuro Futuro', '', '022099539490', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -688,7 +721,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382564', 'WL36BLKDIAM', '36″ Black Diam
         'Range Hood 36-inch Black Diamond Wall-Mount by Futuro Futuro',
         'Futuro Futuro Black Diamond 36 Inch Wall-mount Range Hood, Angled Stainless Steel and Glass, Ultra-Quiet, with Blower',
         '022099538929', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -700,7 +733,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382565', 'WL36QUEST-BLK', '36″ Quest Bl
         'Range Hood 36-inch Quest Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Quest Black 36 Inch Wall-mount Range Hood, Angled Design, Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '022099539643', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -712,7 +745,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382567', 'WL36CAPRI', '36″ Capri Wall R
         'Range Hood 36-inch Capri Wall-Mount by Futuro Futuro',
         'Futuro Futuro Capri 36 Inch Wall-mount Range Hood, Slim Modern Angled Design, Stainless Steel, LED, Ultra-Quiet, with Blower',
         '022099539483', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -724,7 +757,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382570', 'WL36PORTLAND', '36″ Portland 
         'Range Hood 36-inch Portland Wall-Mount by Futuro Futuro',
         'Futuro Futuro Portland 36 Inch Wall-mount Range Hood, Classic Design, White Steel and Wood, Ultra-Quiet, with Blower',
         '022099539742', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -736,7 +769,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382571', 'WL36PORTLAND-PLUS', '36″ Port
         'Range Hood 36-inch Portland Plus Wall-Mount by Futuro Futuro',
         'Futuro Futuro Portland Plus 36 Inch Wall-mount Range Hood, Classic Design, White Steel and Wood, Ultra-Quiet, with Blower',
         '022099531593', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -748,7 +781,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382572', 'WL36CONNECTICUT', '36″ Connec
         'Range Hood 36-inch Connecticut Wall-Mount by Futuro Futuro',
         'Futuro Futuro Connecticut 36 Inch Wall-mount Range Hood, Classic Design, White Steel and Wood, Ultra-Quiet, with Blower',
         '022099538974', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -760,7 +793,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382573', 'WL36BRIDGEPORT', '36″ Bridgep
         'Range Hood 36-inch Bridgeport Wall-Mount by Futuro Futuro',
         'Futuro Futuro Bridgeport 36 Inch Wall-mount Range Hood, Classic Design, White Steel and Wood, Ultra-Quiet, with Blower',
         '022099538943', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -772,7 +805,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382574', 'WL36ORCHID', '36″ Orchid Wall
         'Range Hood 36-inch Orchid Wall-Mount by Futuro Futuro',
         'Futuro Futuro Orchid 36 Inch Wall-mount Range Hood, Classic Design, White Steel and Wood, Ultra-Quiet, with Blower',
         '022099539988', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -784,7 +817,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382575', 'WL24MODERNO', '24″ Moderno Wa
         'Range Hood 24-inch Moderno Wall-Mount by Futuro Futuro',
         'Futuro Futuro Moderno 24 Inch Wall-mount Range Hood, Stainless Steel, Minimalist Modern Design, Ultra-Quiet, with Blower',
         '022099539353', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -796,7 +829,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382576', 'WL24AMALFI', '24″ Amalfi Wall
         'Range Hood 24-inch Amalfi Wall-Mount by Futuro Futuro',
         'Futuro Futuro Amalfi 24 Inch Wall-mount Range Hood, Modern Design, Stainless Steel, LED, Ultra-Quiet, with Blower',
         '022099539346', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -808,7 +841,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382577', 'WL24LOMBARDY-WHT', '24″ Lomba
         'Range Hood 24-inch Lombardy White Wall-Mount by Futuro Futuro',
         'Futuro Futuro Lombardy White 24 Inch Wall-mount Range Hood, Stainless Steel and White Glass, LED, Ultra-Quiet, with Blower',
         '022099538721', '684', 'Kitchen Range Hood > Wall Mount > Glass > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -820,7 +853,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382578', 'WL24LOMBARDY-BLK', '24″ Lomba
         'Range Hood 24-inch Lombardy Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Lombardy Black 24 Inch Wall-mount Range Hood, Stainless Steel and Black Glass, LED, Ultra-Quiet, with Blower',
         '022099538714', '684', 'Kitchen Range Hood > Wall Mount > Glass > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -832,7 +865,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382580', 'WL14JUPITER-LT', '14″ Jupiter
         'Range Hood 14-inch Jupiter Light Wall-Mount by Futuro Futuro',
         'Futuro Futuro Jupiter Light 14 Inch Wall-mount Range Hood, Stainless Steel, Sleek Tubular Style, LED, Ultra-Quiet, with Blower',
         '022099539315', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 14-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -844,7 +877,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382581', 'WL14JUPITER', '14″ Jupiter Wa
         'Range Hood 14-inch Jupiter Wall-Mount by Futuro Futuro',
         'Futuro Futuro Jupiter 14 Inch Wall-mount Range Hood, Stainless Steel, Sleek Tubular Style, Ultra-Quiet, with Blower',
         '022099538660', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 14-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -856,7 +889,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382587', 'WL22RAVENNA', '22″ Ravenna Wa
         'Range Hood 22-inch Ravenna Wall-Mount by Futuro Futuro',
         'Futuro Futuro Ravenna 22 Inch Wall-mount Range Hood, Unique Angled Design, Stainless Steel, LED, Ultra-Quiet, with Blower',
         '022099539339', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 22-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -868,7 +901,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382588', 'WL30ACQUA-GLS', '30″ Acqualin
         'Range Hood 30-inch Acqualina Glass Wall-Mount by Futuro Futuro',
         'Futuro Futuro Acqualina Glass 30 Inch Wall-mount Range Hood, Modern Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '022099538882', '684', 'Kitchen Range Hood > Wall Mount > Glass > 30-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -880,7 +913,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382592', 'WL27MUR-FORTUNALED', '27″ Mur
         'Range Hood 27-inch Murano Fortuna LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Fortuna LED 27 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131882', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -892,7 +925,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382593', 'WL27MUR-ALFALED', '27″ Murano
         'Range Hood 27-inch Murano Alfa LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Alfa LED 27 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131875', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -904,7 +937,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382594', 'WL27MUR-FROSTLED', '27″ Muran
         'Range Hood 27-inch Murano Frost LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Frost 27 Inch Wall-mount Range Hood with Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131899', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -916,7 +949,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382595', 'WL27MUR-SNOWLED', '27″ Murano
         'Range Hood 27-inch Murano Snow LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Snow LED 27 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131905', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -928,7 +961,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382596', 'WL27MUR-EMPIRELED', '27″ Mura
         'Range Hood 27-inch Murano Empire LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Empire LED 27 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538813', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -940,7 +973,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382597', 'WL27MUR-MOTIONLED', '27″ Mura
         'Range Hood 27-inch Murano Motion LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Motion LED 27 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099539964', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -952,7 +985,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382598', 'WL27MUR-ORIONLED', '27″ Muran
         'Range Hood 27-inch Murano Orion LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Orion LED 27 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538868', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -964,7 +997,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382599', 'WL39MUR-SNOWLED', '39″ Murano
         'Range Hood 39-inch Murano Snow LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Snow LED 39 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131455', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -976,7 +1009,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382626', 'WL36AMALFI', '36″ Amalfi Wall
         'Range Hood 36-inch Amalfi Wall-Mount by Futuro Futuro',
         'Futuro Futuro Amalfi 36 Inch Wall-mount Range Hood, Modern Design, Stainless Steel, LED, Ultra-Quiet, with Blower',
         '022099539469', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -988,7 +1021,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382627', 'IS36GULLWING-WHT', '36″ Gullw
         'Range Hood 36-inch Gullwing White Island by Futuro Futuro',
         'Futuro Futuro Gullwing White 36 Inch Island-mount Range Hood, Stainless Steel and Black Glass, LED, Ultra-Quiet, with Blower',
         '022099539124', '684', 'Kitchen Range Hood > Island Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1000,7 +1033,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382628', 'IS36GULLWING-BLK', '36″ Gullw
         'Range Hood 36-inch Gullwing Black Island by Futuro Futuro',
         'Futuro Futuro Gullwing Black 36 Inch Island-mount Range Hood, Stainless Steel and Black Glass, LED, Ultra-Quiet, with Blower',
         '022099539117', '684', 'Kitchen Range Hood > Island Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1012,7 +1045,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382629', 'WL36WAVEWHT', '36″ Wave White
         'Range Hood 36-inch Wave White Wall-Mount by Futuro Futuro',
         'Futuro Futuro Wave 36 Inch Wall-mount Range Hood, Unique Angled Curved Design, Steel and Glass, Ultra-Quiet, with Blower',
         '022099531524', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1024,7 +1057,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382631', 'WL26PEARL-BLK', '26″ Pearl Bl
         'Range Hood 26-inch Pearl Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Pearl Black 26 Inch Wall-mount Range Hood, Unique Designer Glass w/LED Backlight, Ultra-Quiet, with Blower',
         '022099539377', '684', 'Kitchen Range Hood > Wall Mount > Glass > 26-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1036,7 +1069,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382632', 'WL26PEARL-WHT', '26″ Pearl Wh
         'Range Hood 26-inch Pearl White Wall-Mount by Futuro Futuro',
         'Futuro Futuro Pearl White 26 Inch Wall-mount Range Hood, Unique Designer Glass w/LED Backlight, Ultra-Quiet, with Blower',
         '022099539384', '684', 'Kitchen Range Hood > Wall Mount > Glass > 26-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1048,7 +1081,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382633', 'IS24AMALFI', '24″ Amalfi Isla
         'Range Hood 24-inch Amalfi Island by Futuro Futuro',
         'Futuro Futuro Amalfi 24 Inch Island-mount Range Hood, Stainless Steel, LED, Ultra-Quiet, with Blower',
         '022099538042', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1060,7 +1093,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382635', 'WL27MUR-AUTUMNLED', '27″ Mura
         'Range Hood 27-inch Murano Autumn LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Autumn LED 27 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099539391', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1072,7 +1105,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382636', 'IS30PEARL-WHT', '30″ Pearl Wh
         'Range Hood 30-inch Pearl White Island by Futuro Futuro',
         'Futuro Futuro Pearl White 30 Inch Island-mount Range Hood, Designer Glass w/LED Backlight, Ultra-Quiet, with Blower',
         '022099538301', '684', 'Kitchen Range Hood > Island Mount > Glass > 30-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1084,7 +1117,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382637', 'IS30PEARL-BLK', '30″ Pearl Bl
         'Range Hood 30-inch Pearl Black Island by Futuro Futuro',
         'Futuro Futuro Pearl Black 30 Inch Island-mount Range Hood, Designer Glass w/LED Backlight, Ultra-Quiet, with Blower',
         '022099538295', '684', 'Kitchen Range Hood > Island Mount > Glass > 30-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1096,7 +1129,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382639', 'WL48SHADE', '48″ Shade Insert
         'Range Hood 48-inch Shade Insert Built-in by Futuro Futuro',
         'Futuro Futuro Shade 48 Inch Insert / In-Cabinet Range Hood, Stainless Steel and Flip Glass, LED, Ultra-Quiet, with Blower',
         '022099539841', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1108,7 +1141,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382640', 'IS42MOONCRYS', '42″ Moon Crys
         'Range Hood 42-inch Moon Crystal Island by Futuro Futuro',
         'Futuro Futuro Moon Crystal 42 Inch Island-mount Range Hood, Modern Curved Steel and Glass, LED, Ultra-Quiet, with Blower',
         '022099538622', '684', 'Kitchen Range Hood > Island Mount > Glass > 42-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1120,7 +1153,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382641', 'IS36ACQUA-GLS', '36″ Acqualin
         'Range Hood 36-inch Acqualina Glass Island by Futuro Futuro',
         'Futuro Futuro Acqualina Glass 36 Inch Island-mount Range Hood, Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '022099531500', '684', 'Kitchen Range Hood > Island Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1132,7 +1165,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382642', 'WL27MUR-SPACE', '27″ Murano S
         'Range Hood 27-inch Murano Space Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Space 27 Inch Wall-mount Range Hood, Unique Engraved Stainless Steel, Ultra-Quiet, with Blower',
         '022099538875', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1144,7 +1177,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382645', 'IS36EUROPE', '36″ Europe Isla
         'Range Hood 36-inch Europe Island by Futuro Futuro',
         'Futuro Futuro Europe 36 Inch Island-mount Range Hood, Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '022099539100', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1156,7 +1189,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382646', 'IS72EUROPE-STN', '72″ Europe 
         'Range Hood 72-inch Europe Station Island by Futuro Futuro',
         'Futuro Futuro Europe Station 72 Inch Island-mount Range Hood, Contemporary Stainless Steel Design, LED, Ultra-Quiet, w/ Blower',
         '022099539292', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 72-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1168,7 +1201,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382647', 'WL27MUR-GLOWLED', '27″ Murano
         'Range Hood 27-inch Murano Glow LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Glow LED 27 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538837', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1180,7 +1213,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382648', 'WL27MUR-MOONLIGHTLED', '27″ M
         'Range Hood 27-inch Murano Moonlight LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Moonlight LED 27 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538851', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1192,7 +1225,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382649', 'WL27MUR-NEWYORKLED', '27″ Mur
         'Range Hood 27-inch Murano New York LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano New York LED 27 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099539414', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1204,7 +1237,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382650', 'WL27MUR-ZEBRALED', '27″ Muran
         'Range Hood 27-inch Murano Zebra LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Zebra LED 27 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099539971', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1216,7 +1249,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382651', 'WL39MUR-ALFALED', '39″ Murano
         'Range Hood 39-inch Murano Alfa LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Alfa LED 39 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131431', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1228,7 +1261,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382652', 'WL39MUR-FORTUNALED', '39″ Mur
         'Range Hood 39-inch Murano Fortuna LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Fortuna LED 39 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131448', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1240,7 +1273,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382655', 'IS34MUR-EMPIRELED', '34″ Mura
         'Range Hood 34-inch Murano Empire LED Island by Futuro Futuro',
         'Futuro Futuro Murano Empire LED 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538363', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1252,7 +1285,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382656', 'IS34MUR-GLOWLED', '34″ Murano
         'Range Hood 34-inch Murano Glow LED Island by Futuro Futuro',
         'Futuro Futuro Murano Glow LED 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538387', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1264,7 +1297,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382657', 'IS34MUR-MOONLIGHTLED', '34″ M
         'Range Hood 34-inch Murano Moonlight LED Island by Futuro Futuro',
         'Futuro Futuro Murano Moonlight LED 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538400', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1276,7 +1309,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382658', 'IS34MUR-MOTIONLED', '34″ Mura
         'Range Hood 34-inch Murano Motion LED Island by Futuro Futuro',
         'Futuro Futuro Murano Motion LED 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538417', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1288,7 +1321,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382659', 'IS34MUR-NEWYORKLED', '34″ Mur
         'Range Hood 34-inch Murano New York LED Island by Futuro Futuro',
         'Futuro Futuro Murano New York LED 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538424', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1300,7 +1333,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382660', 'IS34MUR-ORIONLED', '34″ Muran
         'Range Hood 34-inch Murano Orion LED Island by Futuro Futuro',
         'Futuro Futuro Murano Orion LED 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538448', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1312,7 +1345,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382661', 'IS34MUR-ZEBRALED', '34″ Muran
         'Range Hood 34-inch Murano Zebra LED Island by Futuro Futuro',
         'Futuro Futuro Murano Zebra LED 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538479', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1324,7 +1357,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382662', 'IS27MUR-AUTUMNLED', '27″ Mura
         'Range Hood 27-inch Murano Autumn LED Island by Futuro Futuro',
         'Futuro Futuro Murano Autumn LED 27 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538127', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1336,7 +1369,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382663', 'IS27MUR-GLOWLED', '27″ Murano
         'Range Hood 27-inch Murano Glow LED Island by Futuro Futuro',
         'Futuro Futuro Murano Glow LED 27 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538189', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1348,7 +1381,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382664', 'IS27MUR-MOTIONLED', '27″ Mura
         'Range Hood 27-inch Murano Motion LED Island by Futuro Futuro',
         'Futuro Futuro Murano Motion LED 27 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538219', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1360,7 +1393,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382665', 'IS27MUR-NEWYORKLED', '27″ Mur
         'Range Hood 27-inch Murano New York LED Island by Futuro Futuro',
         'Futuro Futuro Murano New York LED 27 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538226', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1372,7 +1405,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382666', 'IS27MUR-ORIONLED', '27″ Muran
         'Range Hood 27-inch Murano Orion LED Island by Futuro Futuro',
         'Futuro Futuro Murano Orion LED 27 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538240', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1384,7 +1417,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382667', 'IS27MUR-ZEBRALED', '27″ Muran
         'Range Hood 27-inch Murano Zebra LED Island by Futuro Futuro',
         'Futuro Futuro Murano Zebra LED 27 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538271', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1396,7 +1429,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382668', 'IS34MUR-ALFALED', '34″ Murano
         'Range Hood 34-inch Murano Alfa LED Island by Futuro Futuro',
         'Futuro Futuro Murano Alfa LED 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538325', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1408,7 +1441,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382669', 'IS34MUR-FORTUNALED', '34″ Mur
         'Range Hood 34-inch Murano Fortuna LED Island by Futuro Futuro',
         'Futuro Futuro Murano Fortuna LED 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538370', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1420,7 +1453,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382670', 'IS34MUR-SNOWLED', '34″ Murano
         'Range Hood 34-inch Murano Snow LED Island by Futuro Futuro',
         'Futuro Futuro Murano Snow LED 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538462', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1432,7 +1465,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382671', 'IS38SKYLIGHT', '38″ Skylight 
         'Range Hood 38-inch Skylight Ceiling/Soffit Built-in by Futuro Futuro',
         'Futuro Futuro Skylight 38 Inch Ceiling Range Hood, Unique In-Ceiling Design, Remote Control, Ultra-Quiet, with Blower',
         '022099538608', '684', 'Kitchen Range Hood > Island Mount > Glass > 38-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1444,7 +1477,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382675', 'WL36MASSACHUSETTS', '36″ Mass
         'Range Hood 36-inch Massachusetts Wall-Mount by Futuro Futuro',
         'Futuro Futuro Massachusetts 36 Inch Wall-mount Range Hood, Classic Design, White Steel and Wood, Ultra-Quiet, with Blower',
         '022099539551', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1456,7 +1489,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382676', 'WL36VERMONT', '36″ Vermont Wa
         'Range Hood 36-inch Vermont Wall-Mount by Futuro Futuro',
         'Futuro Futuro Vermont 36 Inch Wall-mount Range Hood, Classic Design, White Steel and Wood, Ultra-Quiet, with Blower',
         '703168131424', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1468,7 +1501,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382677', 'IS27MUR-MOONLIGHT', '27″ Mura
         'Range Hood 27-inch Murano Moonlight Island by Futuro Futuro',
         'Futuro Futuro Murano Moonlight 27 Inch Island-mount Range Hood with Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538196', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1480,7 +1513,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382678', 'IS27MUR-MOONLIGHTLED', '27″ M
         'Range Hood 27-inch Murano Moonlight LED Island by Futuro Futuro',
         'Futuro Futuro Murano Moonlight LED 27 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538202', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1492,7 +1525,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382679', 'WL36LUXOREQUO', '36″ Luxor Wa
         'Range Hood 36-inch Luxor Wall-Mount by Futuro Futuro',
         'Futuro Futuro Luxor 36 Inch Wall-mount Range Hood, Unique Illuminated Glass Body, Ultra-Quiet, with Blower',
         '022099539476', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1504,7 +1537,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382680', 'WL27MUR-ECHOLED', '27″ Murano
         'Range Hood 27-inch Murano Echo LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Echo LED 27 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131363', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1516,7 +1549,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382681', 'IS27MUR-ECHOLED', '27″ Murano
         'Range Hood 27-inch Murano Echo LED Island by Futuro Futuro',
         'Futuro Futuro Murano Echo LED 27 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538165', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1528,7 +1561,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382682', 'IS34MUR-ECHOLED', '34″ Murano
         'Range Hood 34-inch Murano Echo LED Island by Futuro Futuro',
         'Futuro Futuro Murano Echo LED 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '022099538349', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1540,7 +1573,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382683', 'WL36FLORARED', '36″ Flora Red
         'Range Hood 36-inch Flora Red Wall-Mount by Futuro Futuro',
         'Futuro Futuro Flora Red 36 Inch Wall-mount Range Hood, Classic Painted Steel and Ceramic Design, Ultra-Quiet, with Blower',
         '022099538998', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1552,7 +1585,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382684', 'WL36FLORAGREEN', '36″ Flora G
         'Range Hood 36-inch Flora Green Wall-Mount by Futuro Futuro',
         'Futuro Futuro Flora Green 36 Inch Wall-mount Range Hood, Classic Painted Steel and Ceramic Design, Ultra-Quiet, with Blower',
         '022099538981', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1564,7 +1597,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382688', 'WL16LOFT-CTM', '16″ Loft CTM 
         'Range Hood 16-inch Loft CTM Wall-Mount by Futuro Futuro',
         'Futuro Futuro Loft CTM Customizable 16 Inch Wall-mount Range Hood, Stainless Steel, Sleek Style, Ultra-Quiet, with Blower',
         '022099538677', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 16-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1576,7 +1609,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382689', 'WL36BOSTON', '36″ Boston Wall
         'Range Hood 36-inch Boston Wall-Mount by Futuro Futuro',
         'Futuro Futuro Boston 36 Inch Wall-mount Range Hood, Classic Design, White Steel and Wood, Ultra-Quiet, with Blower',
         '022099538936', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1588,7 +1621,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382690', 'WL36CAMBRIDGE', '36″ Cambridg
         'Range Hood 36-inch Cambridge Wall-Mount by Futuro Futuro',
         'Futuro Futuro Cambridge 36 Inch Wall-mount Range Hood, Classic Design, White Steel and Wood, Ultra-Quiet, with Blower',
         '022099538950', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1600,7 +1633,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382691', 'WL27MUR-METROLED', '27″ Muran
         'Range Hood 27-inch Murano Metro LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Metro LED 27 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131387', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1612,7 +1645,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382692', 'IS34MUR-METROLED', '34″ Muran
         'Range Hood 34-inch Murano Metro LED Island by Futuro Futuro',
         'Futuro Futuro Murano Metro LED 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131318', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1624,7 +1657,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382693', 'IS27MUR-METROLED', '27″ Muran
         'Range Hood 27-inch Murano Metro LED Island by Futuro Futuro',
         'Futuro Futuro Murano Metro LED 27 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168132735', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1636,7 +1669,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382694', 'IS36LIVORNO', '36″ Livorno Is
         'Range Hood 36-inch Livorno Island by Futuro Futuro',
         'Futuro Futuro Livorno 36 Inch Island-mount Range Hood, Stainless Steel, Professional Style, LED, Ultra-Quiet, with Blower',
         '022099538516', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1648,7 +1681,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382695', 'WL36LIVORNO', '36″ Livorno Wa
         'Range Hood 36-inch Livorno Wall-Mount by Futuro Futuro',
         'Futuro Futuro Livorno 36 Inch Wall-mount Range Hood, Professional Style Design, Stainless Steel, LED, Ultra-Quiet, with Blower',
         '022099539452', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1660,7 +1693,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382696', 'IS36MINIMALWHT', '36″ Minimal
         'Range Hood 36-inch Minimal White Island by Futuro Futuro',
         'Futuro Futuro Minimal White 36 Inch Island-mount Range Hood, Modern, White Enamel Steel, LED, Ultra-Quiet, with Blower',
         '022099538578', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1672,7 +1705,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382698', 'IS48LINEARE', '48″ Lineare Is
         'Range Hood 48-inch Lineare Island by Futuro Futuro',
         'Futuro Futuro Lineare 48 Inch Island-mount Range Hood, Modern Stainless Steel Design, LED, Ultra-Quiet, with Blower',
         '703168131332', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1684,7 +1717,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382699', 'IS27MUR-EMPIRELED', '27″ Mura
         'Range Hood 27-inch Murano Empire LED Island by Futuro Futuro',
         'Futuro Futuro Murano Empire LED 27 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131233', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1696,7 +1729,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382700', 'WL48MARINO', '48″ Marino Wall
         'Range Hood 48-inch Marino Wall-Mount by Futuro Futuro',
         'Futuro Futuro Marino 48 Inch Wall-mount Range Hood, Professional-Style Design, Stainless Steel, LED, Ultra-Quiet, with Blower',
         '703168131462', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1708,7 +1741,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382702', 'IS27MUR-MAYFLOWERLED', '27″ M
         'Range Hood 27-inch Murano Mayflower LED Island by Futuro Futuro',
         'Futuro Futuro Murano Mayflower LED 27 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131257', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1720,7 +1753,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382703', 'WL27MUR-MAYFLOWERLED', '27″ M
         'Range Hood 27-inch Murano Mayflower LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Mayflower LED 27 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131370', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1732,7 +1765,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382704', 'IS27MUR-SERENITYLED', '27″ Mu
         'Range Hood 27-inch Murano Serenity LED Island by Futuro Futuro',
         'Futuro Futuro Murano Serenity LED 27 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131295', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1744,7 +1777,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382705', 'IS34MUR-SERENITYLED', '34″ Mu
         'Range Hood 34-inch Murano Serenity LED Island by Futuro Futuro',
         'Futuro Futuro Murano Serenity LED 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131325', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1756,7 +1789,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382706', 'WL27MUR-SERENITYLED', '27″ Mu
         'Range Hood 27-inch Murano Serenity LED Wall-Mount by Futuro Futuro',
         'Futuro Futuro Murano Serenity LED 27 Inch Wall-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131394', '684', 'Kitchen Range Hood > Wall Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1768,7 +1801,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382709', 'IS34MUR-MAYFLOWERLED', '34″ M
         'Range Hood 34-inch Murano Mayflower LED Island by Futuro Futuro',
         'Futuro Futuro Murano Mayflower LED 34 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131301', '684', 'Kitchen Range Hood > Island Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1780,7 +1813,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382711', 'WL36MARINO', '36″ Marino Wall
         'Range Hood 36-inch Marino Wall-Mount by Futuro Futuro',
         'Futuro Futuro Marino 36 Inch Wall-mount Range Hood, Professional-Style Design, Stainless Steel, LED, Ultra-Quiet, with Blower',
         '703168131400', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1792,7 +1825,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382712', 'IS27MUR-ALFALED', '27″ Murano
         'Range Hood 27-inch Murano Alfa LED Island by Futuro Futuro',
         'Futuro Futuro Murano Alfa LED 27 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131219', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1804,7 +1837,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382720', 'IS27MUR-SNOWLED', '27″ Murano
         'Range Hood 27-inch Murano Snow LED Island by Futuro Futuro',
         'Futuro Futuro Murano Snow LED 27 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131479', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1816,7 +1849,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382721', 'IS27MUR-FORTUNALED', '27″ Mur
         'Range Hood 27-inch Murano Fortuna LED Island by Futuro Futuro',
         'Futuro Futuro Murano Fortuna LED 27 Inch Island-mount Range Hood, Unique Designer Glass, Ultra-Quiet, with Blower',
         '703168131493', '684', 'Kitchen Range Hood > Island Mount > Glass > 27-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1828,7 +1861,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382722', 'IS69STREAMLINE', '69″ Streaml
         'Range Hood 69-inch Streamline Island by Futuro Futuro',
         'Futuro Futuro Streamline 69 Inch Island-mount Range Hood, Slim Contemporary Design, LED, Ultra-Quiet, with Blower',
         '703168131516', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 69-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1840,7 +1873,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382723', 'WL30SHADOW-BLK', '30″ Shadow 
         'Range Hood 30-inch Shadow Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Shadow Black 30 Inch Wall-mount Range Hood, Modern Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '703168131554', '684', 'Kitchen Range Hood > Wall Mount > Glass > 30-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1852,7 +1885,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382724', 'WL30SHADOW-WHT', '30″ Shadow 
         'Range Hood 30-inch Shadow White Wall-Mount by Futuro Futuro',
         'Futuro Futuro Shadow White 30 Inch Wall-mount Range Hood, Modern Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '703168131561', '684', 'Kitchen Range Hood > Wall Mount > Glass > 30-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1864,7 +1897,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382725', 'WL36VITTORIA', '36″ Vittoria 
         'Range Hood 36-inch Vittoria Wall-Mount by Futuro Futuro',
         'Futuro Futuro Vittoria 36 Inch Wall-mount Range Hood, Contemporary, White Steel, LED, Ultra-Quiet, with Blower',
         '703168131578', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1876,7 +1909,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382726', 'WL34FOLIO-BLK', '34″ Folio Bl
         'Range Hood 34-inch Folio Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Folio Black 34 Inch Wall-mount Range Hood, Modern Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '703168131585', '684', 'Kitchen Range Hood > Wall Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1888,7 +1921,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382727', 'WL34FOLIO-WHT', '34″ Folio Wh
         'Range Hood 34-inch Folio White Wall-Mount by Futuro Futuro',
         'Futuro Futuro Folio White 34 Inch Wall-mount Range Hood, Modern Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '703168131592', '684', 'Kitchen Range Hood > Wall Mount > Glass > 34-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1900,7 +1933,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382729', 'IS40VITTORIA', '40″ Vittoria 
         'Range Hood 40-inch Vittoria Island by Futuro Futuro',
         'Futuro Futuro Vittoria 40 Inch Island-mount Range Hood, Slim Contemporary Design, Ultra-Quiet, with Blower',
         '703168131608', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 40-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1912,7 +1945,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382731', 'IS36SAVONA-INOX', '36″ Savona
         'Range Hood 36-inch Savona Inox Ceiling Built-in by Futuro Futuro',
         'Futuro Futuro Savona Inox 36 Inch Island-mount Range Hood, Stainless Steel, LED, Ultra-Quiet, w/ Blower',
         '703168131622', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1924,7 +1957,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382732', 'IS36SAVONA-WHT', '36″ Savona 
         'Range Hood 36-inch Savona White Ceiling Built-in by Futuro Futuro',
         'Futuro Futuro Savona White 36 Inch Island-mount Range Hood, White Enamel Steel, LED, Ultra-Quiet, w/ Blower',
         '703168131639', '684', 'Kitchen Range Hood > Island Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1941,7 +1974,7 @@ sku: IS36VIALE-BLK', 60, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '36-viale-black
         'Range Hood 36-inch Viale Black Island by Futuro Futuro',
         'Futuro Futuro Viale Black 36 Inch Island-mount Range Hood, Slim Steel and Glass Design, LED, Ultra-Quiet, with Blower',
         '703168131660', '684', 'Kitchen Range Hood > Island Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1955,7 +1988,7 @@ sku: IS48VIALE-BLK', 1020, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '48-viale-bla
         'Range Hood 48-inch Viale Black Island by Futuro Futuro',
         'Futuro Futuro Viale Black 48 Inch Island-mount Range Hood, Slim Steel and Glass Design, LED, Ultra-Quiet, with Blower',
         '703168131707', '684', 'Kitchen Range Hood > Island Mount > Glass > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1970,7 +2003,7 @@ Sku: IS36VIALE-WHT', 70, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '36-viale-white
         'Range Hood 36-inch Viale White Island by Futuro Futuro',
         'Futuro Futuro Viale White 36 Inch Island-mount Range Hood, Slim Steel and Glass Design, LED, Ultra-Quiet, with Blower',
         '703168131677', '684', 'Kitchen Range Hood > Island Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -1990,7 +2023,7 @@ Sku: IS48VIALE-WHT', 1030, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '48-viale-whi
         'Range Hood 48-inch Viale White Island by Futuro Futuro',
         'Futuro Futuro Viale White 48 Inch Island-mount Range Hood, Slim Steel and Glass Design, LED, Ultra-Quiet, with Blower',
         '703168131714', '684', 'Kitchen Range Hood > Island Mount > Glass > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2002,7 +2035,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382740', 'IS60SILVANA', '60″ Silvana Is
         'Range Hood 60-inch Silvana Island by Futuro Futuro',
         'Futuro Futuro Silvana 60 Inch Island-mount Range Hood, Stainless Steel, LED, Ultra-Quiet, w/ Blower',
         '703168131738', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 60-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2014,7 +2047,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382741', 'IS60RECANO', '60″ Recano Isla
         'Range Hood 60-inch Recano Island by Futuro Futuro',
         'Futuro Futuro Recano 60 Inch Island-mount Hood, Unique Modern Design, LED, Ductless, Ultra-Quiet, with Blower',
         '703168131721', '684', 'Kitchen Range Hood > Island Mount > Glass > 60-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2026,7 +2059,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382742', 'IS40RECANO', '40″ Recano Isla
         'Range Hood 40-inch Recano Island by Futuro Futuro',
         'Futuro Futuro Recano 40 Inch Island-mount Hood, Unique Modern Design, LED, Ductless, Ultra-Quiet, with Blower',
         '703168131684', '684', 'Kitchen Range Hood > Island Mount > Glass > 40-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2038,7 +2071,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382743', 'IS19NATALIE', '19″ Natalie Is
         'Range Hood 19-inch Natalie Island by Futuro Futuro',
         'Futuro Futuro Natalie Slim 19 Inch Island-mount Range Hood, Stainless Steel and Glass, LED, Ductless, Ultra-Quiet, with Blower',
         '703168131615', '684', 'Kitchen Range Hood > Island Mount > Glass > 19-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2050,7 +2083,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382744', 'IS36TACTIO', '36″ Tactio Isla
         'Range Hood 36-inch Tactio Island by Futuro Futuro',
         'Futuro Futuro Tactio 36 Inch Island-mount Range Hood, Slim Contemporary Design, Ductless, Ultra-Quiet, with Blower',
         '703168131653', '684', 'Kitchen Range Hood > Island Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2062,7 +2095,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382745', 'WL36TRANS-BLK', '36″ Transiti
         'Range Hood 36-inch Transition Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Transition Black 36 Inch Wall-mount Range Hood, Angled Design, Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '703168131783', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2074,7 +2107,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382747', 'IS24ARENA-INOX', '24″ Arena I
         'Range Hood 24-inch Arena Inox Island by Futuro Futuro',
         'Futuro Futuro Arena Inox 24 Inch Island-mount Range Hood, Stainless Steel, Ductless, LED, Ultra-Quiet, with Blower',
         '703168131820', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2086,7 +2119,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382748', 'IS24ARENA-BLK', '24″ Arena Bl
         'Range Hood 24-inch Arena Black Island by Futuro Futuro',
         'Futuro Futuro Arena Black 24 Inch Island-mount Range Hood, Black, Painted steel, Ductless, LED, Ultra-Quiet, with Blower',
         '703168131806', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2098,7 +2131,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382749', 'IS24ARENA-CR', '24″ Arena Cop
         'Range Hood 24-inch Arena Copper Island by Futuro Futuro',
         'Futuro Futuro Arena Copper 24 Inch Island-mount Range Hood, Copper, Ductless, LED, Ultra-Quiet, with Blower',
         '703168131813', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2110,7 +2143,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382750', 'IS21DOME-BLK', '21″ Dome Blac
         'Range Hood 21-inch Dome Black Island by Futuro Futuro',
         'Futuro Futuro Dome Black 21 Inch Island-mount Range Hood, Black, Painted steel, Ductless, LED, Ultra-Quiet, with Blower',
         '703168131837', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 21-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2122,7 +2155,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382751', 'IS21DOME-IRON', '21″ Dome Iro
         'Range Hood 21-inch Dome Iron Island by Futuro Futuro',
         'Futuro Futuro Dome Iron 21 Inch Island-mount Range Hood, Iron, Painted steel, Ductless, LED, Ultra-Quiet, with Blower',
         '703168131844', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 21-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2134,7 +2167,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382752', 'IS21DOME-WHT', '21″ Dome Whit
         'Range Hood 21-inch Dome White Island by Futuro Futuro',
         'Futuro Futuro Dome White 21 Inch Island-mount Range Hood, White, Painted steel, Ductless, LED, Ultra-Quiet, with Blower',
         '703168131851', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 21-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2146,7 +2179,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382753', 'IS40MONOLITH', '40″ Monolith 
         'Range Hood 40-inch Monolith Island by Futuro Futuro',
         'Futuro Futuro Monolith 40 Inch Island-mount Hood, Unique Modern Design, LED, Ductless, Remote Control, Ultra-Quiet, with Blower',
         '703168131868', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 40-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2158,7 +2191,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382754', 'IS21DOME-BRS', '21″ Dome Bras
         'Range Hood 21-inch Dome Brass Island by Futuro Futuro',
         'Futuro Futuro Dome Brass 21 Inch Island-mount Range Hood, Brass looking, Ductless, LED, Ultra-Quiet, with Blower',
         '703168131929', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 21-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2170,7 +2203,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382755', 'IS21DOME-CR', '21″ Dome Coppe
         'Range Hood 21-inch Dome Copper Island by Futuro Futuro',
         'Futuro Futuro Dome Black 21 Inch Island-mount Range Hood, Copper looking, Ductless, LED, Ultra-Quiet, with Blower',
         '703168131936', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 21-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2182,7 +2215,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382756', 'IS23HALO', '23″ Halo Island R
         'Range Hood 23-inch Halo Island by Futuro Futuro',
         'Futuro Futuro Halo 23 Inch Island-mount Range Hood, Stainless Steel and Glass, Ductless, LED, Ultra-Quiet, with Blower',
         '703168131943', '684', 'Kitchen Range Hood > Island Mount > Glass > 23-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2194,7 +2227,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382757', 'IS30ORBIT-BLK', '30″ Orbit Bl
         'Range Hood 30-inch Orbit Black Island by Futuro Futuro',
         'Futuro Futuro Orbit Black 30 Inch Island-mount Range Hood, Black, Painted steel, Ductless, LED, Ultra-Quiet, with Blower',
         '703168131950', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 30-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2206,7 +2239,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382758', 'IS30ORBIT-INOX', '30″ Orbit I
         'Range Hood 30-inch Orbit Inox Island by Futuro Futuro',
         'Futuro Futuro Orbit Inox 30 Inch Island-mount Range Hood, Stainless Steel, Ductless, LED, Ultra-Quiet, with Blower',
         '703168132193', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 30-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2218,7 +2251,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382759', 'IS48PERIMETER-WHT', '48″ Peri
         'Range Hood 48-inch Perimeter White Island by Futuro Futuro',
         'Futuro Futuro Perimeter White 40 Inch Inox Island-mount Hood, Unique Modern Design, Stainless Steel, LED, Painted Steel, Ductless, Remote Control, Ultra-Quiet, with Blower',
         '703168131981', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2230,7 +2263,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382760', 'IS48PERIMETER-INOX', '48″ Per
         'Range Hood 48-inch Perimeter Inox Island by Futuro Futuro',
         'Futuro Futuro Perimeter Inox 40 Inch Island-mount Hood, Unique Modern Design, Stainless Steel, LED, Ductless, Remote Control, Ultra-Quiet, with Blower',
         '703168131974', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2242,7 +2275,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382761', 'WL36TRANS-CEM', '36″ Transiti
         'Range Hood 36-inch Transition Cement Wall-Mount by Futuro Futuro',
         'Futuro Futuro Transition Cement 36 Inch Wall-mount Range Hood, Angled Design, Stainless Steel, LED, Ultra-Quiet, with Blower',
         '703168131790', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2254,7 +2287,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382763', 'IS14JUPITER-WHT', '14″ Jupite
         'Range Hood 14-inch Jupiter White Island by Futuro Futuro',
         'Futuro Futuro Jupiter White 14 Inch Island-mount Range Hood, White Stainless Steel, LED, Ultra-Quiet, with Blower',
         '022099538028', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 14-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2266,7 +2299,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382764', 'IS14JUPITER-LT', '14″ Jupiter
         'Range Hood 14-inch Jupiter Light Island by Futuro Futuro',
         'Futuro Futuro Jupiter Light 14 Inch Island-mount Range Hood, Stainless Steel, LED, Ultra-Quiet, with Blower',
         '022099538011', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 14-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2278,7 +2311,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382765', 'IS14JUPITER', '14″ Jupiter Is
         'Range Hood 14-inch Jupiter Island by Futuro Futuro',
         'Futuro Futuro Jupiter 14 Inch Island-mount Range Hood, Stainless Steel, LED, Ultra-Quiet, with Blower',
         '022099538004', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 14-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2290,7 +2323,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd326672', 'IS14JUPITER-BLK', '14″ Jupite
         'Range Hood 14-inch Jupiter Black Island by Futuro Futuro',
         'Futuro Futuro Jupiter Black 14 Inch Island-mount Range Hood, Stainless Steel, LED, Ultra-Quiet, with Blower',
         '703168132094', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 14-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2302,7 +2335,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd326853', 'IS36POSITANO-BLK', '36″ Posit
         'Range Hood 36-inch Positano Black Island by Futuro Futuro',
         'Futuro Futuro Positano Black 36 Inch Island-mount Range Hood, Stainless Steel, Modern Style, LED, Ultra-Quiet, with Blower',
         '703168132117', '684', 'Kitchen Range Hood > Island Mount > Black > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2314,7 +2347,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd326881', 'IS16LOFT-BLK', '16″ Loft Blac
         'Range Hood 16-inch Loft Black Island by Futuro Futuro',
         'Futuro Futuro Loft-Black 16 Inch Island-mount Range Hood, Sleek, Modern, Stainless Steel, Ultra-Quiet, with Blower',
         '703168132124', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 16-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2328,7 +2361,7 @@ SKU: IS69STREAMLINE-LH', 1120, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '69-strea
         'Range Hood 69-inch Streamline (LEFT-HANDED) Island by Futuro Futuro',
         'Futuro Futuro Streamline 69 Inch Island-mount Range Hood (left-handed), Slim Contemporary Design, LED, Ultra-Quiet, with Blower',
         '703168132131', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 69-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2342,7 +2375,7 @@ SKU: IS69STREAMLINE-RH', 1120, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '69-strea
         'Range Hood 69-inch Streamline (RIGHT-HANDED) Island by Futuro Futuro',
         'Futuro Futuro Streamline 69 Inch Island-mount Range Hood (left-handed), Slim Contemporary Design, LED, Ultra-Quiet, with Blower',
         '703168132148', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 69-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2354,7 +2387,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd330810', 'WL36GABI', '36″ Gabi Wall Ran
         'Range Hood 36-inch Gabi Wall-Mount by Futuro Futuro',
         'Futuro Futuro Gabi 36 Inch Wall-mount Range Hood, Stainless Steel, Black, Glass, Modern Style, LED, Ultra-Quiet, with Blower',
         '703168132247', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2375,7 +2408,7 @@ High-tech looks &amp; performance. Filters that last for years. Beautiful LED li
         'Range Hood 36-inch Balance Charcoal Island by Futuro Futuro',
         'Futuro Futuro Balance Charcoal 36 Inch Island-mount Range Hood, Slim Contemporary Design, Ductless, Ultra-Quiet, with Blower',
         '703168132278', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2395,7 +2428,7 @@ The high-tech look, the quiet performance, the filters and lights that last for 
         'Range Hood 36-inch Balance White Island by Futuro Futuro',
         'Futuro Futuro Balance White 36 Inch Island-mount Range Hood, Slim Contemporary Design, Ductless, Ultra-Quiet, with Blower',
         '703168132285', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2415,7 +2448,7 @@ Great looks. High tech. Long life filters. Beautiful lighting. Quiet operation. 
         'Range Hood 36-inch Balance Black Island by Futuro Futuro',
         'Futuro Futuro Balance Black 36 Inch Island-mount Range Hood, Slim Contemporary Design, Ductless, Ultra-Quiet, with Blower',
         '703168132261', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2427,7 +2460,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd332358', 'WL36QUEST-WHT', '36″ Quest Wh
         'Range Hood 36-inch Quest White Wall-Mount by Futuro Futuro',
         'Futuro Futuro Quest White 36 Inch Wall-mount Range Hood, Angled Design, Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '022099539650', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2442,7 +2475,7 @@ Futuro Futuro offers a variety of customization options, including ducted or duc
         'Range Hood 69-inch Turo Black Island by Futuro Futuro',
         'Futuro Futuro Turo 69 Inch Island-mount Range Hood, Slim Contemporary Design, Black, LED, Ultra-Quiet, with Blower',
         '703168132315', '684', 'Kitchen Range Hood > Island Mount > Black > 69-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2458,7 +2491,7 @@ All Futuro Futuro kitchen ventilation hoods are made in Italy and include a 1-ye
         'Range Hood 36-inch Turo Black Island by Futuro Futuro',
         'Futuro Futuro Turo Black 36 Inch Island-mount Range Hood, Black, Modern Style, LED, Ultra-Quiet, with Blower',
         '703168132339', '684', 'Kitchen Range Hood > Island Mount > Black > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2474,7 +2507,7 @@ All Futuro Futuro kitchen ventilation hoods are made in Italy and include a 1-ye
         'Range Hood 36-inch Turo Inox Island by Futuro Futuro',
         'Futuro Futuro Turo Inox 36 Inch Island-mount Range Hood, Stainless Steel, Modern Style, LED, Ultra-Quiet, with Blower',
         '703168132346', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2492,7 +2525,7 @@ All Futuro Futuro kitchen ventilation hoods are made in Italy and include a 1-ye
         'Range Hood 36-inch Trim White Ceiling Built-in by Futuro Futuro',
         'Futuro Futuro Trim White 36 Inch Ceiling-mount Range Hood, Slim Contemporary Design, Ductless, Ultra-Quiet, with Blower',
         '703168132322', '684', 'Kitchen Range Hood > Island Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2509,7 +2542,7 @@ For situations where an outside duct is not feasible, such as high-rise condos a
         'Range Hood 36-inch Fano Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Fano 36 Inch Wall-mount Range Hood, Modern Design, Black gunmetal, LED, Ultra-Quiet, with Blower',
         '703168132353', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2527,7 +2560,7 @@ All Futuro Futuro kitchen ventilation hoods are made in Italy and include a 1-ye
         'Range Hood 48-inch Fano Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Fano 48 Inch Wall-mount Range Hood, Modern Design, Black gunmetal, LED, Ultra-Quiet, with Blower',
         '703168132360', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2544,7 +2577,7 @@ All Futuro Futuro kitchen ventilation hoods are manufactured in Italy and come w
         'Range Hood 36-inch Lorenzo Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Lorenzo Black 36 Inch Wall-mount Range Hood, Angled Design, Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '703168132377', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2560,7 +2593,7 @@ The 14-Inch Jupiter Copper Island Range Hood by Futuro Futuro is more than just 
         'Range Hood 14-inch Jupiter Copper Island by Futuro Futuro',
         'Futuro Futuro Jupiter Copper 14 Inch Island-mount Range Hood, LED, Ultra-Quiet, with Blower', '703168132391',
         '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 14-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2576,7 +2609,7 @@ With the Futuro Futuro 14-inch Jupiter Gold Island Range Hood, you can experienc
         'Range Hood 14-inch Jupiter Gold Island by Futuro Futuro',
         'Futuro Futuro Jupiter Gold 14 Inch Island-mount Range Hood, LED, Ultra-Quiet, with Blower', '703168132384',
         '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 14-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2590,7 +2623,7 @@ Crafted with the excellence of Italian craftsmanship, the Futuro Futuro 36-inch 
         'Range Hood 36-inch Camino Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Fano 36 Inch Wall-mount Range Hood, Modern Design, Black gunmetal, LED, Ultra-Quiet, with Blower',
         '703168132414', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2605,7 +2638,7 @@ As with all Futuro Futuro products, this range hood model comes with a one-year 
         'Range Hood 36-inch Cascade Wall-Mount by Futuro Futuro',
         'Futuro Futuro Cascade 36 Inch Wall-mount Range Hood, Classic Design, White Steel and Wood, Ultra-Quiet, with Blower',
         '703168132407', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2622,8 +2655,9 @@ Crafted by skilled Italian craftsmen, the 36-inch Knox Black Wall Range Hood by 
         'Range Hood 36-inch Knox Black Wall-Mount by Futuro Futuro',
         'Elevate your kitchen''s style and functionality with the Futuro Futuro 36-inch Knox Black Wall Range Hood. Boasting a contemporary design with a lustrous gunmetal enamel finish, this hood effortlessly marries aesthetics with utility. Equipped with a powerful 940 CFM blower, optical touch-sensitive control panel, and LED lights, this model makes smoke and odor extraction an effortless task. Maintenance is made easy with dishwasher-safe filters, and a USB port adds an extra layer of convenience. The unique addition of a storage area for planters or accessories gives you the freedom to personalize your space. With an excellent warranty and crafted by skilled Italian craftsmen, this range hood is more than a purchase; it''s a long-term investment in your kitchen''s functionality and style. ',
         '703168132438', '684', 'Kitchen Range Hood > Wall Mount > Black > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd336199', 'WL36COUNTER-GM', '36″ Counter Black Wall Range Hood',
         'Revel in the fusion of modern aesthetics and superior performance with the Futuro Futuro 36-inch Counter Black Wall Range Hood. Its contemporary design, painted with a lustrous gunmetal enamel paint, adds a touch of class to any kitchen.', 'Introducing the Futuro Futuro 36-inch Counter Black Wall Range Hood, a stunning fusion of contemporary design, superior functionality, and durability. Painted in a lustrous gunmetal enamel, this range hood becomes an elegant centrepiece, elevating the aesthetic appeal of any kitchen it graces.
@@ -2638,8 +2672,9 @@ Crafted by skilled Italian artisans, the 36-inch Counter Black Wall Range Hood f
         'Range Hood 36-inch Counter Black Wall-Mount by Futuro Futuro',
         'Upgrade your kitchen with the Futuro Futuro 36-inch Counter Black Wall Range Hood. Showcasing a sleek, contemporary design, it''s coated in lustrous gunmetal enamel paint, making it both a functional appliance and a statement piece. The hood features a powerful 940 CFM blower for an odor-free cooking experience, electronic illuminated buttons for easy control over its features, and dishwasher-safe filters for effortless maintenance. Designed and manufactured in Italy, this range hood is a testament to the superior materials, advanced technology, and meticulous craftsmanship that Futuro Futuro is known for. ',
         '703168132445', '684', 'Kitchen Range Hood > Wall Mount > Black > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd336204', 'WL48COUNTER-GM', '48″ Counter Black Wall Range Hood',
         'The Futuro Futuro 48-inch Counter Black Wall Range Hood is a modern kitchen marvel, combining elegant aesthetics and top-tier functionality. Featuring a stunning gunmetal finish and an intuitive slider control panel, this range hood makes every culinary journey a breeze.', 'Introduce your kitchen to the future with the Futuro Futuro 48-inch Counter Black Wall Range Hood. Flaunting a modern design with a sophisticated gunmetal finish, this range hood promises to enhance your kitchen''s aesthetic appeal.
@@ -2652,8 +2687,9 @@ The Futuro Futuro 48-inch Counter Black Wall Range Hood is a product of meticulo
         'Range Hood 48-inch Counter Black Wall-Mount by Futuro Futuro',
         'Transform your kitchen with the Futuro Futuro 48-inch Counter Black Wall Range Hood. This range hood combines style and practicality, featuring a contemporary design and a luxurious gunmetal finish that''s easy to clean. The range hood houses a powerful 940 CFM blower to ensure a clean, odor-free kitchen environment. It operates quietly and comes with easy-to-use electronic illuminated buttons for adjusting LED lights and controlling blower speed. It also includes dishwasher-safe filters, making maintenance a breeze. Backed by a 1-year US standard and a 2-year parts warranty, the Futuro Futuro 48-inch Counter Black Wall Range Hood is a long-term investment for your kitchen. ',
         '703168132452', '684', 'Kitchen Range Hood > Wall Mount > Black > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd336382', 'WL36SPHINX', '36″ Sphinx Wall Range Hood',
         'The Futuro Futuro 36-inch Sphinx Wall Range Hood perfectly merges traditional and contemporary styles with its stainless steel and wood design. With a powerful 940 CFM blower, dishwasher-safe filters, and energy-efficient LED lights, this range hood is as functional as it is stylish. This versatile unit can be used ducted or ductless and with or without the chimney.', 'Discover a captivating fusion of tradition and modernity with the Futuro Futuro 36-inch Sphinx Wall Range Hood. Featuring a unique blend of stainless steel and wood, it adds a chic touch to any kitchen setup. The minimalist wooden frame comes unstained, offering you the flexibility to tailor it to your liking and match any kitchen design.
@@ -2666,8 +2702,9 @@ Despite its powerful performance, the hood maintains quiet operation, thanks to 
         'Range Hood 36-inch Sphinx Wall-Mount by Futuro Futuro',
         'Futuro Futuro Sphinx 36 Inch Wall-mount Range Hood, Stainless Steel, Wood, Modern Style, LED, Ultra-Quiet, with Blower',
         '703168132476', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd336385', 'WL48SPHINX', '48″ Sphinx Wall Range Hood',
         'The Futuro Futuro 48-inch Sphinx Wall Range Hood embodies the harmonious blend of contemporary stainless steel and traditional wood elements. With an unstained, minimalist wooden frame, it offers the liberty of customization. The hood features a robust 940 CFM blower, energy-efficient LED lighting, and dishwasher-safe filters. Capable of operating ducted or ductless, it promises flexibility and practicality wrapped up in a sleek design.', 'Redefine your kitchen with the Futuro Futuro 48-inch Sphinx Wall Range Hood, an emblem of exquisite design that unites contemporary and traditional elements. The standout feature is its neat, minimalist wooden frame. The wood comes unstained, providing you the opportunity to match it to your kitchen aesthetics.
@@ -2680,8 +2717,9 @@ Boasting quality, performance, and a unique aesthetic appeal, the Futuro Futuro 
         'Range Hood 48-inch Sphinx Wall-Mount by Futuro Futuro',
         'Futuro Futuro Sphinx 48 Inch Wall-mount Range Hood, Stainless Steel, Wood, Modern Style, Traditional, LED, Ultra-Quiet, with Blower',
         '703168132483', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd336411', 'WL36PYRAMID', '36″ Pyramid Wall Range Hood',
         'The Futuro Futuro 36-inch Pyramid Wall Range Hood brings together style and performance with its sleek stainless steel body, elegant raw ash wooden frame, and efficient 4-speed blower motor. The Pyramid model offers an upgrade to traditional classic hoods, featuring LED lights, electronic control, and dishwasher-safe filters. This wall range hood can function in both ducted or ductless setups, providing a versatile solution for your kitchen.', 'An evolution of the classic kitchen hood, the Futuro Futuro 36-inch Pyramid Wall Range Hood is designed with sophistication and modern functionality. This range hood is crafted with a sleek stainless steel body marked by horizontal lines, giving it a modern appeal. Further enhancing its elegance is the raw ash wooden frame that can be custom-tinted to seamlessly blend with your kitchen decor.
@@ -2694,7 +2732,7 @@ The Futuro Futuro 36-inch Pyramid Wall Range Hood can function as both a ducted 
         'Range Hood 36-inch Pyramid Wall-Mount by Futuro Futuro',
         'Futuro Futuro Pyramid 36 Inch Wall-mount Range Hood, Stainless Steel, Wood, Modern Style, LED, Ultra-Quiet, with Blower',
         '703168132469', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2710,7 +2748,7 @@ With the 48-inch Alina White Wall Range Hood, you don''t just make a purchase, b
         'Range Hood 48-inch Alina White Ceiling/Soffit Built-in by Futuro Futuro',
         'Futuro Futuro Alina 48 Inch Ceiling Range Hood, Unique In-Ceiling Design, Remote Control, Ultra-Quiet, with Blower',
         '703168132490', '684', 'Kitchen Range Hood > Island Mount > Glass > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2725,8 +2763,9 @@ The Futuro Futuro 36-inch Castle Wall Range Hood comes with a one-year US standa
         'Range Hood 36-inch Castle Wall-Mount by Futuro Futuro',
         'Futuro Futuro Pyramid 36 Inch Wall-mount Range Hood, Painted Steel, Wood, Modern Style, LED, Ultra-Quiet, with Blower',
         '703168132506', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd336485', 'WL48CASCADE', '48″ Cascade Wall Range Hood',
         'Revamp your kitchen aesthetics with the Futuro Futuro 48-inch Cascade Wall Range Hood. This blend of contemporary and traditional elements, with a minimalist wooden frame and stainless-steel body, will add a stylish touch to your kitchen. Choose between ducted or ductless functionality, and take advantage of easy maintenance with dishwasher-safe filters.', 'The Futuro Futuro 48-inch Cascade Wall Range Hood is an exceptional kitchen appliance that beautifully combines both contemporary and traditional design elements. This model, notable for its sleek, stainless steel body and an understated yet elegant wooden frame, presents a seamless blend of functionality and aesthetics. The design''s primary charm lies in the harmonious balance it maintains between these contrasting materials - the gleaming stainless steel provides a modern, high-tech appeal, while the wooden frame adds a touch of warmth and homeliness. The wooden frame comes unstained, giving you the freedom to customize it to match your kitchen''s decor. This gives you the creative leeway to truly make this appliance a part of your unique kitchen design.
@@ -2740,8 +2779,9 @@ The Futuro Futuro 48-inch Cascade Wall Range Hood is more than just an appliance
         'Range Hood 48-inch Cascade Wall-Mount by Futuro Futuro',
         'Futuro Futuro Cascade 36 Inch Wall-mount Range Hood, Classic Design, Stainless Steel and Wood, Ultra-Quiet, with Blower',
         '703168132520', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd336558', 'WL48CASTLE', '48″ Castle Wall Range Hood',
         'this hood can be customized to match any kitchen color palette. Designed with an efficient air filtration system, user-friendly controls, energy-efficient LED lights, and dishwasher-safe filters, this range hood ensures robust and efficient operation.', 'Experience exquisite Italian craftsmanship and top-tier performance with the Futuro Futuro 48-inch Castle Wall Range Hood. A chic and efficient addition to any antique, farmhouse, or country-style kitchen, this range hood''s high-grade steel body is coated with a durable white enamel paint that can serve as either the finished exterior or a base coat for custom painting.
@@ -2754,8 +2794,9 @@ All Futuro Futuro ventilation hoods are backed by a one-year US standard and two
         'Range Hood 48-inch Castle Wall-Mount by Futuro Futuro',
         'Futuro Futuro Pyramid 36 Inch Wall-mount Range Hood, Painted Steel, Wood, Modern Style, LED, Ultra-Quiet, with Blower',
         '703168132513', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd336638', 'IS48KNOX-BLK', '48″ Knox Black Island Range Hood',
         'Introducing the Futuro Futuro 48-inch Knox Black Island Range Hood – a combination of high-end performance, easy maintenance, and contemporary design. Crafted with a unique gunmetal finish using enamel paint, this range hood not only ventilates your kitchen efficiently with a 940 CFM blower but also elevates its aesthetics.', 'The Futuro Futuro 48-inch Knox Black Island Range Hood takes kitchen ventilation to new heights by merging top-notch performance with striking design. Taking inspiration from the high-standard Knox series, this range hood brings similar efficiency and quality in a stylish gunmetal finish.
@@ -2771,7 +2812,7 @@ With the Futuro Futuro 48-inch Knox Black Island Range Hood, you can enjoy a ble
         'Range Hood 48-inch Viale Black Island by Futuro Futuro',
         'Futuro Futuro Knox Black 48 Inch Island-mount Range Hood, Painted Steel, LED, Ultra-Quiet, with Blower',
         '703168132568', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2788,7 +2829,7 @@ Additionally, the hood comes equipped with four dynamic LED lights (2700K - 5600
         'Range Hood 50-inch Stealth Black Ceiling/Soffit Built-in by Futuro Futuro',
         'Futuro Futuro Stealth 50 Inch Ceiling Range Hood, Unique In-Ceiling Design, Remote Control, Ultra-Quiet, with Blower',
         '703168132575', '684', 'Kitchen Range Hood > Island Mount > Glass > 50-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2802,7 +2843,7 @@ The model also features dishwasher-safe filters, which ensures that maintenance 
         'Range Hood 36-inch Country Wall-Mount by Futuro Futuro',
         'Futuro Futuro Country 36 Inch Wall-mount Range Hood, Painted Steel, Wood, Modern Style, LED, Ultra-Quiet, with Blower',
         '703168132544', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -2817,8 +2858,9 @@ The Futuro Futuro 48-inch Country Wall Range Hood embodies a harmony of style an
         'Range Hood 48-inch Country Wall-Mount by Futuro Futuro',
         'Futuro Futuro Country 48 Inch Wall-mount Range Hood, Painted Steel, Wood, Modern Style, LED, Ultra-Quiet, with Blower',
         '703168132551', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd336918', 'WL36SPLASH-BLK', '36″ Splash Black Wall Range Hood',
         'Enhance your kitchen with the Futuro Futuro 36-inch Splash Black Wall Range Hood. With its unique and sophisticated design, featuring black hardened glass and a stainless steel body, this wall-mounted hood not only adds a touch of elegance but also provides powerful and efficient ventilation with a 940 CFM blower.', 'Elevate your kitchen''s aesthetics and air purification with the Futuro Futuro 36-inch Splash Black Wall Range Hood. Crafted with a stunning black hardened glass and a durable stainless steel body, this wall-mounted range hood combines elegance and functionality.
@@ -2833,8 +2875,9 @@ Immerse your kitchen in sophistication and functionality with the Futuro Futuro 
         'Range Hood 36-inch Splash Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Splash Black 36 Inch Wall-mount Range Hood, Angled Design, Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '703168132582', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd336955', 'WL36SPLASH-WHT', '36″ Splash White Wall Range Hood',
         'Upgrade your kitchen with the Futuro Futuro 36-inch Splash White Wall Range Hood. With a sleek white hardened glass design and efficient 940 CFM blower, this wall-mounted range hood offers top-notch performance and a unique touch of sophistication.', 'Elevate the aesthetics of your kitchen with the Futuro Futuro 36-inch Splash White Wall Range Hood. Boasting a unique and sophisticated design, this range hood features white hardened glass that not only enhances the visual appeal but also acts as a protective barrier for your walls, making cleaning a breeze.
@@ -2849,8 +2892,9 @@ Whether you need a wall-mounted range hood for a modern, contemporary, or tradit
         'Range Hood 36-inch Splash White Wall-Mount by Futuro Futuro',
         'Futuro Futuro Splash White 36 Inch Wall-mount Range Hood, Angled Design, Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '703168132599', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337018', 'WL36RAVEN-BLK', '36″ Raven Black Wall Range Hood',
         'Elevate your kitchen''s style and air quality with the Futuro Futuro 36-inch Raven Black Wall Range Hood. Its contemporary design, gunmetal finish, and black glass panel create a stunning focal point while efficiently eliminating steam, smoke, and odors.', 'Experience the perfect fusion of style and functionality with the Futuro Futuro 36-inch Raven Black Wall Range Hood. This contemporary kitchen marvel showcases a captivating design, combining sharp angles, glossy exterior, and cutting-edge features to redefine your culinary space.
@@ -2865,8 +2909,9 @@ As a mark of quality, the 36-inch Raven Black Wall Range Hood comes with a one-y
         'Range Hood 36-inch Raven Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Raven Black 36 Inch Wall-mount Range Hood, Angled Design, Painted Steel and Glass, LED, Ultra-Quiet, with Blower',
         '703168132674', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337058', 'IS40MAGNOLIA', '40″ Magnolia Island Range Hood',
         'Experience elegance and functionality with the Futuro Futuro 40-inch Magnolia Island Range Hood. Its contemporary stainless-steel design, coupled with curved clear tempered-glass panels and powerful ventilation, makes it an exquisite addition to your modern kitchen.', 'Introducing the Futuro Futuro 40-inch Magnolia Island Range Hood - a captivating blend of aesthetics and performance that redefines your kitchen''s ambiance. This island range hood boasts a contemporary design with a stainless-steel body that exudes modernity and sophistication. Two gracefully curved clear tempered-glass panels further elevate its visual appeal, creating a stunning focal point that complements your culinary space.
@@ -2878,8 +2923,9 @@ Crafted to the highest standards, Futuro Futuro combines Italian craftsmanship w
         'Range Hood 40-inch Magnolia Island by Futuro Futuro',
         'Futuro Futuro Magnolia Black 40 Inch Island-mount Range Hood, Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '703168132605', '684', 'Kitchen Range Hood > Island Mount > Glass > 40-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337091', 'WL20CAMPANA-CPR', '20″ Campana Copper Wall Range Hood',
         'Upgrade your kitchen with the Futuro Futuro 20-inch Campana Copper Wall Range Hood. With its modern design, touch control, and powerful 940 CFM blower, this cooper-painted steel hood ensures efficient ventilation and adds a touch of elegance to your space.', 'Elevate your kitchen''s functionality and style with the Futuro Futuro 20-inch Campana Copper Wall Range Hood. Crafted with meticulous attention to detail, this wall hood boasts a modern bell-shaped body made from cooper-painted steel, making it a striking focal point in your culinary space.
@@ -2894,8 +2940,9 @@ Unleash the potential of your culinary creations with a range hood that not only
         'Range Hood 20-inch Campana Copper Wall-Mount by Futuro Futuro',
         'Futuro Futuro Campana Copper 20 Inch Wall-mount Range Hood, LED, Ultra-Quiet, with Blower', '703168132612',
         '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 20-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337132', 'WL36ARTTEMPO-WHT', '36″ Art Tempo White Wall Range Hood',
         'Experience the perfect fusion of contemporary and traditional design with the Futuro Futuro 36-inch Art Tempo White Wall Range Hood. With a neat wooden frame and painted steel construction, this hood adds a touch of classic Italian style to your kitchen.', 'Elevate your kitchen with the timeless charm of the Futuro Futuro 36-inch Art Tempo White Wall Range Hood. Blending the best of both worlds, this range hood seamlessly combines contemporary sophistication with traditional elegance.
@@ -2909,8 +2956,9 @@ Embrace the perfect blend of modern functionality and traditional allure with th
         'Range Hood 36-inch Art Tempo White Wall-Mount by Futuro Futuro',
         'Futuro Futuro Art Tempo 36 Inch Wall-mount Range Hood, Painted Steel, Wood, Modern Style, LED, Ultra-Quiet, with Blower',
         '703168132636', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337189', 'WL48ARTTEMPO-WHT', '48″ Art Tempo White Wall Range Hood',
         'Experience the perfect blend of classic Italian style and modern functionality with the Futuro Futuro 48-inch Art Tempo White Wall Range Hood. This rustic-style range hood features a neat wooden frame design and powerful ventilation, making it an elegant addition to any kitchen.', 'Elevate your kitchen with the timeless charm of the Futuro Futuro 48-inch Art Tempo White Wall Range Hood. Combining classic Italian design with modern performance, this range hood seamlessly integrates painted steel and wood elements, creating a sophisticated focal point for your cooking space. The minimalist wooden frame design adds a touch of rustic appeal, and the unstained wood allows for customization to match your unique kitchen aesthetics.
@@ -2921,8 +2969,9 @@ Enhance your cooking experience with the energy-efficient LED lights, illuminati
         'Range Hood 48-inch Art Tempo White Wall-Mount by Futuro Futuro',
         'Futuro Futuro Art Tempo 48 Inch Wall-mount Range Hood, Painted Steel, Wood, Modern Style, LED, Ultra-Quiet, with Blower',
         '703168132643', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337252', 'WL36NOVA-GM', '36″ Nova Black Wall Range Hood',
         'Upgrade your kitchen with the Futuro Futuro 36-inch Nova Black Wall Range Hood. Its contemporary design, gunmetal finish, and innovative features make it a modern and functional addition to any cooking space.', 'Elevate your kitchen with the sleek and modern design of the Futuro Futuro 36-inch Nova Black Wall Range Hood. This range hood combines aesthetic elegance with advanced functionality, offering a stylish solution for efficient air ventilation. The gunmetal finish and contemporary design seamlessly integrate into your kitchen''s decor, adding a touch of sophistication to the cooking area.
@@ -2934,8 +2983,9 @@ A unique feature of this range hood is the integrated shelf/storage, which provi
         'Range Hood 36-inch Nova Black Wall-Mount by Futuro Futuro',
         'Elevate your kitchen with the sleek and modern design of the Futuro Futuro 36-inch Nova Black Wall Range Hood. This range hood combines aesthetic elegance with advanced functionality, offering a stylish solution for efficient air ventilation. The gunmetal finish and contemporary design seamlessly integrate into your kitchen''s decor, adding a touch of sophistication to the cooking area. Cleaning is a breeze with the easy-to-clean surface that only requires a wipe with Windex. The painted enamel surface ensures durability and a lasting shine. The range hood''s optical touch-sensitive light control panel adds a futuristic touch to your cooking experience, allowing you to easily adjust the settings with a simple touch. Equipped with a powerful 940 CFM blower, the Nova Black Wall Range Hood efficiently eliminates smoke, steam, and odors, creating a fresh and clean cooking environment. The built-in LED lights not only illuminate your cooking space but also enhance the overall ambiance of your kitchen. A unique feature of this range hood is the integrated shelf/storage, which provides a convenient space for planters or other accessories, adding a personalized touch to your kitchen decor. The dishwasher-safe filters simplify maintenance, ensuring the range hood''s optimal performance over time.',
         '703168132650', '684', 'Kitchen Range Hood > Wall Mount > Black > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337448', 'IS48TURO-INOX', '48″ Turo Inox Island Range Hood',
         'Elevate your kitchen with the Futuro Futuro 48-inch Turo Inox Island Range Hood. Crafted in Italy with AISI 304 stainless steel, this powerful and quiet hood features a unique "Perimeter Suction System" for enhanced performance.', 'Enhance your kitchen''s functionality and aesthetics with the Futuro Futuro 48-inch Turo Inox Island Range Hood. This kitchen ventilation solution, designed by the renowned Italian manufacturer, offers a seamless blend of sleek design and advanced technology, making it a must-have addition to any modern or contemporary kitchen with a 36” range or cooktop.
@@ -2949,8 +2999,9 @@ Illuminating your cooking space is a perimeter LED light strip, delivering even 
         'Range Hood 48-inch Turo Inox Island by Futuro Futuro',
         'Futuro Futuro Turo Inox 48 Inch Island-mount Range Hood, Stainless Steel, Modern Style, LED, Ultra-Quiet, with Blower',
         '703168132681', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337526', 'IS48HORIZON-BLK', '48″ Horizon Black Island Range Hood',
         'Experience modern elegance with the Futuro Futuro 48-inch Horizon Black Range Hood. This airloop recirculating island hood features advanced filter technology for superior performance, contemporary design, remote control, LED lights, and easy installation. Say goodbye to ducts and hello to hassle-free, efficient ventilation.', 'Elevate your kitchen aesthetics and ventilation with the Futuro Futuro 48-inch Horizon Black Range Hood. Designed to redefine modern style and functionality, this island hood boasts innovative airloop recirculating technology that sets it apart. Part of Futuro Futuro’s AIR LOOP advanced filter system, this range hood line combines contemporary elegance with remarkable performance.
@@ -2964,8 +3015,9 @@ Experience the future of ventilation with Futuro Futuro''s Horizon Range Hood, w
         'Range Hood 48-inch Horizon Black Island by Futuro Futuro',
         'Futuro Futuro Horizon Bar 48 Inch Island-mount Range Hood, Slim Contemporary Design, Black, Ductless, Ultra-Quiet, with Blower',
         '703168132698', '684', 'Kitchen Range Hood > Island Mount > Glass > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337553', 'IS63HORIZON-BAR', '63″ Horizon Bar Island Range Hood',
         'Elevate your kitchen with the Futuro Futuro 63-inch Horizon Bar Island Range Hood. This impressive island hood features airloop recirculation technology, contemporary design, LED lights, and wine glass storage, all controlled by a remote and  touch panel.', 'Experience innovation and style with the Futuro Futuro 63-inch Horizon Bar Island Range Hood. As part of Futuro Futuro’s advanced filter system (AIR LOOP), this island range hood presents a blend of modern aesthetics and cutting-edge technology. It offers airloop recirculation, eliminating the need for ducts, ensuring easy installation regardless of your ceiling type - high, low, or even angled.
@@ -2978,8 +3030,9 @@ Incorporating both form and function, the Futuro Futuro 63-inch Horizon Bar Isla
         'Range Hood 63-inch Horizon Bar Island by Futuro Futuro',
         'Futuro Futuro Horizon Bar 63 Inch Island-mount Range Hood, Slim Contemporary Design, Black, Ductless, Ultra-Quiet, with Blower',
         '703168132704', '684', 'Kitchen Range Hood > Island Mount > Glass > 63-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337592', 'IS63HORIZON-SHELF', '63″ Horizon Shelf Island Range Hood',
         'Discover the Futuro Futuro 63-inch Horizon Shelf Island Range Hood, a perfect blend of contemporary style and advanced technology. With airloop recirculation, LED lights, and a convenient shelf, this island range hood offers exceptional performance without the need for ducts.', 'Introducing the Futuro Futuro 63-inch Horizon Shelf Island Range Hood, a pinnacle of innovation and style. Designed to redefine kitchen ventilation, this island range hood is equipped with airloop recirculation technology, ensuring superior performance without the need for ducts.
@@ -2992,8 +3045,9 @@ Finished in a sleek gunmetal color, the Futuro Futuro 63-inch Horizon Shelf Isla
         'Range Hood 63-inch Horizon Shelf Island by Futuro Futuro',
         'Futuro Futuro Horizon Step 63 Inch Island-mount Range Hood, Slim Contemporary Design, Black, Ductless, Ultra-Quiet, with Blower',
         '703168132711', '684', 'Kitchen Range Hood > Island Mount > Glass > 63-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337671', 'IS48TURO-BLK', '48″ Turo Black Island Range Hood',
         'Elevate your kitchen with the Futuro Futuro 48-inch Turo Black Island Range Hood. This sleek and powerful hood combines modern design with advanced ventilation technology, making it the perfect addition to contemporary kitchens.', 'Introducing the Futuro Futuro 48-inch Turo Black Island Range Hood, a stunning fusion of style and innovation. This kitchen ventilation solution from the renowned Italian manufacturer Futuro Futuro adds a touch of modern elegance to your culinary space.
@@ -3009,8 +3063,9 @@ Elevate your kitchen''s aesthetics and functionality with the Futuro Futuro 48-i
         'Range Hood 48-inch Turo Black Island by Futuro Futuro',
         'Futuro Futuro Turo Black 48 Inch Island-mount Range Hood, Painted Steel, Modern Style, LED, Ultra-Quiet, with Blower',
         '703168132728', '684', 'Kitchen Range Hood > Island Mount > Black > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337761', 'WL48FLIPPER', '48″ Flipper Insert Range Hood',
         'Upgrade your kitchen with the Futuro Futuro 48-inch Flipper Insert Range Hood. Its contemporary design and stainless-steel body house a powerful 940 CFM blower. The flippable tempered glass panel adds style and functionality, while easy-to-clean mesh grease filters keep your kitchen fresh. Control it with the touch-sensitive panel concealed behind the glass. Enjoy long-lasting LED dynamic lighting. Trust Futuro Futuro, with a 1-year US standard warranty and an additional 2-year parts warranty.', 'Elevate your kitchen''s style and performance with the Futuro Futuro 48-inch Flipper Insert Range Hood. This kitchen appliance blends contemporary design with cutting-edge technology, making it an essential addition to any modern home.
@@ -3025,8 +3080,9 @@ Trust in Futuro Futuro''s legacy of excellence in kitchen ventilation. Contracto
         'Range Hood 48-inch Flipper Insert Built-in by Futuro Futuro',
         'Upgrade your kitchen with the Futuro Futuro 48-inch Flipper Insert Range Hood. Its contemporary design and stainless-steel body house a powerful 940 CFM blower. The flippable tempered glass panel adds style and functionality, while easy-to-clean mesh grease filters keep your kitchen fresh. Control it with the touch-sensitive panel concealed behind the glass. Enjoy long-lasting LED dynamic lighting. Trust Futuro Futuro, with a 1-year US standard warranty and an additional 2-year parts warranty.',
         '703168132759', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 48-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd339601', 'WL36AESTHETICS-BLK', '36″ Aesthetics Black Wall Range Hood',
         'Elevate your kitchen with the Futuro Futuro 36-inch Aesthetics Black Wall Range Hood. This contemporary marvel combines sleek design with powerful functionality. With a 940 CFM blower, LED lights, and dishwasher-safe filters, it''s the ideal choice for modern kitchens.', 'Upgrade your kitchen to new heights of style and performance with the Futuro Futuro 36-inch Aesthetics Black Wall Range Hood. Crafted with meticulous attention to detail, this range hood seamlessly blends contemporary aesthetics with cutting-edge technology.
@@ -3041,7 +3097,7 @@ Elevate your kitchen''s aesthetics and performance with the Futuro Futuro 36-inc
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
         'Range Hood 36-inch Aesthetics Black Wall-Mount by Futuro Futuro', '', '703168132773', '684',
         'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3053,7 +3109,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382507', 'IS36MOONCRYS', '36″ Moon Crys
         'Range Hood 36-inch Moon Crystal Island by Futuro Futuro',
         'Futuro Futuro Moon Crystal 36 Inch Island-mount Range Hood, Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '022099531517', '684', 'Kitchen Range Hood > Island Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3065,7 +3121,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382508', 'IS36MOONINOX', '36″ Moon Inox
         'Range Hood 36-inch Moon Inox Island by Futuro Futuro',
         'Futuro Futuro Moon Inox 36 Inch Island-mount Range Hood, Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '022099538585', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3077,7 +3133,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382509', 'IS36VENICE', '36″ Venice Isla
         'Range Hood 36-inch Venice Island by Futuro Futuro',
         'Futuro Futuro Venice 36 Inch Island-mount Range Hood, Slim Steel and Glass Design, LED, Ultra-Quiet, with Blower',
         '703168132209', '684', 'Kitchen Range Hood > Island Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3089,7 +3145,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382515', 'IS36POSITANO-FS', '36″ Posita
         'Range Hood 36-inch Positano FS Island by Futuro Futuro',
         'Futuro Futuro Positano FS 36 Inch Island-mount Range Hood, Fingerprint-Free Stainless Steel, LED, Ultra-Quiet, w/ Blower',
         '022099538592', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3101,7 +3157,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382527', 'IS24SPIRIT', '24″ Spirit Isla
         'Range Hood 24-inch Spirit Island by Futuro Futuro',
         'Futuro Futuro Spirit 24 Inch Island-mount Range Hood, Modern Stainless Steel Design, Ultra-Quiet, with Blower',
         '022099538110', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3113,7 +3169,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382528', 'IS24MOONINOX', '24″ Moon Inox
         'Range Hood 24-inch Moon Inox Island by Futuro Futuro',
         'Futuro Futuro Moon Inox 24 Inch Island-mount Range Hood, Modern Curved Stainless Steel Design, Ultra-Quiet, with Blower',
         '022099538103', '684', 'Kitchen Range Hood > Island Mount > Stainless Steel > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3125,7 +3181,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382552', 'WL36INTEGRA-WHT', '36″ Integr
         'Range Hood 36-inch Integra White Wall-Mount by Futuro Futuro',
         'Futuro Futuro Integra White 36 Inch Wall-mount Range Hood, Modern Stainless Steel and Glass Design, Ultra-Quiet, with Blower',
         '022099539179', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3137,7 +3193,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382553', 'WL36MOONCRYS', '36″ Moon Crys
         'Range Hood 36-inch Moon Crystal Wall-Mount by Futuro Futuro',
         'Futuro Futuro Moon Crystal 36 Inch Wall-mount Range Hood, Modern Stainless Steel and Curved Glass, LED, Ultra-Quiet, with Blower',
         '022099531562', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3149,7 +3205,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382554', 'WL36MOONINOX', '36″ Moon Inox
         'Range Hood 36-inch Moon Inox Wall-Mount by Futuro Futuro',
         'Futuro Futuro Moon Inox 36 Inch Wall-mount Range Hood, Modern Stainless Steel Design, Ultra-Quiet, with Blower',
         '022099539698', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3161,7 +3217,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382555', 'WL36VENICE', '36″ Venice Wall
         'Range Hood 36-inch Venice Wall-Mount by Futuro Futuro',
         'Futuro Futuro Venice 36 Inch Wall-mount Range Hood, Slim Modern Steel and Glass Design, LED, Ultra-Quiet, with Blower',
         '022099539728', '684', 'Kitchen Range Hood > Wall Mount > Glass > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3173,7 +3229,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382557', 'WL36MYSTIC-INOX', '36″ Mystic
         'Range Hood 36-inch Mystic Inox Wall-Mount by Futuro Futuro',
         'Futuro Futuro Mystic Inox 36 Inch Wall-mount Range Hood, Modern Stainless Steel Design, Ultra-Quiet, with Blower',
         '022099539957', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3185,7 +3241,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382558', 'WL36STREAMLINE-WHT', '36″ Str
         'Range Hood 36-inch Streamline Wall-Mount by Futuro Futuro',
         'Futuro Futuro Streamline White 36 Inch Wall-mount Range Hood, Slim Contemporary Design, Ultra-Quiet, with Blower',
         '022099539704', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3197,7 +3253,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382560', 'WL36LINEARE', '36″ Lineare Wa
         'Range Hood 36-inch Lineare Wall-Mount by Futuro Futuro',
         'Futuro Futuro Lineare 36 Inch Wall-mount Range Hood, Professional Style Design, Stainless Steel, Ultra-Quiet, with Blower',
         '022099539254', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3209,7 +3265,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382561', 'WL36RAZOR', '36″ Razor Wall R
         'Range Hood 36-inch Razor Wall-Mount by Futuro Futuro',
         'Futuro Futuro Razor 36 Inch Wall-mount Range Hood, Incredibly Thin Stainless Steel Design, LED, Ultra-Quiet, with Blower',
         '703168131547', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3221,7 +3277,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382566', 'WL36RAINBOW', '36″ Rainbow Wa
         'Range Hood 36-inch Rainbow Wall-Mount by Futuro Futuro',
         'Futuro Futuro Rainbow 36 Inch Wall-mount Range Hood, Traditional / Modern Stainless Steel Design, LED, Ultra-Quiet, w/ Blower',
         '022099539759', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3233,7 +3289,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382568', 'WL36IDEA', '36″ Idea Wall Ran
         'Range Hood 36-inch Idea Wall-Mount by Futuro Futuro',
         'Futuro Futuro Idea 36 Inch Wall-mount Range Hood, Modern Stainless Steel and Glass Design, Ultra-Quiet, with Blower',
         '022099539193', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3245,7 +3301,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382569', 'WL36MAGNUS', '36″ Magnus Wall
         'Range Hood 36-inch Magnus Wall-Mount by Futuro Futuro',
         'Futuro Futuro Magnus 36 Inch Wall-mount Range Hood, Professional-Style Design w/Extra Filters, LED, Ultra-Quiet, with Blower',
         '022099539605', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3257,7 +3313,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382579', 'WL24LINEARE', '24″ Lineare Wa
         'Range Hood 24-inch Lineare Wall-Mount by Futuro Futuro',
         'Futuro Futuro Lineare 24 Inch Wall-mount Range Hood, Professional Style Design, Stainless Steel, LED, Ultra-Quiet, with Blower',
         '022099538707', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3269,7 +3325,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382582', 'WL24MOONINOX', '24″ Moon Inox
         'Range Hood 24-inch Moon Inox Wall-Mount by Futuro Futuro',
         'Futuro Futuro Moon Inox 24 Inch Wall-mount Range Hood, Modern Stainless Steel Design, Ultra-Quiet, with Blower',
         '022099538745', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3281,7 +3337,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382583', 'WL24VENICE', '24″ Venice Wall
         'Range Hood 24-inch Venice Wall-Mount by Futuro Futuro',
         'Futuro Futuro Venice 24 Inch Wall-mount Range Hood, Slim Modern Steel and Glass Design, LED, Ultra-Quiet, with Blower',
         '022099538776', '684', 'Kitchen Range Hood > Wall Mount > Glass > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3293,7 +3349,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382584', 'WL24STREAMLINE-WHT', '24″ Str
         'Range Hood 24-inch Streamline White Wall-Mount by Futuro Futuro',
         'Futuro Futuro Streamline White 24 Inch Wall-mount Range Hood, Slim Contemporary Design, Ultra-Quiet, with Blower',
         '022099539360', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3305,7 +3361,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382585', 'WL24CAPRI', '24″ Capri Wall R
         'Range Hood 24-inch Capri Wall-Mount by Futuro Futuro',
         'Futuro Futuro Capri 24 Inch Wall-mount Range Hood, Slim Modern Angled Design, Stainless Steel, Ultra-Quiet, with Blower',
         '022099538691', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3317,7 +3373,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382586', 'WL24SPIRIT', '24″ Spirit Wall
         'Range Hood 24-inch Spirit Wall-Mount by Futuro Futuro',
         'Futuro Futuro Spirit 24 Inch Wall-mount Range Hood, Modern Stainless Steel 2-Level Design, Ultra-Quiet, with Blower',
         '022099538769', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3329,7 +3385,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382589', 'WL30MOONCRYS', '30″ Moon Crys
         'Range Hood 30-inch Moon Crystal Wall-Mount by Futuro Futuro',
         'Futuro Futuro Moon Crystal 30 Inch Wall-mount Range Hood, Modern Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '022099539445', '684', 'Kitchen Range Hood > Wall Mount > Glass > 30-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3341,7 +3397,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382590', 'WL22INSERT-BAF', '22″ Insert-
         'Range Hood 22-inch Insert-Liner Baffle Built-in by Futuro Futuro',
         'Futuro Futuro Insert-Liner Baffle 22 Inch Wall-mount / In-Cabinet Range Hood, Remote Control, LED, Ultra-Quiet, with Blower',
         '022099538684', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 22-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3353,7 +3409,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382591', 'WL32INSERT', '32″ Insert-Line
         'Range Hood 32-inch Insert-Liner Built-in by Futuro Futuro',
         'Futuro Futuro Insert-Liner 32 Inch Wall-mount / In-Cabinet Range Hood, Remote Control, LED, Ultra-Quiet, with Blower',
         '022099538899', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 32-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3365,7 +3421,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382630', 'WL36SHADE', '36″ Shade Insert
         'Range Hood 36-inch Shade Insert Built-in by Futuro Futuro',
         'Futuro Futuro Shade 36 Inch Insert / In-Cabinet Range Hood, Stainless Steel and Flip Glass, LED, Ultra-Quiet, with Blower',
         '022099539919', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3377,7 +3433,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382638', 'WL36POSITANO', '36″ Positano 
         'Range Hood 36-inch Positano Wall-Mount by Futuro Futuro',
         'Futuro Futuro Positano 36 Inch Wall-mount Range Hood, Modern Slim Stainless Steel Design, LED, Ultra-Quiet, with Blower',
         '022099539735', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3389,7 +3445,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382644', 'WL22INSERT', '22″ Insert-Line
         'Range Hood 22-inch Insert-Liner Built-in by Futuro Futuro',
         'Futuro Futuro Insert-Liner 22 Inch Wall-mount / In-Cabinet Range Hood, Remote Control, LED, Ultra-Quiet, with Blower',
         '022099539322', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 22-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3401,7 +3457,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382672', 'WL42INSERT', '42″ Insert-Line
         'Range Hood 42-inch Insert-Liner Built-in by Futuro Futuro',
         'Futuro Futuro Insert-Liner 42 Inch Wall-mount / In-Cabinet Range Hood, Remote Control, LED, Ultra-Quiet, with Blower',
         '022099538493', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 42-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3413,7 +3469,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382697', 'WL36MINIMAL-WHT', '36″ Minima
         'Range Hood 36-inch Minimal White Wall-Mount by Futuro Futuro',
         'Futuro Futuro Minimal White 36 Inch Wall-mount Range Hood, Modern Painted Steel Design, LED, Ultra-Quiet, with Blower',
         '022099539636', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3425,7 +3481,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382701', 'WL24SHADE', '24″ Shade Insert
         'Range Hood 24-inch Shade Insert Built-in by Futuro Futuro',
         'Futuro Futuro Shade 24 Inch Insert / In-Cabinet Range Hood, Stainless Steel and Flip Glass, LED, Ultra-Quiet, with Blower',
         '703168131349', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3437,7 +3493,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382707', 'IS24MOONCRYS', '24″ Moon Crys
         'Range Hood 24-inch Moon Crystal Island by Futuro Futuro',
         'Futuro Futuro Moon Crystal 24 Inch Island-mount Range Hood, Stainless Steel and Glass, LED, Ultra-Quiet, with Blower',
         '703168131196', '684', 'Kitchen Range Hood > Island Mount > Glass > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3449,7 +3505,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382708', 'WL32INSERT-BAF', '32″ Insert-
         'Range Hood 32-inch Insert-Liner Baffle Built-in by Futuro Futuro',
         'Futuro Futuro Insert-Liner Baffle 32 Inch Wall-mount / In-Cabinet Range Hood, Remote Control, LED, Ultra-Quiet, with Blower',
         '022099538905', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 32-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3461,7 +3517,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382710', 'WL24STREAMLINE-BLU', '24″ Str
         'Range Hood 24-inch Streamline Blue Wall-Mount by Futuro Futuro',
         'Futuro Futuro Streamline Blue 24 Inch Wall-mount Range Hood, Slim Contemporary Design, Ultra-Quiet, with Blower',
         '703168131356', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3473,7 +3529,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382733', 'WL24RACCOLTA', '24″ Raccolta 
         'Range Hood 24-inch Raccolta Insert Built-in by Futuro Futuro',
         'Futuro Futuro Raccolta 24 Inch Wall-mount / In-Cabinet Range Hood, Remote Control, LED, Ultra-Quiet, with Blower',
         '703168131745', '684', 'Kitchen Range Hood > Wall Mount > Glass > 24-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3485,7 +3541,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382734', 'WL30RACCOLTA', '30″ Raccolta 
         'Range Hood 30-inch Raccolta Insert Built-in by Futuro Futuro',
         'Futuro Futuro Raccolta 30 Inch Wall-mount / In-Cabinet Range Hood, Remote Control, LED, Ultra-Quiet, with Blower',
         '703168131912', '684', 'Kitchen Range Hood > Wall Mount > Glass > 30-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3497,7 +3553,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382735', 'WL36DECORSA', '36″ Decorsa In
         'Range Hood 36-inch Decorsa Insert Built-in by Futuro Futuro',
         'Futuro Futuro Decorsa 36 Inch Wall-mount / In-Cabinet Range Hood, Remote Control, LED, Ultra-Quiet, with Blower',
         '703168131769', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3507,7 +3563,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382766', 'WL36EVO', '36″ Evolution Wall
         2147483647, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '36-evolution-wall', '2350', '1595', '-99',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', '0', '0', '0', '0',
         'Range Hood 36-inch Evolution Wall-Mount by Futuro Futuro', '', '022099539520', '684', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3519,7 +3575,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd325680', 'WL36SLIDE', '36″ Slide Insert
         'Range Hood 36-inch Slide Insert Built-in by Futuro Futuro',
         'Futuro Futuro Slide 36 Inch Wall-mount / In-Cabinet Range Hood, Remote Control, Oil trap, LED, Ultra-Quiet, with Blower',
         '703168131998', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3531,7 +3587,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd325681', 'WL46SLIDE', '46″ Slide Insert
         'Range Hood 46-inch Slide Insert Built-in by Futuro Futuro',
         'Futuro Futuro Slide 46 Inch Wall-mount / In-Cabinet Range Hood, Remote Control, Oil trap, LED, Ultra-Quiet, with Blower',
         '703168132001', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 46-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3543,7 +3599,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd326730', 'WL36POSITANO-BLK', '36″ Posit
         'Range Hood 36-inch Positano Black Wall-Mount by Futuro Futuro',
         'Futuro Futuro Positano Black 36 Inch Wall-mount Range Hood, Modern Slim Stainless Steel Design, LED, Ultra-Quiet, with Blower',
         '703168132100', '684', 'Kitchen Range Hood > Wall Mount > Black > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3560,7 +3616,7 @@ The Futuro Futuro “Kelvin Black” series range hoods are the perfect ventilat
         'Range Hood 30-inch Kelvin Black Insert Built-in by Futuro Futuro',
         'Futuro Futuro Kelvin 30 Inch Wall-mount / In-Cabinet Range Hood, Remote Control, LED, Ultra-Quiet, with Blower',
         '703168132223', '684', 'Kitchen Range Hood > Wall Mount > Black > 30-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3578,7 +3634,7 @@ sku: WL30KELVIN-INOX', 1123, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '30-kelvin-
         'Range Hood 30-inch Kelvin Inox Insert Built-in by Futuro Futuro',
         'Futuro Futuro Kelvin 30 Inch Wall-mount / In-Cabinet Range Hood, Remote Control, LED, Ultra-Quiet, stainless steel, with Blower',
         '703168132230', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 30-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3590,8 +3646,9 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd330777', 'WL30SLIDE', '30″ Slide Insert
         'Range Hood 30-inch Slide Insert Built-in by Futuro Futuro',
         'Futuro Futuro Slide 30 Inch Wall-mount / In-Cabinet Range Hood, Remote Control, Oil trap, LED, Ultra-Quiet, with Blower',
         '703168132254', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 30-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337293', 'AC-MCIF', 'Micro Infusion Carbon Filter',
         'Micro Carbon Infusion Filter offers an exceptional FIVE-YEAR lifespan before recharge, far surpassing the need for 2-3 month replacements in traditional charcoal filters. This translates to significantly reduced maintenance costs and effort.', 'Micro Infusion Carbon Filter does not require changing filters every 2-3 months, which can result in around $200 additional spending yearly.
@@ -3599,8 +3656,9 @@ Micro Infusion Carbon Filter can operate without any maintenance for 12-15 month
 To ensure product''s compatibility, please contact our Customer Service by phone at (800) 230-3565 ext 101, or by E-mail futurofuturo@optonline.net sku: AC-MCIF',
         0, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'micro-carbon-infusion-filter', '550', '375', '9',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', '', '', '703168132629', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337707', 'WL36FLIPPER', '36″ Flipper Insert Range Hood',
         'Upgrade your kitchen with the Futuro Futuro 36-inch Flipper Insert Range Hood. Its contemporary design, stainless steel body, and modern features make it a stylish and functional addition. With a powerful 940 CFM blower, it ensures efficient ventilation, while the flippable tempered glass panel conceals the touch-sensitive control panel, adding a sleek touch. The included mesh grease filters are dishwasher-safe, and the LED light strip provides excellent dynamic illumination. Experience the perfect blend of Italian craftsmanship and advanced technology.', 'With meticulous attention to detail, this range hood features a stainless-steel body that not only exudes modern elegance but also ensures durability and resistance to rust and corrosion, thanks to its AISI 304 Stainless Steel construction.
@@ -3615,8 +3673,9 @@ This Futuro Futuro 36-inch Flipper Insert Range Hood comes with a 1-year US stan
         'Range Hood 36-inch Flipper Insert Built-in by Futuro Futuro',
         'Upgrade your kitchen with the Futuro Futuro 36-inch Flipper Insert Range Hood. Its contemporary design, stainless steel body, and modern features make it a stylish and functional addition. With a powerful 940 CFM blower, it ensures efficient ventilation, while the flippable tempered glass panel conceals the touch-sensitive control panel, adding a sleek touch. The included mesh grease filters are dishwasher-safe, and the LED light strip provides excellent illumination. Experience the perfect blend of Italian craftsmanship and advanced technology.',
         '703168132742', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337887', 'WL36LINEA', '36″ Linea Wall Range Hood',
         'Elevate your kitchen with the Futuro Futuro 36-inch Linea Wall Range Hood. Its sleek stainless steel design, energy-efficient LED lights, and tactile black trim add modern elegance. With four airflow speeds and a quiet, powerful blower, it offers precise ventilation. Easy maintenance, smart technology, and a warranty ensure lasting quality. Upgrade your kitchen with style and performance.', 'Elevate the aesthetics and functionality of your kitchen with the Futuro Futuro 36-inch Linea Wall Range Hood. Combining contemporary design with cutting-edge technology, this range hood is a masterpiece of form and function.
@@ -3631,7 +3690,7 @@ Upgrade your kitchen with the Futuro Futuro 36-inch Line Black Wall Range Hood a
         'Range Hood 36-inch Linea Wall-Mount by Futuro Futuro',
         'Futuro Futuro Linea 36 Inch Wall-mount Range Hood, Slim Contemporary Design, Black Accent Trim, Ultra-Quiet, with Blower',
         '703168132766', '684', 'Kitchen Range Hood > Wall Mount > Stainless Steel > 36-inch range hood');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3641,7 +3700,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382600', 'AC-RBK', 'Remote Blower Kit',
         10060, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'remote-blower-kit', '520', '345', '923',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '13', '17', '15', '14', 'Futuro Futuro Remote Blower Kit', '',
         '703168131035', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3651,7 +3710,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382601', 'AC-WIRELESS', 'Wireless Remote 
         10080, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'wireless-remote-control-kit', '490', '325', '987',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '1', '13', '12', '2', 'Futuro Futuro Wireless Remote Control Kit', '',
         '703168131059', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3661,7 +3720,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382603', 'AC-CARBR6', 'Carbon Filter - Ro
         10030, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'carbon-filter-round-6-2-pack', '74', '50', '90',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '1', '13', '11', '2',
         'Futuro Futuro Carbon Filter - Round 6-inch (2-pack)', '', '022099538097', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3671,7 +3730,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382604', 'AC-CARBR8', 'Carbon Filter - Ro
         10031, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'carbon-filter-round-8-2-pack', '74', '50', '9',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '1', '13', '11', '2',
         'Futuro Futuro Carbon Filter - Round 8-inch (2-pack)', '', '022099538134', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3681,7 +3740,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382605', 'AC-METALFILTER', 'Replacement M
         10010, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'replacement-metal-filters', '105', '85', '705',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0', 'Futuro Futuro Replacement Metal Filters', '',
         '022099539056', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3714,7 +3773,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
         10220, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'chimney-extension-island-square', '840', '565', '12',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '47', '53', '14', '12',
         'Range Hood Ch-inch Chimney Extension - Square Island by Futuro Futuro', '', '022099538806', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3737,7 +3796,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
         10240, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'chimney-extension-murano-pearl-island', '840', '565', '8',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Range Hood Ch-inch Chimney Extension - Murano/Pearl Island by Futuro Futuro', '', '022099538561', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3776,7 +3835,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
         10260, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'chimney-extension-wall-square', '370', '245', '0',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '22', '41', '14', '13',
         'Range Hood Ch-inch Chimney Extension - Square Wall-Mount by Futuro Futuro', '', '022099538967', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3803,7 +3862,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
         10250, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'chimney-extension-wall-round', '370', '245', '5',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Range Hood Ch-inch Chimney Extension - Round Wall-Mount by Futuro Futuro', '', '022099538844', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3813,7 +3872,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382610', 'AC-HALOBULB', 'Halogen Bulbs (4
         10140, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'halogen-bulbs-4-pack', '40', '25', '36',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '1', '13', '12', '2', 'Futuro Futuro Halogen Bulbs (4-pack)', '',
         '022099539865', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3823,7 +3882,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382611', 'AC-HALOFXRND', 'Halogen Fixture
         10110, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'halogen-fixture-round', '98', '75', '44',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '1', '13', '12', '2', 'Futuro Futuro Halogen Fixture - Round', '',
         '022099539926', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3833,7 +3892,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382612', 'AC-HALOFXSQ', 'Halogen Fixture 
         10120, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'halogen-fixture-square', '98', '75', '21',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0', 'Futuro Futuro Halogen Fixture - Square', '',
         '022099539933', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3843,7 +3902,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382613', 'AC-MINIHALO', 'Miniature Haloge
         10130, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'miniature-halogen-bulb-4-pack', '60', '45', '13',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '1', '13', '12', '2', 'Futuro Futuro Miniature Halogen Bulb (4-pack)',
         '', '703168131028', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3853,7 +3912,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382614', 'AC-FLRBULB', 'Fluorescent Bulbs
         10170, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'fluorescent-bulbs-36-inch-set-of-2', '50', '35', '-99',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '2', '38', '7', '7',
         'Futuro Futuro Fluorescent Bulbs 36-inch (set of 2)', '', '022099539131', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3863,7 +3922,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382617', 'AC-BACKSPL', 'Stainless Steel B
         10090, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'stainless-steel-backsplash', '400', '265', '1',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Range Hood St-inch Stainless Steel Backsplash by Futuro Futuro', '', '022099538066', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3880,7 +3939,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
         10340, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'glass-panel-jupiter-island', '600', '400', '4',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Range Hood Gl-inch Glass Panel - Jupiter Island by Futuro Futuro', '', '703168131172', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3890,7 +3949,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382620', 'AC-GLSJUPITERWL', 'Glass Panel 
         10350, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'glass-panel-jupiter-wall', '600', '400', '-99',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Range Hood Gl-inch Glass Panel - Jupiter Wall-Mount by Futuro Futuro', '', '703168131189', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3900,7 +3959,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382621', 'AC-36PANELLOFT', '36″ Loft CT
         10320, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '36-loft-ctm-stainless-steel-panel', '520', '350', '1',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Range Hood 36-inch Loft CTM Stainless Steel Panel by Futuro Futuro', '', '703168131127', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3929,7 +3988,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
         10280, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'chimney-extension-con850', '370', '245', '14',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Range Hood Ch-inch Chimney Extension CON by Futuro Futuro', '', '022099538356', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3948,7 +4007,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
         10290, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'chimney-extension-fab960', '370', '245', '6',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Range Hood Ch-inch Chimney Extension FAB by Futuro Futuro', '', '022099538394', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3969,7 +4028,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
         10300, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'chimney-extension-mim850', '370', '245', '6',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Range Hood Ch-inch Chimney Extension MIM by Futuro Futuro', '', '022099538547', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -3992,7 +4051,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
         10310, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'chimney-extension-stp960', '370', '245', '1',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Range Hood Ch-inch Chimney Extension STP by Futuro Futuro', '', '022099538752', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4002,7 +4061,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382634', 'AC-CARBSQ', 'Carbon Filter - Sq
         10020, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'carbon-filter-square-2-pack', '74', '50', '56',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '1', '13', '11', '2', 'Futuro Futuro Carbon Filter - Square 2-pack', '',
         '022099538141', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4023,7 +4082,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
         10270, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'chimney-extension-luxor-wall', '520', '345', '2',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Range Hood Ch-inch Chimney Extension - Luxor Wall-Mount by Futuro Futuro', '', '022099538486', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4054,7 +4113,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
         10210, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'chimney-extension-island-round', '840', '565', '15',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Range Hood Ch-inch Chimney Extension - Round Island by Futuro Futuro', '', '022099538790', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4064,7 +4123,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382673', 'AC-BLOWER4', 'Internal Blower',
         10070, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'internal-blower', '490', '330', '855',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '11', '13', '12', '12', 'Futuro Futuro Internal Blower', '',
         '022099538080', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4089,7 +4148,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
         10230, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'chimney-extension-luxor-island', '880', '595', '2',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Range Hood Ch-inch Chimney Extension - Luxor Island by Futuro Futuro', '', '022099538431', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4106,7 +4165,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
         10375, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'glass-panel-48-europe-island', '500', '350', '2',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0', 'Futuro Futuro Glass Panel - 48-inch Europe Island',
         '', '703168131158', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4123,7 +4182,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
         10370, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'glass-panel-36-europe-island', '500', '350', '3',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0', 'Futuro Futuro Glass Panel - 36-inch Europe Island',
         '', '703168131141', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4133,7 +4192,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382687', 'AC-GLSEUROSHELF', '36″ Glass 
         10390, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'glass-panel-shelf-36-for-europe', '500', '350', '0',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Futuro Futuro Glass Panel - Shelf (36-inch) for Europe', '', '703168131165', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4143,7 +4202,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382716', 'AC-RCRS', 'Recessed Ceiling Rec
         10050, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'recessed-ceiling-recirculation-system', '790', '439', '5',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '32', '21', '21', '10',
         'Futuro Futuro Recessed Ceiling Recirculation System', '', '703168132018', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4153,7 +4212,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382717', 'AC-RRCF', 'Carbon Filter - Rech
         10040, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'carbon-filter-rechargeable', '190', '149', '16',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '1', '13', '11', '2', 'Futuro Futuro Carbon Filter - Rechargeable', '',
         '703168132025', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4169,7 +4228,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
 sku: AC-LED-INCBULB-CW', 10150, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'incandescent-to-led-upgrade-cool-4-pk', '55',
         '45', '0', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Futuro Futuro Incandescent to LED Upgrade (Cool, 4-Pk)', '', '703168132032', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4185,7 +4244,7 @@ To ensure product''s compatibility, please contact our Customer Service by phone
 sku: AC-LED-INCBULB-CW', 10160, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'incandescent-to-led-upgrade-warm-4-pk', '55',
         '45', '15', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '0', '0', '0', '0',
         'Futuro Futuro Incandescent to LED Upgrade (Warm, 4-Pk)', '', '703168132049', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4195,7 +4254,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382728', 'AC-FLRBULB48', 'Fluorescent Bul
         10180, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'fluorescent-bulbs-48-inch-set-of-2', '50', '35', '-99',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '2', '51', '7', '7',
         'Futuro Futuro Fluorescent Bulbs 48-inch (set of 2)', '', '022099539131', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4205,7 +4264,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382746', 'AC-SILENT-DUCTLESS', 'Silent Sy
         10070, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'silent-system-for-recirculating-models', '460', '295', '8',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '10', '17', '16', '15',
         'Futuro Futuro Silent System For Recirculating Models', '', '703168132056', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4215,7 +4274,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382762', 'AC-CARB-A', 'Carbon Filter - Ty
         10032, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'carbon-filter-type-a', '74', '50', '80',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '1', '13', '11', '2', 'Futuro Futuro Carbon Filter - Type A', '',
         '703168132063', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4252,7 +4311,7 @@ sku: AC-STRINGS-6', 10090, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '1', '13', '12', '2',
         'Futuro Futuro Longer Mounting Strings for Recirculating (Air Loop) Range Hoods (6 pcs)', '', '703168132070',
         '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4277,7 +4336,7 @@ sku: AC-STRINGS-4', 10090, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '1', '13', '12', '2',
         'Futuro Futuro Longer Mounting Strings for Recirculating (Air Loop) Range Hoods (4 pcs)', '', '703168132087',
         '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4294,8 +4353,9 @@ To ensure product&amp;s compatibility, please contact our Customer Service by ph
         10380, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'europe-island-36-accessory-shelf', '2050', '1395', '5',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '47', '40', '29', '10',
         'Range Hood 36-inch Shelf - for Europe range hood Island by Futuro Futuro', '', '703168131103', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd326824', 'AC-EXT-MURWL', 'Chimney Extension - Murano Wall',
         'Chimney Extension - Murano Wall accessory allows to increase an overall height of the range hood in order to accommodate various ceiling heights.', 'The height-adjustable chimneys included with Futuro Futuro range hoods consist of 2 parts, with the upper portion sliding into the lower portion in order to accommodate range hood installation under various ceiling heights.
@@ -4309,8 +4369,9 @@ To ensure product''s compatibility, please contact our Customer Service by phone
 SKU: AC-EXT-MURWL', 10305, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'chimney-extension-murano-wall', '370.00', '245.00',
         '5', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13',
         'Range Hood Ch-inch Chimney Extension - Murano Wall-Mount by Futuro Futuro', '', '703168132162', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd326997', 'AC-ADAPTER', 'Duct Adapter for Recessed Ceiling Recirculation System',
         'Duct Adapter from the European standard 8 1/2" x 3 1/2" to the US standard 6" round duct. Allows to connect US 6" duct to the European size Recessed Ceiling Recirculation System fast, easy and without any customization.',
@@ -4318,7 +4379,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd326997', 'AC-ADAPTER', 'Duct Adapter for 
         10055, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'duct-adapter', '100', '65', '8',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13',
         'Futuro Futuro Duct Adapter for Recessed Ceiling Recirculation System', '', '703168132018', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4333,7 +4394,7 @@ Please note: Magic Steel Wipes (or any other oil-based stainless steel cleaner) 
         10185, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'magic-steel-wipes', '44', '29', '77',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '1', '13', '11', '2', 'Futuro Futuro Magic Steel Wipes', '',
         '703168131011', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4349,8 +4410,9 @@ sku: AC-STRINGS-2', 10090, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'longer-mount
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '1', '13', '12', '2',
         'Futuro Futuro Longer Mounting Strings for 69″ Streamline Island Range Hoods (2-pcs)', '', '703168132179', '',
         '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd328042', 'AC-SHELF-L', '36" Designer Shelf (+dish rack)', '', 'Freestanding designer shelf with a dish rack.
 
@@ -4364,7 +4426,7 @@ If you have any questions, please contact our Customer Service by phone at (800)
         10315, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '36-freestanding-shelf-w-dish-rackw-meaning', '930', '750', '5',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13',
         'Range Hood 36-inch " Designer Shelf (+dish rack) by Futuro Futuro', '', '703168132186', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4379,7 +4441,7 @@ Compatible models:
 sku: AC-STRINGS-8', 0, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
         'longer-mounting-strings-for-36-inch-balance-island-range-hoods-8-pcs', '99', '75', '96',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '1', '13', '12', '2', '', '', '703168132308', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
                            sale_price, quantity, shipping_class_id, shipping_weight, shipping_length, shipping_width,
                            shipping_height, seo_title, seo_description, gtin, google_product_category,
                            google_product_type)
@@ -4389,8 +4451,9 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd336591', 'AC-CARB-ART', 'Carbon Filter - 
         10020, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'carbon-filter-art-2-pack', '74', '50', '47',
         'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', '1', '13', '11', '2', 'Futuro Futuro Carbon Filter - Square 2-pack', '',
         '703168132537', '', '');
-INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, slug, regular_price,
-                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin, google_product_category,
+INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
+                           sale_price, quantity, shipping_class_id, seo_title, seo_description, gtin,
+                           google_product_category,
                            google_product_type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd337298', 'AC-24NOVA-SHELF', '24″ Nova Shelf for Nova Wall Range Hood',
         'Upgrade your kitchen with the Futuro Futuro 36-inch Nova Black Wall Range Hood. Its contemporary design, gunmetal finish, and innovative features make it a modern and functional addition to any cooking space.', 'Upgrade your kitchen''s functionality and aesthetics with the Futuro Futuro 24-inch Nova Shelf, a perfect companion to the Nova Black Wall Range Hood. This shelf seamlessly blends contemporary design with practicality, offering a stylish and convenient storage solution for your cooking space.
@@ -4454,7 +4517,7 @@ from public.product;
 --         WHEN p.post_status = 'publish' THEN 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
 --         ELSE 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12'
 --         END as status_id,
---     p.post_name as slug,
+--     p.post_name as url,
 --     pm2.meta_value as regular_price,
 --     pm3.meta_value as sale_price,
 --     pm4.meta_value as quantity,

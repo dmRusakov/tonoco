@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS public.product_category
 (
     id                UUID UNIQUE   DEFAULT uuid_generate_v4(),
     name              VARCHAR(255)                NOT NULL,
-    slug              VARCHAR(255) UNIQUE         NOT NULL,
+    url              VARCHAR(255) UNIQUE         NOT NULL,
     short_description VARCHAR(255)  DEFAULT ''    NOT NULL,
     description       VARCHAR(4000) DEFAULT ''    NOT NULL,
     sort_order        INTEGER       DEFAULT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS public.product_category
 );
 
 CREATE INDEX category_id ON public.product_category (id);
-CREATE INDEX category_slug ON public.product_category (slug);
+CREATE INDEX category_url ON public.product_category (url);
 ALTER TABLE public.product_category
     OWNER TO postgres;
 COMMENT ON TABLE public.product_category IS 'Product categories';
@@ -46,7 +46,7 @@ CREATE TRIGGER product_category_order
 EXECUTE FUNCTION set_order_column_to_product_category();
 
 -- insert data
-INSERT INTO public.product_category (id, slug, name, short_description, description)
+INSERT INTO public.product_category (id, url, name, short_description, description)
 VALUES ('1f484cda-c00e-4ed8-a325-9c5e035f9901', 'island', 'Island Range Hoods', 'Some text', 'Some text'),
        ('1f484cda-c00e-4ed8-a325-9c5e035f9902', 'wall', 'Wall range hoods', 'Some text', 'Some text'),
        ('1f484cda-c00e-4ed8-a325-9c5e035f9903', 'ait-loop', 'Air loop range hoods', 'Some text', 'Some text'),

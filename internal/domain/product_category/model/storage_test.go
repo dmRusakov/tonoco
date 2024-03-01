@@ -13,7 +13,7 @@ import (
 var productCategoryNewWithId = model.ProductCategory{
 	ID:               "1f484cda-c00e-4ed8-a325-9c5e035f0000",
 	Name:             "New product category",
-	Slug:             "new-product-category",
+	Url:              "new-product-category",
 	ShortDescription: "Some text",
 	Description:      "Some text",
 	SortOrder:        1,
@@ -23,7 +23,7 @@ var productCategoryNewWithId = model.ProductCategory{
 
 var productCategoryNewWithoutId = model.ProductCategory{
 	Name:             "New product category",
-	Slug:             "new-product-category-01",
+	Url:              "new-product-category-01",
 	ShortDescription: "Some text",
 	Description:      "Some text",
 	SortOrder:        1,
@@ -34,7 +34,7 @@ var productCategoryNewWithoutId = model.ProductCategory{
 var productCategory01 = model.ProductCategory{
 	ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9901",
 	Name:             "Island Range Hoods",
-	Slug:             "island",
+	Url:              "island",
 	ShortDescription: "Some text",
 	Description:      "Some text",
 	SortOrder:        1,
@@ -45,7 +45,7 @@ var productCategory01 = model.ProductCategory{
 var productCategory02 = model.ProductCategory{
 	ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9902",
 	Name:             "Wall range hoods",
-	Slug:             "wall",
+	Url:              "wall",
 	ShortDescription: "Some text",
 	Description:      "Some text",
 	SortOrder:        2,
@@ -56,7 +56,7 @@ var productCategory02 = model.ProductCategory{
 var productCategory03 = model.ProductCategory{
 	ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9903",
 	Name:             "Air loop range hoods",
-	Slug:             "ait-loop",
+	Url:              "ait-loop",
 	ShortDescription: "Some text",
 	Description:      "Some text",
 	SortOrder:        3,
@@ -67,7 +67,7 @@ var productCategory03 = model.ProductCategory{
 var productCategory04 = model.ProductCategory{
 	ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9904",
 	Name:             "Built-in Range Hoods",
-	Slug:             "built-in",
+	Url:              "built-in",
 	ShortDescription: "Some text",
 	Description:      "Some text",
 	SortOrder:        4,
@@ -85,26 +85,26 @@ func TestProductCategoryGet(t *testing.T) {
 
 	// Define the test cases
 	testCases := []struct {
-		name     string
-		id       string
-		expected *model.ProductCategory
+		name string
+		id   string
+		get  *model.ProductCategory
 	}{
 		{
-			name:     "Get product category 01",
-			id:       productCategory01.ID,
-			expected: &productCategory01,
+			name: "Get product category 01",
+			id:   productCategory01.ID,
+			get:  &productCategory01,
 		}, {
-			name:     "Get product category 02",
-			id:       productCategory02.ID,
-			expected: &productCategory02,
+			name: "Get product category 02",
+			id:   productCategory02.ID,
+			get:  &productCategory02,
 		}, {
-			name:     "Get product category 03",
-			id:       productCategory03.ID,
-			expected: &productCategory03,
+			name: "Get product category 03",
+			id:   productCategory03.ID,
+			get:  &productCategory03,
 		}, {
-			name:     "Get product category 04",
-			id:       productCategory04.ID,
-			expected: &productCategory04,
+			name: "Get product category 04",
+			id:   productCategory04.ID,
+			get:  &productCategory04,
 		},
 	}
 
@@ -116,14 +116,14 @@ func TestProductCategoryGet(t *testing.T) {
 			// Assert that there was no error
 			assert.NoError(t, err)
 
-			// Assert that the result matches the expected value
-			assert.Equal(t, tc.expected.ID, result.ID)
-			assert.Equal(t, tc.expected.Name, result.Name)
-			assert.Equal(t, tc.expected.Slug, result.Slug)
-			assert.Equal(t, tc.expected.ShortDescription, result.ShortDescription)
-			assert.Equal(t, tc.expected.Description, result.Description)
-			assert.Equal(t, tc.expected.Prime, result.Prime)
-			assert.Equal(t, tc.expected.Active, result.Active)
+			// Assert that the result matches the get value
+			assert.Equal(t, tc.get.ID, result.ID)
+			assert.Equal(t, tc.get.Name, result.Name)
+			assert.Equal(t, tc.get.Url, result.Url)
+			assert.Equal(t, tc.get.ShortDescription, result.ShortDescription)
+			assert.Equal(t, tc.get.Description, result.Description)
+			assert.Equal(t, tc.get.Prime, result.Prime)
+			assert.Equal(t, tc.get.Active, result.Active)
 		})
 	}
 }
@@ -139,7 +139,7 @@ func TestProductCategoryUpdate(t *testing.T) {
 	// create new variable from productCategory01
 	productCategory01New := productCategory01
 	productCategory01New.Name = "Island Range Hoods New"
-	productCategory01New.Slug = "island-new"
+	productCategory01New.Url = "island-new"
 	productCategory01New.Prime = false
 
 	// Define the test cases
@@ -177,10 +177,10 @@ func TestProductCategoryUpdate(t *testing.T) {
 			// Assert that there was no error
 			assert.NoError(t, err)
 
-			// Assert that the result matches the expected value
+			// Assert that the result matches the get value
 			assert.Equal(t, tc.update.ID, result.ID)
 			assert.Equal(t, tc.update.Name, result.Name)
-			assert.Equal(t, tc.update.Slug, result.Slug)
+			assert.Equal(t, tc.update.Url, result.Url)
 			assert.Equal(t, tc.update.ShortDescription, result.ShortDescription)
 			assert.Equal(t, tc.update.Description, result.Description)
 			assert.Equal(t, tc.update.Prime, result.Prime)
@@ -200,34 +200,34 @@ func TestProductCategoryPatch(t *testing.T) {
 	// create new variable from productCategory01
 	productCategory01New := productCategory01
 	productCategory01New.Name = "Island Range Hoods New"
-	productCategory01New.Slug = "island-new"
+	productCategory01New.Url = "island-new"
 	productCategory01New.Prime = false
 
 	// Define the test cases
 	testCases := []struct {
-		name     string
-		id       string
-		fields   map[string]interface{}
-		expected *model.ProductCategory
+		name   string
+		id     string
+		fields map[string]interface{}
+		get    *model.ProductCategory
 	}{
 		{
 			name: "Patch product category 01",
 			id:   productCategory01.ID,
 			fields: map[string]interface{}{
 				"Name":  productCategory01New.Name,
-				"Slug":  productCategory01New.Slug,
+				"Url":   productCategory01New.Url,
 				"Prime": productCategory01New.Prime,
 			},
-			expected: &productCategory01New,
+			get: &productCategory01New,
 		}, {
 			name: "Patch product category 02",
 			id:   productCategory01.ID,
 			fields: map[string]interface{}{
 				"Name":  productCategory01.Name,
-				"Slug":  productCategory01.Slug,
+				"Url":   productCategory01.Url,
 				"Prime": productCategory01.Prime,
 			},
-			expected: &productCategory01,
+			get: &productCategory01,
 		},
 	}
 
@@ -246,14 +246,14 @@ func TestProductCategoryPatch(t *testing.T) {
 			// Assert that there was no error
 			assert.NoError(t, err)
 
-			// Assert that the result matches the expected value
-			assert.Equal(t, tc.expected.ID, result.ID)
-			assert.Equal(t, tc.expected.Name, result.Name)
-			assert.Equal(t, tc.expected.Slug, result.Slug)
-			assert.Equal(t, tc.expected.ShortDescription, result.ShortDescription)
-			assert.Equal(t, tc.expected.Description, result.Description)
-			assert.Equal(t, tc.expected.Prime, result.Prime)
-			assert.Equal(t, tc.expected.Active, result.Active)
+			// Assert that the result matches the get value
+			assert.Equal(t, tc.get.ID, result.ID)
+			assert.Equal(t, tc.get.Name, result.Name)
+			assert.Equal(t, tc.get.Url, result.Url)
+			assert.Equal(t, tc.get.ShortDescription, result.ShortDescription)
+			assert.Equal(t, tc.get.Description, result.Description)
+			assert.Equal(t, tc.get.Prime, result.Prime)
+			assert.Equal(t, tc.get.Active, result.Active)
 		})
 	}
 }
@@ -268,14 +268,14 @@ func TestProductCategoryCreateWithId(t *testing.T) {
 
 	// Define the test cases
 	testCases := []struct {
-		name     string
-		sent     *model.ProductCategory
-		expected *model.ProductCategory
+		name string
+		sent *model.ProductCategory
+		get  *model.ProductCategory
 	}{
 		{
-			name:     "Create product category with id",
-			sent:     &productCategoryNewWithId,
-			expected: &productCategoryNewWithId,
+			name: "Create product category with id",
+			sent: &productCategoryNewWithId,
+			get:  &productCategoryNewWithId,
 		},
 	}
 
@@ -288,14 +288,14 @@ func TestProductCategoryCreateWithId(t *testing.T) {
 			// Assert that there was no error
 			assert.NoError(t, err)
 
-			// Assert that the result matches the expected value
-			assert.Equal(t, tc.expected.ID, result.ID)
-			assert.Equal(t, tc.expected.Name, result.Name)
-			assert.Equal(t, tc.expected.Slug, result.Slug)
-			assert.Equal(t, tc.expected.ShortDescription, result.ShortDescription)
-			assert.Equal(t, tc.expected.Description, result.Description)
-			assert.Equal(t, tc.expected.Prime, result.Prime)
-			assert.Equal(t, tc.expected.Active, result.Active)
+			// Assert that the result matches the get value
+			assert.Equal(t, tc.get.ID, result.ID)
+			assert.Equal(t, tc.get.Name, result.Name)
+			assert.Equal(t, tc.get.Url, result.Url)
+			assert.Equal(t, tc.get.ShortDescription, result.ShortDescription)
+			assert.Equal(t, tc.get.Description, result.Description)
+			assert.Equal(t, tc.get.Prime, result.Prime)
+			assert.Equal(t, tc.get.Active, result.Active)
 		})
 	}
 }
@@ -310,14 +310,14 @@ func TestProductCategoryCreateWithoutId(t *testing.T) {
 
 	// Define the test cases
 	testCases := []struct {
-		name     string
-		sent     *model.ProductCategory
-		expected *model.ProductCategory
+		name string
+		sent *model.ProductCategory
+		get  *model.ProductCategory
 	}{
 		{
-			name:     "Create product category without id",
-			sent:     &productCategoryNewWithoutId,
-			expected: &productCategoryNewWithoutId,
+			name: "Create product category without id",
+			sent: &productCategoryNewWithoutId,
+			get:  &productCategoryNewWithoutId,
 		},
 	}
 
@@ -328,18 +328,18 @@ func TestProductCategoryCreateWithoutId(t *testing.T) {
 			result, err := storage.Create(context.Background(), tc.sent, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
 
 			// update ID
-			tc.expected.ID = result.ID
+			tc.get.ID = result.ID
 
 			// Assert that there was no error
 			assert.NoError(t, err)
 
-			// Assert that the result matches the expected value
-			assert.Equal(t, tc.expected.Name, result.Name)
-			assert.Equal(t, tc.expected.Slug, result.Slug)
-			assert.Equal(t, tc.expected.ShortDescription, result.ShortDescription)
-			assert.Equal(t, tc.expected.Description, result.Description)
-			assert.Equal(t, tc.expected.Prime, result.Prime)
-			assert.Equal(t, tc.expected.Active, result.Active)
+			// Assert that the result matches the get value
+			assert.Equal(t, tc.get.Name, result.Name)
+			assert.Equal(t, tc.get.Url, result.Url)
+			assert.Equal(t, tc.get.ShortDescription, result.ShortDescription)
+			assert.Equal(t, tc.get.Description, result.Description)
+			assert.Equal(t, tc.get.Prime, result.Prime)
+			assert.Equal(t, tc.get.Active, result.Active)
 		})
 	}
 }
@@ -374,6 +374,10 @@ func TestProductCategoryDelete(t *testing.T) {
 
 			// Assert that there was no error
 			assert.NoError(t, err)
+
+			// Call the Get method
+			_, err = storage.Get(context.Background(), tc.id)
+			assert.Error(t, err)
 		})
 	}
 

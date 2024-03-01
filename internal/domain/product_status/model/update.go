@@ -12,7 +12,7 @@ func (repo *ProductStatusModel) Update(ctx context.Context, product *ProductStat
 	// build query
 	statement := repo.qb.Update(repo.table).
 		Set(fieldMap["Name"], product.Name).
-		Set(fieldMap["Slug"], product.Slug).
+		Set(fieldMap["Url"], product.Url).
 		Set(fieldMap["SortOrder"], product.SortOrder).
 		Set(fieldMap["Active"], product.Active).
 		Set(fieldMap["UpdatedAt"], "NOW()").

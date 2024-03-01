@@ -12,7 +12,7 @@ func (repo *ProductCategoryModel) Update(ctx context.Context, productCategory *P
 	statement := repo.qb.
 		Update(repo.table).
 		Set(fieldMap["Name"], productCategory.Name).
-		Set(fieldMap["Slug"], productCategory.Slug).
+		Set(fieldMap["Url"], productCategory.Url).
 		Set(fieldMap["ShortDescription"], productCategory.ShortDescription).
 		Set(fieldMap["Description"], productCategory.Description).
 		Set(fieldMap["SortOrder"], productCategory.SortOrder).

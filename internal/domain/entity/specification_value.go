@@ -4,7 +4,7 @@ type SpecificationValue struct {
 	ID              string `json:"id"`
 	SpecificationID string `json:"specification_id"`
 	Name            string `json:"name"`
-	Slug            string `json:"slug"`
+	Url             string `json:"url"`
 	Active          bool   `json:"active"`
 	Order           int32  `json:"order"`
 	CreatedAt       int64  `json:"created_at"`

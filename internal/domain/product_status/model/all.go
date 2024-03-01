@@ -7,34 +7,48 @@ import (
 
 func (repo *ProductStatusModel) All(
 	ctx context.Context,
-	active *bool,
-	sortBy *string, // field to sort by
-	sortOrder *string, // sort order (asc, desc)
-	page *uint32, // page number
-	perPage *uint32, // number of items per page
+	filter *Filter,
 ) ([]*ProductStatus, error) {
+	// check standard filter parameter
+	if filter.SortBy == nil {
+		filter.SortBy = new(string)
+		*filter.SortBy = "SortOrder"
+	}
+
+	if filter.SortOrder == nil {
+		filter.SortOrder = new(string)
+		*filter.SortOrder = "ASC"
+	}
+
+	if filter.Page == nil {
+		filter.Page = new(uint64)
+		*filter.Page = 1
+	}
+
+	if filter.PerPage == nil {
+		filter.PerPage = new(uint64)
+		*filter.PerPage = 10
+
+	}
+
 	// build query
 	statement := repo.qb.
-		Select(repo.makeDbRequestColumns()...).
+		Select(
+			fieldMap["ID"],
+			fieldMap["Name"],
+			fieldMap["Url"],
+			fieldMap["SortOrder"],
+			fieldMap["Active"],
+		).
 		From(repo.table + " p")
 
 	// add the active filter if it is not nil
-	if active != nil {
-		statement = statement.Where(sq.Eq{fieldMap["Active"]: *active})
+	if filter.Active != nil {
+		statement = statement.Where(sq.Eq{fieldMap["Active"]: *filter.Active})
 	}
 
-	// add the sort order if it is not nil
-	if sortBy == nil {
-		sort := fieldMap["SortOrder"]
-		sortBy = &sort
-	}
-
-	if sortOrder == nil {
-		sort := "asc"
-		sortOrder = &sort
-	}
-
-	statement = statement.OrderBy(*sortBy + " " + *sortOrder)
+	statement = statement.OrderBy(fieldMap[*filter.SortBy] + " " + *filter.SortOrder).
+		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()
@@ -57,7 +71,7 @@ func (repo *ProductStatusModel) All(
 		if err = rows.Scan(
 			&productStatus.ID,
 			&productStatus.Name,
-			&productStatus.Slug,
+			&productStatus.Url,
 			&productStatus.SortOrder,
 			&productStatus.Active,
 		); err != nil {

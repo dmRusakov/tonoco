@@ -3,7 +3,7 @@ package entity
 type ProductStatus struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
-	Slug      string `json:"slug"`
+	Url       string `json:"url"`
 	Order     uint32 `json:"order"`
 	Active    bool   `json:"active"`
 	CreatedAt uint32 `json:"created_at"`

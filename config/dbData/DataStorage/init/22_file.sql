@@ -3,14 +3,14 @@ CREATE TABLE IF NOT EXISTS public.file
 (
     id         uuid unique DEFAULT uuid_generate_v4(),
     name       varchar(255) not null,
-    slug       varchar(255) not null,
+    url        varchar(255) not null,
     active     BOOLEAN     DEFAULT TRUE,
     sort_order INTEGER     DEFAULT null,
 
-    created_at TIMESTAMP   DEFAULT NOW(),
-    created_by UUID        DEFAULT NULL REFERENCES public.user (id),
-    updated_at TIMESTAMP   DEFAULT NOW(),
-    updated_by UUID        DEFAULT NULL REFERENCES public.user (id),
+    created_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
+    created_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    updated_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
+    updated_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
 
     CONSTRAINT file_pkey PRIMARY KEY (id)
 );

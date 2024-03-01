@@ -11,7 +11,7 @@ type Product struct {
 	Description           string
 	SortOrder             uint32
 	StatusID              string
-	Slug                  string
+	Url                   string
 	RegularPrice          float32
 	SalePrice             float32
 	FactoryPrice          float32
@@ -44,7 +44,7 @@ var fieldMap = map[string]string{
 	"Description":           "description",
 	"SortOrder":             "sort_order",
 	"StatusID":              "status_id",
-	"Slug":                  "slug",
+	"Url":                   "url",
 	"RegularPrice":          "regular_price",
 	"SalePrice":             "sale_price",
 	"FactoryPrice":          "factory_price",

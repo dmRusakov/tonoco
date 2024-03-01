@@ -19,7 +19,7 @@ var productNew1 = model.Product{
 	ShortDescription:      "Test Short Description",
 	Description:           "Test Description",
 	StatusID:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-	Slug:                  "test-product",
+	Url:                   "test-product",
 	RegularPrice:          100,
 	SalePrice:             50,
 	FactoryPrice:          0,
@@ -45,7 +45,7 @@ var productNew2 = model.Product{
 	ShortDescription:      "Test Short Description 2",
 	Description:           "Test Description 2",
 	StatusID:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-	Slug:                  "test-product-2",
+	Url:                   "test-product-2",
 	RegularPrice:          200,
 	SalePrice:             100,
 	FactoryPrice:          0,
@@ -73,7 +73,7 @@ var product2500 = model.Product{
 	Description:           "Radiant, lustrous, and on the cutting edge of modernity, the Futuro Futuro 48 inch Luxor Island Range Hood will make a striking statement in any kitchen. With its sleek, gleaming exterior and bright white perimeter light, this luxury range hood is reminiscent of an extraterrestrial spacecraft- and it has the advanced technology to boot. This unique range hood is composed of an illuminated glass perimeter that is lit entirely from within, and specialized stainless steel that prevents smudging or streaks and leaves only a glossy, finger-print free finish. This unique range hood possesses cutting-edge industrial technology that optimizes air filtration performance. This suspended range hood will keep your kitchen cool and contaminant free with its exclusive perimeter suction system, which redirects the airflow from the center of the unit to the mesh filters along the edges of the exhaust hood, providing a cleaner look, increasing suction, and cutting ambient noise. This professional style range hood further improves upon its superb performance by entrapping airborne grease and other culinary contaminants with its designer grease filters, which are concealed behind its illuminated glass panels to provide a clean, streamlined design. This unique range hood possesses four different airflow speeds, energy efficient fluorescent lights, and an extendable chimney that can be easily lengthened between 25 and 48 inches for perfect placement over any kitchen island range. This unique range hood makes regular maintenance easy with its automated reminders that indicate when it’s time to clean the grease filters in the dishwasher to maintain optimal performance. This Italian range hood also possesses a delayed shut-off function, which keeps the ventilation hood on even after you have finished cooking until the removal of odors, grease, and impurities from the air has been completed. Customers may purchase this kitchen range hood with the choice of a ducted or ductless exhaust vent, and all Futuro Futuro ventilation hoods come with a one year US standard and two year parts warranty. Show-stoppingly gorgeous and expertly crafted, the Italian made 36 inch Luxor island mount range hood is perfect for kitchen owners seeking a powerful kitchen accessory with exclusive style. sku: IS48LUXOR",
 	SortOrder:             1,
 	StatusID:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-	Slug:                  "48-luxor-island-range-hood",
+	Url:                   "48-luxor-island-range-hood",
 	RegularPrice:          4000,
 	SalePrice:             2695,
 	FactoryPrice:          0,
@@ -105,7 +105,7 @@ var product2501 = model.Product{
 	Description:           "Comfortable yet sophisticated, the Futuro Futuro 36 inch Melara Wall Range Hood is a beautifully crafted Italian range hood that will feel right at home in any traditional or country style kitchen. This steel range hood is composed of solid white oak and high quality steel that has been specially coated in a durable and unique enamel that can serve as either the finished exterior or as a base coat for another paint color. Kitchen owners can easily alter the exterior of this luxury range hood by using any kind of paint, including oil-based, water-based, or sprays, to coat the exhaust hood’s steel body to match or complement other colors in the kitchen- with no primer needed. The wooden accents on this traditional style range hood come unstained, so kitchen owners may perfectly match them to existing kitchen cabinetry. This modern range hood offers user-friendly features, including its three different airflow speeds, energy efficient LED lights, and an easy to use slider control. Robust and efficient, this powerful range hood uses cutting-edge technology to quickly remove steam, smoke, and odors from the air while maintaining whisper quiet noise levels, thanks to Futuro Futuro’s innovative blower and exclusive sound absorbing technology. This wood range hood also contains dishwasher safe, designer metal mesh filters that specifically target the capture of oil and grease, keeping it from collecting on your kitchen surfaces. Regular maintenance is straightforward with this country style range hood’s convenient features and functionality. This designer range hood has automated reminders that are programmed to routinely indicate when it’s time to clean the filters in the dishwasher to maintain optimal performance. Additionally, this unique range hood’s convenient delayed shut-off function keeps the exhaust hood on until all odors, grease, and impurities have been removed from the air, allowing users to focus their attention elsewhere after cooking. Customers may purchase this kitchen range hood with the choice of a ducted or ductless exhaust vent, dependent on their existing kitchen’s build. All Futuro Futuro ventilation hoods come with a one year US standard and two year parts warranty. Stately yet homey, the 36 inch Melara wall mount range hood is perfect for kitchen owners who prefer traditional styles but require a modern performance. sku: WL36MELARA",
 	SortOrder:             2,
 	StatusID:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-	Slug:                  "36-melara-wall-range-hood",
+	Url:                   "36-melara-wall-range-hood",
 	RegularPrice:          2050,
 	SalePrice:             1395,
 	FactoryPrice:          0,
@@ -137,7 +137,7 @@ var product2502 = model.Product{
 	Description:           "Futuro Futuro’s Positano series of island range hoods have a simple design that will look great in any kitchen. These hoods with the highest grade of Stainless Steel, patented technology, and premium Italian craftsmanship. The Positano series puts an emphasis on form and function, ease of use, and simplicity. The Stainless Steel used in all Futuro Futuro products is of the highest quality for kitchen hoods, AISI 304. What makes AISI 304 Stainless Steel perfect for kitchen hoods is the high proportion of Chromium which gives it a high resistance to corrosion and rust. This helps the material stand up to the grime that is inevitable when regularly using a kitchen hood. The main piece of patented technology that you will notice immediately is the sound-absorbing chamber. By advancing technology in sound absorption for kitchen hoods Futuro Futuro is able to keep their products powerful yet still quiet for a residential kitchen. By using a powerful blower motor that would simply be too loud without their patented sound-absorbing chamber gives you the power of a commercial hood without all the noise. To make this simple hood even easier to use they added an illuminated electronic control panel to control every function of the hood. You can easily set a delayed shut off timer so the hood will continue to run for 15 minutes after shutting it off. This lets you turn the hood off as soon as your done and it will keep running to ensure the air in your kitchen is clean. These control panels even come equipped with a reminder for when it’s time to clean the designer filters that come standard! The Positano Island Range Hoods comes equipped with four LED lights that perfectly illuminate your cooking area. The four lights are positioned in the corners of the hood to create a central point of light over your stove top that melds out to your countertop. These LED lights are long lasting and energy efficient bulbs to keep your costs and maintenance as low as possible. The goal in designing the Positano series was to create a simple design that perfectly combined form and function. Through patented technology, premium Italian craftsmanship, and high quality materials Futuro Futuro created a hood that is built to last and will always look great. sku: IS48POSITANO",
 	SortOrder:             3,
 	StatusID:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-	Slug:                  "48-positano-island-range-hood",
+	Url:                   "48-positano-island-range-hood",
 	RegularPrice:          3400,
 	SalePrice:             2295,
 	FactoryPrice:          0,
@@ -169,7 +169,7 @@ var product5681 = model.Product{
 	Description:           "Futuro Futuro’s 46-Inch Slide Insert Range Hood offers a sleek design perfect for fitting into a kitchen centered around custom cabinetry. This hood slides right into your custom cabinetry to bring a uniformed look across your kitchen. It also comes packed with high quality features such as a rotatable blower, the highest grade Stainless Steel, premium Italian craftsmanship, an electronic control panel, and heavy-duty chrome baffle filters. The highest grade of Stainless Steel, AISI 304, and the best Italian craftsmanship make for a hood that looks as perfectly as it works. AISI 304 Stainless Steel is ideal for kitchen hoods because it has a particularly high resistance to corrosion and rust that lets it stand up to the most brutal kitchen applications. This all makes for a hood that will look great when it’s delivered and continue to look great for years to come. By implementing a cutting edge sound absorbing chamber, Futuro Futuro keeps extremely powerful hoods quiet no matter how hard or long it’s running for. The Slide Insert Range Hood uses a 940 CFM rotatable blower with four adjustable speeds that are easily controlled with an electronic control panel. A powerful blower like this with the patented sound absorbing chamber keeps your kitchen fresh, clean, and quiet at all times. To make sure the Slide Insert series hoods are always easy to maintain, they use heavy-duty chrome baffle filters that are easy to remove and dishwasher safe. Baffle filtration is a time tested standard among high quality kitchen hoods that simply work. It also comes equipped with a built-in oil collector to ensure clean up is as easy as it can be. The futuristic electronic control panel that comes standard with these hoods have a filter-cleaning reminder to help keep your kitchen clean. It also has a 15-minute delayed shut off timer, easy access to four adjustable speeds, and a boost mode for when you’re deep frying or doing any messy cooking. To illuminate your cooking space, this hood comes with an LED light strip that is long lasting and energy efficient. An LED strip light will bring all the light you could need to your stovetop with a smooth, balanced illumination. Futuro Futuro has stayed at the forefront of kitchen ventilation by always using cutting edge technology, high quality materials, and fine Italian craftsmanship. sku: WL46SLIDE",
 	SortOrder:             273,
 	StatusID:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-	Slug:                  "46-inch-slide-insert-range-hood",
+	Url:                   "46-inch-slide-insert-range-hood",
 	RegularPrice:          2500,
 	SalePrice:             1695,
 	FactoryPrice:          0,
@@ -199,7 +199,7 @@ var product6730 = model.Product{
 	Description:           "Radiant, lustrous, and on the cutting edge of modernity, the Futuro Futuro 48 inch Luxor Island Range Hood will make a striking statement in any kitchen. With its sleek, gleaming exterior and bright white perimeter light, this luxury range hood is reminiscent of an extraterrestrial spacecraft- and it has the advanced technology to boot. This unique range hood is composed of an illuminated glass perimeter that is lit entirely from within, and specialized stainless steel that prevents smudging or streaks and leaves only a glossy, finger-print free finish. This unique range hood possesses cutting-edge industrial technology that optimizes air filtration performance. This suspended range hood will keep your kitchen cool and contaminant free with its exclusive perimeter suction system, which redirects the airflow from the center of the unit to the mesh filters along the edges of the exhaust hood, providing a cleaner look, increasing suction, and cutting ambient noise. This professional style range hood further improves upon its superb performance by entrapping airborne grease and other culinary contaminants with its designer grease filters, which are concealed behind its illuminated glass panels to provide a clean, streamlined design. This unique range hood possesses four different airflow speeds, energy efficient fluorescent lights, and an extendable chimney that can be easily lengthened between 25 and 48 inches for perfect placement over any kitchen island range. This unique range hood makes regular maintenance easy with its automated reminders that indicate when it’s time to clean the grease filters in the dishwasher to maintain optimal performance. Additionally, this Italian range hood possesses a delayed shut-off function, which keeps the ventilation hood on even after you have finished cooking until the removal of odors, grease, and impurities from the air has been completed. Customers may purchase this kitchen range hood with the choice of a ducted or ductless exhaust vent, and all Futuro Futuro ventilation hoods come with a one year US standard and two year parts warranty. Show-stoppingly gorgeous and expertly crafted, the Italian made 36 inch Luxor island mount range hood is perfect for kitchen owners seeking a powerful kitchen accessory with exclusive style. sku: IS48LUXOR",
 	SortOrder:             274,
 	StatusID:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-	Slug:                  "36-positano-black-wall-range-hood",
+	Url:                   "36-positano-black-wall-range-hood",
 	RegularPrice:          2650,
 	SalePrice:             1795,
 	FactoryPrice:          0,
@@ -275,7 +275,7 @@ func TestGet(t *testing.T) {
 			assert.Equal(t, tc.expected.Name, result.Name)
 			assert.Equal(t, tc.expected.SortOrder, result.SortOrder)
 			assert.Equal(t, tc.expected.StatusID, result.StatusID)
-			assert.Equal(t, tc.expected.Slug, result.Slug)
+			assert.Equal(t, tc.expected.Url, result.Url)
 			assert.Equal(t, tc.expected.RegularPrice, result.RegularPrice)
 			assert.Equal(t, tc.expected.SalePrice, result.SalePrice)
 			assert.Equal(t, tc.expected.FactoryPrice, result.FactoryPrice)
@@ -351,7 +351,7 @@ func TestUpdate(t *testing.T) {
 			assert.Equal(t, tc.expected.Name, result.Name)
 			assert.Equal(t, tc.expected.SortOrder, result.SortOrder)
 			assert.Equal(t, tc.expected.StatusID, result.StatusID)
-			assert.Equal(t, tc.expected.Slug, result.Slug)
+			assert.Equal(t, tc.expected.Url, result.Url)
 			assert.Equal(t, tc.expected.RegularPrice, result.RegularPrice)
 			assert.Equal(t, tc.expected.SalePrice, result.SalePrice)
 			assert.Equal(t, tc.expected.FactoryPrice, result.FactoryPrice)
@@ -430,7 +430,7 @@ func TestPatch(t *testing.T) {
 			assert.Equal(t, tc.expected.Name, result.Name)
 			assert.Equal(t, tc.expected.SortOrder, result.SortOrder)
 			assert.Equal(t, tc.expected.StatusID, result.StatusID)
-			assert.Equal(t, tc.expected.Slug, result.Slug)
+			assert.Equal(t, tc.expected.Url, result.Url)
 			assert.Equal(t, tc.expected.RegularPrice, result.RegularPrice)
 			assert.Equal(t, tc.expected.SalePrice, result.SalePrice)
 			assert.Equal(t, tc.expected.FactoryPrice, result.FactoryPrice)
@@ -489,7 +489,7 @@ func TestCreateWithID(t *testing.T) {
 			assert.Equal(t, tc.expected.ShortDescription, result.ShortDescription)
 			assert.Equal(t, tc.expected.Description, result.Description)
 			assert.Equal(t, tc.expected.StatusID, result.StatusID)
-			assert.Equal(t, tc.expected.Slug, result.Slug)
+			assert.Equal(t, tc.expected.Url, result.Url)
 			assert.Equal(t, tc.expected.RegularPrice, result.RegularPrice)
 			assert.Equal(t, tc.expected.SalePrice, result.SalePrice)
 			assert.Equal(t, tc.expected.FactoryPrice, result.FactoryPrice)
@@ -549,7 +549,7 @@ func TestCreateWithoutID(t *testing.T) {
 			assert.Equal(t, tc.expected.ShortDescription, result.ShortDescription)
 			assert.Equal(t, tc.expected.Description, result.Description)
 			assert.Equal(t, tc.expected.StatusID, result.StatusID)
-			assert.Equal(t, tc.expected.Slug, result.Slug)
+			assert.Equal(t, tc.expected.Url, result.Url)
 			assert.Equal(t, tc.expected.RegularPrice, result.RegularPrice)
 			assert.Equal(t, tc.expected.SalePrice, result.SalePrice)
 			assert.Equal(t, tc.expected.FactoryPrice, result.FactoryPrice)
@@ -603,11 +603,11 @@ func TestDelete(t *testing.T) {
 			err := storage.Delete(context.Background(), tc.id)
 
 			// Assert that there was no error
-			if tc.success {
-				assert.NoError(t, err)
-			} else {
-				assert.Error(t, err)
-			}
+			assert.NoError(t, err)
+
+			// Call the Get method
+			_, err = storage.Get(context.Background(), tc.id)
+			assert.Error(t, err)
 		})
 	}
 }

@@ -3,7 +3,7 @@ package entity
 type Folder struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
-	Slug      string `json:"slug"`
+	Url       string `json:"url"`
 	ParentID  string `json:"parent_id"`
 	Active    bool   `json:"active"`
 	Order     int32  `json:"order"`

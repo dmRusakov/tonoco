@@ -2,15 +2,15 @@ CREATE TABLE IF NOT EXISTS public.specification_type
 (
     id         UUID UNIQUE  DEFAULT uuid_generate_v4(),
     name       VARCHAR(255) NOT NULL,
-    slug       VARCHAR(255) NOT NULL,
+    url       VARCHAR(255) NOT NULL,
     unit       VARCHAR(255) DEFAULT NULL,
     active     BOOLEAN      DEFAULT TRUE,
     sort_order INTEGER      DEFAULT 9999,
 
-    created_at TIMESTAMP    DEFAULT NOW(),
-    created_by UUID         DEFAULT NULL REFERENCES public.user (id),
-    updated_at TIMESTAMP    DEFAULT NOW(),
-    updated_by UUID         DEFAULT NULL REFERENCES public.user (id),
+    created_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
+    created_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    updated_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
+    updated_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
 
     CONSTRAINT specification_type_pkey PRIMARY KEY (id)
 );
@@ -44,7 +44,7 @@ CREATE TRIGGER specification_type_order
 EXECUTE FUNCTION set_order_column_to_specification_type();
 
 -- insert data
-INSERT INTO public.specification_type (id, name, slug, unit)
+INSERT INTO public.specification_type (id, name, url, unit)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a11', 'Inch', 'inch', '″'),
        ('a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a12', 'Pound', 'pound', 'lb'),
        ('a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13', 'Select', 'select', null),

@@ -6,7 +6,7 @@ import "time"
 type ProductCategory struct {
 	ID               string
 	Name             string
-	Slug             string
+	Url              string
 	ShortDescription string
 	Description      string
 	SortOrder        uint32
@@ -22,7 +22,7 @@ type ProductCategory struct {
 var fieldMap = map[string]string{
 	"ID":               "id",
 	"Name":             "name",
-	"Slug":             "slug",
+	"Url":              "url",
 	"ShortDescription": "short_description",
 	"Description":      "description",
 	"SortOrder":        "sort_order",

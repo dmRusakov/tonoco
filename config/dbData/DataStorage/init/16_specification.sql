@@ -2,21 +2,21 @@ CREATE TABLE IF NOT EXISTS public.specification
 (
     id         UUID UNIQUE DEFAULT uuid_generate_v4(),
     name       VARCHAR(255)        NOT NULL,
-    slug       VARCHAR(255) UNIQUE NOT NULL,
+    url       VARCHAR(255) UNIQUE NOT NULL,
     type       UUID                NOT NULL REFERENCES public.specification_type (id),
     active     BOOLEAN     DEFAULT TRUE,
     sort_order INTEGER     DEFAULT 9999,
 
-    created_at TIMESTAMP   DEFAULT NOW(),
-    created_by UUID        DEFAULT NULL REFERENCES public.user (id),
-    updated_at TIMESTAMP   DEFAULT NOW(),
-    updated_by UUID        DEFAULT NULL REFERENCES public.user (id),
+    created_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
+    created_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    updated_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
+    updated_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
 
     CONSTRAINT specification_pkey PRIMARY KEY (id)
 );
 
 CREATE INDEX specification_id ON public.specification (id);
-CREATE INDEX specification_slug ON public.specification (slug);
+CREATE INDEX specification_url ON public.specification (url);
 ALTER TABLE public.specification
     OWNER TO postgres;
 COMMENT ON TABLE public.specification IS 'Product Specification';
@@ -45,7 +45,7 @@ CREATE TRIGGER specification_order
 EXECUTE FUNCTION set_order_column_to_specification();
 
 -- insert data
-INSERT INTO public.specification (id, name, slug, type)
+INSERT INTO public.specification (id, name, url, type)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380107', 'Mounting Type', 'mounting-type',
         'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
        ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380108', 'Width', 'width', 'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13'),
@@ -112,7 +112,7 @@ from public.specification;
 -- select
 --     CONCAT('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380', attribute_id) as id,
 --     attribute_label as name,
---     attribute_name as slug,
+--     attribute_name as url,
 --     attribute_id as sort_order,
 --     'a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13' as type
 -- from wp_woocommerce_attribute_taxonomies;

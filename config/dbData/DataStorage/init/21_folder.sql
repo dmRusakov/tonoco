@@ -3,15 +3,15 @@ CREATE TABLE IF NOT EXISTS public.folder
 (
     id         uuid unique DEFAULT uuid_generate_v4(),
     name       varchar(255) not null,
-    slug       varchar(255) not null,
+    url        varchar(255) not null,
     parent_id  uuid        default null REFERENCES public.folder (id),
     active     BOOLEAN     DEFAULT TRUE,
     sort_order INTEGER     DEFAULT null,
 
-    created_at TIMESTAMP   DEFAULT NOW(),
-    created_by UUID        DEFAULT NULL REFERENCES public.user (id),
-    updated_at TIMESTAMP   DEFAULT NOW(),
-    updated_by UUID        DEFAULT NULL REFERENCES public.user (id),
+    created_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
+    created_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    updated_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
+    updated_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
 
     CONSTRAINT folder_pkey PRIMARY KEY (id)
 );
@@ -46,7 +46,7 @@ CREATE TRIGGER update_folder_updated_at
 EXECUTE PROCEDURE update_update_at_column();
 
 -- -- default data
-INSERT INTO public.folder (id, name, slug, parent_id)
+INSERT INTO public.folder (id, name, url, parent_id)
 VALUES ('c475a6f3-55ad-4641-8caa-a76bfae13fb0', 'root', '/assets', null),
        ('c475a6f3-55ad-4641-8caa-a76bfae13fb1', 'images', '/images', 'c475a6f3-55ad-4641-8caa-a76bfae13fb0'),
        ('c475a6f3-55ad-4641-8caa-a76bfae13fb2', 'videos', '/videos', 'c475a6f3-55ad-4641-8caa-a76bfae13fb0'),

@@ -8,7 +8,7 @@ type Product struct {
 	Description           string  `json:"description"`
 	Order                 int32   `json:"order"`
 	StatusID              string  `json:"status_id"`
-	Slug                  string  `json:"slug"`
+	Url                   string  `json:"url"`
 	RegularPrice          float32 `json:"regular_price"`
 	SalePrice             float32 `json:"sale_price"`
 	FactoryPrice          float32 `json:"factory_price"`

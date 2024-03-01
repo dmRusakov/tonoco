@@ -3,7 +3,7 @@ package entity
 type Specification struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
-	Slug      string `json:"slug"`
+	Url       string `json:"url"`
 	Type      string `json:"type"`
 	Active    bool   `json:"active"`
 	Order     int32  `json:"order"`

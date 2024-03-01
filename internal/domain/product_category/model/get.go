@@ -14,7 +14,7 @@ func (repo *ProductCategoryModel) Get(ctx context.Context, id string) (*ProductC
 		Select(
 			fieldMap["ID"],
 			fieldMap["Name"],
-			fieldMap["Slug"],
+			fieldMap["Url"],
 			fieldMap["ShortDescription"],
 			fieldMap["Description"],
 			fieldMap["SortOrder"],
@@ -63,7 +63,7 @@ func (repo *ProductCategoryModel) Get(ctx context.Context, id string) (*ProductC
 	if err = rows.Scan(
 		&productCategory.ID,
 		&productCategory.Name,
-		&productCategory.Slug,
+		&productCategory.Url,
 		&productCategory.ShortDescription,
 		&productCategory.Description,
 		&productCategory.SortOrder,

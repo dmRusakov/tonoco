@@ -19,7 +19,7 @@ func (repo *ProductStatusModel) Create(ctx context.Context, productStatus *Produ
 		Columns(
 			fieldMap["ID"],
 			fieldMap["Name"],
-			fieldMap["Slug"],
+			fieldMap["Url"],
 			fieldMap["SortOrder"],
 			fieldMap["Active"],
 			fieldMap["CreatedAt"],
@@ -29,7 +29,7 @@ func (repo *ProductStatusModel) Create(ctx context.Context, productStatus *Produ
 		Values(
 			productStatus.ID,
 			productStatus.Name,
-			productStatus.Slug,
+			productStatus.Url,
 			productStatus.SortOrder,
 			productStatus.Active,
 			"NOW()",

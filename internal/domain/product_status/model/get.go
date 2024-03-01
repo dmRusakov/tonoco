@@ -14,13 +14,9 @@ func (repo *ProductStatusModel) Get(ctx context.Context, id string) (*ProductSta
 		Select(
 			fieldMap["ID"],
 			fieldMap["Name"],
-			fieldMap["Slug"],
+			fieldMap["Url"],
 			fieldMap["SortOrder"],
 			fieldMap["Active"],
-			fieldMap["CreatedAt"],
-			fieldMap["CreatedBy"],
-			fieldMap["UpdatedAt"],
-			fieldMap["UpdatedBy"],
 		).
 		From(repo.table + " p").
 		Where(sq.Eq{fieldMap["ID"]: id})
@@ -60,13 +56,9 @@ func (repo *ProductStatusModel) Get(ctx context.Context, id string) (*ProductSta
 	if err = rows.Scan(
 		&productStatus.ID,
 		&productStatus.Name,
-		&productStatus.Slug,
+		&productStatus.Url,
 		&productStatus.SortOrder,
 		&productStatus.Active,
-		&productStatus.CreatedAt,
-		&productStatus.CreatedBy,
-		&productStatus.UpdatedAt,
-		&productStatus.UpdatedBy,
 	); err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)

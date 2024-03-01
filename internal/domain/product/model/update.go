@@ -18,7 +18,7 @@ func (repo *ProductModel) Update(ctx context.Context, product *Product, by strin
 		Set(fieldMap["Description"], product.Description).
 		Set(fieldMap["SortOrder"], product.SortOrder).
 		Set(fieldMap["StatusID"], product.StatusID).
-		Set(fieldMap["Slug"], product.Slug).
+		Set(fieldMap["Url"], product.Url).
 		Set(fieldMap["RegularPrice"], product.RegularPrice).
 		Set(fieldMap["SalePrice"], product.SalePrice).
 		Set(fieldMap["FactoryPrice"], product.FactoryPrice).

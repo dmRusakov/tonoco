@@ -7,6 +7,7 @@ import (
 )
 
 type ProductCategoryStorage interface {
+	All(ctx context.Context, filter *Filter) ([]*ProductStatus, error)
 	Create(ctx context.Context, productCategory *ProductStatus, by string) (*ProductStatus, error)
 	Get(ctx context.Context, id string) (*ProductStatus, error)
 	Update(ctx context.Context, product *ProductStatus, by string) (*ProductStatus, error)

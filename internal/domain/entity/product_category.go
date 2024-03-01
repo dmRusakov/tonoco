@@ -3,7 +3,7 @@ package entity
 type ProductCategory struct {
 	ID               string `json:"id"`
 	Name             string `json:"name"`
-	Slug             string `json:"slug"`
+	Url              string `json:"url"`
 	ShortDescription string `json:"short_description"`
 	Description      string `json:"description"`
 	Order            int32  `json:"order"`

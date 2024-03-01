@@ -19,7 +19,7 @@ func (repo *ProductCategoryModel) Create(ctx context.Context, productCategory *P
 		Columns(
 			fieldMap["ID"],
 			fieldMap["Name"],
-			fieldMap["Slug"],
+			fieldMap["Url"],
 			fieldMap["ShortDescription"],
 			fieldMap["Description"],
 			fieldMap["SortOrder"],
@@ -32,7 +32,7 @@ func (repo *ProductCategoryModel) Create(ctx context.Context, productCategory *P
 		Values(
 			productCategory.ID,
 			productCategory.Name,
-			productCategory.Slug,
+			productCategory.Url,
 			productCategory.ShortDescription,
 			productCategory.Description,
 			productCategory.SortOrder,
