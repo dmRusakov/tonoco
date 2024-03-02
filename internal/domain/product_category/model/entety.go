@@ -18,6 +18,16 @@ type ProductCategory struct {
 	UpdatedBy        string
 }
 
+type Filter struct {
+	Active    *bool
+	Prime     *bool
+	Search    *string
+	SortBy    *string
+	SortOrder *string
+	Page      *uint64
+	PerPage   *uint64
+}
+
 // fieldMap
 var fieldMap = map[string]string{
 	"ID":               "id",

@@ -20,10 +20,6 @@ func (repo *ProductCategoryModel) Get(ctx context.Context, id string) (*ProductC
 			fieldMap["SortOrder"],
 			fieldMap["Prime"],
 			fieldMap["Active"],
-			fieldMap["CreatedAt"],
-			fieldMap["CreatedBy"],
-			fieldMap["UpdatedAt"],
-			fieldMap["UpdatedBy"],
 		).
 		From(repo.table + " p").
 		Where(sq.Eq{fieldMap["ID"]: id})
@@ -69,10 +65,6 @@ func (repo *ProductCategoryModel) Get(ctx context.Context, id string) (*ProductC
 		&productCategory.SortOrder,
 		&productCategory.Prime,
 		&productCategory.Active,
-		&productCategory.CreatedAt,
-		&productCategory.CreatedBy,
-		&productCategory.UpdatedAt,
-		&productCategory.UpdatedBy,
 	); err != nil {
 		err = psql.ErrScan(err)
 		tracing.Error(ctx, err)

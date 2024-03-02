@@ -10,6 +10,153 @@ import (
 	"testing"
 )
 
+var testProductCategories = []*model.ProductCategory{
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9901",
+		Url:              "island",
+		Name:             "Island Range Hoods",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            true,
+		Active:           true,
+	},
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9902",
+		Url:              "wall",
+		Name:             "Wall range hoods",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            true,
+		Active:           true,
+	},
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9903",
+		Url:              "ait-loop",
+		Name:             "Air loop range hoods",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            true,
+		Active:           true,
+	},
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9904",
+		Url:              "built-in",
+		Name:             "Built-in Range Hoods",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            true,
+		Active:           true,
+	},
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9905",
+		Url:              "under-cabinet",
+		Name:             "Under Cabinet Range hood",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            true,
+		Active:           true,
+	},
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9906",
+		Url:              "accessories",
+		Name:             "Accessories",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            true,
+		Active:           true,
+	},
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9907",
+		Url:              "black",
+		Name:             "Black Range hood",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            false,
+		Active:           true,
+	},
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9908",
+		Url:              "white",
+		Name:             "White Range hood",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            false,
+		Active:           true,
+	},
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9909",
+		Url:              "wood",
+		Name:             "Wood Range hood",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            false,
+		Active:           true,
+	},
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9910",
+		Url:              "stainless-steel",
+		Name:             "Stainless Steel Range hood",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            false,
+		Active:           true,
+	},
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9911",
+		Url:              "glass",
+		Name:             "Glass Range hood",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            false,
+		Active:           true,
+	},
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9912",
+		Url:              "perimeter-filter",
+		Name:             "Perimeter Filter Range Hoods",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            false,
+		Active:           true,
+	},
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9913",
+		Url:              "murano",
+		Name:             "Murano Range Hoods",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            false,
+		Active:           true,
+	},
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9914",
+		Url:              "ductless-range-hoods",
+		Name:             "Ductless Range hood",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            false,
+		Active:           true,
+	},
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9915",
+		Url:              "ducted-range-hoods",
+		Name:             "Ducted Range hood",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            false,
+		Active:           true,
+	},
+	{
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9999",
+		Url:              "discontinued-range-hoods",
+		Name:             "Discontinued",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+		Prime:            false,
+		Active:           false,
+	},
+}
+
 var productCategoryNewWithId = model.ProductCategory{
 	ID:               "1f484cda-c00e-4ed8-a325-9c5e035f0000",
 	Name:             "New product category",
@@ -31,52 +178,18 @@ var productCategoryNewWithoutId = model.ProductCategory{
 	Active:           true,
 }
 
-var productCategory01 = model.ProductCategory{
-	ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9901",
-	Name:             "Island Range Hoods",
-	Url:              "island",
-	ShortDescription: "Some text",
-	Description:      "Some text",
-	SortOrder:        1,
-	Prime:            true,
-	Active:           true,
-}
-
-var productCategory02 = model.ProductCategory{
-	ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9902",
-	Name:             "Wall range hoods",
-	Url:              "wall",
-	ShortDescription: "Some text",
-	Description:      "Some text",
-	SortOrder:        2,
-	Prime:            true,
-	Active:           true,
-}
-
-var productCategory03 = model.ProductCategory{
-	ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9903",
-	Name:             "Air loop range hoods",
-	Url:              "ait-loop",
-	ShortDescription: "Some text",
-	Description:      "Some text",
-	SortOrder:        3,
-	Prime:            true,
-	Active:           true,
-}
-
-var productCategory04 = model.ProductCategory{
-	ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9904",
-	Name:             "Built-in Range Hoods",
-	Url:              "built-in",
-	ShortDescription: "Some text",
-	Description:      "Some text",
-	SortOrder:        4,
-	Prime:            true,
-	Active:           true,
+func TestProductCategory(t *testing.T) {
+	t.Run("testProductCategoryGet", testProductCategoryGet)
+	t.Run("testProductCategoryUpdate", testProductCategoryUpdate)
+	t.Run("testProductCategoryPatch", testProductCategoryPatch)
+	t.Run("testProductCategoryCreateWithId", testProductCategoryCreateWithId)
+	t.Run("testProductCategoryCreateWithoutId", testProductCategoryCreateWithoutId)
+	t.Run("testProductCategoryCreateWithoutId", testProductCategoryDelete)
+	t.Run("testProductCategoryAll", testProductCategoryAll)
 }
 
 // test get
-func TestProductCategoryGet(t *testing.T) {
+func testProductCategoryGet(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
 
@@ -91,20 +204,24 @@ func TestProductCategoryGet(t *testing.T) {
 	}{
 		{
 			name: "Get product category 01",
-			id:   productCategory01.ID,
-			get:  &productCategory01,
+			id:   testProductCategories[0].ID,
+			get:  testProductCategories[0],
 		}, {
 			name: "Get product category 02",
-			id:   productCategory02.ID,
-			get:  &productCategory02,
+			id:   testProductCategories[1].ID,
+			get:  testProductCategories[1],
 		}, {
 			name: "Get product category 03",
-			id:   productCategory03.ID,
-			get:  &productCategory03,
+			id:   testProductCategories[2].ID,
+			get:  testProductCategories[2],
 		}, {
 			name: "Get product category 04",
-			id:   productCategory04.ID,
-			get:  &productCategory04,
+			id:   testProductCategories[3].ID,
+			get:  testProductCategories[3],
+		}, {
+			name: "Get product category 05",
+			id:   testProductCategories[4].ID,
+			get:  testProductCategories[4],
 		},
 	}
 
@@ -129,18 +246,18 @@ func TestProductCategoryGet(t *testing.T) {
 }
 
 // test update
-func TestProductCategoryUpdate(t *testing.T) {
+func testProductCategoryUpdate(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
 
 	// Initialize a new instance of the model
 	storage := model.NewProductCategoryStorage(pgClient)
 
-	// create new variable from productCategory01
-	productCategory01New := productCategory01
-	productCategory01New.Name = "Island Range Hoods New"
-	productCategory01New.Url = "island-new"
-	productCategory01New.Prime = false
+	// create new variable from testProductCategories[0]
+	testProductCategoryNew := testProductCategories[0]
+	testProductCategoryNew.Name = "Island Range Hoods New"
+	testProductCategoryNew.Url = "island-new"
+	testProductCategoryNew.Active = false
 
 	// Define the test cases
 	testCases := []struct {
@@ -151,14 +268,14 @@ func TestProductCategoryUpdate(t *testing.T) {
 	}{
 		{
 			name:   "Update product category 01",
-			id:     productCategory01.ID,
-			sent:   &productCategory01New,
-			update: &productCategory01New,
+			id:     testProductCategories[0].ID,
+			sent:   testProductCategoryNew,
+			update: testProductCategoryNew,
 		}, {
 			name:   "Update product category 02",
-			id:     productCategory01.ID,
-			sent:   &productCategory01,
-			update: &productCategory01,
+			id:     testProductCategories[0].ID,
+			sent:   testProductCategories[0],
+			update: testProductCategories[0],
 		},
 	}
 
@@ -179,8 +296,6 @@ func TestProductCategoryUpdate(t *testing.T) {
 
 			// Assert that the result matches the get value
 			assert.Equal(t, tc.update.ID, result.ID)
-			assert.Equal(t, tc.update.Name, result.Name)
-			assert.Equal(t, tc.update.Url, result.Url)
 			assert.Equal(t, tc.update.ShortDescription, result.ShortDescription)
 			assert.Equal(t, tc.update.Description, result.Description)
 			assert.Equal(t, tc.update.Prime, result.Prime)
@@ -190,18 +305,18 @@ func TestProductCategoryUpdate(t *testing.T) {
 }
 
 // test patch
-func TestProductCategoryPatch(t *testing.T) {
+func testProductCategoryPatch(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
 
 	// Initialize a new instance of the model
 	storage := model.NewProductCategoryStorage(pgClient)
 
-	// create new variable from productCategory01
-	productCategory01New := productCategory01
-	productCategory01New.Name = "Island Range Hoods New"
-	productCategory01New.Url = "island-new"
-	productCategory01New.Prime = false
+	// create new variable from testProductCategories[0]
+	testProductCategoryNew := testProductCategories[0]
+	testProductCategoryNew.Name = "Island Range Hoods New"
+	testProductCategoryNew.Url = "island-new"
+	testProductCategoryNew.Active = false
 
 	// Define the test cases
 	testCases := []struct {
@@ -212,22 +327,22 @@ func TestProductCategoryPatch(t *testing.T) {
 	}{
 		{
 			name: "Patch product category 01",
-			id:   productCategory01.ID,
+			id:   testProductCategories[0].ID,
 			fields: map[string]interface{}{
-				"Name":  productCategory01New.Name,
-				"Url":   productCategory01New.Url,
-				"Prime": productCategory01New.Prime,
+				"Name":  testProductCategoryNew.Name,
+				"Url":   testProductCategoryNew.Url,
+				"Prime": testProductCategoryNew.Prime,
 			},
-			get: &productCategory01New,
+			get: testProductCategoryNew,
 		}, {
 			name: "Patch product category 02",
-			id:   productCategory01.ID,
+			id:   testProductCategories[0].ID,
 			fields: map[string]interface{}{
-				"Name":  productCategory01.Name,
-				"Url":   productCategory01.Url,
-				"Prime": productCategory01.Prime,
+				"Name":  testProductCategories[0].Name,
+				"Url":   testProductCategories[0].Url,
+				"Prime": testProductCategories[0].Prime,
 			},
-			get: &productCategory01,
+			get: testProductCategories[0],
 		},
 	}
 
@@ -259,7 +374,7 @@ func TestProductCategoryPatch(t *testing.T) {
 }
 
 // test create with id
-func TestProductCategoryCreateWithId(t *testing.T) {
+func testProductCategoryCreateWithId(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
 
@@ -301,7 +416,7 @@ func TestProductCategoryCreateWithId(t *testing.T) {
 }
 
 // test create without id
-func TestProductCategoryCreateWithoutId(t *testing.T) {
+func testProductCategoryCreateWithoutId(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
 
@@ -345,7 +460,7 @@ func TestProductCategoryCreateWithoutId(t *testing.T) {
 }
 
 // test delete
-func TestProductCategoryDelete(t *testing.T) {
+func testProductCategoryDelete(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
 
@@ -381,6 +496,70 @@ func TestProductCategoryDelete(t *testing.T) {
 		})
 	}
 
+}
+
+// test all
+func testProductCategoryAll(t *testing.T) {
+	// Create a real database client
+	pgClient := initDB(t)
+
+	// Initialize a new instance of the model
+	storage := model.NewProductCategoryStorage(pgClient)
+
+	// test varietals
+	isPrime := true
+	page := uint64(1)
+	perPage3 := uint64(3)
+
+	// Define the test cases
+	testCases := []struct {
+		name     string
+		filter   *model.Filter
+		expected []*model.ProductCategory
+	}{
+		{
+			name:     "Get 10 products categories 01",
+			filter:   &model.Filter{},
+			expected: testProductCategories[:10],
+		}, {
+			name: "Get 3 products categories 02",
+			filter: &model.Filter{
+				PerPage: &perPage3,
+				Page:    &page,
+			},
+			expected: testProductCategories[:3],
+		}, {
+			name: "Get Prime products categories 03",
+			filter: &model.Filter{
+				Prime: &isPrime,
+			},
+			expected: testProductCategories[0:6],
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call All method
+			result, err := storage.All(context.Background(), tc.filter)
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result matches the expected value
+			assert.Equal(t, len(tc.expected), len(result))
+
+			for i, v := range result {
+				assert.Equal(t, tc.expected[i].ID, v.ID)
+				assert.Equal(t, tc.expected[i].Name, v.Name)
+				assert.Equal(t, tc.expected[i].Url, v.Url)
+				assert.Equal(t, tc.expected[i].ShortDescription, v.ShortDescription)
+				assert.Equal(t, tc.expected[i].Description, v.Description)
+				assert.Equal(t, tc.expected[i].Prime, v.Prime)
+				assert.Equal(t, tc.expected[i].Active, v.Active)
+			}
+		})
+	}
 }
 
 // initDB

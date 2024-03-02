@@ -315,6 +315,8 @@ func TestProductStatusAll(t *testing.T) {
 
 	// Initialize a new instance of the model
 	storage := model.NewProductStatusStorage(pgClient)
+
+	// test varietals
 	isActive := true
 	sortOrder := "SortOrder"
 	sortOrderDesc := "desc"
@@ -328,29 +330,55 @@ func TestProductStatusAll(t *testing.T) {
 		expected []*model.ProductStatus
 	}{
 		{
-			name:     "Get all product status",
-			filter:   &model.Filter{},
-			expected: []*model.ProductStatus{&productStatus11, &productStatus12, &productStatus13, &productStatus14, &productStatus15, productStatusNewWithId, productStatusNewWithoutId},
+			name:   "Get all product status",
+			filter: &model.Filter{},
+			expected: []*model.ProductStatus{
+				&productStatus11,
+				&productStatus12,
+				&productStatus13,
+				&productStatus14,
+				&productStatus15,
+				productStatusNewWithId,
+				productStatusNewWithoutId,
+			},
 		}, {
 			name: "Get active product status",
 			filter: &model.Filter{
 				Active: &isActive,
 			},
-			expected: []*model.ProductStatus{&productStatus11, &productStatus12, &productStatus13, &productStatus14, &productStatus15},
+			expected: []*model.ProductStatus{
+				&productStatus11,
+				&productStatus12,
+				&productStatus13,
+				&productStatus14,
+				&productStatus15,
+			},
 		}, {
 			name: "Get product status by sort order desc",
 			filter: &model.Filter{
 				SortBy:    &sortOrder,
 				SortOrder: &sortOrderDesc,
 			},
-			expected: []*model.ProductStatus{productStatusNewWithoutId, productStatusNewWithId, &productStatus15, &productStatus14, &productStatus13, &productStatus12, &productStatus11},
+			expected: []*model.ProductStatus{
+				productStatusNewWithoutId,
+				productStatusNewWithId,
+				&productStatus15,
+				&productStatus14,
+				&productStatus13,
+				&productStatus12,
+				&productStatus11,
+			},
 		}, {
 			name: "Get product status with page and per page",
 			filter: &model.Filter{
 				Page:    &page,
 				PerPage: &perPage,
 			},
-			expected: []*model.ProductStatus{&productStatus11, &productStatus12, &productStatus13},
+			expected: []*model.ProductStatus{
+				&productStatus11,
+				&productStatus12,
+				&productStatus13,
+			},
 		},
 	}
 

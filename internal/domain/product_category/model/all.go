@@ -2,13 +2,14 @@ package model
 
 import (
 	"context"
+	"fmt"
 	sq "github.com/Masterminds/squirrel"
 )
 
-func (repo *ProductStatusModel) All(
+func (repo *ProductCategoryModel) All(
 	ctx context.Context,
 	filter *Filter,
-) ([]*ProductStatus, error) {
+) ([]*ProductCategory, error) {
 	// check standard filter parameter
 	if filter.SortBy == nil {
 		filter.SortBy = new(string)
@@ -36,20 +37,34 @@ func (repo *ProductStatusModel) All(
 			fieldMap["ID"],
 			fieldMap["Name"],
 			fieldMap["Url"],
+			fieldMap["ShortDescription"],
+			fieldMap["Description"],
 			fieldMap["SortOrder"],
+			fieldMap["Prime"],
 			fieldMap["Active"],
 		).
 		From(repo.table + " p").
 		OrderBy(fieldMap[*filter.SortBy] + " " + *filter.SortOrder).
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 
-	// add the active filter if it is not nil
+	// Active
 	if filter.Active != nil {
 		statement = statement.Where(sq.Eq{fieldMap["Active"]: *filter.Active})
 	}
 
+	// Prime
+	if filter.Prime != nil {
+		statement = statement.Where(sq.Eq{fieldMap["Prime"]: *filter.Prime})
+	}
+
+	// Search
+	if filter.Search != nil {
+		statement = statement.Where(sq.Like{fieldMap["Name"]: *filter.Search})
+	}
+
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()
+	fmt.Println("++++", query)
 	if err != nil {
 		return nil, err
 	}
@@ -62,22 +77,24 @@ func (repo *ProductStatusModel) All(
 
 	defer rows.Close()
 
-	var productStatuses []*ProductStatus
+	var productCategories []*ProductCategory
 	for rows.Next() {
-		// scan the result set into a ProductStatus struct
-		productStatus := &ProductStatus{}
-		if err = rows.Scan(
-			&productStatus.ID,
-			&productStatus.Name,
-			&productStatus.Url,
-			&productStatus.SortOrder,
-			&productStatus.Active,
-		); err != nil {
+		var productCategory ProductCategory
+		err = rows.Scan(
+			&productCategory.ID,
+			&productCategory.Name,
+			&productCategory.Url,
+			&productCategory.ShortDescription,
+			&productCategory.Description,
+			&productCategory.SortOrder,
+			&productCategory.Prime,
+			&productCategory.Active,
+		)
+		if err != nil {
 			return nil, err
 		}
-
-		productStatuses = append(productStatuses, productStatus)
+		productCategories = append(productCategories, &productCategory)
 	}
 
-	return productStatuses, nil
+	return productCategories, nil
 }
