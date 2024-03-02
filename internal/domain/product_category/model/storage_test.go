@@ -179,17 +179,17 @@ var productCategoryNewWithoutId = model.ProductCategory{
 }
 
 func TestProductCategory(t *testing.T) {
-	t.Run("testProductCategoryGet", testProductCategoryGet)
-	t.Run("testProductCategoryUpdate", testProductCategoryUpdate)
-	t.Run("testProductCategoryPatch", testProductCategoryPatch)
-	t.Run("testProductCategoryCreateWithId", testProductCategoryCreateWithId)
-	t.Run("testProductCategoryCreateWithoutId", testProductCategoryCreateWithoutId)
-	t.Run("testProductCategoryCreateWithoutId", testProductCategoryDelete)
-	t.Run("testProductCategoryAll", testProductCategoryAll)
+	t.Run("get", get)
+	t.Run("update", update)
+	t.Run("patch", patch)
+	t.Run("createWithId", createWithId)
+	t.Run("createWithoutId", createWithoutId)
+	t.Run("createWithoutId", delete)
+	t.Run("all", all)
 }
 
 // test get
-func testProductCategoryGet(t *testing.T) {
+func get(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
 
@@ -203,23 +203,23 @@ func testProductCategoryGet(t *testing.T) {
 		get  *model.ProductCategory
 	}{
 		{
-			name: "Get product category 01",
+			name: "Get 01",
 			id:   testProductCategories[0].ID,
 			get:  testProductCategories[0],
 		}, {
-			name: "Get product category 02",
+			name: "Get 02",
 			id:   testProductCategories[1].ID,
 			get:  testProductCategories[1],
 		}, {
-			name: "Get product category 03",
+			name: "Get 03",
 			id:   testProductCategories[2].ID,
 			get:  testProductCategories[2],
 		}, {
-			name: "Get product category 04",
+			name: "Get 04",
 			id:   testProductCategories[3].ID,
 			get:  testProductCategories[3],
 		}, {
-			name: "Get product category 05",
+			name: "Get 05",
 			id:   testProductCategories[4].ID,
 			get:  testProductCategories[4],
 		},
@@ -246,7 +246,7 @@ func testProductCategoryGet(t *testing.T) {
 }
 
 // test update
-func testProductCategoryUpdate(t *testing.T) {
+func update(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
 
@@ -267,12 +267,12 @@ func testProductCategoryUpdate(t *testing.T) {
 		update *model.ProductCategory
 	}{
 		{
-			name:   "Update product category 01",
+			name:   "Update 01",
 			id:     testProductCategories[0].ID,
 			sent:   testProductCategoryNew,
 			update: testProductCategoryNew,
 		}, {
-			name:   "Update product category 02",
+			name:   "Update 02",
 			id:     testProductCategories[0].ID,
 			sent:   testProductCategories[0],
 			update: testProductCategories[0],
@@ -305,7 +305,7 @@ func testProductCategoryUpdate(t *testing.T) {
 }
 
 // test patch
-func testProductCategoryPatch(t *testing.T) {
+func patch(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
 
@@ -326,7 +326,7 @@ func testProductCategoryPatch(t *testing.T) {
 		get    *model.ProductCategory
 	}{
 		{
-			name: "Patch product category 01",
+			name: "Patch 01",
 			id:   testProductCategories[0].ID,
 			fields: map[string]interface{}{
 				"Name":  testProductCategoryNew.Name,
@@ -335,7 +335,7 @@ func testProductCategoryPatch(t *testing.T) {
 			},
 			get: testProductCategoryNew,
 		}, {
-			name: "Patch product category 02",
+			name: "Patch 02",
 			id:   testProductCategories[0].ID,
 			fields: map[string]interface{}{
 				"Name":  testProductCategories[0].Name,
@@ -374,7 +374,7 @@ func testProductCategoryPatch(t *testing.T) {
 }
 
 // test create with id
-func testProductCategoryCreateWithId(t *testing.T) {
+func createWithId(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
 
@@ -388,7 +388,7 @@ func testProductCategoryCreateWithId(t *testing.T) {
 		get  *model.ProductCategory
 	}{
 		{
-			name: "Create product category with id",
+			name: "Create with id",
 			sent: &productCategoryNewWithId,
 			get:  &productCategoryNewWithId,
 		},
@@ -416,7 +416,7 @@ func testProductCategoryCreateWithId(t *testing.T) {
 }
 
 // test create without id
-func testProductCategoryCreateWithoutId(t *testing.T) {
+func createWithoutId(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
 
@@ -430,7 +430,7 @@ func testProductCategoryCreateWithoutId(t *testing.T) {
 		get  *model.ProductCategory
 	}{
 		{
-			name: "Create product category without id",
+			name: "Create without id",
 			sent: &productCategoryNewWithoutId,
 			get:  &productCategoryNewWithoutId,
 		},
@@ -460,7 +460,7 @@ func testProductCategoryCreateWithoutId(t *testing.T) {
 }
 
 // test delete
-func testProductCategoryDelete(t *testing.T) {
+func delete(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
 
@@ -473,10 +473,10 @@ func testProductCategoryDelete(t *testing.T) {
 		id   string
 	}{
 		{
-			name: "Delete product category 01",
+			name: "Delete 01",
 			id:   productCategoryNewWithId.ID,
 		}, {
-			name: "Delete product category 02",
+			name: "Delete 02",
 			id:   productCategoryNewWithoutId.ID,
 		},
 	}
@@ -499,7 +499,7 @@ func testProductCategoryDelete(t *testing.T) {
 }
 
 // test all
-func testProductCategoryAll(t *testing.T) {
+func all(t *testing.T) {
 	// Create a real database client
 	pgClient := initDB(t)
 
