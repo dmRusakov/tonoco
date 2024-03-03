@@ -10,6 +10,7 @@ type ProductCategoryStorage interface {
 	All(ctx context.Context, filter *Filter) ([]*ProductCategory, error)
 	Create(ctx context.Context, productCategory *ProductCategory, by string) (*ProductCategory, error)
 	Get(ctx context.Context, id string) (*ProductCategory, error)
+	GetByURL(ctx context.Context, url string) (*ProductCategory, error)
 	Update(ctx context.Context, product *ProductCategory, by string) (*ProductCategory, error)
 	Patch(ctx context.Context, id string, fields map[string]interface{}, by string) (*ProductCategory, error)
 	Delete(ctx context.Context, id string) error

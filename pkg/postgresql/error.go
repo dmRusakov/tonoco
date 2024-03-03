@@ -39,3 +39,7 @@ func ErrDoQuery(err error) error {
 func ErrNoRowForID(id string) error {
 	return errors.New("no rows found for id: " + id)
 }
+
+func ErrNoRowForURL(url string) error {
+	return errors.New("no rows found for url: " + url)
+}

@@ -198,6 +198,7 @@ var testProductCategoriesNew = []*model.ProductCategory{
 func TestProductCategory(t *testing.T) {
 	t.Run("all", all)
 	t.Run("get", get)
+	t.Run("getByUrl", getByUrl)
 	t.Run("createWithId", createWithId)
 	t.Run("createWithoutId", createWithoutId)
 	t.Run("update", update)
@@ -341,6 +342,61 @@ func get(t *testing.T) {
 			assert.Equal(t, tc.get.Active, result.Active)
 		})
 	}
+}
+
+// test get by url
+func getByUrl(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
+
+	// Define the test cases
+	testCases := []struct {
+		name string
+		url  string
+		get  *model.ProductCategory
+	}{
+		{
+			name: "Get by url 01",
+			url:  testProductCategories[0].Url,
+			get:  testProductCategories[0],
+		}, {
+			name: "Get by url 02",
+			url:  testProductCategories[1].Url,
+			get:  testProductCategories[1],
+		}, {
+			name: "Get by url 03",
+			url:  testProductCategories[2].Url,
+			get:  testProductCategories[2],
+		}, {
+			name: "Get by url 04",
+			url:  testProductCategories[3].Url,
+			get:  testProductCategories[3],
+		}, {
+			name: "Get by url 05",
+			url:  testProductCategories[4].Url,
+			get:  testProductCategories[4],
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result, err := storage.GetByURL(context.Background(), tc.url)
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result matches the get value
+			assert.Equal(t, tc.get.ID, result.ID)
+			assert.Equal(t, tc.get.Name, result.Name)
+			assert.Equal(t, tc.get.Url, result.Url)
+			assert.Equal(t, tc.get.ShortDescription, result.ShortDescription)
+			assert.Equal(t, tc.get.Description, result.Description)
+			assert.Equal(t, tc.get.Prime, result.Prime)
+			assert.Equal(t, tc.get.Active, result.Active)
+		})
+	}
+
 }
 
 // test create with id
