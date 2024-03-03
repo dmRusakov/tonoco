@@ -51,18 +51,18 @@ VALUES ('1f484cda-c00e-4ed8-a325-9c5e035f9901', 'island', 'Island range hoods', 
        ('1f484cda-c00e-4ed8-a325-9c5e035f9902', 'wall', 'Wall range hoods', 'Some text', 'Some text', true, true),
        ('1f484cda-c00e-4ed8-a325-9c5e035f9903', 'ait-loop', 'Air loop range hoods', 'Some text', 'Some text', true, true),
        ('1f484cda-c00e-4ed8-a325-9c5e035f9904', 'built-in', 'Built-in range hoods', 'Some text', 'Some text', true, true),
-       ('1f484cda-c00e-4ed8-a325-9c5e035f9905', 'under-cabinet', 'Under Cabinet range hood', 'Some text', 'Some text', true, true),
+       ('1f484cda-c00e-4ed8-a325-9c5e035f9905', 'under-cabinet', 'Under Cabinet range hoods', 'Some text', 'Some text', true, true),
        ('1f484cda-c00e-4ed8-a325-9c5e035f9906', 'accessories', 'Accessories', 'Some text', 'Some text', true, true),
-       ('1f484cda-c00e-4ed8-a325-9c5e035f9907', 'black', 'Black range hood', 'Some text', 'Some text', false, true),
-       ('1f484cda-c00e-4ed8-a325-9c5e035f9908', 'white', 'White range hood', 'Some text', 'Some text', false, true),
-       ('1f484cda-c00e-4ed8-a325-9c5e035f9909', 'wood', 'Wood range hood', 'Some text', 'Some text', false, true),
-       ('1f484cda-c00e-4ed8-a325-9c5e035f9910', 'stainless-steel', 'Stainless Steel range hood', 'Some text', 'Some text', false, true),
-       ('1f484cda-c00e-4ed8-a325-9c5e035f9911', 'glass', 'Glass range hood', 'Some text', 'Some text', false, true),
+       ('1f484cda-c00e-4ed8-a325-9c5e035f9907', 'black', 'Black range hoods', 'Some text', 'Some text', false, true),
+       ('1f484cda-c00e-4ed8-a325-9c5e035f9908', 'white', 'White range hoods', 'Some text', 'Some text', false, true),
+       ('1f484cda-c00e-4ed8-a325-9c5e035f9909', 'wood', 'Wood range hoods', 'Some text', 'Some text', false, true),
+       ('1f484cda-c00e-4ed8-a325-9c5e035f9910', 'stainless-steel', 'Stainless Steel range hoods', 'Some text', 'Some text', false, true),
+       ('1f484cda-c00e-4ed8-a325-9c5e035f9911', 'glass', 'Glass range hoods', 'Some text', 'Some text', false, true),
        ('1f484cda-c00e-4ed8-a325-9c5e035f9912', 'perimeter-filter', 'Perimeter Filter range hoods', 'Some text', 'Some text', false, true),
        ('1f484cda-c00e-4ed8-a325-9c5e035f9913', 'murano', 'Murano range hoods', 'Some text', 'Some text', false, true),
-       ('1f484cda-c00e-4ed8-a325-9c5e035f9914', 'ductless-range-hoods', 'Ductless range hood', 'Some text', 'Some text', false, true),
-       ('1f484cda-c00e-4ed8-a325-9c5e035f9915', 'ducted-range-hoods', 'Ducted range hood', 'Some text', 'Some text', false, true),
-       ('1f484cda-c00e-4ed8-a325-9c5e035f9999', 'discontinued-range-hoods', 'Discontinued', 'Some text', 'Some text', false, false);
+       ('1f484cda-c00e-4ed8-a325-9c5e035f9914', 'ductless', 'Ductless range hoods', 'Some text', 'Some text', false, true),
+       ('1f484cda-c00e-4ed8-a325-9c5e035f9915', 'ducted', 'Ducted range hoods', 'Some text', 'Some text', false, true),
+       ('1f484cda-c00e-4ed8-a325-9c5e035f9999', 'discontinued', 'Discontinued', 'Some text', 'Some text', false, false);
 
 -- get data
 select *

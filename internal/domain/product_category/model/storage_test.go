@@ -54,7 +54,7 @@ var testProductCategories = []*model.ProductCategory{
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9905",
 		Url:              "under-cabinet",
-		Name:             "Under Cabinet range hood",
+		Name:             "Under Cabinet range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
 		Prime:            true,
@@ -72,7 +72,7 @@ var testProductCategories = []*model.ProductCategory{
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9907",
 		Url:              "black",
-		Name:             "Black range hood",
+		Name:             "Black range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
 		Prime:            false,
@@ -81,7 +81,7 @@ var testProductCategories = []*model.ProductCategory{
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9908",
 		Url:              "white",
-		Name:             "White range hood",
+		Name:             "White range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
 		Prime:            false,
@@ -90,7 +90,7 @@ var testProductCategories = []*model.ProductCategory{
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9909",
 		Url:              "wood",
-		Name:             "Wood range hood",
+		Name:             "Wood range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
 		Prime:            false,
@@ -99,7 +99,7 @@ var testProductCategories = []*model.ProductCategory{
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9910",
 		Url:              "stainless-steel",
-		Name:             "Stainless Steel range hood",
+		Name:             "Stainless Steel range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
 		Prime:            false,
@@ -108,7 +108,7 @@ var testProductCategories = []*model.ProductCategory{
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9911",
 		Url:              "glass",
-		Name:             "Glass range hood",
+		Name:             "Glass range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
 		Prime:            false,
@@ -134,8 +134,8 @@ var testProductCategories = []*model.ProductCategory{
 	},
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9914",
-		Url:              "ductless-range-hoods",
-		Name:             "Ductless range hood",
+		Url:              "ductless",
+		Name:             "Ductless range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
 		Prime:            false,
@@ -143,8 +143,8 @@ var testProductCategories = []*model.ProductCategory{
 	},
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9915",
-		Url:              "ducted-range-hoods",
-		Name:             "Ducted range hood",
+		Url:              "ducted",
+		Name:             "Ducted range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
 		Prime:            false,
@@ -152,7 +152,7 @@ var testProductCategories = []*model.ProductCategory{
 	},
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9999",
-		Url:              "discontinued-range-hoods",
+		Url:              "discontinued",
 		Name:             "Discontinued",
 		ShortDescription: "Some text",
 		Description:      "Some text",
@@ -215,6 +215,8 @@ func all(t *testing.T) {
 	page := uint64(1)
 	perPage3 := uint64(3)
 	perPage100 := uint64(100)
+	searchAir := "air"
+	searchSteel := "steel"
 
 	// Define the test cases
 	testCases := []struct {
@@ -247,6 +249,18 @@ func all(t *testing.T) {
 				PerPage: &perPage100,
 			},
 			expected: testProductCategories[:15],
+		}, {
+			name: "Get with name like `air` products categories 05",
+			filter: &model.Filter{
+				Search: &searchAir,
+			},
+			expected: testProductCategories[2:3],
+		}, {
+			name: "Get with name like `steel` products categories 06",
+			filter: &model.Filter{
+				Search: &searchSteel,
+			},
+			expected: testProductCategories[9:10],
 		},
 	}
 
@@ -465,13 +479,6 @@ func update(t *testing.T) {
 			assert.Equal(t, tc.update.Active, result.Active)
 		})
 	}
-
-	// rename back
-	_, err := storage.Update(context.Background(), testProductCategories[0], "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
-	assert.NoError(t, err)
-
-	_, err = storage.Update(context.Background(), testProductCategories[1], "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
-	assert.NoError(t, err)
 }
 
 // test patch
@@ -480,7 +487,7 @@ func patch(t *testing.T) {
 	storage := initStorage(t)
 
 	// create new variable from testProductCategories[0]
-	testProductCategoryNew := testProductCategories[1]
+	testProductCategoryNew := testProductCategoriesNew[1]
 	testProductCategoryNew.Name = fmt.Sprintf("%s Test", testProductCategoryNew.Name)
 	testProductCategoryNew.Url = fmt.Sprintf("%s-test", testProductCategoryNew.Url)
 
@@ -493,7 +500,7 @@ func patch(t *testing.T) {
 	}{
 		{
 			name: "Patch 01",
-			id:   testProductCategories[1].ID,
+			id:   testProductCategoriesNew[1].ID,
 			fields: map[string]interface{}{
 				"Name":  testProductCategoryNew.Name,
 				"Url":   testProductCategoryNew.Url,
@@ -528,14 +535,6 @@ func patch(t *testing.T) {
 			assert.Equal(t, tc.get.Active, result.Active)
 		})
 	}
-
-	// rename back
-	_, err := storage.Patch(context.Background(), testProductCategories[0].ID, map[string]interface{}{
-		"Name":  testProductCategories[0].Name,
-		"Url":   testProductCategories[0].Url,
-		"Prime": testProductCategories[0].Prime,
-	}, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
-	assert.NoError(t, err)
 }
 
 // test delete

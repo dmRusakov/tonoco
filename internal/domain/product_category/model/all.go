@@ -2,7 +2,6 @@ package model
 
 import (
 	"context"
-	"fmt"
 	sq "github.com/Masterminds/squirrel"
 )
 
@@ -59,12 +58,11 @@ func (repo *ProductCategoryModel) All(
 
 	// Search
 	if filter.Search != nil {
-		statement = statement.Where(sq.Like{fieldMap["Name"]: *filter.Search})
+		statement = statement.Where(sq.Expr("LOWER("+fieldMap["Name"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"))
 	}
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()
-	fmt.Println("++++", query)
 	if err != nil {
 		return nil, err
 	}
