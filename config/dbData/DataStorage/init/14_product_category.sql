@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS public.product_category
 (
     id                UUID UNIQUE   DEFAULT uuid_generate_v4(),
     name              VARCHAR(255)                NOT NULL,
-    url              VARCHAR(255) UNIQUE         NOT NULL,
+    url               VARCHAR(255) UNIQUE         NOT NULL,
     short_description VARCHAR(255)  DEFAULT ''    NOT NULL,
     description       VARCHAR(4000) DEFAULT ''    NOT NULL,
     sort_order        INTEGER       DEFAULT NULL,
@@ -17,11 +17,30 @@ CREATE TABLE IF NOT EXISTS public.product_category
     CONSTRAINT product_category_pkey PRIMARY KEY (id)
 );
 
-CREATE INDEX category_id ON public.product_category (id);
-CREATE INDEX category_url ON public.product_category (url);
+-- permissions
 ALTER TABLE public.product_category
     OWNER TO postgres;
+
+-- indexes
+CREATE INDEX category_id ON public.product_category (id);
+CREATE INDEX category_url ON public.product_category (url);
+CREATE INDEX category_sort_order ON public.product_category (sort_order);
+CREATE INDEX category_updated_at ON public.product_category (updated_at);
+
+-- comments
 COMMENT ON TABLE public.product_category IS 'Product categories';
+COMMENT ON COLUMN public.product_category.id IS 'Unique identifier';
+COMMENT ON COLUMN public.product_category.name IS 'Name';
+COMMENT ON COLUMN public.product_category.url IS 'URL';
+COMMENT ON COLUMN public.product_category.short_description IS 'Short description';
+COMMENT ON COLUMN public.product_category.description IS 'Description';
+COMMENT ON COLUMN public.product_category.sort_order IS 'Sort order';
+COMMENT ON COLUMN public.product_category.prime IS 'Prime';
+COMMENT ON COLUMN public.product_category.active IS 'Active';
+COMMENT ON COLUMN public.product_category.created_at IS 'Created at';
+COMMENT ON COLUMN public.product_category.created_by IS 'Created by';
+COMMENT ON COLUMN public.product_category.updated_at IS 'Updated at';
+COMMENT ON COLUMN public.product_category.updated_by IS 'Updated by';
 
 -- auto update updated_at
 CREATE TRIGGER product_category_updated_at
@@ -29,21 +48,6 @@ CREATE TRIGGER product_category_updated_at
     ON public.user
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();
-
--- auto set sort_order column
-CREATE OR REPLACE FUNCTION set_order_column_to_product_category()
-    RETURNS TRIGGER AS
-$$
-BEGIN
-    NEW.sort_order = (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM product_category);
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
-CREATE TRIGGER product_category_order
-    BEFORE INSERT
-    ON public.product_category
-    FOR EACH ROW
-EXECUTE FUNCTION set_order_column_to_product_category();
 
 -- insert data
 INSERT INTO public.product_category (id, url, name, short_description, description, prime, active)

@@ -4,6 +4,7 @@ import (
 	"context"
 	sq "github.com/Masterminds/squirrel"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
+	"time"
 )
 
 type ProductCategoryStorage interface {
@@ -13,6 +14,8 @@ type ProductCategoryStorage interface {
 	GetByURL(ctx context.Context, url string) (*ProductCategory, error)
 	Update(ctx context.Context, product *ProductCategory, by string) (*ProductCategory, error)
 	Patch(ctx context.Context, id string, fields map[string]interface{}, by string) (*ProductCategory, error)
+	UpdatedAt(ctx context.Context, id string) (time.Time, error)
+	TableUpdated(ctx context.Context) (time.Time, error)
 	Delete(ctx context.Context, id string) error
 }
 

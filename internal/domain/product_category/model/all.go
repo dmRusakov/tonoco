@@ -58,7 +58,13 @@ func (repo *ProductCategoryModel) All(
 
 	// Search
 	if filter.Search != nil {
-		statement = statement.Where(sq.Expr("LOWER("+fieldMap["Name"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"))
+		statement = statement.Where(
+			sq.Or{
+				sq.Expr("LOWER("+fieldMap["Name"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+fieldMap["ShortDescription"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+fieldMap["Description"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+			},
+		)
 	}
 
 	// convert the SQL statement to a string

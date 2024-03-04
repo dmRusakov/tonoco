@@ -192,6 +192,18 @@ var testProductCategoriesNew = []*model.ProductCategory{
 		Description:      "Some text",
 		Prime:            false,
 		Active:           false,
+	}, {
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e045f0005",
+		Url:              "test5-url",
+		Name:             "Test 5",
+		ShortDescription: "Some text",
+		Description:      "Some text",
+	}, {
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e045f0006",
+		Url:              "test6-url",
+		Name:             "Test 6",
+		ShortDescription: "Some text",
+		Description:      "Some text",
 	},
 }
 
@@ -203,6 +215,8 @@ func TestProductCategory(t *testing.T) {
 	t.Run("createWithoutId", createWithoutId)
 	t.Run("update", update)
 	t.Run("patch", patch)
+	t.Run("updatedAt", updatedAt)
+	t.Run("tableUpdated", tableUpdated)
 	t.Run("delete", delete)
 }
 
@@ -418,6 +432,14 @@ func createWithId(t *testing.T) {
 			name: "Create with id 2",
 			sent: testProductCategoriesNew[1],
 			get:  testProductCategoriesNew[1],
+		}, {
+			name: "Create with id 3",
+			sent: testProductCategoriesNew[4],
+			get:  testProductCategoriesNew[4],
+		}, {
+			name: "Create with id 4",
+			sent: testProductCategoriesNew[5],
+			get:  testProductCategoriesNew[5],
 		},
 	}
 
@@ -593,6 +615,113 @@ func patch(t *testing.T) {
 	}
 }
 
+// test UpdatedAt
+func updatedAt(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
+
+	// Define the test cases
+	testCases := []struct {
+		name string
+		id   string
+		sent *model.ProductCategory
+	}{
+		{
+			name: "Updated at 01",
+			id:   testProductCategoriesNew[4].ID,
+			sent: testProductCategoriesNew[4],
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call the UpdatedAt method
+			updatedAtBefore, err := storage.UpdatedAt(context.Background(), tc.id)
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result is not empty
+			assert.NotEmpty(t, updatedAtBefore)
+
+			// Call the Update method
+			_, err = storage.Update(context.Background(), tc.sent, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Call the UpdatedAt method
+			updatedAtAfter, err := storage.UpdatedAt(context.Background(), tc.id)
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result is not empty
+			assert.NotEmpty(t, updatedAtAfter)
+
+			// Assert that the result is not equal
+			assert.NotEqual(t, updatedAtBefore, updatedAtAfter)
+		})
+	}
+
+}
+
+// test TableUpdated
+func tableUpdated(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
+
+	// Define the test cases
+	testCases := []struct {
+		name  string
+		id    string
+		patch map[string]interface{}
+	}{
+		{
+			name: "Table updated 01",
+			id:   testProductCategoriesNew[5].ID,
+			patch: map[string]interface{}{
+				"Name": fmt.Sprintf("%s Test+++", testProductCategoriesNew[5].Name),
+			},
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call the TableUpdated method
+			tableUpdatedBefore, err := storage.TableUpdated(context.Background())
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result is not empty
+			assert.NotEmpty(t, tableUpdatedBefore)
+
+			// Call the Patch method
+			_, err = storage.Patch(context.Background(), tc.id, tc.patch, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Call the TableUpdated method
+			tableUpdatedAfter, err := storage.TableUpdated(context.Background())
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result is not empty
+			assert.NotEmpty(t, tableUpdatedAfter)
+
+			// Assert that the result is not equal
+			assert.NotEqual(t, tableUpdatedBefore, tableUpdatedAfter)
+		})
+
+	}
+
+}
+
 // test delete
 func delete(t *testing.T) {
 	// Create a storage with real database client
@@ -615,6 +744,12 @@ func delete(t *testing.T) {
 		}, {
 			name: "Delete 04",
 			id:   testProductCategoriesNew[3].ID,
+		}, {
+			name: "Delete 05",
+			id:   testProductCategoriesNew[4].ID,
+		}, {
+			name: "Delete 06",
+			id:   testProductCategoriesNew[5].ID,
 		},
 	}
 
