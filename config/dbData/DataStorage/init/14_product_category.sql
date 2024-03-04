@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS public.product_category
 (
     id                UUID UNIQUE   DEFAULT uuid_generate_v4(),
     name              VARCHAR(255)                NOT NULL,
-    url               VARCHAR(255) UNIQUE         NOT NULL,
+    url               VARCHAR(255)  UNIQUE        NOT NULL,
     short_description VARCHAR(255)  DEFAULT ''    NOT NULL,
     description       VARCHAR(4000) DEFAULT ''    NOT NULL,
     sort_order        INTEGER       DEFAULT NULL,

@@ -722,6 +722,22 @@ func tableUpdated(t *testing.T) {
 
 }
 
+// max sort order
+func maxSortOrder(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
+
+	// Call the MaxSortOrder method
+	sortOrder, err := storage.MaxSortOrder(context.Background())
+
+	// Assert that there was no error
+	assert.NoError(t, err)
+
+	// Assert that the result is not empty
+	assert.NotEmpty(t, sortOrder)
+
+}
+
 // test delete
 func delete(t *testing.T) {
 	// Create a storage with real database client
