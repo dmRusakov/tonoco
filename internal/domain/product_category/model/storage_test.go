@@ -217,6 +217,7 @@ func TestProductCategory(t *testing.T) {
 	t.Run("patch", patch)
 	t.Run("updatedAt", updatedAt)
 	t.Run("tableUpdated", tableUpdated)
+	t.Run("maxSortOrder", maxSortOrder)
 	t.Run("delete", delete)
 }
 
