@@ -16,7 +16,7 @@ type ProductCategoryStorage interface {
 	Patch(ctx context.Context, id string, fields map[string]interface{}, by string) (*ProductCategory, error)
 	UpdatedAt(ctx context.Context, id string) (time.Time, error)
 	TableUpdated(ctx context.Context) (time.Time, error)
-	MaxSortOrder(ctx context.Context) (*int, error)
+	MaxSortOrder(ctx context.Context) (*uint32, error)
 	Delete(ctx context.Context, id string) error
 }
 

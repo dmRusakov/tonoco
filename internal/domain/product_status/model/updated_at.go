@@ -7,7 +7,7 @@ import (
 )
 
 // UpdatedAt - Get item updated at by id
-func (repo *ProductCategoryModel) UpdatedAt(
+func (repo *ProductStatusModel) UpdatedAt(
 	ctx context.Context,
 	id string,
 ) (time.Time, error) {
@@ -48,7 +48,7 @@ func (repo *ProductCategoryModel) UpdatedAt(
 }
 
 // TableUpdated - Get table updated at
-func (repo *ProductCategoryModel) TableUpdated(
+func (repo *ProductStatusModel) TableUpdated(
 	ctx context.Context,
 ) (time.Time, error) {
 	// build query
@@ -74,9 +74,11 @@ func (repo *ProductCategoryModel) TableUpdated(
 		return time.Time{}, nil
 	}
 
-	// scan the result set into a time.Time variable
+	// scan the result set into a slice of Product structs
 	var updatedAt time.Time
-	if err = rows.Scan(&updatedAt); err != nil {
+	if err = rows.Scan(
+		&updatedAt,
+	); err != nil {
 		return time.Time{}, err
 	}
 

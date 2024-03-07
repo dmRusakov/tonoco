@@ -4,14 +4,19 @@ import (
 	"context"
 	sq "github.com/Masterminds/squirrel"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
+	"time"
 )
 
 type ProductStatusStorage interface {
 	All(ctx context.Context, filter *Filter) ([]*ProductStatus, error)
 	Create(ctx context.Context, productCategory *ProductStatus, by string) (*ProductStatus, error)
 	Get(ctx context.Context, id string) (*ProductStatus, error)
+	GetByURL(ctx context.Context, url string) (*ProductStatus, error)
 	Update(ctx context.Context, product *ProductStatus, by string) (*ProductStatus, error)
 	Patch(ctx context.Context, id string, fields map[string]interface{}, by string) (*ProductStatus, error)
+	UpdatedAt(ctx context.Context, id string) (time.Time, error)
+	TableUpdated(ctx context.Context) (time.Time, error)
+	MaxSortOrder(ctx context.Context) (*uint32, error)
 	Delete(ctx context.Context, id string) error
 }
 

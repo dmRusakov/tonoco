@@ -6,6 +6,7 @@ import (
 	"github.com/dmRusakov/tonoco/internal/appInit"
 	"github.com/dmRusakov/tonoco/internal/config"
 	"github.com/dmRusakov/tonoco/internal/domain/product_category/model"
+	"github.com/dmRusakov/tonoco/internal/domain/product_category/service"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -237,29 +238,29 @@ func all(t *testing.T) {
 	// Define the test cases
 	testCases := []struct {
 		name     string
-		filter   *model.Filter
+		filter   *service.Filter
 		expected []*model.ProductCategory
 	}{
 		{
 			name:     "Get 10 products categories 01",
-			filter:   &model.Filter{},
+			filter:   &service.Filter{},
 			expected: testProductCategories[:10],
 		}, {
 			name: "Get 3 products categories 02",
-			filter: &model.Filter{
+			filter: &service.Filter{
 				PerPage: &perPage3,
 				Page:    &page,
 			},
 			expected: testProductCategories[:3],
 		}, {
 			name: "Get Prime products categories 03",
-			filter: &model.Filter{
+			filter: &service.Filter{
 				Prime: &isPrime,
 			},
 			expected: testProductCategories[0:6],
 		}, {
 			name: "Get Active products categories 04",
-			filter: &model.Filter{
+			filter: &service.Filter{
 				Active:  &isPrime,
 				Page:    &page,
 				PerPage: &perPage100,
@@ -267,13 +268,13 @@ func all(t *testing.T) {
 			expected: testProductCategories[:15],
 		}, {
 			name: "Get with name like `air` products categories 05",
-			filter: &model.Filter{
+			filter: &service.Filter{
 				Search: &searchAir,
 			},
 			expected: testProductCategories[2:3],
 		}, {
 			name: "Get with name like `steel` products categories 06",
-			filter: &model.Filter{
+			filter: &service.Filter{
 				Search: &searchSteel,
 			},
 			expected: testProductCategories[9:10],
@@ -284,7 +285,7 @@ func all(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call All method
-			result, err := storage.All(context.Background(), tc.filter)
+			result, err := storage.All(context.Background(), (*model.Filter)(tc.filter))
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -788,7 +789,7 @@ func delete(t *testing.T) {
 }
 
 // initStorage with real database client
-func initStorage(t *testing.T) model.ProductCategoryStorage {
+func initStorage(t *testing.T) *model.ProductCategoryModel {
 	// Create a real database client
 	cfg := config.GetConfig(context.Background())
 	app := appInit.NewAppInit(context.Background(), cfg)
