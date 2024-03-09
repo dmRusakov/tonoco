@@ -8,7 +8,10 @@ import (
 	"strconv"
 )
 
-func (repo *ProductStatusModel) Update(ctx context.Context, product *ProductStatus, by string) (*ProductStatus, error) {
+func (repo *ProductStatusModel) Update(ctx context.Context, product *ProductStatus) (*ProductStatus, error) {
+	// get user_id from context
+	by := ctx.Value("user_id").(string)
+
 	// build query
 	statement := repo.qb.Update(repo.table).
 		Set(fieldMap["Name"], product.Name).

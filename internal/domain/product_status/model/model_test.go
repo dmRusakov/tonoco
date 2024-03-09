@@ -2,186 +2,460 @@ package model_test
 
 import (
 	"context"
+	"fmt"
 	"github.com/dmRusakov/tonoco/internal/appInit"
 	"github.com/dmRusakov/tonoco/internal/config"
 	"github.com/dmRusakov/tonoco/internal/domain/product_status/model"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-var productStatusNewWithId = &model.ProductStatus{
-	ID:     "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a00",
-	Name:   "New",
-	Url:    "new",
-	Active: false,
+var testProductStatuses = []*model.ProductStatus{
+	{
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		Name:      "Public",
+		Url:       "public",
+		SortOrder: 0,
+		Active:    true,
+	},
+	{
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12",
+		Name:      "Privet",
+		Url:       "private",
+		SortOrder: 1,
+		Active:    true,
+	},
+	{
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13",
+		Name:      "Out of stock",
+		Url:       "out-of-stock",
+		SortOrder: 2,
+		Active:    true,
+	},
+	{
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14",
+		Name:      "Discontinued",
+		Url:       "discontinued",
+		Active:    true,
+		SortOrder: 3,
+	},
+	{
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15",
+		Name:      "Archived",
+		Url:       "archived",
+		Active:    true,
+		SortOrder: 4,
+	},
+}
+var testProductStatusesNew = []*model.ProductStatus{
+	{
+		ID:     "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a00",
+		Name:   "New",
+		Url:    "new",
+		Active: false,
+	},
+	{
+		ID:     "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a01",
+		Name:   "New1",
+		Url:    "new1",
+		Active: false,
+	}, {
+		ID:     "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a02",
+		Name:   "New2",
+		Url:    "new2",
+		Active: false,
+	}, {
+		ID:     "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a03",
+		Name:   "New3",
+		Url:    "new3",
+		Active: false,
+	},
+	{
+		Name:   "New4",
+		Url:    "new2",
+		Active: false,
+	}, {
+		Name:   "New5",
+		Url:    "new3",
+		Active: false,
+	},
 }
 
-var productStatusNewWithoutId = &model.ProductStatus{
-	Name:   "New2",
-	Url:    "new2",
-	Active: false,
+// Test Product Status
+func TestProductStatus(t *testing.T) {
+	t.Run("clearTestData", clearTestData)
+
+	t.Run("all", all)
+	t.Run("get", get)
+	t.Run("getByUrl", getByUrl)
+	t.Run("createWithId", createWithId)
+	t.Run("createWithoutId", createWithoutId)
+	t.Run("update", update)
+	t.Run("patch", patch)
+	t.Run("updatedAt", updatedAt)
+	t.Run("tableUpdated", tableUpdated)
+	t.Run("maxSortOrder", maxSortOrder)
+	t.Run("delete", delete)
+	t.Run("clearTestData", clearTestData)
+	t.Run("clearTestData", clearTestData)
 }
 
-var productStatus11 = model.ProductStatus{
-	ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-	Name:      "Public",
-	Url:       "public",
-	SortOrder: 1,
-	Active:    true,
+// Create test data for the test cases
+func clearTestData(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
+
+	// get all data from the table
+	all, err := storage.All(initContext(), &model.Filter{})
+
+	// check if there is an error
+	assert.NoError(t, err)
+
+	// go thought all data and delete it if is not in the testProductStatuses
+	for _, v := range all {
+		found := false
+		for _, tv := range testProductStatuses {
+			if v.ID == tv.ID {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			err = storage.Delete(initContext(), v.ID)
+			assert.NoError(t, err)
+		}
+	}
+
+	// go thought all testProductStatuses and create or update them
+	for _, v := range testProductStatuses {
+		// get the product status by the ID
+		ps, err := storage.Get(initContext(), v.ID)
+
+		// check if there is an error
+		assert.NoError(t, err)
+
+		// if the product status is not found create it
+		if ps == nil {
+			_, err = storage.Create(initContext(), v)
+			assert.NoError(t, err)
+		} else {
+			_, err = storage.Update(initContext(), v)
+			assert.NoError(t, err)
+		}
+	}
 }
 
-var productStatus12 = model.ProductStatus{
-	ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12",
-	Name:      "Privet",
-	Url:       "private",
-	SortOrder: 2,
-	Active:    true,
-}
+// test all
+func all(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
 
-var productStatus13 = model.ProductStatus{
-	ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13",
-	Name:      "Out of stock",
-	Url:       "out-of-stock",
-	SortOrder: 3,
-	Active:    true,
-}
-
-var productStatus14 = model.ProductStatus{
-	ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14",
-	Name:      "Discontinued",
-	Url:       "discontinued",
-	Active:    true,
-	SortOrder: 4,
-}
-
-var productStatus15 = model.ProductStatus{
-	ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15",
-	Name:      "Archived",
-	Url:       "archived",
-	SortOrder: 5,
-	Active:    true,
-}
-
-// test get
-func TestProductStatusGet(t *testing.T) {
-	// Create a real database client
-	pgClient := initDB(t)
-
-	// Initialize a new instance of the model
-	storage := model.NewProductStatusStorage(pgClient)
+	// test varietals
+	isActive := true
+	perPage3 := uint64(3)
+	page1 := uint64(1)
+	searchOut := "out"
 
 	// Define the test cases
-	testCases := []struct {
+	tests := []struct {
 		name     string
-		id       string
-		expected *model.ProductStatus
+		filter   *model.Filter
+		expected []*model.ProductStatus
 	}{
 		{
-			name:     "Get product status by ID",
-			id:       productStatus11.ID,
-			expected: &productStatus11,
+			name:     "Get all",
+			filter:   &model.Filter{},
+			expected: testProductStatuses,
 		}, {
-			name:     "Get product status by ID",
-			id:       productStatus12.ID,
-			expected: &productStatus12,
+			name:     "Get all active",
+			filter:   &model.Filter{Active: &isActive},
+			expected: testProductStatuses,
 		}, {
-			name:     "Get product status by ID",
-			id:       productStatus13.ID,
-			expected: &productStatus13,
+			name:     "Get with name like 'out'",
+			filter:   &model.Filter{Search: &searchOut},
+			expected: testProductStatuses[2:3],
 		}, {
-			name:     "Get product status by ID",
-			id:       productStatus14.ID,
-			expected: &productStatus14,
+			name:     "Get with perPage 3",
+			filter:   &model.Filter{PerPage: &perPage3},
+			expected: testProductStatuses[:3],
 		}, {
-			name:     "Get product status by ID",
-			id:       productStatus15.ID,
-			expected: &productStatus15,
+			name:     "Get with perPage 3 and page 1",
+			filter:   &model.Filter{PerPage: &perPage3, Page: &page1},
+			expected: testProductStatuses[:3],
 		},
 	}
 
 	// Run the test cases
-	for _, tc := range testCases {
+	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := storage.Get(context.Background(), tc.id)
+			// Call All method
+			result, err := storage.All(initContext(), tc.filter)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
 
-			// Assert that the result matches the expected value
-			assert.Equal(t, tc.expected.ID, result.ID)
-			assert.Equal(t, tc.expected.Name, result.Name)
-			assert.Equal(t, tc.expected.Url, result.Url)
-			assert.Equal(t, tc.expected.Active, result.Active)
+			// Assert that the result length is equal to the expected length
+			assert.Len(t, result, len(tc.expected))
+
+			// Assert that each element in the result is equal to the corresponding element in the expected slice
+			for i, v := range tc.expected {
+				assert.Equal(t, tc.expected[i].ID, v.ID)
+				assert.Equal(t, tc.expected[i].Name, v.Name)
+				assert.Equal(t, tc.expected[i].Url, v.Url)
+				assert.Equal(t, tc.expected[i].SortOrder, v.SortOrder)
+				assert.Equal(t, tc.expected[i].Active, v.Active)
+			}
 		})
 	}
-
 }
 
-// test update
-func TestProductStatusUpdate(t *testing.T) {
-	// Create a real database client
-	pgClient := initDB(t)
-
-	// Initialize a new instance of the model
-	storage := model.NewProductStatusStorage(pgClient)
-
-	// create new variable from productStatus01
-	productStatus11New := productStatus11
-	productStatus11New.Name = "PublicNew"
-	productStatus11New.Url = "public-new"
-	productStatus11New.Active = false
+// test get
+func get(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
 
 	// Define the test cases
 	testCases := []struct {
 		name string
 		id   string
-		sent *model.ProductStatus
 		get  *model.ProductStatus
 	}{
 		{
-			name: "Update product status by ID",
-			id:   productStatus11.ID,
-			sent: &productStatus11New,
-			get:  &productStatus11New,
+			name: "Get by ID",
+			id:   testProductStatuses[0].ID,
+			get:  testProductStatuses[0],
 		}, {
-			name: "Update product status by ID",
-			id:   productStatus12.ID,
-			sent: &productStatus12,
-			get:  &productStatus12,
+			name: "Get by ID",
+			id:   testProductStatuses[1].ID,
+			get:  testProductStatuses[1],
+		}, {
+			name: "Get by ID",
+			id:   testProductStatuses[2].ID,
+			get:  testProductStatuses[2],
+		}, {
+			name: "Get by ID",
+			id:   testProductStatuses[3].ID,
+			get:  testProductStatuses[3],
+		}, {
+			name: "Get by ID",
+			id:   testProductStatuses[4].ID,
+			get:  testProductStatuses[4],
 		},
 	}
 
 	// Run the test cases
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := storage.Update(context.Background(), tc.sent, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+			// Call Get method
+			result, err := storage.Get(initContext(), tc.id)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
 
-			// Assert that the result matches the expected value
+			// Assert that the result is equal to the expected
 			assert.Equal(t, tc.get.ID, result.ID)
 			assert.Equal(t, tc.get.Name, result.Name)
 			assert.Equal(t, tc.get.Url, result.Url)
+			assert.Equal(t, tc.get.SortOrder, result.SortOrder)
 			assert.Equal(t, tc.get.Active, result.Active)
 		})
 	}
 }
 
+// test get by url
+func getByUrl(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
+
+	// Define the test cases
+	testCases := []struct {
+		name string
+		url  string
+		get  *model.ProductStatus
+	}{
+		{
+			name: "Get by URL",
+			url:  testProductStatuses[0].Url,
+			get:  testProductStatuses[0],
+		}, {
+			name: "Get by URL",
+			url:  testProductStatuses[1].Url,
+			get:  testProductStatuses[1],
+		}, {
+			name: "Get by URL",
+			url:  testProductStatuses[2].Url,
+			get:  testProductStatuses[2],
+		}, {
+			name: "Get by URL",
+			url:  testProductStatuses[3].Url,
+			get:  testProductStatuses[3],
+		}, {
+			name: "Get by URL",
+			url:  testProductStatuses[4].Url,
+			get:  testProductStatuses[4],
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call Get method
+			result, err := storage.GetByURL(initContext(), tc.url)
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result is equal to the expected
+			assert.Equal(t, tc.get.ID, result.ID)
+			assert.Equal(t, tc.get.Name, result.Name)
+			assert.Equal(t, tc.get.Url, result.Url)
+			assert.Equal(t, tc.get.SortOrder, result.SortOrder)
+			assert.Equal(t, tc.get.Active, result.Active)
+		})
+	}
+
+}
+
+// test create with id
+func createWithId(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
+
+	// Define the test cases
+	testCases := []struct {
+		name string
+		new  *model.ProductStatus
+	}{
+		{
+			name: "Create with ID",
+			new:  testProductStatusesNew[0],
+		}, {
+			name: "Create with ID",
+			new:  testProductStatusesNew[1],
+		}, {
+			name: "Create with ID",
+			new:  testProductStatusesNew[2],
+		}, {
+			name: "Create with ID",
+			new:  testProductStatusesNew[3],
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call Create method
+			result, err := storage.Create(initContext(), tc.new)
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result is equal to the expected
+			assert.Equal(t, tc.new.ID, result.ID)
+			assert.Equal(t, tc.new.Name, result.Name)
+			assert.Equal(t, tc.new.Url, result.Url)
+			assert.Equal(t, tc.new.SortOrder, result.SortOrder)
+			assert.Equal(t, tc.new.Active, result.Active)
+		})
+	}
+
+}
+
+// test create without id
+func createWithoutId(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
+
+	// Define the test cases
+	testCases := []struct {
+		name string
+		sent *model.ProductStatus
+		get  *model.ProductStatus
+	}{
+		{
+			name: "Create without ID",
+			sent: testProductStatusesNew[4],
+			get:  testProductStatusesNew[4],
+		}, {
+			name: "Create without ID",
+			sent: testProductStatusesNew[5],
+			get:  testProductStatusesNew[5],
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call Create method
+			result, err := storage.Create(initContext(), tc.sent)
+
+			// update ID
+			tc.get.ID = result.ID
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result is equal to the expected
+			assert.Equal(t, tc.get.Name, result.Name)
+			assert.Equal(t, tc.get.Url, result.Url)
+			assert.Equal(t, tc.get.SortOrder, result.SortOrder)
+			assert.Equal(t, tc.get.Active, result.Active)
+		})
+	}
+}
+
+// test update
+func update(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
+
+	// create new variable from the testProductStatuses[0]
+	testProductCategoryNew := *testProductStatuses[0]
+	testProductCategoryNew.Name = fmt.Sprintf("%s - updated", testProductCategoryNew.Name)
+	testProductCategoryNew.Url = fmt.Sprintf("%s - updated", testProductCategoryNew.Url)
+
+	// Define the test cases
+	testCases := []struct {
+		name   string
+		sent   *model.ProductStatus
+		update *model.ProductStatus
+	}{
+		{
+			name:   "Update",
+			sent:   &testProductCategoryNew,
+			update: &testProductCategoryNew,
+		},
+	}
+
+	// Run the test cases
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call Update method
+			result, err := storage.Update(initContext(), tc.sent)
+
+			// Assert that there was no error
+			assert.NoError(t, err)
+
+			// Assert that the result is equal to the expected
+			assert.Equal(t, tc.update.ID, result.ID)
+			assert.Equal(t, tc.update.Name, result.Name)
+			assert.Equal(t, tc.update.Url, result.Url)
+			assert.Equal(t, tc.update.SortOrder, result.SortOrder)
+			assert.Equal(t, tc.update.Active, result.Active)
+		})
+	}
+}
+
 // test patch
-func TestProductStatusPatch(t *testing.T) {
-	// Create a real database client
-	pgClient := initDB(t)
+func patch(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
 
-	// Initialize a new instance of the model
-	storage := model.NewProductStatusStorage(pgClient)
-
-	// create new variable from productStatus01
-	productStatus11New := productStatus11
-	productStatus11New.Name = "PublicNew"
-	productStatus11New.Url = "public-new"
-	productStatus11New.Active = false
+	// create new variable from the testProductStatuses[0]
+	testProductCategoryNew := *testProductStatuses[0]
+	testProductCategoryNew.Name = fmt.Sprintf("%s - patched", testProductCategoryNew.Name)
+	testProductCategoryNew.Url = fmt.Sprintf("%s - patched", testProductCategoryNew.Url)
 
 	// Define the test cases
 	testCases := []struct {
@@ -191,225 +465,149 @@ func TestProductStatusPatch(t *testing.T) {
 		get    *model.ProductStatus
 	}{
 		{
-			name: "Patch product status by ID",
-			id:   productStatus11.ID,
+			name: "Patch",
 			fields: map[string]interface{}{
-				"Name":   productStatus11New.Name,
-				"Url":    productStatus11New.Url,
-				"Active": productStatus11New.Active,
+				"Name": testProductCategoryNew.Name,
+				"Url":  testProductCategoryNew.Url,
 			},
-			get: &productStatus11New,
-		}, {
-			name: "Patch product status by ID",
-			id:   productStatus11.ID,
-			fields: map[string]interface{}{
-				"Name":   productStatus11.Name,
-				"Url":    productStatus11.Url,
-				"Active": productStatus11.Active,
-			},
-			get: &productStatus11,
 		},
 	}
 
 	// Run the test cases
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := storage.Patch(context.Background(), tc.id, tc.fields, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+			// Call Patch method
+			result, err := storage.Patch(initContext(), testProductCategoryNew.ID, tc.fields)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
 
-			// Assert that the result matches the expected value
-			assert.Equal(t, tc.get.ID, result.ID)
-			assert.Equal(t, tc.get.Name, result.Name)
-			assert.Equal(t, tc.get.Url, result.Url)
-			assert.Equal(t, tc.get.Active, result.Active)
+			// Assert that the result is equal to the expected
+			assert.Equal(t, testProductCategoryNew.ID, result.ID)
+			assert.Equal(t, testProductCategoryNew.Name, result.Name)
+			assert.Equal(t, testProductCategoryNew.Url, result.Url)
+			assert.Equal(t, testProductCategoryNew.SortOrder, result.SortOrder)
+			assert.Equal(t, testProductCategoryNew.Active, result.Active)
 		})
-
 	}
 }
 
-// test create with id
-func TestProductStatusCreateWithId(t *testing.T) {
-	// Create a real database client
-	pgClient := initDB(t)
-
-	// Initialize a new instance of the model
-	storage := model.NewProductStatusStorage(pgClient)
-
-	// Define the test cases
-	testCases := []struct {
-		name     string
-		sent     *model.ProductStatus
-		expected *model.ProductStatus
-	}{
-		{
-			name:     "Create product status with ID",
-			sent:     productStatusNewWithId,
-			expected: productStatusNewWithId,
-		},
-	}
-
-	// Run the test cases
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			result, err := storage.Create(context.Background(), tc.sent, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
-
-			// Assert that there was no error
-			assert.NoError(t, err)
-
-			// Assert that the result matches the expected value
-			assert.Equal(t, tc.expected.ID, result.ID)
-			assert.Equal(t, tc.expected.Name, result.Name)
-			assert.Equal(t, tc.expected.Url, result.Url)
-			assert.Equal(t, tc.expected.Active, result.Active)
-		})
-	}
-
-}
-
-// test create without id
-func TestProductStatusCreateWithoutId(t *testing.T) {
-	// Create a real database client
-	pgClient := initDB(t)
-
-	// Initialize a new instance of the model
-	storage := model.NewProductStatusStorage(pgClient)
+// test updated at
+func updatedAt(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
 
 	// Define the test cases
 	testCases := []struct {
 		name string
+		id   string
 		sent *model.ProductStatus
-		get  *model.ProductStatus
 	}{
 		{
-			name: "Create product status without ID",
-			sent: productStatusNewWithoutId,
-			get:  productStatusNewWithoutId,
+			name: "Updated at 01",
+			id:   testProductStatusesNew[4].ID,
+			sent: testProductStatusesNew[4],
 		},
 	}
 
 	// Run the test cases
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			result, err := storage.Create(context.Background(), tc.sent, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+		// Call the UpdatedAt method
+		updatedAtBefore, err := storage.UpdatedAt(initContext(), tc.id)
 
-			// update ID
-			tc.get.ID = result.ID
+		// Assert that there was no error
+		assert.NoError(t, err)
 
-			// Assert that there was no error
-			assert.NoError(t, err)
+		// Call the Update method
+		_, err = storage.Update(initContext(), tc.sent)
 
-			// Assert that the result matches the expected value
-			assert.Equal(t, tc.get.Name, result.Name)
-			assert.Equal(t, tc.get.Url, result.Url)
-			assert.Equal(t, tc.get.Active, result.Active)
-		})
+		// Assert that there was no error
+		assert.NoError(t, err)
+
+		// Call the UpdatedAt method
+		updatedAtAfter, err := storage.UpdatedAt(initContext(), tc.id)
+
+		// Assert that there was no error
+		assert.NoError(t, err)
+
+		// Assert that the updatedAtAfter is greater than updatedAtBefore
+		assert.NotEqual(t, updatedAtBefore, updatedAtAfter)
 	}
 }
 
-// test all
-func TestProductStatusAll(t *testing.T) {
-	// Create a real database client
-	pgClient := initDB(t)
-
-	// Initialize a new instance of the model
-	storage := model.NewProductStatusStorage(pgClient)
-
-	// test varietals
-	isActive := true
-	sortOrder := "SortOrder"
-	sortOrderDesc := "desc"
-	page := uint64(1)
-	perPage := uint64(3)
+// test TableUpdated
+func tableUpdated(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
 
 	// Define the test cases
 	testCases := []struct {
-		name     string
-		filter   *model.Filter
-		expected []*model.ProductStatus
+		name  string
+		id    string
+		patch map[string]interface{}
 	}{
 		{
-			name:   "Get all product status",
-			filter: &model.Filter{},
-			expected: []*model.ProductStatus{
-				&productStatus11,
-				&productStatus12,
-				&productStatus13,
-				&productStatus14,
-				&productStatus15,
-				productStatusNewWithId,
-				productStatusNewWithoutId,
-			},
-		}, {
-			name: "Get active product status",
-			filter: &model.Filter{
-				Active: &isActive,
-			},
-			expected: []*model.ProductStatus{
-				&productStatus11,
-				&productStatus12,
-				&productStatus13,
-				&productStatus14,
-				&productStatus15,
-			},
-		}, {
-			name: "Get product status by sort order desc",
-			filter: &model.Filter{
-				SortBy:    &sortOrder,
-				SortOrder: &sortOrderDesc,
-			},
-			expected: []*model.ProductStatus{
-				productStatusNewWithoutId,
-				productStatusNewWithId,
-				&productStatus15,
-				&productStatus14,
-				&productStatus13,
-				&productStatus12,
-				&productStatus11,
-			},
-		}, {
-			name: "Get product status with page and per page",
-			filter: &model.Filter{
-				Page:    &page,
-				PerPage: &perPage,
-			},
-			expected: []*model.ProductStatus{
-				&productStatus11,
-				&productStatus12,
-				&productStatus13,
+			name: "Table Updated 01",
+			id:   testProductStatusesNew[5].ID,
+			patch: map[string]interface{}{
+				"Name": fmt.Sprintf("%s - patched", testProductStatusesNew[5].Name),
 			},
 		},
 	}
 
 	// Run the test cases
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			result, err := storage.All(context.Background(), tc.filter)
+		// Call the TableUpdated method
+		tableUpdatedBefore, err := storage.TableUpdated(context.Background())
 
-			// Assert that there was no error
-			assert.NoError(t, err)
+		// Assert that there was no error
+		assert.NoError(t, err)
 
-			// Assert that the result matches the expected value
-			assert.Equal(t, len(tc.expected), len(result))
-			for i, v := range result {
-				assert.Equal(t, tc.expected[i].ID, v.ID)
-				assert.Equal(t, tc.expected[i].Name, v.Name)
-				assert.Equal(t, tc.expected[i].Url, v.Url)
-				assert.Equal(t, tc.expected[i].Active, v.Active)
-			}
-		})
+		// Assert that the result is not empty
+		assert.NotEmpty(t, tableUpdatedBefore)
+
+		// Call the Patch method
+		_, err = storage.Patch(initContext(), tc.id, tc.patch)
+
+		// Assert that there was no error
+		assert.NoError(t, err)
+
+		// Call the TableUpdated method
+		tableUpdatedAfter, err := storage.TableUpdated(context.Background())
+
+		// Assert that there was no error
+		assert.NoError(t, err)
+
+		// Assert that the result is not empty
+		assert.NotEmpty(t, tableUpdatedAfter)
+
+		// Assert that the tableUpdatedAfter is greater than tableUpdatedBefore
+		assert.NotEqual(t, tableUpdatedBefore, tableUpdatedAfter)
+
 	}
+}
 
+// max sort order
+func maxSortOrder(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
+
+	// Call the MaxSortOrder method
+	sortOrder, err := storage.MaxSortOrder(context.Background())
+
+	fmt.Println("Test: ", sortOrder)
+
+	// Assert that there was no error
+	assert.NoError(t, err)
+
+	// Assert that the result is not empty
+	assert.NotEmpty(t, sortOrder)
 }
 
 // test delete
-func TestProductStatusDelete(t *testing.T) {
-	// Create a real database client
-	pgClient := initDB(t)
-
-	// Initialize a new instance of the model
-	storage := model.NewProductStatusStorage(pgClient)
+func delete(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
 
 	// Define the test cases
 	testCases := []struct {
@@ -417,38 +615,58 @@ func TestProductStatusDelete(t *testing.T) {
 		id   string
 	}{
 		{
-			name: "Delete product status by ID",
-			id:   productStatusNewWithId.ID,
+			name: "Delete 01",
+			id:   testProductStatusesNew[0].ID,
 		}, {
-			name: "Delete product status by ID",
-			id:   productStatusNewWithoutId.ID,
+			name: "Delete 02",
+			id:   testProductStatusesNew[1].ID,
+		}, {
+			name: "Delete 03",
+			id:   testProductStatusesNew[2].ID,
+		}, {
+			name: "Delete 04",
+			id:   testProductStatusesNew[3].ID,
+		}, {
+			name: "Delete 05",
+			id:   testProductStatusesNew[4].ID,
+		}, {
+			name: "Delete 06",
+			id:   testProductStatusesNew[5].ID,
 		},
 	}
 
 	// Run the test cases
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			err := storage.Delete(context.Background(), tc.id)
+		// Call the Delete method
+		err := storage.Delete(initContext(), tc.id)
 
-			// Assert that there was no error
-			assert.NoError(t, err)
+		// Assert that there was no error
+		assert.NoError(t, err)
 
-			// Assert that the result matches the expected value
-			_, err = storage.Get(context.Background(), tc.id)
-			assert.Error(t, err)
-		})
+		// Call the Get method
+		_, err = storage.Get(initContext(), tc.id)
+		assert.Error(t, err)
 	}
 }
 
-// initDB
-func initDB(t *testing.T) *pgxpool.Pool {
+// initStorage will create a storage with real database client
+func initStorage(t *testing.T) *model.ProductStatusModel {
 	// Create a real database client
 	cfg := config.GetConfig(context.Background())
-	app := appInit.NewAppInit(context.Background(), cfg)
+	app := appInit.NewAppInit(initContext(), cfg)
 	err := app.SqlDBInit()
 	if err != nil {
 		t.Fatalf("Failed to initialize database: %v", err)
 	}
 	pgClient := app.SqlDB
-	return pgClient
+
+	// Initialize Storage
+	return model.NewProductStatusStorage(pgClient)
+}
+
+// init context
+func initContext() context.Context {
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "user_id", "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+	return ctx
 }

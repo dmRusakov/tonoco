@@ -6,11 +6,11 @@ import (
 	"github.com/dmRusakov/tonoco/internal/appInit"
 	"github.com/dmRusakov/tonoco/internal/config"
 	"github.com/dmRusakov/tonoco/internal/domain/product_category/model"
-	"github.com/dmRusakov/tonoco/internal/domain/product_category/service"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
+// test data
 var testProductCategories = []*model.ProductCategory{
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9901",
@@ -161,7 +161,6 @@ var testProductCategories = []*model.ProductCategory{
 		Active:           false,
 	},
 }
-
 var testProductCategoriesNew = []*model.ProductCategory{
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e045f0001",
@@ -208,6 +207,7 @@ var testProductCategoriesNew = []*model.ProductCategory{
 	},
 }
 
+// Test Product Category
 func TestProductCategory(t *testing.T) {
 	t.Run("all", all)
 	t.Run("get", get)
@@ -229,7 +229,7 @@ func all(t *testing.T) {
 
 	// test varietals
 	isPrime := true
-	page := uint64(1)
+	page1 := uint64(1)
 	perPage3 := uint64(3)
 	perPage100 := uint64(100)
 	searchAir := "air"
@@ -238,43 +238,43 @@ func all(t *testing.T) {
 	// Define the test cases
 	testCases := []struct {
 		name     string
-		filter   *service.Filter
+		filter   *model.Filter
 		expected []*model.ProductCategory
 	}{
 		{
-			name:     "Get 10 products categories 01",
-			filter:   &service.Filter{},
+			name:     "Get All",
+			filter:   &model.Filter{},
 			expected: testProductCategories[:10],
 		}, {
 			name: "Get 3 products categories 02",
-			filter: &service.Filter{
+			filter: &model.Filter{
 				PerPage: &perPage3,
-				Page:    &page,
+				Page:    &page1,
 			},
 			expected: testProductCategories[:3],
 		}, {
 			name: "Get Prime products categories 03",
-			filter: &service.Filter{
+			filter: &model.Filter{
 				Prime: &isPrime,
 			},
 			expected: testProductCategories[0:6],
 		}, {
 			name: "Get Active products categories 04",
-			filter: &service.Filter{
+			filter: &model.Filter{
 				Active:  &isPrime,
-				Page:    &page,
+				Page:    &page1,
 				PerPage: &perPage100,
 			},
 			expected: testProductCategories[:15],
 		}, {
 			name: "Get with name like `air` products categories 05",
-			filter: &service.Filter{
+			filter: &model.Filter{
 				Search: &searchAir,
 			},
 			expected: testProductCategories[2:3],
 		}, {
 			name: "Get with name like `steel` products categories 06",
-			filter: &service.Filter{
+			filter: &model.Filter{
 				Search: &searchSteel,
 			},
 			expected: testProductCategories[9:10],
@@ -524,13 +524,11 @@ func update(t *testing.T) {
 	// Define the test cases
 	testCases := []struct {
 		name   string
-		id     string
 		sent   *model.ProductCategory
 		update *model.ProductCategory
 	}{
 		{
 			name:   "Update 01",
-			id:     testProductCategoryNew.ID,
 			sent:   testProductCategoryNew,
 			update: testProductCategoryNew,
 		},
@@ -546,7 +544,7 @@ func update(t *testing.T) {
 			assert.NoError(t, err)
 
 			// Call the Get method
-			result, err := storage.Get(context.Background(), tc.id)
+			result, err := storage.Get(context.Background(), testProductCategoryNew.ID)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -594,13 +592,7 @@ func patch(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Patch method
-			_, err := storage.Patch(context.Background(), tc.id, tc.fields, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
-
-			// Assert that there was no error
-			assert.NoError(t, err)
-
-			// Call the Get method
-			result, err := storage.Get(context.Background(), tc.id)
+			result, err := storage.Patch(context.Background(), tc.id, tc.fields, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -666,7 +658,6 @@ func updatedAt(t *testing.T) {
 			assert.NotEqual(t, updatedAtBefore, updatedAtAfter)
 		})
 	}
-
 }
 
 // test TableUpdated
@@ -737,7 +728,6 @@ func maxSortOrder(t *testing.T) {
 
 	// Assert that the result is not empty
 	assert.NotEmpty(t, sortOrder)
-
 }
 
 // test delete
@@ -799,8 +789,6 @@ func initStorage(t *testing.T) *model.ProductCategoryModel {
 	}
 	pgClient := app.SqlDB
 
-	// Initialize a new instance of the model
-	storage := model.NewProductCategoryStorage(pgClient)
-
-	return storage
+	// Initialize Storage
+	return model.NewProductCategoryStorage(pgClient)
 }

@@ -43,9 +43,19 @@ func (repo *ProductStatusModel) All(
 		OrderBy(fieldMap[*filter.SortBy] + " " + *filter.SortOrder).
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 
-	// add the active filter if it is not nil
+	// Active
 	if filter.Active != nil {
 		statement = statement.Where(sq.Eq{fieldMap["Active"]: *filter.Active})
+	}
+
+	// Search
+	if filter.Search != nil {
+		statement = statement.Where(
+			sq.Or{
+				sq.Expr("LOWER("+fieldMap["Name"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+fieldMap["Url"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+			},
+		)
 	}
 
 	// convert the SQL statement to a string

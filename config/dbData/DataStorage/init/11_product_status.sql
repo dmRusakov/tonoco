@@ -38,12 +38,12 @@ CREATE TRIGGER product_status_updated_at
 EXECUTE FUNCTION update_update_at_column();
 
 -- demo data
-INSERT INTO public.product_status (id, name, url)
-VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Public', 'public'),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', 'Privet', 'private'),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', 'Out of stock', 'out-of-stock'),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14', 'Discontinued', 'discontinued'),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15', 'Archived', 'archived');
+INSERT INTO public.product_status (id, name, url, sort_order)
+VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Public', 'public', 0),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', 'Private', 'private', 1),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', 'Out of stock', 'out-of-stock', 2),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14', 'Discontinued', 'discontinued', 3),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15', 'Archived', 'archived', 4);
 
 -- get data
 select * from public.product_status;

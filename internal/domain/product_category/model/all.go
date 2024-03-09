@@ -61,6 +61,7 @@ func (repo *ProductCategoryModel) All(
 		statement = statement.Where(
 			sq.Or{
 				sq.Expr("LOWER("+fieldMap["Name"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+fieldMap["Url"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+fieldMap["ShortDescription"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+fieldMap["Description"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 			},
