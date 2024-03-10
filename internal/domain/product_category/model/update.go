@@ -7,7 +7,10 @@ import (
 	"strconv"
 )
 
-func (repo *ProductCategoryModel) Update(ctx context.Context, productCategory *ProductCategory, by string) (*ProductCategory, error) {
+func (repo *ProductCategoryModel) Update(ctx context.Context, productCategory *ProductCategory) (*ProductCategory, error) {
+	// get user_id from context
+	by := ctx.Value("user_id").(string)
+
 	// build query
 	statement := repo.qb.
 		Update(repo.table).

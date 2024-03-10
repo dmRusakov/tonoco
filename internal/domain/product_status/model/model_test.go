@@ -84,6 +84,7 @@ var testProductStatusesNew = []*model.ProductStatus{
 // Test Product Status
 func TestProductStatus(t *testing.T) {
 	t.Run("clearTestData", clearTestData)
+	defer t.Run("clearTestData", clearTestData)
 
 	t.Run("all", all)
 	t.Run("get", get)
@@ -96,8 +97,6 @@ func TestProductStatus(t *testing.T) {
 	t.Run("tableUpdated", tableUpdated)
 	t.Run("maxSortOrder", maxSortOrder)
 	t.Run("delete", delete)
-	t.Run("clearTestData", clearTestData)
-	t.Run("clearTestData", clearTestData)
 }
 
 // Create test data for the test cases

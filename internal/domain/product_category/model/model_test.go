@@ -18,7 +18,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "Island range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
-		SortOrder:        1,
+		SortOrder:        0,
 		Prime:            true,
 		Active:           true,
 	},
@@ -28,7 +28,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "Wall range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
-		SortOrder:        2,
+		SortOrder:        1,
 		Prime:            true,
 		Active:           true,
 	},
@@ -38,7 +38,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "Air loop range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
-		SortOrder:        3,
+		SortOrder:        2,
 		Prime:            true,
 		Active:           true,
 	},
@@ -48,7 +48,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "Built-in range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
-		SortOrder:        4,
+		SortOrder:        3,
 		Prime:            true,
 		Active:           true,
 	},
@@ -58,6 +58,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "Under Cabinet range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        4,
 		Prime:            true,
 		Active:           true,
 	},
@@ -67,6 +68,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "Accessories",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        5,
 		Prime:            true,
 		Active:           true,
 	},
@@ -76,6 +78,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "Black range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        6,
 		Prime:            false,
 		Active:           true,
 	},
@@ -85,6 +88,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "White range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        7,
 		Prime:            false,
 		Active:           true,
 	},
@@ -94,6 +98,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "Wood range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        8,
 		Prime:            false,
 		Active:           true,
 	},
@@ -103,6 +108,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "Stainless Steel range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        9,
 		Prime:            false,
 		Active:           true,
 	},
@@ -112,6 +118,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "Glass range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        10,
 		Prime:            false,
 		Active:           true,
 	},
@@ -121,6 +128,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "Perimeter Filter range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        11,
 		Prime:            false,
 		Active:           true,
 	},
@@ -130,6 +138,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "Murano range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        12,
 		Prime:            false,
 		Active:           true,
 	},
@@ -139,6 +148,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "Ductless range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        13,
 		Prime:            false,
 		Active:           true,
 	},
@@ -148,6 +158,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "Ducted range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        14,
 		Prime:            false,
 		Active:           true,
 	},
@@ -157,6 +168,7 @@ var testProductCategories = []*model.ProductCategory{
 		Name:             "Discontinued",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        15,
 		Prime:            false,
 		Active:           false,
 	},
@@ -209,6 +221,9 @@ var testProductCategoriesNew = []*model.ProductCategory{
 
 // Test Product Category
 func TestProductCategory(t *testing.T) {
+	t.Run("clearTestData", clearTestData)
+	defer t.Run("clearTestData", clearTestData)
+
 	t.Run("all", all)
 	t.Run("get", get)
 	t.Run("getByUrl", getByUrl)
@@ -220,6 +235,52 @@ func TestProductCategory(t *testing.T) {
 	t.Run("tableUpdated", tableUpdated)
 	t.Run("maxSortOrder", maxSortOrder)
 	t.Run("delete", delete)
+}
+
+// clear test data
+func clearTestData(t *testing.T) {
+	// Create a storage with real database client
+	storage := initStorage(t)
+
+	// get all data from the table
+	all, err := storage.All(initContext(), &model.Filter{})
+
+	// check if there is an error
+	assert.NoError(t, err)
+
+	// go thought all data and delete it if is not in the testProductStatuses
+	for _, v := range all {
+		found := false
+		for _, tv := range testProductCategories {
+			if v.ID == tv.ID {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			err = storage.Delete(initContext(), v.ID)
+			assert.NoError(t, err)
+		}
+	}
+
+	// go thought all testProductStatuses and create or update them
+	for _, v := range testProductCategories {
+		// get the product status by the ID
+		ps, err := storage.Get(initContext(), v.ID)
+
+		// check if there is an error
+		assert.NoError(t, err)
+
+		// if the product status is not found create it
+		if ps == nil {
+			_, err = storage.Create(initContext(), v)
+			assert.NoError(t, err)
+		} else {
+			_, err = storage.Update(initContext(), v)
+			assert.NoError(t, err)
+		}
+	}
 }
 
 // test all
@@ -285,7 +346,7 @@ func all(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call All method
-			result, err := storage.All(context.Background(), (*model.Filter)(tc.filter))
+			result, err := storage.All(initContext(), (*model.Filter)(tc.filter))
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -343,7 +404,7 @@ func get(t *testing.T) {
 	// Run the test cases
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := storage.Get(context.Background(), tc.id)
+			result, err := storage.Get(initContext(), tc.id)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -397,7 +458,7 @@ func getByUrl(t *testing.T) {
 	// Run the test cases
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := storage.GetByURL(context.Background(), tc.url)
+			result, err := storage.GetByURL(initContext(), tc.url)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -449,7 +510,7 @@ func createWithId(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Create method
-			result, err := storage.Create(context.Background(), tc.sent, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+			result, err := storage.Create(initContext(), tc.sent)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -492,7 +553,7 @@ func createWithoutId(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Create method
-			result, err := storage.Create(context.Background(), tc.sent, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+			result, err := storage.Create(initContext(), tc.sent)
 
 			// update ID
 			tc.get.ID = result.ID
@@ -538,13 +599,13 @@ func update(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Update method
-			_, err := storage.Update(context.Background(), tc.sent, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+			_, err := storage.Update(initContext(), tc.sent)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
 
 			// Call the Get method
-			result, err := storage.Get(context.Background(), testProductCategoryNew.ID)
+			result, err := storage.Get(initContext(), testProductCategoryNew.ID)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -592,7 +653,7 @@ func patch(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Patch method
-			result, err := storage.Patch(context.Background(), tc.id, tc.fields, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+			result, err := storage.Patch(initContext(), tc.id, tc.fields)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -631,7 +692,7 @@ func updatedAt(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the UpdatedAt method
-			updatedAtBefore, err := storage.UpdatedAt(context.Background(), tc.id)
+			updatedAtBefore, err := storage.UpdatedAt(initContext(), tc.id)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -640,13 +701,13 @@ func updatedAt(t *testing.T) {
 			assert.NotEmpty(t, updatedAtBefore)
 
 			// Call the Update method
-			_, err = storage.Update(context.Background(), tc.sent, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+			_, err = storage.Update(initContext(), tc.sent)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
 
 			// Call the UpdatedAt method
-			updatedAtAfter, err := storage.UpdatedAt(context.Background(), tc.id)
+			updatedAtAfter, err := storage.UpdatedAt(initContext(), tc.id)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -693,7 +754,7 @@ func tableUpdated(t *testing.T) {
 			assert.NotEmpty(t, tableUpdatedBefore)
 
 			// Call the Patch method
-			_, err = storage.Patch(context.Background(), tc.id, tc.patch, "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+			_, err = storage.Patch(initContext(), tc.id, tc.patch)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -765,13 +826,13 @@ func delete(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Delete method
-			err := storage.Delete(context.Background(), tc.id)
+			err := storage.Delete(initContext(), tc.id)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
 
 			// Call the Get method
-			_, err = storage.Get(context.Background(), tc.id)
+			_, err = storage.Get(initContext(), tc.id)
 			assert.Error(t, err)
 		})
 	}
@@ -782,7 +843,7 @@ func delete(t *testing.T) {
 func initStorage(t *testing.T) *model.ProductCategoryModel {
 	// Create a real database client
 	cfg := config.GetConfig(context.Background())
-	app := appInit.NewAppInit(context.Background(), cfg)
+	app := appInit.NewAppInit(initContext(), cfg)
 	err := app.SqlDBInit()
 	if err != nil {
 		t.Fatalf("Failed to initialize database: %v", err)
@@ -791,4 +852,11 @@ func initStorage(t *testing.T) *model.ProductCategoryModel {
 
 	// Initialize Storage
 	return model.NewProductCategoryStorage(pgClient)
+}
+
+// init context
+func initContext() context.Context {
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, "user_id", "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+	return ctx
 }

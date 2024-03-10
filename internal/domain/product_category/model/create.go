@@ -8,7 +8,10 @@ import (
 	"strconv"
 )
 
-func (repo *ProductCategoryModel) Create(ctx context.Context, productCategory *ProductCategory, by string) (*ProductCategory, error) {
+func (repo *ProductCategoryModel) Create(ctx context.Context, productCategory *ProductCategory) (*ProductCategory, error) {
+	// get user_id from context
+	by := ctx.Value("user_id").(string)
+
 	// if ID is not set, generate a new UUID
 	if productCategory.ID == "" {
 		productCategory.ID = uuid.New().String()

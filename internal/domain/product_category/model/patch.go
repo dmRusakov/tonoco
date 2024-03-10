@@ -8,7 +8,10 @@ import (
 	"strconv"
 )
 
-func (repo *ProductCategoryModel) Patch(ctx context.Context, id string, fields map[string]interface{}, by string) (*ProductCategory, error) {
+func (repo *ProductCategoryModel) Patch(ctx context.Context, id string, fields map[string]interface{}) (*ProductCategory, error) {
+	// get user_id from context
+	by := ctx.Value("user_id").(string)
+
 	// build query
 	statement := repo.qb.Update(repo.table).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), id)
 
