@@ -2,14 +2,13 @@ package model
 
 import (
 	"context"
-	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/google/uuid"
 	"strconv"
 )
 
-func (repo *ProductStatusModel) Create(ctx context.Context, productStatus *entity.ProductStatus) (*entity.ProductStatus, error) {
+func (repo *ShippingClassModel) Create(ctx context.Context, productStatus *ShippingClass) (*ShippingClass, error) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 

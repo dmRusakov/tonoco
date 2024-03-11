@@ -18,7 +18,7 @@ type ProductCategory struct {
 	UpdatedBy        string
 }
 
-type Filter struct {
+type ProductCategoryFilter struct {
 	Active    *bool
 	Prime     *bool
 	Search    *string

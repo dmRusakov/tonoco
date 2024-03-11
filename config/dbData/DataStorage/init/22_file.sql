@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS public.file
     name       varchar(255) not null,
     url        varchar(255) not null,
     active     BOOLEAN     DEFAULT TRUE,
+    parent_id  uuid        DEFAULT null,
     sort_order INTEGER     DEFAULT null,
 
     created_at TIMESTAMP   DEFAULT NOW()              NOT NULL,

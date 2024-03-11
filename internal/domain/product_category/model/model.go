@@ -8,7 +8,7 @@ import (
 )
 
 type ProductCategoryStorage interface {
-	All(ctx context.Context, filter *Filter) ([]*ProductCategory, error)
+	All(ctx context.Context, filter *ProductCategoryFilter) ([]*ProductCategory, error)
 	Create(ctx context.Context, productCategory *ProductCategory) (*ProductCategory, error)
 	Get(ctx context.Context, id string) (*ProductCategory, error)
 	GetByURL(ctx context.Context, url string) (*ProductCategory, error)

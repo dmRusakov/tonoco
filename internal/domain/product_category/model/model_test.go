@@ -125,7 +125,7 @@ var testProductCategories = []*model.ProductCategory{
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9912",
 		Url:              "perimeter-filter",
-		Name:             "Perimeter Filter range hoods",
+		Name:             "Perimeter ProductCategoryFilter range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
 		SortOrder:        11,
@@ -243,7 +243,7 @@ func clearTestData(t *testing.T) {
 	storage := initStorage(t)
 
 	// get all data from the table
-	all, err := storage.All(initContext(), &model.Filter{})
+	all, err := storage.All(initContext(), &model.ProductCategoryFilter{})
 
 	// check if there is an error
 	assert.NoError(t, err)
@@ -299,29 +299,29 @@ func all(t *testing.T) {
 	// Define the test cases
 	testCases := []struct {
 		name     string
-		filter   *model.Filter
+		filter   *model.ProductCategoryFilter
 		expected []*model.ProductCategory
 	}{
 		{
 			name:     "Get All",
-			filter:   &model.Filter{},
+			filter:   &model.ProductCategoryFilter{},
 			expected: testProductCategories[:10],
 		}, {
 			name: "Get 3 products categories 02",
-			filter: &model.Filter{
+			filter: &model.ProductCategoryFilter{
 				PerPage: &perPage3,
 				Page:    &page1,
 			},
 			expected: testProductCategories[:3],
 		}, {
 			name: "Get Prime products categories 03",
-			filter: &model.Filter{
+			filter: &model.ProductCategoryFilter{
 				Prime: &isPrime,
 			},
 			expected: testProductCategories[0:6],
 		}, {
 			name: "Get Active products categories 04",
-			filter: &model.Filter{
+			filter: &model.ProductCategoryFilter{
 				Active:  &isPrime,
 				Page:    &page1,
 				PerPage: &perPage100,
@@ -329,13 +329,13 @@ func all(t *testing.T) {
 			expected: testProductCategories[:15],
 		}, {
 			name: "Get with name like `air` products categories 05",
-			filter: &model.Filter{
+			filter: &model.ProductCategoryFilter{
 				Search: &searchAir,
 			},
 			expected: testProductCategories[2:3],
 		}, {
 			name: "Get with name like `steel` products categories 06",
-			filter: &model.Filter{
+			filter: &model.ProductCategoryFilter{
 				Search: &searchSteel,
 			},
 			expected: testProductCategories[9:10],
@@ -346,7 +346,7 @@ func all(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call All method
-			result, err := storage.All(initContext(), (*model.Filter)(tc.filter))
+			result, err := storage.All(initContext(), (*model.ProductCategoryFilter)(tc.filter))
 
 			// Assert that there was no error
 			assert.NoError(t, err)

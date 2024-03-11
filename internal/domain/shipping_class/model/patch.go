@@ -3,37 +3,39 @@ package model
 import (
 	"context"
 	"fmt"
-	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"strconv"
 )
 
-func (repo *ProductStatusModel) Update(ctx context.Context, product *entity.ProductStatus) (*entity.ProductStatus, error) {
+func (repo *ShippingClassModel) Patch(ctx context.Context, id string, fields map[string]interface{}) (*ShippingClass, error) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
 	// build query
-	statement := repo.qb.Update(repo.table).
-		Set(fieldMap["Name"], product.Name).
-		Set(fieldMap["Url"], product.Url).
-		Set(fieldMap["SortOrder"], product.SortOrder).
-		Set(fieldMap["Active"], product.Active).
-		Set(fieldMap["UpdatedAt"], "NOW()").
-		Set(fieldMap["UpdatedBy"], by).
-		Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), product.ID)
+	statement := repo.qb.Update(repo.table).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), id)
+
+	// iterate over the fields map and add each field to the update statement
+	for field, value := range fields {
+		// get DB field name from Product struct and db tag
+		field = fieldMap[field]
+		statement = statement.Set(field, value)
+	}
+
+	// add the updated_at field
+	statement = statement.Set(fieldMap["UpdatedAt"], "NOW()")
+
+	// add the updated_by field
+	statement = statement.Set(fieldMap["UpdatedBy"], by)
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()
 	if err != nil {
-		err = psql.ErrCreateQuery(err)
-		tracing.Error(ctx, err)
-
 		return nil, err
 	}
 
 	// Add tracing
-	tracing.SpanEvent(ctx, "Update ProductStatus")
+	tracing.SpanEvent(ctx, "Patch Product")
 	tracing.TraceVal(ctx, "SQL", query)
 	for i, arg := range args {
 		argStr, ok := arg.(string)
@@ -58,7 +60,7 @@ func (repo *ProductStatusModel) Update(ctx context.Context, product *entity.Prod
 	}
 
 	// retrieve the updated Product
-	productStatus, err := repo.Get(ctx, product.ID)
+	productStatus, err := repo.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}

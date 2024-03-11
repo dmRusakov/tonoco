@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"github.com/dmRusakov/tonoco/internal/appInit"
 	"github.com/dmRusakov/tonoco/internal/config"
+	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	"github.com/dmRusakov/tonoco/internal/domain/product_status/model"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-var testProductStatuses = []*model.ProductStatus{
+var testProductStatuses = []*entity.ProductStatus{
 	{
 		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Name:      "Public",
@@ -47,7 +48,7 @@ var testProductStatuses = []*model.ProductStatus{
 		SortOrder: 4,
 	},
 }
-var testProductStatusesNew = []*model.ProductStatus{
+var testProductStatusesNew = []*entity.ProductStatus{
 	{
 		ID:     "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a00",
 		Name:   "New",
@@ -105,7 +106,7 @@ func clearTestData(t *testing.T) {
 	storage := initStorage(t)
 
 	// get all data from the table
-	all, err := storage.All(initContext(), &model.Filter{})
+	all, err := storage.All(initContext(), &entity.ProductStatusFilter{})
 
 	// check if there is an error
 	assert.NoError(t, err)
@@ -159,28 +160,28 @@ func all(t *testing.T) {
 	// Define the test cases
 	tests := []struct {
 		name     string
-		filter   *model.Filter
-		expected []*model.ProductStatus
+		filter   *entity.ProductStatusFilter
+		expected []*entity.ProductStatus
 	}{
 		{
 			name:     "Get all",
-			filter:   &model.Filter{},
+			filter:   &entity.ProductStatusFilter{},
 			expected: testProductStatuses,
 		}, {
 			name:     "Get all active",
-			filter:   &model.Filter{Active: &isActive},
+			filter:   &entity.ProductStatusFilter{Active: &isActive},
 			expected: testProductStatuses,
 		}, {
 			name:     "Get with name like 'out'",
-			filter:   &model.Filter{Search: &searchOut},
+			filter:   &entity.ProductStatusFilter{Search: &searchOut},
 			expected: testProductStatuses[2:3],
 		}, {
 			name:     "Get with perPage 3",
-			filter:   &model.Filter{PerPage: &perPage3},
+			filter:   &entity.ProductStatusFilter{PerPage: &perPage3},
 			expected: testProductStatuses[:3],
 		}, {
 			name:     "Get with perPage 3 and page 1",
-			filter:   &model.Filter{PerPage: &perPage3, Page: &page1},
+			filter:   &entity.ProductStatusFilter{PerPage: &perPage3, Page: &page1},
 			expected: testProductStatuses[:3],
 		},
 	}
@@ -218,7 +219,7 @@ func get(t *testing.T) {
 	testCases := []struct {
 		name string
 		id   string
-		get  *model.ProductStatus
+		get  *entity.ProductStatus
 	}{
 		{
 			name: "Get by ID",
@@ -271,7 +272,7 @@ func getByUrl(t *testing.T) {
 	testCases := []struct {
 		name string
 		url  string
-		get  *model.ProductStatus
+		get  *entity.ProductStatus
 	}{
 		{
 			name: "Get by URL",
@@ -324,7 +325,7 @@ func createWithId(t *testing.T) {
 	// Define the test cases
 	testCases := []struct {
 		name string
-		new  *model.ProductStatus
+		new  *entity.ProductStatus
 	}{
 		{
 			name: "Create with ID",
@@ -369,8 +370,8 @@ func createWithoutId(t *testing.T) {
 	// Define the test cases
 	testCases := []struct {
 		name string
-		sent *model.ProductStatus
-		get  *model.ProductStatus
+		sent *entity.ProductStatus
+		get  *entity.ProductStatus
 	}{
 		{
 			name: "Create without ID",
@@ -417,8 +418,8 @@ func update(t *testing.T) {
 	// Define the test cases
 	testCases := []struct {
 		name   string
-		sent   *model.ProductStatus
-		update *model.ProductStatus
+		sent   *entity.ProductStatus
+		update *entity.ProductStatus
 	}{
 		{
 			name:   "Update",
@@ -461,7 +462,7 @@ func patch(t *testing.T) {
 		name   string
 		id     string
 		fields map[string]interface{}
-		get    *model.ProductStatus
+		get    *entity.ProductStatus
 	}{
 		{
 			name: "Patch",
@@ -500,7 +501,7 @@ func updatedAt(t *testing.T) {
 	testCases := []struct {
 		name string
 		id   string
-		sent *model.ProductStatus
+		sent *entity.ProductStatus
 	}{
 		{
 			name: "Updated at 01",

@@ -3,13 +3,12 @@ package model
 import (
 	"context"
 	"fmt"
-	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"strconv"
 )
 
-func (repo *ProductStatusModel) Update(ctx context.Context, product *entity.ProductStatus) (*entity.ProductStatus, error) {
+func (repo *ShippingClassModel) Update(ctx context.Context, product *ShippingClass) (*ShippingClass, error) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
@@ -33,7 +32,7 @@ func (repo *ProductStatusModel) Update(ctx context.Context, product *entity.Prod
 	}
 
 	// Add tracing
-	tracing.SpanEvent(ctx, "Update ProductStatus")
+	tracing.SpanEvent(ctx, "Update ShippingClass")
 	tracing.TraceVal(ctx, "SQL", query)
 	for i, arg := range args {
 		argStr, ok := arg.(string)

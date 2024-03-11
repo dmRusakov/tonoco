@@ -2,31 +2,31 @@ package service
 
 import (
 	"context"
-	"github.com/dmRusakov/tonoco/internal/domain/product_status/model"
+	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	"time"
 )
 
-func (s *ProductStatusService) All(ctx context.Context, filter *model.Filter) ([]*model.ProductStatus, error) {
+func (s *ProductStatusService) All(ctx context.Context, filter *entity.ProductStatusFilter) ([]*entity.ProductStatus, error) {
 	return s.repository.All(ctx, filter)
 }
 
-func (s *ProductStatusService) Create(ctx context.Context, productStatus *model.ProductStatus, by string) (*model.ProductStatus, error) {
+func (s *ProductStatusService) Create(ctx context.Context, productStatus *entity.ProductStatus, by string) (*entity.ProductStatus, error) {
 	return s.repository.Create(ctx, productStatus)
 }
 
-func (s *ProductStatusService) Get(ctx context.Context, id string) (*model.ProductStatus, error) {
+func (s *ProductStatusService) Get(ctx context.Context, id string) (*entity.ProductStatus, error) {
 	return s.repository.Get(ctx, id)
 }
 
-func (s *ProductStatusService) GetByURL(ctx context.Context, url string) (*model.ProductStatus, error) {
+func (s *ProductStatusService) GetByURL(ctx context.Context, url string) (*entity.ProductStatus, error) {
 	return s.repository.GetByURL(ctx, url)
 }
 
-func (s *ProductStatusService) Update(ctx context.Context, productStatus *model.ProductStatus, by string) (*model.ProductStatus, error) {
+func (s *ProductStatusService) Update(ctx context.Context, productStatus *entity.ProductStatus, by string) (*entity.ProductStatus, error) {
 	return s.repository.Update(ctx, productStatus)
 }
 
-func (s *ProductStatusService) Patch(ctx context.Context, id string, fields map[string]interface{}, by string) (*model.ProductStatus, error) {
+func (s *ProductStatusService) Patch(ctx context.Context, id string, fields map[string]interface{}, by string) (*entity.ProductStatus, error) {
 	return s.repository.Patch(ctx, id, fields)
 }
 

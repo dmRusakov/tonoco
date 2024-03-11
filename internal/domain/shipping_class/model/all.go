@@ -5,10 +5,10 @@ import (
 	sq "github.com/Masterminds/squirrel"
 )
 
-func (repo *ProductCategoryModel) All(
+func (repo *ShippingClassModel) All(
 	ctx context.Context,
-	filter *ProductCategoryFilter,
-) ([]*ProductCategory, error) {
+	filter *ShippingClassFilter,
+) ([]*ShippingClass, error) {
 	// check standard filter parameter
 	if filter.SortBy == nil {
 		filter.SortBy = new(string)
@@ -36,10 +36,7 @@ func (repo *ProductCategoryModel) All(
 			fieldMap["ID"],
 			fieldMap["Name"],
 			fieldMap["Url"],
-			fieldMap["ShortDescription"],
-			fieldMap["Description"],
 			fieldMap["SortOrder"],
-			fieldMap["Prime"],
 			fieldMap["Active"],
 		).
 		From(repo.table + " p").
@@ -51,19 +48,12 @@ func (repo *ProductCategoryModel) All(
 		statement = statement.Where(sq.Eq{fieldMap["Active"]: *filter.Active})
 	}
 
-	// Prime
-	if filter.Prime != nil {
-		statement = statement.Where(sq.Eq{fieldMap["Prime"]: *filter.Prime})
-	}
-
 	// Search
 	if filter.Search != nil {
 		statement = statement.Where(
 			sq.Or{
 				sq.Expr("LOWER("+fieldMap["Name"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+fieldMap["Url"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["ShortDescription"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["Description"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 			},
 		)
 	}
@@ -82,24 +72,22 @@ func (repo *ProductCategoryModel) All(
 
 	defer rows.Close()
 
-	var productCategories []*ProductCategory
+	var productStatuses []*ShippingClass
 	for rows.Next() {
-		var productCategory ProductCategory
-		err = rows.Scan(
-			&productCategory.ID,
-			&productCategory.Name,
-			&productCategory.Url,
-			&productCategory.ShortDescription,
-			&productCategory.Description,
-			&productCategory.SortOrder,
-			&productCategory.Prime,
-			&productCategory.Active,
-		)
-		if err != nil {
+		// scan the result set into a ShippingClass struct
+		productStatus := &ShippingClass{}
+		if err = rows.Scan(
+			&productStatus.ID,
+			&productStatus.Name,
+			&productStatus.Url,
+			&productStatus.SortOrder,
+			&productStatus.Active,
+		); err != nil {
 			return nil, err
 		}
-		productCategories = append(productCategories, &productCategory)
+
+		productStatuses = append(productStatuses, productStatus)
 	}
 
-	return productCategories, nil
+	return productStatuses, nil
 }

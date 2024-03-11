@@ -1,13 +1,24 @@
 package entity
 
+import "time"
+
 type ProductStatus struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Url       string `json:"url"`
-	Order     uint32 `json:"order"`
-	Active    bool   `json:"active"`
-	CreatedAt uint32 `json:"created_at"`
-	CreatedBy string `json:"created_by"`
-	UpdatedAt uint32 `json:"updated_at"`
-	UpdatedBy string `json:"updated_by"`
+	ID        string
+	Name      string
+	Url       string
+	SortOrder uint32
+	Active    bool
+	CreatedAt time.Time
+	CreatedBy string
+	UpdatedAt time.Time
+	UpdatedBy string
+}
+
+type ProductStatusFilter struct {
+	Active    *bool
+	Search    *string
+	SortBy    *string
+	SortOrder *string
+	Page      *uint64
+	PerPage   *uint64
 }

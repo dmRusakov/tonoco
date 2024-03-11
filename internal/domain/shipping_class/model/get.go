@@ -3,13 +3,12 @@ package model
 import (
 	"context"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"strconv"
 )
 
-func (repo *ProductStatusModel) Get(ctx context.Context, id string) (*entity.ProductStatus, error) {
+func (repo *ShippingClassModel) Get(ctx context.Context, id string) (*ShippingClass, error) {
 	// build query
 	statement := repo.qb.
 		Select(
@@ -52,8 +51,8 @@ func (repo *ProductStatusModel) Get(ctx context.Context, id string) (*entity.Pro
 		return nil, psql.ErrNoRowForID(id)
 	}
 
-	// scan the result set into a ProductStatus struct
-	productStatus := &entity.ProductStatus{}
+	// scan the result set into a ShippingClass struct
+	productStatus := &ShippingClass{}
 	if err = rows.Scan(
 		&productStatus.ID,
 		&productStatus.Name,
@@ -67,11 +66,11 @@ func (repo *ProductStatusModel) Get(ctx context.Context, id string) (*entity.Pro
 		return nil, err
 	}
 
-	return (*entity.ProductStatus)(productStatus), nil
+	return (*ShippingClass)(productStatus), nil
 }
 
 // GetByURL - get a product status by URL
-func (repo *ProductStatusModel) GetByURL(ctx context.Context, url string) (*entity.ProductStatus, error) {
+func (repo *ShippingClassModel) GetByURL(ctx context.Context, url string) (*ShippingClass, error) {
 	// build query
 	statement := repo.qb.
 		Select(
@@ -114,8 +113,8 @@ func (repo *ProductStatusModel) GetByURL(ctx context.Context, url string) (*enti
 		return nil, psql.ErrNoRowForURL(url)
 	}
 
-	// scan the result set into a ProductStatus struct
-	productStatus := &entity.ProductStatus{}
+	// scan the result set into a ShippingClass struct
+	productStatus := &ShippingClass{}
 	if err = rows.Scan(
 		&productStatus.ID,
 		&productStatus.Name,
@@ -129,5 +128,5 @@ func (repo *ProductStatusModel) GetByURL(ctx context.Context, url string) (*enti
 		return nil, err
 	}
 
-	return (*entity.ProductStatus)(productStatus), nil
+	return (*ShippingClass)(productStatus), nil
 }

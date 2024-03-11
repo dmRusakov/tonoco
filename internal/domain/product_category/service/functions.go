@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func (s *ProductCategoryService) All(ctx context.Context, filter *model.Filter) ([]*model.ProductCategory, error) {
+func (s *ProductCategoryService) All(ctx context.Context, filter *model.ProductCategoryFilter) ([]*model.ProductCategory, error) {
 	return s.repository.All(ctx, filter)
 }
 
