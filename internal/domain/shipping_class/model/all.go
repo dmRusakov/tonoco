@@ -3,12 +3,13 @@ package model
 import (
 	"context"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/dmRusakov/tonoco/internal/domain/entity"
 )
 
-func (repo *ShippingClassModel) All(
+func (repo *Model) All(
 	ctx context.Context,
-	filter *ShippingClassFilter,
-) ([]*ShippingClass, error) {
+	filter *entity.ShippingClassFilter,
+) ([]*entity.ShippingClass, error) {
 	// check standard filter parameter
 	if filter.SortBy == nil {
 		filter.SortBy = new(string)
@@ -72,10 +73,10 @@ func (repo *ShippingClassModel) All(
 
 	defer rows.Close()
 
-	var productStatuses []*ShippingClass
+	var productStatuses []*entity.ShippingClass
 	for rows.Next() {
 		// scan the result set into a ShippingClass struct
-		productStatus := &ShippingClass{}
+		productStatus := &entity.ShippingClass{}
 		if err = rows.Scan(
 			&productStatus.ID,
 			&productStatus.Name,

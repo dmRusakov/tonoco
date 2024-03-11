@@ -6,7 +6,7 @@ import (
 )
 
 // MaxSortOrder - get the maximum value for the sort order in the table
-func (repo *ShippingClassModel) MaxSortOrder(ctx context.Context) (*uint32, error) {
+func (repo *Model) MaxSortOrder(ctx context.Context) (*uint32, error) {
 	// build query
 	statement := repo.qb.
 		Select("max(sort_order)").

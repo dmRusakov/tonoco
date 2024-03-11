@@ -2,13 +2,14 @@ package model
 
 import (
 	"context"
+	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/google/uuid"
 	"strconv"
 )
 
-func (repo *ProductCategoryModel) Create(ctx context.Context, productCategory *ProductCategory) (*ProductCategory, error) {
+func (repo *Model) Create(ctx context.Context, productCategory *entity.ProductCategory) (*entity.ProductCategory, error) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 

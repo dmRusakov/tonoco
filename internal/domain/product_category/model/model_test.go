@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"github.com/dmRusakov/tonoco/internal/appInit"
 	"github.com/dmRusakov/tonoco/internal/config"
+	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	"github.com/dmRusakov/tonoco/internal/domain/product_category/model"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 // test data
-var testProductCategories = []*model.ProductCategory{
+var testProductCategories = []*entity.ProductCategory{
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9901",
 		Url:              "island",
@@ -173,7 +174,7 @@ var testProductCategories = []*model.ProductCategory{
 		Active:           false,
 	},
 }
-var testProductCategoriesNew = []*model.ProductCategory{
+var testProductCategoriesNew = []*entity.ProductCategory{
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e045f0001",
 		Url:              "test1-url",
@@ -243,7 +244,7 @@ func clearTestData(t *testing.T) {
 	storage := initStorage(t)
 
 	// get all data from the table
-	all, err := storage.All(initContext(), &model.ProductCategoryFilter{})
+	all, err := storage.All(initContext(), &entity.ProductCategoryFilter{})
 
 	// check if there is an error
 	assert.NoError(t, err)
@@ -299,29 +300,29 @@ func all(t *testing.T) {
 	// Define the test cases
 	testCases := []struct {
 		name     string
-		filter   *model.ProductCategoryFilter
-		expected []*model.ProductCategory
+		filter   *entity.ProductCategoryFilter
+		expected []*entity.ProductCategory
 	}{
 		{
 			name:     "Get All",
-			filter:   &model.ProductCategoryFilter{},
+			filter:   &entity.ProductCategoryFilter{},
 			expected: testProductCategories[:10],
 		}, {
 			name: "Get 3 products categories 02",
-			filter: &model.ProductCategoryFilter{
+			filter: &entity.ProductCategoryFilter{
 				PerPage: &perPage3,
 				Page:    &page1,
 			},
 			expected: testProductCategories[:3],
 		}, {
 			name: "Get Prime products categories 03",
-			filter: &model.ProductCategoryFilter{
+			filter: &entity.ProductCategoryFilter{
 				Prime: &isPrime,
 			},
 			expected: testProductCategories[0:6],
 		}, {
 			name: "Get Active products categories 04",
-			filter: &model.ProductCategoryFilter{
+			filter: &entity.ProductCategoryFilter{
 				Active:  &isPrime,
 				Page:    &page1,
 				PerPage: &perPage100,
@@ -329,13 +330,13 @@ func all(t *testing.T) {
 			expected: testProductCategories[:15],
 		}, {
 			name: "Get with name like `air` products categories 05",
-			filter: &model.ProductCategoryFilter{
+			filter: &entity.ProductCategoryFilter{
 				Search: &searchAir,
 			},
 			expected: testProductCategories[2:3],
 		}, {
 			name: "Get with name like `steel` products categories 06",
-			filter: &model.ProductCategoryFilter{
+			filter: &entity.ProductCategoryFilter{
 				Search: &searchSteel,
 			},
 			expected: testProductCategories[9:10],
@@ -346,7 +347,7 @@ func all(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call All method
-			result, err := storage.All(initContext(), (*model.ProductCategoryFilter)(tc.filter))
+			result, err := storage.All(initContext(), (*entity.ProductCategoryFilter)(tc.filter))
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -376,7 +377,7 @@ func get(t *testing.T) {
 	testCases := []struct {
 		name string
 		id   string
-		get  *model.ProductCategory
+		get  *entity.ProductCategory
 	}{
 		{
 			name: "Get 01",
@@ -430,7 +431,7 @@ func getByUrl(t *testing.T) {
 	testCases := []struct {
 		name string
 		url  string
-		get  *model.ProductCategory
+		get  *entity.ProductCategory
 	}{
 		{
 			name: "Get by url 01",
@@ -484,8 +485,8 @@ func createWithId(t *testing.T) {
 	// Define the test cases
 	testCases := []struct {
 		name string
-		sent *model.ProductCategory
-		get  *model.ProductCategory
+		sent *entity.ProductCategory
+		get  *entity.ProductCategory
 	}{
 		{
 			name: "Create with id 1",
@@ -535,8 +536,8 @@ func createWithoutId(t *testing.T) {
 	// Define the test cases
 	testCases := []struct {
 		name string
-		sent *model.ProductCategory
-		get  *model.ProductCategory
+		sent *entity.ProductCategory
+		get  *entity.ProductCategory
 	}{
 		{
 			name: "Create without id - 1",
@@ -585,8 +586,8 @@ func update(t *testing.T) {
 	// Define the test cases
 	testCases := []struct {
 		name   string
-		sent   *model.ProductCategory
-		update *model.ProductCategory
+		sent   *entity.ProductCategory
+		update *entity.ProductCategory
 	}{
 		{
 			name:   "Update 01",
@@ -635,7 +636,7 @@ func patch(t *testing.T) {
 		name   string
 		id     string
 		fields map[string]interface{}
-		get    *model.ProductCategory
+		get    *entity.ProductCategory
 	}{
 		{
 			name: "Patch 01",
@@ -679,7 +680,7 @@ func updatedAt(t *testing.T) {
 	testCases := []struct {
 		name string
 		id   string
-		sent *model.ProductCategory
+		sent *entity.ProductCategory
 	}{
 		{
 			name: "Updated at 01",
@@ -840,7 +841,7 @@ func delete(t *testing.T) {
 }
 
 // initStorage with real database client
-func initStorage(t *testing.T) *model.ProductCategoryModel {
+func initStorage(t *testing.T) *model.Model {
 	// Create a real database client
 	cfg := config.GetConfig(context.Background())
 	app := appInit.NewAppInit(initContext(), cfg)

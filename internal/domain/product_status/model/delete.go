@@ -8,7 +8,7 @@ import (
 )
 
 // Delete removes a ProductStatus from the database by its ID.
-func (repo *ProductStatusModel) Delete(ctx context.Context, id string) error {
+func (repo *Model) Delete(ctx context.Context, id string) error {
 	// build query
 	statement := repo.qb.Delete(repo.table).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), id)
 

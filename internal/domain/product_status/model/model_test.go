@@ -97,7 +97,7 @@ func TestProductStatus(t *testing.T) {
 	t.Run("updatedAt", updatedAt)
 	t.Run("tableUpdated", tableUpdated)
 	t.Run("maxSortOrder", maxSortOrder)
-	t.Run("delete", delete)
+	t.Run("del", del)
 }
 
 // Create test data for the test cases
@@ -111,7 +111,7 @@ func clearTestData(t *testing.T) {
 	// check if there is an error
 	assert.NoError(t, err)
 
-	// go thought all data and delete it if is not in the testProductStatuses
+	// go thought all data and del it if is not in the testProductStatuses
 	for _, v := range all {
 		found := false
 		for _, tv := range testProductStatuses {
@@ -595,8 +595,6 @@ func maxSortOrder(t *testing.T) {
 	// Call the MaxSortOrder method
 	sortOrder, err := storage.MaxSortOrder(context.Background())
 
-	fmt.Println("Test: ", sortOrder)
-
 	// Assert that there was no error
 	assert.NoError(t, err)
 
@@ -604,8 +602,8 @@ func maxSortOrder(t *testing.T) {
 	assert.NotEmpty(t, sortOrder)
 }
 
-// test delete
-func delete(t *testing.T) {
+// test del
+func del(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
@@ -650,7 +648,7 @@ func delete(t *testing.T) {
 }
 
 // initStorage will create a storage with real database client
-func initStorage(t *testing.T) *model.ProductStatusModel {
+func initStorage(t *testing.T) *model.Model {
 	// Create a real database client
 	cfg := config.GetConfig(context.Background())
 	app := appInit.NewAppInit(initContext(), cfg)

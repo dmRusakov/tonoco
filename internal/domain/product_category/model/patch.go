@@ -3,12 +3,13 @@ package model
 import (
 	"context"
 	"fmt"
+	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"strconv"
 )
 
-func (repo *ProductCategoryModel) Patch(ctx context.Context, id string, fields map[string]interface{}) (*ProductCategory, error) {
+func (repo *Model) Patch(ctx context.Context, id string, fields map[string]interface{}) (*entity.ProductCategory, error) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 

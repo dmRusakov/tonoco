@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func (repo *ProductStatusModel) Update(ctx context.Context, product *entity.ProductStatus) (*entity.ProductStatus, error) {
+func (repo *Model) Update(ctx context.Context, product *entity.ProductStatus) (*entity.ProductStatus, error) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 

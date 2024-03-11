@@ -7,7 +7,7 @@ import (
 )
 
 // UpdatedAt - Get item updated at by id
-func (repo *ProductStatusModel) UpdatedAt(
+func (repo *Model) UpdatedAt(
 	ctx context.Context,
 	id string,
 ) (time.Time, error) {
@@ -48,7 +48,7 @@ func (repo *ProductStatusModel) UpdatedAt(
 }
 
 // TableUpdated - Get table updated at
-func (repo *ProductStatusModel) TableUpdated(
+func (repo *Model) TableUpdated(
 	ctx context.Context,
 ) (time.Time, error) {
 	// build query

@@ -6,7 +6,7 @@ import (
 	"github.com/dmRusakov/tonoco/internal/domain/entity"
 )
 
-func (repo *ProductStatusModel) All(
+func (repo *Model) All(
 	ctx context.Context,
 	filter *entity.ProductStatusFilter,
 ) ([]*entity.ProductStatus, error) {

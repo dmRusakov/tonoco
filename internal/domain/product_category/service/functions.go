@@ -2,31 +2,31 @@ package service
 
 import (
 	"context"
-	"github.com/dmRusakov/tonoco/internal/domain/product_category/model"
+	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	"time"
 )
 
-func (s *ProductCategoryService) All(ctx context.Context, filter *model.ProductCategoryFilter) ([]*model.ProductCategory, error) {
+func (s *ProductCategoryService) All(ctx context.Context, filter *entity.ProductCategoryFilter) ([]*entity.ProductCategory, error) {
 	return s.repository.All(ctx, filter)
 }
 
-func (s *ProductCategoryService) Create(ctx context.Context, productCategory *model.ProductCategory) (*model.ProductCategory, error) {
+func (s *ProductCategoryService) Create(ctx context.Context, productCategory *entity.ProductCategory) (*entity.ProductCategory, error) {
 	return s.repository.Create(ctx, productCategory)
 }
 
-func (s *ProductCategoryService) Get(ctx context.Context, id string) (*model.ProductCategory, error) {
+func (s *ProductCategoryService) Get(ctx context.Context, id string) (*entity.ProductCategory, error) {
 	return s.repository.Get(ctx, id)
 }
 
-func (s *ProductCategoryService) GetByURL(ctx context.Context, url string) (*model.ProductCategory, error) {
+func (s *ProductCategoryService) GetByURL(ctx context.Context, url string) (*entity.ProductCategory, error) {
 	return s.repository.GetByURL(ctx, url)
 }
 
-func (s *ProductCategoryService) Update(ctx context.Context, productCategory *model.ProductCategory) (*model.ProductCategory, error) {
+func (s *ProductCategoryService) Update(ctx context.Context, productCategory *entity.ProductCategory) (*entity.ProductCategory, error) {
 	return s.repository.Update(ctx, productCategory)
 }
 
-func (s *ProductCategoryService) Patch(ctx context.Context, id string, fields map[string]interface{}) (*model.ProductCategory, error) {
+func (s *ProductCategoryService) Patch(ctx context.Context, id string, fields map[string]interface{}) (*entity.ProductCategory, error) {
 	return s.repository.Patch(ctx, id, fields)
 }
 

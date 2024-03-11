@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func (repo *ProductStatusModel) Get(ctx context.Context, id string) (*entity.ProductStatus, error) {
+func (repo *Model) Get(ctx context.Context, id string) (*entity.ProductStatus, error) {
 	// build query
 	statement := repo.qb.
 		Select(
@@ -71,7 +71,7 @@ func (repo *ProductStatusModel) Get(ctx context.Context, id string) (*entity.Pro
 }
 
 // GetByURL - get a product status by URL
-func (repo *ProductStatusModel) GetByURL(ctx context.Context, url string) (*entity.ProductStatus, error) {
+func (repo *Model) GetByURL(ctx context.Context, url string) (*entity.ProductStatus, error) {
 	// build query
 	statement := repo.qb.
 		Select(

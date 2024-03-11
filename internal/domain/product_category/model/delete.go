@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func (repo *ProductCategoryModel) Delete(ctx context.Context, id string) error {
+func (repo *Model) Delete(ctx context.Context, id string) error {
 	// build query
 	statement := repo.qb.Delete(repo.table).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), id)
 

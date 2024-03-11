@@ -1,7 +1,8 @@
 package product
 
 import (
-	"github.com/dmRusakov/tonoco/internal/domain/product/service"
+	product_service "github.com/dmRusakov/tonoco/internal/domain/product/service"
+	product_category_service "github.com/dmRusakov/tonoco/internal/domain/product_category/service"
 	"github.com/dmRusakov/tonoco/pkg/common/core/clock"
 	"time"
 )
@@ -15,15 +16,22 @@ type Clock interface {
 }
 
 type UseCase struct {
-	productService *service.ProductService
+	productService         *product_service.ProductService
+	productCategoryService *product_category_service.ProductCategoryService
 
 	identity IdentityGenerator
 	clock    Clock
 }
 
-func NewProductUseCase(productService *service.ProductService, identity IdentityGenerator, clock clock.Clock) *UseCase {
+func NewProductUseCase(
+	productService *product_service.ProductService,
+	productCategoryService *product_category_service.ProductCategoryService,
+	identity IdentityGenerator,
+	clock clock.Clock,
+) *UseCase {
 	return &UseCase{
-		productService: productService,
+		productService:         productService,
+		productCategoryService: productCategoryService,
 
 		identity: identity,
 		clock:    clock,
