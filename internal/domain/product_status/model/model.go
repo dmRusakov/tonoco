@@ -3,18 +3,17 @@ package model
 import (
 	"context"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"time"
 )
 
 type ProductStatusStorage interface {
-	All(ctx context.Context, filter *entity.ProductStatusFilter) ([]*entity.ProductStatus, error)
-	Create(ctx context.Context, productCategory *entity.ProductStatus) (*entity.ProductStatus, error)
-	Get(ctx context.Context, id string) (*entity.ProductStatus, error)
-	GetByURL(ctx context.Context, url string) (*entity.ProductStatus, error)
-	Update(ctx context.Context, product *entity.ProductStatus) (*entity.ProductStatus, error)
-	Patch(ctx context.Context, id string, fields map[string]interface{}) (*entity.ProductStatus, error)
+	All(ctx context.Context, filter *Filter) ([]*Item, error)
+	Create(ctx context.Context, productCategory *Item) (*Item, error)
+	Get(ctx context.Context, id string) (*Item, error)
+	GetByURL(ctx context.Context, url string) (*Item, error)
+	Update(ctx context.Context, product *Item) (*Item, error)
+	Patch(ctx context.Context, id string, fields map[string]interface{}) (*Item, error)
 	UpdatedAt(ctx context.Context, id string) (time.Time, error)
 	TableUpdated(ctx context.Context) (time.Time, error)
 	MaxSortOrder(ctx context.Context) (*uint32, error)

@@ -3,13 +3,12 @@ package model
 import (
 	"context"
 	"fmt"
-	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"strconv"
 )
 
-func (repo *Model) Update(ctx context.Context, product *entity.ProductStatus) (*entity.ProductStatus, error) {
+func (repo *Model) Update(ctx context.Context, product *Item) (*Item, error) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 

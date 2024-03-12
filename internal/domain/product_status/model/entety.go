@@ -1,5 +1,10 @@
 package model
 
+import "github.com/dmRusakov/tonoco/internal/domain/entity"
+
+type Item = entity.ProductStatus
+type Filter = entity.ProductStatusFilter
+
 // fieldMap
 var fieldMap = map[string]string{
 	"ID":        "id",

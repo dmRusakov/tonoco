@@ -3,13 +3,12 @@ package model
 import (
 	"context"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"strconv"
 )
 
-func (repo *Model) Get(ctx context.Context, id string) (*entity.ProductStatus, error) {
+func (repo *Model) Get(ctx context.Context, id string) (*Item, error) {
 	// build query
 	statement := repo.qb.
 		Select(
@@ -53,7 +52,7 @@ func (repo *Model) Get(ctx context.Context, id string) (*entity.ProductStatus, e
 	}
 
 	// scan the result set into a ProductStatus struct
-	productStatus := &entity.ProductStatus{}
+	productStatus := &Item{}
 	if err = rows.Scan(
 		&productStatus.ID,
 		&productStatus.Name,
@@ -67,11 +66,11 @@ func (repo *Model) Get(ctx context.Context, id string) (*entity.ProductStatus, e
 		return nil, err
 	}
 
-	return (*entity.ProductStatus)(productStatus), nil
+	return (*Item)(productStatus), nil
 }
 
 // GetByURL - get a product status by URL
-func (repo *Model) GetByURL(ctx context.Context, url string) (*entity.ProductStatus, error) {
+func (repo *Model) GetByURL(ctx context.Context, url string) (*Item, error) {
 	// build query
 	statement := repo.qb.
 		Select(
@@ -115,7 +114,7 @@ func (repo *Model) GetByURL(ctx context.Context, url string) (*entity.ProductSta
 	}
 
 	// scan the result set into a ProductStatus struct
-	productStatus := &entity.ProductStatus{}
+	productStatus := &Item{}
 	if err = rows.Scan(
 		&productStatus.ID,
 		&productStatus.Name,
@@ -129,5 +128,5 @@ func (repo *Model) GetByURL(ctx context.Context, url string) (*entity.ProductSta
 		return nil, err
 	}
 
-	return (*entity.ProductStatus)(productStatus), nil
+	return (*Item)(productStatus), nil
 }
