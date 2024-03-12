@@ -44,8 +44,8 @@ var testProductStatuses = []*entity.ProductStatus{
 		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15",
 		Name:      "Archived",
 		Url:       "archived",
-		Active:    true,
 		SortOrder: 4,
+		Active:    true,
 	},
 }
 var testProductStatusesNew = []*entity.ProductStatus{
