@@ -28,8 +28,8 @@ type Model struct {
 	client psql.Client
 }
 
-// ProductStatusStorage is a constructor function that returns a new instance of the Model.
-func NewProductStatusStorage(client psql.Client) *Model {
+// NewStorage is a constructor function that returns a new instance of the Model.
+func NewStorage(client psql.Client) *Model {
 	return &Model{
 		qb:     sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		client: client,

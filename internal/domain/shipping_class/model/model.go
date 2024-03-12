@@ -29,8 +29,8 @@ type Model struct {
 	client psql.Client
 }
 
-// ShippingClassStorage is a constructor function that returns a new instance of the Model.
-func NewShippingClassStorage(client psql.Client) *Model {
+// NewStorage is a constructor function that returns a new instance of the Model.
+func NewStorage(client psql.Client) *Model {
 	return &Model{
 		qb:     sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		client: client,

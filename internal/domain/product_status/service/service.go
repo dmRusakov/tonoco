@@ -20,10 +20,10 @@ type repository interface {
 	Delete(ctx context.Context, id string) error
 }
 
-type ProductStatusService struct {
+type Service struct {
 	repository model.ProductStatusStorage
 }
 
-func NewProductStatusService(repository model.ProductStatusStorage) *ProductStatusService {
-	return &ProductStatusService{repository: repository}
+func NewService(repository model.ProductStatusStorage) *Service {
+	return &Service{repository: repository}
 }

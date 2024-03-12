@@ -852,7 +852,7 @@ func initStorage(t *testing.T) *model.Model {
 	pgClient := app.SqlDB
 
 	// Initialize Storage
-	return model.NewProductCategoryStorage(pgClient)
+	return model.NewStorage(pgClient)
 }
 
 // init context
