@@ -37,8 +37,8 @@ var testProductStatuses = []*entity.ProductStatus{
 		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14",
 		Name:      "Discontinued",
 		Url:       "discontinued",
-		Active:    true,
 		SortOrder: 3,
+		Active:    true,
 	},
 	{
 		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15",
