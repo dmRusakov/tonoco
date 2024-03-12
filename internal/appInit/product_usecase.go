@@ -24,8 +24,6 @@ func (a *App) ProductUseCaseInit() (err error) {
 	productStatusStorage := product_status_model.NewStorage(a.SqlDB)
 	productStatusService := product_status_service.NewService(productStatusStorage)
 
-	// product status
-
 	a.ProductUseCase = productPolicy.NewProductUseCase(a.generator, a.clock, productService, productCategoryService, productStatusService)
 
 	return nil
