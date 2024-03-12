@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"github.com/dmRusakov/tonoco/internal/appInit"
 	"github.com/dmRusakov/tonoco/internal/config"
-	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	"github.com/dmRusakov/tonoco/internal/domain/product_status/model"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-var testProductStatuses = []*entity.ProductStatus{
+var testProductStatuses = []*model.Item{
 	{
 		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Name:      "Public",
@@ -48,7 +47,7 @@ var testProductStatuses = []*entity.ProductStatus{
 		Active:    true,
 	},
 }
-var testProductStatusesNew = []*entity.ProductStatus{
+var testProductStatusesNew = []*model.Item{
 	{
 		ID:     "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a00",
 		Name:   "New",
@@ -84,9 +83,11 @@ var testProductStatusesNew = []*entity.ProductStatus{
 
 // Test Product Status
 func TestProductStatus(t *testing.T) {
+	// prepare data
 	t.Run("clearTestData", clearTestData)
 	defer t.Run("clearTestData", clearTestData)
 
+	// run tests
 	t.Run("all", all)
 	t.Run("get", get)
 	t.Run("getByUrl", getByUrl)
@@ -106,7 +107,7 @@ func clearTestData(t *testing.T) {
 	storage := initStorage(t)
 
 	// get all data from the table
-	all, err := storage.All(initContext(), &entity.ProductStatusFilter{})
+	all, err := storage.All(initContext(), &model.Filter{})
 
 	// check if there is an error
 	assert.NoError(t, err)
@@ -160,28 +161,28 @@ func all(t *testing.T) {
 	// Define the test cases
 	tests := []struct {
 		name     string
-		filter   *entity.ProductStatusFilter
-		expected []*entity.ProductStatus
+		filter   *model.Filter
+		expected []*model.Item
 	}{
 		{
 			name:     "Get all",
-			filter:   &entity.ProductStatusFilter{},
+			filter:   &model.Filter{},
 			expected: testProductStatuses,
 		}, {
 			name:     "Get all active",
-			filter:   &entity.ProductStatusFilter{Active: &isActive},
+			filter:   &model.Filter{Active: &isActive},
 			expected: testProductStatuses,
 		}, {
 			name:     "Get with name like 'out'",
-			filter:   &entity.ProductStatusFilter{Search: &searchOut},
+			filter:   &model.Filter{Search: &searchOut},
 			expected: testProductStatuses[2:3],
 		}, {
 			name:     "Get with perPage 3",
-			filter:   &entity.ProductStatusFilter{PerPage: &perPage3},
+			filter:   &model.Filter{PerPage: &perPage3},
 			expected: testProductStatuses[:3],
 		}, {
 			name:     "Get with perPage 3 and page 1",
-			filter:   &entity.ProductStatusFilter{PerPage: &perPage3, Page: &page1},
+			filter:   &model.Filter{PerPage: &perPage3, Page: &page1},
 			expected: testProductStatuses[:3],
 		},
 	}
@@ -219,7 +220,7 @@ func get(t *testing.T) {
 	testCases := []struct {
 		name string
 		id   string
-		get  *entity.ProductStatus
+		get  *model.Item
 	}{
 		{
 			name: "Get by ID",
@@ -272,7 +273,7 @@ func getByUrl(t *testing.T) {
 	testCases := []struct {
 		name string
 		url  string
-		get  *entity.ProductStatus
+		get  *model.Item
 	}{
 		{
 			name: "Get by URL",
@@ -325,7 +326,7 @@ func createWithId(t *testing.T) {
 	// Define the test cases
 	testCases := []struct {
 		name string
-		new  *entity.ProductStatus
+		new  *model.Item
 	}{
 		{
 			name: "Create with ID",
@@ -370,8 +371,8 @@ func createWithoutId(t *testing.T) {
 	// Define the test cases
 	testCases := []struct {
 		name string
-		sent *entity.ProductStatus
-		get  *entity.ProductStatus
+		sent *model.Item
+		get  *model.Item
 	}{
 		{
 			name: "Create without ID",
@@ -418,8 +419,8 @@ func update(t *testing.T) {
 	// Define the test cases
 	testCases := []struct {
 		name   string
-		sent   *entity.ProductStatus
-		update *entity.ProductStatus
+		sent   *model.Item
+		update *model.Item
 	}{
 		{
 			name:   "Update",
@@ -462,7 +463,7 @@ func patch(t *testing.T) {
 		name   string
 		id     string
 		fields map[string]interface{}
-		get    *entity.ProductStatus
+		get    *model.Item
 	}{
 		{
 			name: "Patch",
@@ -501,7 +502,7 @@ func updatedAt(t *testing.T) {
 	testCases := []struct {
 		name string
 		id   string
-		sent *entity.ProductStatus
+		sent *model.Item
 	}{
 		{
 			name: "Updated at 01",
