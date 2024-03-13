@@ -83,8 +83,8 @@ func TestShippingClass(t *testing.T) {
 	t.Run("patch", patch)
 	t.Run("updatedAt", updatedAt)
 	t.Run("tableUpdated", tableUpdated)
-	t.Run("maxSortOrder", maxSortOrder)
 	t.Run("del", del)
+	t.Run("maxSortOrder", maxSortOrder)
 }
 
 // Create test data for the test cases
@@ -114,8 +114,9 @@ func clearTestData(t *testing.T) {
 		}
 	}
 
-	// go thought all testItems and create or update them
-	for _, v := range testItems {
+	// Add this in your clearTestData function
+	for i, v := range testItems {
+		v.SortOrder = uint32(i + 1) // Ensure SortOrder is greater than 0
 		// get the product status by the ID
 		ps, err := storage.Get(initContext(), v.ID)
 

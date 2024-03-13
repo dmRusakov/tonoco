@@ -12,7 +12,7 @@ import (
 )
 
 // test data
-var testProductCategories = []*entity.ProductCategory{
+var testItems = []*entity.ProductCategory{
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9901",
 		Url:              "island",
@@ -174,7 +174,7 @@ var testProductCategories = []*entity.ProductCategory{
 		Active:           false,
 	},
 }
-var testProductCategoriesNew = []*entity.ProductCategory{
+var newTestItems = []*entity.ProductCategory{
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e045f0001",
 		Url:              "test1-url",
@@ -234,8 +234,8 @@ func TestProductCategory(t *testing.T) {
 	t.Run("patch", patch)
 	t.Run("updatedAt", updatedAt)
 	t.Run("tableUpdated", tableUpdated)
-	t.Run("maxSortOrder", maxSortOrder)
 	t.Run("delete", delete)
+	t.Run("maxSortOrder", maxSortOrder)
 }
 
 // clear test data
@@ -252,7 +252,7 @@ func clearTestData(t *testing.T) {
 	// go thought all data and delete it if is not in the testProductStatuses
 	for _, v := range all {
 		found := false
-		for _, tv := range testProductCategories {
+		for _, tv := range testItems {
 			if v.ID == tv.ID {
 				found = true
 				break
@@ -266,7 +266,7 @@ func clearTestData(t *testing.T) {
 	}
 
 	// go thought all testProductStatuses and create or update them
-	for _, v := range testProductCategories {
+	for _, v := range testItems {
 		// get the product status by the ID
 		ps, err := storage.Get(initContext(), v.ID)
 
@@ -306,20 +306,20 @@ func all(t *testing.T) {
 		{
 			name:     "Get All",
 			filter:   &entity.ProductCategoryFilter{},
-			expected: testProductCategories[:10],
+			expected: testItems[:10],
 		}, {
 			name: "Get 3 products categories 02",
 			filter: &entity.ProductCategoryFilter{
 				PerPage: &perPage3,
 				Page:    &page1,
 			},
-			expected: testProductCategories[:3],
+			expected: testItems[:3],
 		}, {
 			name: "Get Prime products categories 03",
 			filter: &entity.ProductCategoryFilter{
 				Prime: &isPrime,
 			},
-			expected: testProductCategories[0:6],
+			expected: testItems[0:6],
 		}, {
 			name: "Get Active products categories 04",
 			filter: &entity.ProductCategoryFilter{
@@ -327,19 +327,19 @@ func all(t *testing.T) {
 				Page:    &page1,
 				PerPage: &perPage100,
 			},
-			expected: testProductCategories[:15],
+			expected: testItems[:15],
 		}, {
 			name: "Get with name like `air` products categories 05",
 			filter: &entity.ProductCategoryFilter{
 				Search: &searchAir,
 			},
-			expected: testProductCategories[2:3],
+			expected: testItems[2:3],
 		}, {
 			name: "Get with name like `steel` products categories 06",
 			filter: &entity.ProductCategoryFilter{
 				Search: &searchSteel,
 			},
-			expected: testProductCategories[9:10],
+			expected: testItems[9:10],
 		},
 	}
 
@@ -381,24 +381,24 @@ func get(t *testing.T) {
 	}{
 		{
 			name: "Get 01",
-			id:   testProductCategories[0].ID,
-			get:  testProductCategories[0],
+			id:   testItems[0].ID,
+			get:  testItems[0],
 		}, {
 			name: "Get 02",
-			id:   testProductCategories[1].ID,
-			get:  testProductCategories[1],
+			id:   testItems[1].ID,
+			get:  testItems[1],
 		}, {
 			name: "Get 03",
-			id:   testProductCategories[2].ID,
-			get:  testProductCategories[2],
+			id:   testItems[2].ID,
+			get:  testItems[2],
 		}, {
 			name: "Get 04",
-			id:   testProductCategories[3].ID,
-			get:  testProductCategories[3],
+			id:   testItems[3].ID,
+			get:  testItems[3],
 		}, {
 			name: "Get 05",
-			id:   testProductCategories[4].ID,
-			get:  testProductCategories[4],
+			id:   testItems[4].ID,
+			get:  testItems[4],
 		},
 	}
 
@@ -435,24 +435,24 @@ func getByUrl(t *testing.T) {
 	}{
 		{
 			name: "Get by url 01",
-			url:  testProductCategories[0].Url,
-			get:  testProductCategories[0],
+			url:  testItems[0].Url,
+			get:  testItems[0],
 		}, {
 			name: "Get by url 02",
-			url:  testProductCategories[1].Url,
-			get:  testProductCategories[1],
+			url:  testItems[1].Url,
+			get:  testItems[1],
 		}, {
 			name: "Get by url 03",
-			url:  testProductCategories[2].Url,
-			get:  testProductCategories[2],
+			url:  testItems[2].Url,
+			get:  testItems[2],
 		}, {
 			name: "Get by url 04",
-			url:  testProductCategories[3].Url,
-			get:  testProductCategories[3],
+			url:  testItems[3].Url,
+			get:  testItems[3],
 		}, {
 			name: "Get by url 05",
-			url:  testProductCategories[4].Url,
-			get:  testProductCategories[4],
+			url:  testItems[4].Url,
+			get:  testItems[4],
 		},
 	}
 
@@ -490,20 +490,20 @@ func createWithId(t *testing.T) {
 	}{
 		{
 			name: "Create with id 1",
-			sent: testProductCategoriesNew[0],
-			get:  testProductCategoriesNew[0],
+			sent: newTestItems[0],
+			get:  newTestItems[0],
 		}, {
 			name: "Create with id 2",
-			sent: testProductCategoriesNew[1],
-			get:  testProductCategoriesNew[1],
+			sent: newTestItems[1],
+			get:  newTestItems[1],
 		}, {
 			name: "Create with id 3",
-			sent: testProductCategoriesNew[4],
-			get:  testProductCategoriesNew[4],
+			sent: newTestItems[4],
+			get:  newTestItems[4],
 		}, {
 			name: "Create with id 4",
-			sent: testProductCategoriesNew[5],
-			get:  testProductCategoriesNew[5],
+			sent: newTestItems[5],
+			get:  newTestItems[5],
 		},
 	}
 
@@ -541,12 +541,12 @@ func createWithoutId(t *testing.T) {
 	}{
 		{
 			name: "Create without id - 1",
-			sent: testProductCategoriesNew[2],
-			get:  testProductCategoriesNew[2],
+			sent: newTestItems[2],
+			get:  newTestItems[2],
 		}, {
 			name: "Create without id - 2",
-			sent: testProductCategoriesNew[3],
-			get:  testProductCategoriesNew[3],
+			sent: newTestItems[3],
+			get:  newTestItems[3],
 		},
 	}
 
@@ -578,8 +578,8 @@ func update(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
-	// create new variable from testProductCategories[0]
-	testProductCategoryNew := testProductCategoriesNew[0]
+	// create new variable from testItems[0]
+	testProductCategoryNew := newTestItems[0]
 	testProductCategoryNew.Name = fmt.Sprintf("%s Test", testProductCategoryNew.Name)
 	testProductCategoryNew.Url = fmt.Sprintf("%s-test", testProductCategoryNew.Url)
 
@@ -626,8 +626,8 @@ func patch(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
-	// create new variable from testProductCategories[0]
-	testProductCategoryNew := testProductCategoriesNew[1]
+	// create new variable from testItems[0]
+	testProductCategoryNew := newTestItems[1]
 	testProductCategoryNew.Name = fmt.Sprintf("%s Test", testProductCategoryNew.Name)
 	testProductCategoryNew.Url = fmt.Sprintf("%s-test", testProductCategoryNew.Url)
 
@@ -640,7 +640,7 @@ func patch(t *testing.T) {
 	}{
 		{
 			name: "Patch 01",
-			id:   testProductCategoriesNew[1].ID,
+			id:   newTestItems[1].ID,
 			fields: map[string]interface{}{
 				"Name":  testProductCategoryNew.Name,
 				"Url":   testProductCategoryNew.Url,
@@ -684,8 +684,8 @@ func updatedAt(t *testing.T) {
 	}{
 		{
 			name: "Updated at 01",
-			id:   testProductCategoriesNew[4].ID,
-			sent: testProductCategoriesNew[4],
+			id:   newTestItems[4].ID,
+			sent: newTestItems[4],
 		},
 	}
 
@@ -735,9 +735,9 @@ func tableUpdated(t *testing.T) {
 	}{
 		{
 			name: "Table updated 01",
-			id:   testProductCategoriesNew[5].ID,
+			id:   newTestItems[5].ID,
 			patch: map[string]interface{}{
-				"Name": fmt.Sprintf("%s Test+++", testProductCategoriesNew[5].Name),
+				"Name": fmt.Sprintf("%s Test+++", newTestItems[5].Name),
 			},
 		},
 	}
@@ -804,22 +804,22 @@ func delete(t *testing.T) {
 	}{
 		{
 			name: "Delete 01",
-			id:   testProductCategoriesNew[0].ID,
+			id:   newTestItems[0].ID,
 		}, {
 			name: "Delete 02",
-			id:   testProductCategoriesNew[1].ID,
+			id:   newTestItems[1].ID,
 		}, {
 			name: "Delete 03",
-			id:   testProductCategoriesNew[2].ID,
+			id:   newTestItems[2].ID,
 		}, {
 			name: "Delete 04",
-			id:   testProductCategoriesNew[3].ID,
+			id:   newTestItems[3].ID,
 		}, {
 			name: "Delete 05",
-			id:   testProductCategoriesNew[4].ID,
+			id:   newTestItems[4].ID,
 		}, {
 			name: "Delete 06",
-			id:   testProductCategoriesNew[5].ID,
+			id:   newTestItems[5].ID,
 		},
 	}
 

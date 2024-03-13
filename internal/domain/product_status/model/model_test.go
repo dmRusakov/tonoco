@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-var testProductStatuses = []*model.Item{
+var testItems = []*model.Item{
 	{
 		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Name:      "Public",
@@ -47,7 +47,7 @@ var testProductStatuses = []*model.Item{
 		Active:    true,
 	},
 }
-var testProductStatusesNew = []*model.Item{
+var newTestItems = []*model.Item{
 	{
 		ID:     "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a00",
 		Name:   "New",
@@ -97,8 +97,8 @@ func TestProductStatus(t *testing.T) {
 	t.Run("patch", patch)
 	t.Run("updatedAt", updatedAt)
 	t.Run("tableUpdated", tableUpdated)
-	t.Run("maxSortOrder", maxSortOrder)
 	t.Run("del", del)
+	t.Run("maxSortOrder", maxSortOrder)
 }
 
 // Create test data for the test cases
@@ -112,10 +112,10 @@ func clearTestData(t *testing.T) {
 	// check if there is an error
 	assert.NoError(t, err)
 
-	// go thought all data and del it if is not in the testProductStatuses
+	// go thought all data and del it if is not in the testItems
 	for _, v := range all {
 		found := false
-		for _, tv := range testProductStatuses {
+		for _, tv := range testItems {
 			if v.ID == tv.ID {
 				found = true
 				break
@@ -128,8 +128,9 @@ func clearTestData(t *testing.T) {
 		}
 	}
 
-	// go thought all testProductStatuses and create or update them
-	for _, v := range testProductStatuses {
+	// go thought all testItems and create or update them
+	for i, v := range testItems {
+		v.SortOrder = uint32(i + 1) // Ensure SortOrder is greater than 0
 		// get the product status by the ID
 		ps, err := storage.Get(initContext(), v.ID)
 
@@ -167,23 +168,23 @@ func all(t *testing.T) {
 		{
 			name:     "Get all",
 			filter:   &model.Filter{},
-			expected: testProductStatuses,
+			expected: testItems,
 		}, {
 			name:     "Get all active",
 			filter:   &model.Filter{Active: &isActive},
-			expected: testProductStatuses,
+			expected: testItems,
 		}, {
 			name:     "Get with name like 'out'",
 			filter:   &model.Filter{Search: &searchOut},
-			expected: testProductStatuses[2:3],
+			expected: testItems[2:3],
 		}, {
 			name:     "Get with perPage 3",
 			filter:   &model.Filter{PerPage: &perPage3},
-			expected: testProductStatuses[:3],
+			expected: testItems[:3],
 		}, {
 			name:     "Get with perPage 3 and page 1",
 			filter:   &model.Filter{PerPage: &perPage3, Page: &page1},
-			expected: testProductStatuses[:3],
+			expected: testItems[:3],
 		},
 	}
 
@@ -224,24 +225,24 @@ func get(t *testing.T) {
 	}{
 		{
 			name: "Get by ID",
-			id:   testProductStatuses[0].ID,
-			get:  testProductStatuses[0],
+			id:   testItems[0].ID,
+			get:  testItems[0],
 		}, {
 			name: "Get by ID",
-			id:   testProductStatuses[1].ID,
-			get:  testProductStatuses[1],
+			id:   testItems[1].ID,
+			get:  testItems[1],
 		}, {
 			name: "Get by ID",
-			id:   testProductStatuses[2].ID,
-			get:  testProductStatuses[2],
+			id:   testItems[2].ID,
+			get:  testItems[2],
 		}, {
 			name: "Get by ID",
-			id:   testProductStatuses[3].ID,
-			get:  testProductStatuses[3],
+			id:   testItems[3].ID,
+			get:  testItems[3],
 		}, {
 			name: "Get by ID",
-			id:   testProductStatuses[4].ID,
-			get:  testProductStatuses[4],
+			id:   testItems[4].ID,
+			get:  testItems[4],
 		},
 	}
 
@@ -277,24 +278,24 @@ func getByUrl(t *testing.T) {
 	}{
 		{
 			name: "Get by URL",
-			url:  testProductStatuses[0].Url,
-			get:  testProductStatuses[0],
+			url:  testItems[0].Url,
+			get:  testItems[0],
 		}, {
 			name: "Get by URL",
-			url:  testProductStatuses[1].Url,
-			get:  testProductStatuses[1],
+			url:  testItems[1].Url,
+			get:  testItems[1],
 		}, {
 			name: "Get by URL",
-			url:  testProductStatuses[2].Url,
-			get:  testProductStatuses[2],
+			url:  testItems[2].Url,
+			get:  testItems[2],
 		}, {
 			name: "Get by URL",
-			url:  testProductStatuses[3].Url,
-			get:  testProductStatuses[3],
+			url:  testItems[3].Url,
+			get:  testItems[3],
 		}, {
 			name: "Get by URL",
-			url:  testProductStatuses[4].Url,
-			get:  testProductStatuses[4],
+			url:  testItems[4].Url,
+			get:  testItems[4],
 		},
 	}
 
@@ -330,16 +331,16 @@ func createWithId(t *testing.T) {
 	}{
 		{
 			name: "Create with ID",
-			new:  testProductStatusesNew[0],
+			new:  newTestItems[0],
 		}, {
 			name: "Create with ID",
-			new:  testProductStatusesNew[1],
+			new:  newTestItems[1],
 		}, {
 			name: "Create with ID",
-			new:  testProductStatusesNew[2],
+			new:  newTestItems[2],
 		}, {
 			name: "Create with ID",
-			new:  testProductStatusesNew[3],
+			new:  newTestItems[3],
 		},
 	}
 
@@ -376,12 +377,12 @@ func createWithoutId(t *testing.T) {
 	}{
 		{
 			name: "Create without ID",
-			sent: testProductStatusesNew[4],
-			get:  testProductStatusesNew[4],
+			sent: newTestItems[4],
+			get:  newTestItems[4],
 		}, {
 			name: "Create without ID",
-			sent: testProductStatusesNew[5],
-			get:  testProductStatusesNew[5],
+			sent: newTestItems[5],
+			get:  newTestItems[5],
 		},
 	}
 
@@ -411,8 +412,8 @@ func update(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
-	// create new variable from the testProductStatuses[0]
-	testProductCategoryNew := *testProductStatuses[0]
+	// create new variable from the testItems[0]
+	testProductCategoryNew := *testItems[0]
 	testProductCategoryNew.Name = fmt.Sprintf("%s - updated", testProductCategoryNew.Name)
 	testProductCategoryNew.Url = fmt.Sprintf("%s - updated", testProductCategoryNew.Url)
 
@@ -453,8 +454,8 @@ func patch(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
-	// create new variable from the testProductStatuses[0]
-	testProductCategoryNew := *testProductStatuses[0]
+	// create new variable from the testItems[0]
+	testProductCategoryNew := *testItems[0]
 	testProductCategoryNew.Name = fmt.Sprintf("%s - patched", testProductCategoryNew.Name)
 	testProductCategoryNew.Url = fmt.Sprintf("%s - patched", testProductCategoryNew.Url)
 
@@ -506,8 +507,8 @@ func updatedAt(t *testing.T) {
 	}{
 		{
 			name: "Updated at 01",
-			id:   testProductStatusesNew[4].ID,
-			sent: testProductStatusesNew[4],
+			id:   newTestItems[4].ID,
+			sent: newTestItems[4],
 		},
 	}
 
@@ -549,9 +550,9 @@ func tableUpdated(t *testing.T) {
 	}{
 		{
 			name: "Table Updated 01",
-			id:   testProductStatusesNew[5].ID,
+			id:   newTestItems[5].ID,
 			patch: map[string]interface{}{
-				"Name": fmt.Sprintf("%s - patched", testProductStatusesNew[5].Name),
+				"Name": fmt.Sprintf("%s - patched", newTestItems[5].Name),
 			},
 		},
 	}
@@ -615,22 +616,22 @@ func del(t *testing.T) {
 	}{
 		{
 			name: "Delete 01",
-			id:   testProductStatusesNew[0].ID,
+			id:   newTestItems[0].ID,
 		}, {
 			name: "Delete 02",
-			id:   testProductStatusesNew[1].ID,
+			id:   newTestItems[1].ID,
 		}, {
 			name: "Delete 03",
-			id:   testProductStatusesNew[2].ID,
+			id:   newTestItems[2].ID,
 		}, {
 			name: "Delete 04",
-			id:   testProductStatusesNew[3].ID,
+			id:   newTestItems[3].ID,
 		}, {
 			name: "Delete 05",
-			id:   testProductStatusesNew[4].ID,
+			id:   newTestItems[4].ID,
 		}, {
 			name: "Delete 06",
-			id:   testProductStatusesNew[5].ID,
+			id:   newTestItems[5].ID,
 		},
 	}
 
