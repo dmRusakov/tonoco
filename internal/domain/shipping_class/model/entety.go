@@ -1,5 +1,10 @@
 package model
 
+import "github.com/dmRusakov/tonoco/internal/domain/entity"
+
+type Item = entity.ShippingClass
+type Filter = entity.ShippingClassFilter
+
 // fieldMap
 var fieldMap = map[string]string{
 	"ID":        "id",

@@ -3,13 +3,12 @@ package model
 import (
 	"context"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/dmRusakov/tonoco/internal/domain/entity"
 )
 
 func (repo *Model) All(
 	ctx context.Context,
-	filter *entity.ProductCategoryFilter,
-) ([]*entity.ProductCategory, error) {
+	filter *Filter,
+) ([]*Item, error) {
 	// check standard filter parameter
 	if filter.SortBy == nil {
 		filter.SortBy = new(string)
@@ -83,9 +82,9 @@ func (repo *Model) All(
 
 	defer rows.Close()
 
-	var productCategories []*entity.ProductCategory
+	var productCategories []*Item
 	for rows.Next() {
-		var productCategory entity.ProductCategory
+		var productCategory Item
 		err = rows.Scan(
 			&productCategory.ID,
 			&productCategory.Name,

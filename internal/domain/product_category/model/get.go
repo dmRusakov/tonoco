@@ -3,14 +3,13 @@ package model
 import (
 	"context"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"strconv"
 )
 
 // Get returns a single product category by ID.
-func (repo *Model) Get(ctx context.Context, id string) (*entity.ProductCategory, error) {
+func (repo *Model) Get(ctx context.Context, id string) (*Item, error) {
 	// build query
 	statement := repo.qb.
 		Select(
@@ -57,7 +56,7 @@ func (repo *Model) Get(ctx context.Context, id string) (*entity.ProductCategory,
 	}
 
 	// scan the result set into a slice of Product structs
-	productCategory := &entity.ProductCategory{}
+	productCategory := &Item{}
 	if err = rows.Scan(
 		&productCategory.ID,
 		&productCategory.Name,
@@ -78,7 +77,7 @@ func (repo *Model) Get(ctx context.Context, id string) (*entity.ProductCategory,
 }
 
 // GetByURL returns a single product category by URL.
-func (repo *Model) GetByURL(ctx context.Context, url string) (*entity.ProductCategory, error) {
+func (repo *Model) GetByURL(ctx context.Context, url string) (*Item, error) {
 	// build query
 	statement := repo.qb.
 		Select(
@@ -125,7 +124,7 @@ func (repo *Model) GetByURL(ctx context.Context, url string) (*entity.ProductCat
 	}
 
 	// scan the result set into a slice of Product structs
-	productCategory := &entity.ProductCategory{}
+	productCategory := &Item{}
 	if err = rows.Scan(
 		&productCategory.ID,
 		&productCategory.Name,
