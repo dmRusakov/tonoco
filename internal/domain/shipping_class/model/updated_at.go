@@ -35,7 +35,7 @@ func (repo *Model) UpdatedAt(
 		return time.Time{}, nil
 	}
 
-	// scan the result set into a slice of Product structs
+	// scan the result set into a slice of Item structs
 	var updatedAt time.Time
 	if err = rows.Scan(
 		&updatedAt,
@@ -74,7 +74,7 @@ func (repo *Model) TableUpdated(
 		return time.Time{}, nil
 	}
 
-	// scan the result set into a slice of Product structs
+	// scan the result set into a slice of Item
 	var updatedAt time.Time
 	if err = rows.Scan(
 		&updatedAt,

@@ -47,18 +47,19 @@ func (repo *Model) Get(ctx context.Context, id string) (*Item, error) {
 
 	defer rows.Close()
 
+	// check if the row exists
 	if !rows.Next() {
 		return nil, psql.ErrNoRowForID(id)
 	}
 
-	// scan the result set into a ProductStatus struct
-	productStatus := &Item{}
+	// scan the row into the struct
+	item := &Item{}
 	if err = rows.Scan(
-		&productStatus.ID,
-		&productStatus.Name,
-		&productStatus.Url,
-		&productStatus.SortOrder,
-		&productStatus.Active,
+		&item.ID,
+		&item.Name,
+		&item.Url,
+		&item.SortOrder,
+		&item.Active,
 	); err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
@@ -66,7 +67,8 @@ func (repo *Model) Get(ctx context.Context, id string) (*Item, error) {
 		return nil, err
 	}
 
-	return (*Item)(productStatus), nil
+	// done
+	return (*Item)(item), nil
 }
 
 // GetByURL - get a product status by URL
@@ -113,7 +115,6 @@ func (repo *Model) GetByURL(ctx context.Context, url string) (*Item, error) {
 		return nil, psql.ErrNoRowForURL(url)
 	}
 
-	// scan the result set into a ProductStatus struct
 	productStatus := &Item{}
 	if err = rows.Scan(
 		&productStatus.ID,

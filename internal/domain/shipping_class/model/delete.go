@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-// Delete removes a ShippingClass from the database by its ID.
+// Delete removes a Item from the database
 func (repo *Model) Delete(ctx context.Context, id string) error {
 	// build query
 	statement := repo.qb.Delete(repo.table).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), id)

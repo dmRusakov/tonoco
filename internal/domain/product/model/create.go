@@ -91,7 +91,7 @@ func (repo *ProductModel) Create(ctx context.Context, product *Product, by strin
 		return nil, err
 	}
 
-	// Add tracing for the insert product query
+	// add tracing for the insert product query
 	tracing.SpanEvent(ctx, "Insert Product query")
 	tracing.TraceVal(ctx, "sql", query)
 	for i, arg := range args {

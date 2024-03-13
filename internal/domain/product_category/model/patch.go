@@ -34,7 +34,7 @@ func (repo *Model) Patch(ctx context.Context, id string, fields map[string]inter
 		return nil, err
 	}
 
-	// Add tracing
+	// add tracing
 	tracing.SpanEvent(ctx, "Patch Product")
 	tracing.TraceVal(ctx, "SQL", query)
 	for i, arg := range args {
@@ -58,7 +58,7 @@ func (repo *Model) Patch(ctx context.Context, id string, fields map[string]inter
 		return nil, err
 	}
 
-	// retrieve the updated Product
+	// retrieve the updated Item
 	productCategory, err := repo.Get(ctx, id)
 	if err != nil {
 		return nil, err

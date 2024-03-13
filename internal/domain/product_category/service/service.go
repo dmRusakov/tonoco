@@ -21,9 +21,9 @@ type repository interface {
 }
 
 type Service struct {
-	repository model.ProductCategoryStorage
+	repository model.Storage
 }
 
-func NewService(repository model.ProductCategoryStorage) *Service {
+func NewService(repository model.Storage) *Service {
 	return &Service{repository: repository}
 }

@@ -55,7 +55,7 @@ func (repo *Model) Get(ctx context.Context, id string) (*Item, error) {
 		return nil, psql.ErrNoRowForID(id)
 	}
 
-	// scan the result set into a slice of Product structs
+	// scan the result set into a slice of Item structs
 	productCategory := &Item{}
 	if err = rows.Scan(
 		&productCategory.ID,
@@ -123,7 +123,7 @@ func (repo *Model) GetByURL(ctx context.Context, url string) (*Item, error) {
 		return nil, psql.ErrNoRowForURL(url)
 	}
 
-	// scan the result set into a slice of Product structs
+	// scan the result set into a slice of Item structs
 	productCategory := &Item{}
 	if err = rows.Scan(
 		&productCategory.ID,

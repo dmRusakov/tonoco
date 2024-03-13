@@ -53,7 +53,7 @@ func (repo *ProductModel) Patch(ctx context.Context, id string, fields map[strin
 		return nil, err
 	}
 
-	// retrieve the updated Product
+	// retrieve the updated Item
 	product, err := repo.Get(ctx, id)
 	if err != nil {
 		tracing.Error(ctx, err)

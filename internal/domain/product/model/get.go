@@ -76,7 +76,7 @@ func (repo *ProductModel) Get(ctx context.Context, id string) (*Product, error) 
 		return nil, psql.ErrNoRowForID(id)
 	}
 
-	// scan the result set into a slice of Product structs
+	// scan the result set into a slice of Item structs
 	product := &Product{}
 	if err = rows.Scan(
 		&product.ID,

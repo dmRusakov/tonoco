@@ -2,20 +2,20 @@ package model
 
 import (
 	"context"
-	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/google/uuid"
 	"strconv"
 )
 
-func (repo *Model) Create(ctx context.Context, productStatus *entity.ShippingClass) (*entity.ShippingClass, error) {
+// Create a new item
+func (repo *Model) Create(ctx context.Context, item *Item) (*Item, error) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
 	// if ID is not set, generate a new UUID
-	if productStatus.ID == "" {
-		productStatus.ID = uuid.New().String()
+	if item.ID == "" {
+		item.ID = uuid.New().String()
 	}
 
 	// build query
@@ -31,11 +31,11 @@ func (repo *Model) Create(ctx context.Context, productStatus *entity.ShippingCla
 			fieldMap["UpdatedAt"],
 			fieldMap["UpdatedBy"]).
 		Values(
-			productStatus.ID,
-			productStatus.Name,
-			productStatus.Url,
-			productStatus.SortOrder,
-			productStatus.Active,
+			item.ID,
+			item.Name,
+			item.Url,
+			item.SortOrder,
+			item.Active,
 			"NOW()",
 			by,
 			"NOW()",
@@ -66,9 +66,17 @@ func (repo *Model) Create(ctx context.Context, productStatus *entity.ShippingCla
 		return nil, execErr
 	}
 
+	// check if the item was created
 	if cmd.RowsAffected() == 0 {
 		return nil, psql.ErrNothingInserted
 	}
 
-	return productStatus, nil
+	// get the newly created item
+	item, err = repo.Get(ctx, item.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// return the item
+	return item, nil
 }

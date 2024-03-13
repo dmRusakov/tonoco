@@ -31,7 +31,7 @@ func (repo *Model) Update(ctx context.Context, product *Item) (*Item, error) {
 		return nil, err
 	}
 
-	// Add tracing
+	// add tracing
 	tracing.SpanEvent(ctx, "Update ProductStatus")
 	tracing.TraceVal(ctx, "SQL", query)
 	for i, arg := range args {
@@ -56,11 +56,12 @@ func (repo *Model) Update(ctx context.Context, product *Item) (*Item, error) {
 		return nil, err
 	}
 
-	// retrieve the updated Product
-	productStatus, err := repo.Get(ctx, product.ID)
+	// get the updated item
+	item, err := repo.Get(ctx, product.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	return productStatus, nil
+	// return the updated item
+	return item, nil
 }

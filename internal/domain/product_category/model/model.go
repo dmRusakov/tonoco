@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type ProductCategoryStorage interface {
+type Storage interface {
 	All(ctx context.Context, filter *Filter) ([]*Item, error)
 	Create(ctx context.Context, productCategory *Item) (*Item, error)
 	Get(ctx context.Context, id string) (*Item, error)

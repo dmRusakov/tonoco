@@ -72,22 +72,24 @@ func (repo *Model) All(
 
 	defer rows.Close()
 
-	var productStatuses []*Item
+	// iterate over the result set
+	var items []*Item
 	for rows.Next() {
 		// scan the result set into a ShippingClass struct
-		productStatus := &Item{}
+		item := &Item{}
 		if err = rows.Scan(
-			&productStatus.ID,
-			&productStatus.Name,
-			&productStatus.Url,
-			&productStatus.SortOrder,
-			&productStatus.Active,
+			&item.ID,
+			&item.Name,
+			&item.Url,
+			&item.SortOrder,
+			&item.Active,
 		); err != nil {
 			return nil, err
 		}
 
-		productStatuses = append(productStatuses, productStatus)
+		items = append(items, item)
 	}
 
-	return productStatuses, nil
+	// done
+	return items, nil
 }

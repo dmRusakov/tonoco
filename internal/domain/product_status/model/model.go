@@ -7,17 +7,17 @@ import (
 	"time"
 )
 
-type ProductStatusStorage interface {
-	All(ctx context.Context, filter *Filter) ([]*Item, error)
-	Create(ctx context.Context, productCategory *Item) (*Item, error)
-	Get(ctx context.Context, id string) (*Item, error)
-	GetByURL(ctx context.Context, url string) (*Item, error)
-	Update(ctx context.Context, product *Item) (*Item, error)
-	Patch(ctx context.Context, id string, fields map[string]interface{}) (*Item, error)
-	UpdatedAt(ctx context.Context, id string) (time.Time, error)
-	TableUpdated(ctx context.Context) (time.Time, error)
-	MaxSortOrder(ctx context.Context) (*uint32, error)
-	Delete(ctx context.Context, id string) error
+type Storage interface {
+	All(context.Context, *Filter) ([]*Item, error)
+	Create(context.Context, *Item) (*Item, error)
+	Get(context.Context, string) (*Item, error)
+	GetByURL(context.Context, string) (*Item, error)
+	Update(context.Context, *Item) (*Item, error)
+	Patch(context.Context, string, map[string]interface{}) (*Item, error)
+	UpdatedAt(context.Context, string) (time.Time, error)
+	TableUpdated(context.Context) (time.Time, error)
+	MaxSortOrder(context.Context) (*uint32, error)
+	Delete(context.Context, string) error
 }
 
 // Model is a struct that contains the SQL statement builder and the PostgreSQL client.

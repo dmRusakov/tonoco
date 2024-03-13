@@ -2,7 +2,6 @@ package model
 
 import (
 	"context"
-	"fmt"
 )
 
 // MaxSortOrder - get the maximum value for the sort order in the table
@@ -31,15 +30,13 @@ func (repo *Model) MaxSortOrder(ctx context.Context) (*uint32, error) {
 		return nil, nil
 	}
 
-	// scan the result set into a slice of Product structs
+	// scan the result set into a slice of Item structs
 	var sortOrder uint32
 	if err = rows.Scan(
 		&sortOrder,
 	); err != nil {
 		return nil, err
 	}
-
-	fmt.Println("MaxSortOrder: ", sortOrder)
 
 	// return the max sort order
 	return &sortOrder, nil

@@ -28,7 +28,7 @@ func (repo *Model) MaxSortOrder(ctx context.Context) (*uint32, error) {
 		return nil, nil
 	}
 
-	// scan the result set into a slice of Product structs
+	// scan the result set into a slice of Item structs
 	var sortOrder uint32
 	if err = rows.Scan(
 		&sortOrder,

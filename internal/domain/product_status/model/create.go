@@ -8,13 +8,13 @@ import (
 	"strconv"
 )
 
-func (repo *Model) Create(ctx context.Context, productStatus *Item) (*Item, error) {
+func (repo *Model) Create(ctx context.Context, item *Item) (*Item, error) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
 	// if ID is not set, generate a new UUID
-	if productStatus.ID == "" {
-		productStatus.ID = uuid.New().String()
+	if item.ID == "" {
+		item.ID = uuid.New().String()
 	}
 
 	// build query
@@ -30,11 +30,11 @@ func (repo *Model) Create(ctx context.Context, productStatus *Item) (*Item, erro
 			fieldMap["UpdatedAt"],
 			fieldMap["UpdatedBy"]).
 		Values(
-			productStatus.ID,
-			productStatus.Name,
-			productStatus.Url,
-			productStatus.SortOrder,
-			productStatus.Active,
+			item.ID,
+			item.Name,
+			item.Url,
+			item.SortOrder,
+			item.Active,
 			"NOW()",
 			by,
 			"NOW()",
@@ -65,9 +65,17 @@ func (repo *Model) Create(ctx context.Context, productStatus *Item) (*Item, erro
 		return nil, execErr
 	}
 
+	// check if the item was inserted
 	if cmd.RowsAffected() == 0 {
 		return nil, psql.ErrNothingInserted
 	}
 
-	return productStatus, nil
+	// get the newly created item
+	item, err = repo.Get(ctx, item.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// return the item
+	return item, nil
 }

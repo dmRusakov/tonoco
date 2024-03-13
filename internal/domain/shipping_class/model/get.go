@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+// Get - get item by ID
 func (repo *Model) Get(ctx context.Context, id string) (*Item, error) {
 	// build query
 	statement := repo.qb.
@@ -52,13 +53,13 @@ func (repo *Model) Get(ctx context.Context, id string) (*Item, error) {
 	}
 
 	// scan the result set into a ShippingClass struct
-	productStatus := &Item{}
+	item := &Item{}
 	if err = rows.Scan(
-		&productStatus.ID,
-		&productStatus.Name,
-		&productStatus.Url,
-		&productStatus.SortOrder,
-		&productStatus.Active,
+		&item.ID,
+		&item.Name,
+		&item.Url,
+		&item.SortOrder,
+		&item.Active,
 	); err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
@@ -66,10 +67,11 @@ func (repo *Model) Get(ctx context.Context, id string) (*Item, error) {
 		return nil, err
 	}
 
-	return (*Item)(productStatus), nil
+	// return the Item
+	return (*Item)(item), nil
 }
 
-// GetByURL - get a product status by URL
+// GetByURL - get item by URL
 func (repo *Model) GetByURL(ctx context.Context, url string) (*Item, error) {
 	// build query
 	statement := repo.qb.
@@ -113,14 +115,14 @@ func (repo *Model) GetByURL(ctx context.Context, url string) (*Item, error) {
 		return nil, psql.ErrNoRowForURL(url)
 	}
 
-	// scan the result set into a ShippingClass struct
-	productStatus := &Item{}
+	// scan the result set into Item struct
+	item := &Item{}
 	if err = rows.Scan(
-		&productStatus.ID,
-		&productStatus.Name,
-		&productStatus.Url,
-		&productStatus.SortOrder,
-		&productStatus.Active,
+		&item.ID,
+		&item.Name,
+		&item.Url,
+		&item.SortOrder,
+		&item.Active,
 	); err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
@@ -128,5 +130,5 @@ func (repo *Model) GetByURL(ctx context.Context, url string) (*Item, error) {
 		return nil, err
 	}
 
-	return (*Item)(productStatus), nil
+	return (*Item)(item), nil
 }
