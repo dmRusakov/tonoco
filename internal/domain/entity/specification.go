@@ -6,7 +6,7 @@ type Specification struct {
 	Url       string `json:"url"`
 	Type      string `json:"type"`
 	Active    bool   `json:"active"`
-	SortOrder int32  `json:"order"`
+	SortOrder uint32 `json:"order"`
 	CreatedAt int64  `json:"created_at"`
 	CreatedBy string `json:"created_by"`
 	UpdatedAt int64  `json:"updated_at"`
