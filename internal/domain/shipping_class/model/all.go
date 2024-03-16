@@ -75,7 +75,7 @@ func (repo *Model) All(
 	// iterate over the result set
 	var items []*Item
 	for rows.Next() {
-		// scan the result set into a ShippingClass struct
+
 		item := &Item{}
 		if err = rows.Scan(
 			&item.ID,

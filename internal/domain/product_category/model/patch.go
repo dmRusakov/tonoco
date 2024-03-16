@@ -17,7 +17,7 @@ func (repo *Model) Patch(ctx context.Context, id string, fields map[string]inter
 
 	// iterate over the fields map and add each field to the update statement
 	for field, value := range fields {
-		// get DB field name from Product struct and db tag
+
 		field = fieldMap[field]
 		statement = statement.Set(field, value)
 	}
@@ -58,11 +58,6 @@ func (repo *Model) Patch(ctx context.Context, id string, fields map[string]inter
 		return nil, err
 	}
 
-	// retrieve the updated Item
-	productCategory, err := repo.Get(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return productCategory, nil
+	// return the updated product
+	return repo.Get(ctx, id)
 }

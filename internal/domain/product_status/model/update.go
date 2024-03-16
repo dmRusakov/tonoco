@@ -56,12 +56,6 @@ func (repo *Model) Update(ctx context.Context, product *Item) (*Item, error) {
 		return nil, err
 	}
 
-	// get the updated item
-	item, err := repo.Get(ctx, product.ID)
-	if err != nil {
-		return nil, err
-	}
-
 	// return the updated item
-	return item, nil
+	return repo.Get(ctx, product.ID)
 }

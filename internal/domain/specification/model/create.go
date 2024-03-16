@@ -23,8 +23,9 @@ func (repo *Model) Create(ctx context.Context, item *Item) (*Item, error) {
 			fieldMap["ID"],
 			fieldMap["Name"],
 			fieldMap["Url"],
-			fieldMap["SortOrder"],
+			fieldMap["Type"],
 			fieldMap["Active"],
+			fieldMap["SortOrder"],
 			fieldMap["CreatedAt"],
 			fieldMap["CreatedBy"],
 			fieldMap["UpdatedAt"],
@@ -33,8 +34,9 @@ func (repo *Model) Create(ctx context.Context, item *Item) (*Item, error) {
 			item.ID,
 			item.Name,
 			item.Url,
-			item.SortOrder,
+			item.Type,
 			item.Active,
+			item.SortOrder,
 			"NOW()",
 			by,
 			"NOW()",
@@ -65,11 +67,11 @@ func (repo *Model) Create(ctx context.Context, item *Item) (*Item, error) {
 		return nil, execErr
 	}
 
-	// check if the item was inserted
+	// check if the item was created
 	if cmd.RowsAffected() == 0 {
 		return nil, psql.ErrNothingInserted
 	}
 
-	// get the newly created item
+	// return the newly created item
 	return repo.Get(ctx, item.ID)
 }

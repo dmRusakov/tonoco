@@ -51,21 +51,22 @@ func (repo *Model) Get(ctx context.Context, id string) (*Item, error) {
 
 	defer rows.Close()
 
+	// check if the result set is empty
 	if !rows.Next() {
 		return nil, psql.ErrNoRowForID(id)
 	}
 
 	// scan the result set into a slice of Item structs
-	productCategory := &Item{}
+	item := &Item{}
 	if err = rows.Scan(
-		&productCategory.ID,
-		&productCategory.Name,
-		&productCategory.Url,
-		&productCategory.ShortDescription,
-		&productCategory.Description,
-		&productCategory.SortOrder,
-		&productCategory.Prime,
-		&productCategory.Active,
+		&item.ID,
+		&item.Name,
+		&item.Url,
+		&item.ShortDescription,
+		&item.Description,
+		&item.SortOrder,
+		&item.Prime,
+		&item.Active,
 	); err != nil {
 		err = psql.ErrScan(err)
 		tracing.Error(ctx, err)
@@ -73,7 +74,8 @@ func (repo *Model) Get(ctx context.Context, id string) (*Item, error) {
 		return nil, err
 	}
 
-	return productCategory, nil
+	// done
+	return item, nil
 }
 
 // GetByURL returns a single product category by URL.

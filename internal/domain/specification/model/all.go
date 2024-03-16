@@ -36,11 +36,9 @@ func (repo *Model) All(
 			fieldMap["ID"],
 			fieldMap["Name"],
 			fieldMap["Url"],
-			fieldMap["ShortDescription"],
-			fieldMap["Description"],
-			fieldMap["SortOrder"],
-			fieldMap["Prime"],
+			fieldMap["Type"],
 			fieldMap["Active"],
+			fieldMap["SortOrder"],
 		).
 		From(repo.table + " p").
 		OrderBy(fieldMap[*filter.SortBy] + " " + *filter.SortOrder).
@@ -51,19 +49,12 @@ func (repo *Model) All(
 		statement = statement.Where(sq.Eq{fieldMap["Active"]: *filter.Active})
 	}
 
-	// Prime
-	if filter.Prime != nil {
-		statement = statement.Where(sq.Eq{fieldMap["Prime"]: *filter.Prime})
-	}
-
 	// Search
 	if filter.Search != nil {
 		statement = statement.Where(
 			sq.Or{
 				sq.Expr("LOWER("+fieldMap["Name"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+fieldMap["Url"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["ShortDescription"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["Description"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 			},
 		)
 	}
@@ -82,24 +73,22 @@ func (repo *Model) All(
 
 	defer rows.Close()
 
-	// iterate over the rows
+	// iterate over the result set
 	var items []*Item
 	for rows.Next() {
-		var item Item
-		err = rows.Scan(
+		item := &Item{}
+		if err = rows.Scan(
 			&item.ID,
 			&item.Name,
 			&item.Url,
-			&item.ShortDescription,
-			&item.Description,
-			&item.SortOrder,
-			&item.Prime,
+			&item.Type,
 			&item.Active,
-		)
-		if err != nil {
+			&item.SortOrder,
+		); err != nil {
 			return nil, err
 		}
-		items = append(items, &item)
+
+		items = append(items, item)
 	}
 
 	// done

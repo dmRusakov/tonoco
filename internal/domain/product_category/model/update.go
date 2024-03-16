@@ -7,23 +7,23 @@ import (
 	"strconv"
 )
 
-func (repo *Model) Update(ctx context.Context, productCategory *Item) (*Item, error) {
+func (repo *Model) Update(ctx context.Context, item *Item) (*Item, error) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
 	// build query
 	statement := repo.qb.
 		Update(repo.table).
-		Set(fieldMap["Name"], productCategory.Name).
-		Set(fieldMap["Url"], productCategory.Url).
-		Set(fieldMap["ShortDescription"], productCategory.ShortDescription).
-		Set(fieldMap["Description"], productCategory.Description).
-		Set(fieldMap["SortOrder"], productCategory.SortOrder).
-		Set(fieldMap["Prime"], productCategory.Prime).
-		Set(fieldMap["Active"], productCategory.Active).
+		Set(fieldMap["Name"], item.Name).
+		Set(fieldMap["Url"], item.Url).
+		Set(fieldMap["ShortDescription"], item.ShortDescription).
+		Set(fieldMap["Description"], item.Description).
+		Set(fieldMap["SortOrder"], item.SortOrder).
+		Set(fieldMap["Prime"], item.Prime).
+		Set(fieldMap["Active"], item.Active).
 		Set(fieldMap["UpdatedAt"], "NOW()").
 		Set(fieldMap["UpdatedBy"], by).
-		Where(fieldMap["ID"]+" = ?", productCategory.ID)
+		Where(fieldMap["ID"]+" = ?", item.ID)
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()
@@ -54,6 +54,7 @@ func (repo *Model) Update(ctx context.Context, productCategory *Item) (*Item, er
 		return nil, err
 	}
 
+	// check if the query was successful
 	if cmd.RowsAffected() == 0 {
 		err = psql.ErrNothingInserted
 		tracing.Error(ctx, err)
@@ -61,5 +62,6 @@ func (repo *Model) Update(ctx context.Context, productCategory *Item) (*Item, er
 		return nil, err
 	}
 
-	return repo.Get(ctx, productCategory.ID)
+	// return the updated product
+	return repo.Get(ctx, item.ID)
 }

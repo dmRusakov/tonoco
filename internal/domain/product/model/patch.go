@@ -15,7 +15,7 @@ func (repo *ProductModel) Patch(ctx context.Context, id string, fields map[strin
 
 	// iterate over the fields map and add each field to the update statement
 	for field, value := range fields {
-		// get DB field name from Product struct and db tag
+
 		field = fieldMap[field]
 		statement = statement.Set(field, value)
 	}

@@ -8,7 +8,6 @@ import (
 	"strconv"
 )
 
-// Create a new item
 func (repo *Model) Create(ctx context.Context, item *Item) (*Item, error) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
@@ -71,12 +70,6 @@ func (repo *Model) Create(ctx context.Context, item *Item) (*Item, error) {
 		return nil, psql.ErrNothingInserted
 	}
 
-	// get the newly created item
-	item, err = repo.Get(ctx, item.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	// return the item
-	return item, nil
+	// return the newly created item
+	return repo.Get(ctx, item.ID)
 }
