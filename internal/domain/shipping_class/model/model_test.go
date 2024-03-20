@@ -123,7 +123,7 @@ func clearTestData(t *testing.T) {
 		// check if there is an error
 		assert.NoError(t, err)
 
-		// if the product status is not found create it
+		// if the item not found create it
 		if ps == nil {
 			_, err = storage.Create(initContext(), v)
 			assert.NoError(t, err)

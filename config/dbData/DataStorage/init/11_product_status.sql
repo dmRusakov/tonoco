@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS public.product_status
     CONSTRAINT product_status_pkey PRIMARY KEY (id)
 );
 
--- ownership, index and comment
+-- ownership and index
 ALTER TABLE public.product_status OWNER TO postgres;
 CREATE INDEX product_status_id ON public.product_status (id);
 CREATE INDEX product_status_url ON public.product_status (url);
@@ -30,6 +30,13 @@ COMMENT ON COLUMN public.product_status.url IS 'Url of the status';
 COMMENT ON COLUMN public.product_status.sort_order IS 'Sort order of the status';
 COMMENT ON COLUMN public.product_status.active IS 'Status is active or not';
 
+-- auto set sort_order column
+CREATE TRIGGER product_status_order
+    BEFORE INSERT
+    ON public.product_status
+    FOR EACH ROW
+EXECUTE FUNCTION set_order_column_universal();
+
 -- auto update updated_at
 CREATE TRIGGER product_status_updated_at
     BEFORE UPDATE
@@ -38,12 +45,12 @@ CREATE TRIGGER product_status_updated_at
 EXECUTE FUNCTION update_update_at_column();
 
 -- demo data
-INSERT INTO public.product_status (id, name, url, sort_order)
-VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Public', 'public', 0),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', 'Private', 'private', 1),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', 'Out of stock', 'out-of-stock', 2),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14', 'Discontinued', 'discontinued', 3),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15', 'Archived', 'archived', 4);
+INSERT INTO public.product_status (id, name, url)
+VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Public', 'public'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', 'Private', 'private'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', 'Out of stock', 'out-of-stock'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14', 'Discontinued', 'discontinued'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15', 'Archived', 'archived');
 
 -- get data
 select * from public.product_status;

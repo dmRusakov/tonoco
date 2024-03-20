@@ -31,17 +31,9 @@ func (repo *Model) All(
 	}
 
 	// build query
-	statement := repo.qb.
-		Select(
-			fieldMap["ID"],
-			fieldMap["Name"],
-			fieldMap["Url"],
-			fieldMap["Type"],
-			fieldMap["Active"],
-			fieldMap["SortOrder"],
-		).
-		From(repo.table + " p").
-		OrderBy(fieldMap[*filter.SortBy] + " " + *filter.SortOrder).
+	statement := repo.makeSelect()
+
+	statement = statement.OrderBy(fieldMap[*filter.SortBy] + " " + *filter.SortOrder).
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 
 	// Active

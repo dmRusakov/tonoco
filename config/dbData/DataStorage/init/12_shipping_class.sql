@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS public.shipping_class
     CONSTRAINT shipping_class_pkey PRIMARY KEY (id)
 );
 
--- ownership, index and comment
+-- ownership and index
 ALTER TABLE public.shipping_class OWNER TO postgres;
 CREATE INDEX shipping_class_id ON public.shipping_class (id);
 CREATE INDEX shipping_class_url ON public.shipping_class (url);
@@ -30,6 +30,13 @@ COMMENT ON COLUMN public.shipping_class.url IS 'URL of the shipping class';
 COMMENT ON COLUMN public.shipping_class.sort_order IS 'Sort order of the shipping class';
 COMMENT ON COLUMN public.shipping_class.active IS 'Active status of the shipping class';
 
+-- auto set sort_order column
+CREATE TRIGGER shipping_class_order
+    BEFORE INSERT
+    ON public.shipping_class
+    FOR EACH ROW
+EXECUTE FUNCTION set_order_column_universal();
+
 -- auto update updated_at
 CREATE TRIGGER shipping_class_updated_at
     BEFORE UPDATE
@@ -38,10 +45,10 @@ CREATE TRIGGER shipping_class_updated_at
 EXECUTE FUNCTION update_update_at_column();
 
 -- demo data
-INSERT INTO public.shipping_class (id, name, url, sort_order)
-VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Freight', 'freight', 0),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', 'Ground', 'ground', 1),
-       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', 'Ground - small', 'ground-small', 2);
+INSERT INTO public.shipping_class (id, name, url)
+VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Freight', 'freight'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12', 'Ground', 'ground'),
+       ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13', 'Ground - small', 'ground-small');
 
 -- get data
 select * from public.shipping_class;

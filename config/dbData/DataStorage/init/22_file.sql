@@ -34,7 +34,7 @@ CREATE OR REPLACE FUNCTION set_order_column_to_file()
     RETURNS TRIGGER AS
 $$
 BEGIN
-    NEW.sort_order = (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM file);
+    NEW.sort_order = (SELECT COALESCE(MAX(sort_order)  + 1, 0) FROM file);
     RETURN NEW;
 END;
 $$ language 'plpgsql';

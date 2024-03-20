@@ -1,23 +1,29 @@
 CREATE TABLE IF NOT EXISTS public.specification_value
 (
     id               UUID UNIQUE DEFAULT uuid_generate_v4(),
-    specification_id UUID         NOT NULL REFERENCES public.specification (id),
-    name             VARCHAR(255) NOT NULL,
-    url              VARCHAR(255) NOT NULL,
+    specification_id UUID                      NOT NULL REFERENCES public.specification (id),
+    name             VARCHAR(255)              NOT NULL,
+    url              VARCHAR(255)              NOT NULL,
     active           BOOLEAN     DEFAULT TRUE,
-    sort_order       INTEGER     DEFAULT null,
+    sort_order       INTEGER                   NOT NULL,
 
-    created_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
-    created_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
-    updated_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
-    updated_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    created_at       TIMESTAMP   DEFAULT NOW() NOT NULL,
+    created_by       UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    updated_at       TIMESTAMP   DEFAULT NOW() NOT NULL,
+    updated_by       UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
 
     CONSTRAINT specification_value_pkey PRIMARY KEY (id)
 );
 
+-- ownership and index
+ALTER TABLE public.specification_value OWNER TO postgres;
 CREATE INDEX specification_value_id ON public.specification_value (id);
-ALTER TABLE public.specification_value
-    OWNER TO postgres;
+CREATE INDEX specification_value_specification_id ON public.specification_value (specification_id);
+CREATE UNIQUE INDEX specification_value_url ON public.specification_value (url);
+CREATE INDEX specification_value_sort_order ON public.specification_value (sort_order);
+CREATE INDEX specification_value_updated_at ON public.specification_value (updated_at);
+
+-- add comment to table
 COMMENT ON TABLE public.specification_value IS 'Product Specification values';
 
 -- auto update updated_at
@@ -28,20 +34,11 @@ CREATE TRIGGER specification_value_updated_at
 EXECUTE FUNCTION update_update_at_column();
 
 -- auto set sort_order column
-CREATE OR REPLACE FUNCTION set_order_column_to_specification_value()
-    RETURNS TRIGGER AS
-$$
-BEGIN
-    NEW.sort_order = (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM specification_value);
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
-
 CREATE TRIGGER specification_value_order
     BEFORE INSERT
-    ON public.specification_type
+    ON public.specification_value
     FOR EACH ROW
-EXECUTE FUNCTION set_order_column_to_specification_value();
+EXECUTE FUNCTION set_order_column_universal();
 
 -- insert data
 INSERT INTO public.specification_value (id, specification_id, name, url, sort_order)

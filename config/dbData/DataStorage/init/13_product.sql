@@ -1,4 +1,4 @@
--- ownership, index and comment
+-- ownership and index
 CREATE TABLE IF NOT EXISTS public.product
 (
     id                      UUID UNIQUE                  DEFAULT uuid_generate_v4(),
@@ -88,20 +88,11 @@ CREATE TRIGGER product_updated_at
 EXECUTE FUNCTION update_update_at_column();
 
 -- auto set sort_order column
-CREATE OR REPLACE FUNCTION set_order_column_to_product()
-    RETURNS TRIGGER AS
-$$
-BEGIN
-    NEW.sort_order = (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM product);
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
-
 CREATE TRIGGER product_order
     BEFORE INSERT
     ON public.product
     FOR EACH ROW
-EXECUTE FUNCTION set_order_column_to_product();
+EXECUTE FUNCTION set_order_column_universal();
 
 -- demo data
 INSERT INTO public.product(id, sku, name, short_description, description, sort_order, status_id, url, regular_price,
