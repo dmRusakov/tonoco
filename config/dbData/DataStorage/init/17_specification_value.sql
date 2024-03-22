@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS public.specification_value
 ALTER TABLE public.specification_value OWNER TO postgres;
 CREATE INDEX specification_value_id ON public.specification_value (id);
 CREATE INDEX specification_value_specification_id ON public.specification_value (specification_id);
-CREATE UNIQUE INDEX specification_value_url ON public.specification_value (url);
+CREATE INDEX specification_value_url ON public.specification_value (url);
 CREATE INDEX specification_value_sort_order ON public.specification_value (sort_order);
 CREATE INDEX specification_value_updated_at ON public.specification_value (updated_at);
 
@@ -898,8 +898,7 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382160',
         '42″-84″', 'up-to-48', '1585');
 
 -- get data
-select *
-from public.specification_value;
+select * from public.specification_value;
 
 -- get data form WooCommerce DB
 -- SELECT

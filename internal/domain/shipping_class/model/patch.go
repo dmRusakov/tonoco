@@ -2,30 +2,14 @@ package model
 
 import (
 	"context"
-	"fmt"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"strconv"
 )
 
 func (repo *Model) Patch(ctx context.Context, id string, fields map[string]interface{}) (*Item, error) {
-	// get user_id from context
-	by := ctx.Value("user_id").(string)
-
 	// build query
-	statement := repo.qb.Update(repo.table).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), id)
-
-	// iterate over the fields map and add each field to the update statement
-	for field, value := range fields {
-		field = fieldMap[field]
-		statement = statement.Set(field, value)
-	}
-
-	// add the updated_at field
-	statement = statement.Set(fieldMap["UpdatedAt"], "NOW()")
-
-	// add the updated_by field
-	statement = statement.Set(fieldMap["UpdatedBy"], by)
+	statement := repo.makePatch(ctx, id, fields)
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()

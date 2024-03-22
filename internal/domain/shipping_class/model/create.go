@@ -4,42 +4,12 @@ import (
 	"context"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
-	"github.com/google/uuid"
 	"strconv"
 )
 
 func (repo *Model) Create(ctx context.Context, item *Item) (*Item, error) {
-	// get user_id from context
-	by := ctx.Value("user_id").(string)
-
-	// if ID is not set, generate a new UUID
-	if item.ID == "" {
-		item.ID = uuid.New().String()
-	}
-
 	// build query
-	statement := repo.qb.Insert(repo.table).
-		Columns(
-			fieldMap["ID"],
-			fieldMap["Name"],
-			fieldMap["Url"],
-			fieldMap["SortOrder"],
-			fieldMap["Active"],
-			fieldMap["CreatedAt"],
-			fieldMap["CreatedBy"],
-			fieldMap["UpdatedAt"],
-			fieldMap["UpdatedBy"]).
-		Values(
-			item.ID,
-			item.Name,
-			item.Url,
-			item.SortOrder,
-			item.Active,
-			"NOW()",
-			by,
-			"NOW()",
-			by,
-		)
+	statement := repo.makeInsert(ctx, item)
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()

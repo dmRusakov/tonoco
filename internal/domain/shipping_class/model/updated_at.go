@@ -2,7 +2,8 @@ package model
 
 import (
 	"context"
-	sq "github.com/Masterminds/squirrel"
+	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
+	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"time"
 )
 
@@ -10,37 +11,34 @@ import (
 func (repo *Model) UpdatedAt(
 	ctx context.Context,
 	id string,
-) (time.Time, error) {
+) (*time.Time, error) {
 	// build query
-	statement := repo.qb.
-		Select(fieldMap["UpdatedAt"]).
-		From(repo.table).
-		Where(sq.Eq{fieldMap["ID"]: id})
+	statement := repo.makeUpdatedAt(id)
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()
 	if err != nil {
-		return time.Time{}, err
+		return nil, err
 	}
 
 	// execute the SQL query
 	rows, err := repo.client.Query(ctx, query, args...)
 	if err != nil {
-		return time.Time{}, err
+		return nil, err
 	}
 
 	defer rows.Close()
 
 	if !rows.Next() {
-		return time.Time{}, nil
+		return nil, nil
 	}
 
 	// scan the result set into a slice of Item structs
-	var updatedAt time.Time
+	var updatedAt *time.Time
 	if err = rows.Scan(
 		&updatedAt,
 	); err != nil {
-		return time.Time{}, err
+		return nil, err
 	}
 
 	// return the updated at
@@ -50,38 +48,36 @@ func (repo *Model) UpdatedAt(
 // TableUpdated - Get table updated at
 func (repo *Model) TableUpdated(
 	ctx context.Context,
-) (time.Time, error) {
+) (*time.Time, error) {
 	// build query
-	statement := repo.qb.
-		Select("max(updated_at)").
-		From(repo.table)
+	statement := repo.makeTableUpdated()
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()
 	if err != nil {
-		return time.Time{}, err
+		err = psql.ErrCreateQuery(err)
+		tracing.Error(ctx, err)
+		return nil, err
 	}
 
+	tracing.SpanEvent(ctx, "Select Table Updated")
+	tracing.TraceVal(ctx, "SQL", query)
 	// execute the SQL query
 	rows, err := repo.client.Query(ctx, query, args...)
 	if err != nil {
-		return time.Time{}, err
+		err = psql.ErrDoQuery(err)
+		tracing.Error(ctx, err)
+		return nil, err
 	}
 
 	defer rows.Close()
 
 	if !rows.Next() {
-		return time.Time{}, nil
-	}
-
-	// scan the result set into a slice of Item
-	var updatedAt time.Time
-	if err = rows.Scan(
-		&updatedAt,
-	); err != nil {
-		return time.Time{}, err
+		err = psql.ErrNoRowForTableUpdated()
+		tracing.Error(ctx, err)
+		return nil, err
 	}
 
 	// return the updated at
-	return updatedAt, nil
+	return repo.scanUpdatedAt(ctx, rows)
 }

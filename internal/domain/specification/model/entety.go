@@ -17,7 +17,7 @@ var fieldMap = map[string]string{
 	"ID":        "id",
 	"Name":      "name",
 	"Url":       "url",
-	"Type":      "type",
+	"Type":      "specification_type",
 	"Active":    "active",
 	"SortOrder": "sort_order",
 	"CreatedAt": "created_at",
@@ -29,21 +29,21 @@ var fieldMap = map[string]string{
 // make select
 func (repo *Model) makeSelect() sq.SelectBuilder {
 	return repo.qb.Select(
-		"id",
-		"name",
-		"url",
-		"'type' as type",
-		"active",
-		"sort_order",
-		"created_at",
-		"created_by",
-		"updated_at",
-		"updated_by",
+		fieldMap["ID"],
+		fieldMap["Name"],
+		fieldMap["Url"],
+		fieldMap["Type"],
+		fieldMap["Active"],
+		fieldMap["SortOrder"],
+		fieldMap["CreatedAt"],
+		fieldMap["CreatedBy"],
+		fieldMap["UpdatedAt"],
+		fieldMap["UpdatedBy"],
 	).From(repo.table + " p")
 }
 
 // make insert
-func (repo *Model) makeInsert(ctx context.Context, item *Item) (sq.InsertBuilder, error) {
+func (repo *Model) makeInsert(ctx context.Context, item *Item) sq.InsertBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
@@ -53,23 +53,23 @@ func (repo *Model) makeInsert(ctx context.Context, item *Item) (sq.InsertBuilder
 	}
 
 	// build query
-	statement := repo.qb.Insert(repo.table).
+	return repo.qb.Insert(repo.table).
 		Columns(
-			"id",
-			"name",
-			"url",
-			"type",
-			"active",
-			"sort_order",
-			"created_at",
-			"created_by",
-			"updated_at",
-			"updated_by").
+			fieldMap["ID"],
+			fieldMap["Name"],
+			fieldMap["Url"],
+			fieldMap["Type"],
+			fieldMap["Active"],
+			fieldMap["SortOrder"],
+			fieldMap["CreatedAt"],
+			fieldMap["CreatedBy"],
+			fieldMap["UpdatedAt"],
+			fieldMap["UpdatedBy"]).
 		Values(
 			item.ID,
 			item.Name,
 			item.Url,
-			item.Type,
+			item.SpecificationType,
 			item.Active,
 			item.SortOrder,
 			"NOW()",
@@ -77,8 +77,6 @@ func (repo *Model) makeInsert(ctx context.Context, item *Item) (sq.InsertBuilder
 			"NOW()",
 			by,
 		)
-
-	return statement, nil
 }
 
 // make Scan
@@ -88,7 +86,7 @@ func (repo *Model) makeScan(ctx context.Context, rows sq.RowScanner) (*Item, err
 		&item.ID,
 		&item.Name,
 		&item.Url,
-		&item.Type,
+		&item.SpecificationType,
 		&item.Active,
 		&item.SortOrder,
 		&item.CreatedAt,
@@ -96,11 +94,11 @@ func (repo *Model) makeScan(ctx context.Context, rows sq.RowScanner) (*Item, err
 		&item.UpdatedAt,
 		&item.UpdatedBy,
 	)
+
 	if err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
 		return nil, err
-
 	}
 
 	return item, nil

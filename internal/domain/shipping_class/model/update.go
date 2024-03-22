@@ -9,18 +9,8 @@ import (
 )
 
 func (repo *Model) Update(ctx context.Context, item *Item) (*Item, error) {
-	// get user_id from context
-	by := ctx.Value("user_id").(string)
-
 	// build query
-	statement := repo.qb.Update(repo.table).
-		Set(fieldMap["Name"], item.Name).
-		Set(fieldMap["Url"], item.Url).
-		Set(fieldMap["SortOrder"], item.SortOrder).
-		Set(fieldMap["Active"], item.Active).
-		Set(fieldMap["UpdatedAt"], "NOW()").
-		Set(fieldMap["UpdatedBy"], by).
-		Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), item.ID)
+	statement := repo.makeUpdate(ctx, item).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), item.ID)
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()

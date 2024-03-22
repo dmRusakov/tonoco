@@ -17,10 +17,12 @@ CREATE OR REPLACE FUNCTION set_order_column_universal()
     RETURNS TRIGGER AS
 $$
 DECLARE
-max_sort_order INTEGER;
+    max_sort_order BIGINT;
 BEGIN
-    EXECUTE format('SELECT COALESCE(MAX(sort_order) + 1, 0) FROM %I', TG_TABLE_NAME) INTO max_sort_order;
-    NEW.sort_order = max_sort_order;
+    EXECUTE format('SELECT COALESCE(MAX(sort_order), 0) + 1 FROM %I', TG_TABLE_NAME) INTO max_sort_order;
+    IF NEW.sort_order IS NULL THEN
+        NEW.sort_order = max_sort_order;
+    END IF;
     RETURN NEW;
 END;
 $$ language 'plpgsql';

@@ -55,7 +55,7 @@ func (repo *ProductModel) Get(ctx context.Context, id string) (*Product, error) 
 		return nil, err
 	}
 
-	tracing.SpanEvent(ctx, "Select Product")
+	tracing.SpanEvent(ctx, "Select Item")
 	tracing.TraceVal(ctx, "SQL", query)
 	for i, arg := range args {
 		tracing.TraceIVal(ctx, "arg-"+strconv.Itoa(i), arg)

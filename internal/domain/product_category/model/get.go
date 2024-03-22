@@ -34,7 +34,7 @@ func (repo *Model) Get(ctx context.Context, id string) (*Item, error) {
 		return nil, err
 	}
 
-	tracing.SpanEvent(ctx, "Select Product")
+	tracing.SpanEvent(ctx, "Select Item")
 	tracing.TraceVal(ctx, "SQL", query)
 	for i, arg := range args {
 		tracing.TraceIVal(ctx, "arg-"+strconv.Itoa(i), arg)
@@ -104,7 +104,7 @@ func (repo *Model) GetByURL(ctx context.Context, url string) (*Item, error) {
 		return nil, err
 	}
 
-	tracing.SpanEvent(ctx, "Select Product")
+	tracing.SpanEvent(ctx, "Select Item")
 	tracing.TraceVal(ctx, "SQL", query)
 	for i, arg := range args {
 		tracing.TraceIVal(ctx, "arg-"+strconv.Itoa(i), arg)

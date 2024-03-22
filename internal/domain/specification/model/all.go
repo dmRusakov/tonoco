@@ -31,9 +31,7 @@ func (repo *Model) All(
 	}
 
 	// build query
-	statement := repo.makeSelect()
-
-	statement = statement.OrderBy(fieldMap[*filter.SortBy] + " " + *filter.SortOrder).
+	statement := repo.makeSelect().OrderBy(fieldMap[*filter.SortBy] + " " + *filter.SortOrder).
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 
 	// Active
@@ -73,7 +71,7 @@ func (repo *Model) All(
 			&item.ID,
 			&item.Name,
 			&item.Url,
-			&item.Type,
+			&item.SpecificationType,
 			&item.Active,
 			&item.SortOrder,
 		); err != nil {

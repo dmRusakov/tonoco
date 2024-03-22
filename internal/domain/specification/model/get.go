@@ -11,10 +11,7 @@ import (
 // Get - get item by ID
 func (repo *Model) Get(ctx context.Context, id string) (*Item, error) {
 	// build query
-	statement := repo.makeSelect()
-
-	// build where
-	statement = statement.Where(sq.Eq{fieldMap["ID"]: id})
+	statement := repo.makeSelect().Where(sq.Eq{fieldMap["ID"]: id})
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()
@@ -25,7 +22,7 @@ func (repo *Model) Get(ctx context.Context, id string) (*Item, error) {
 		return nil, err
 	}
 
-	tracing.SpanEvent(ctx, "Select Product")
+	tracing.SpanEvent(ctx, "Select Item")
 	tracing.TraceVal(ctx, "SQL", query)
 	for i, arg := range args {
 		tracing.TraceIVal(ctx, "arg-"+strconv.Itoa(i), arg)
@@ -53,10 +50,7 @@ func (repo *Model) Get(ctx context.Context, id string) (*Item, error) {
 // GetByURL - get item by URL
 func (repo *Model) GetByURL(ctx context.Context, url string) (*Item, error) {
 	// build query
-	statement := repo.makeSelect()
-
-	// build where
-	statement = statement.Where(sq.Eq{fieldMap["Url"]: url})
+	statement := repo.makeSelect().Where(sq.Eq{fieldMap["Url"]: url})
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()
@@ -67,7 +61,7 @@ func (repo *Model) GetByURL(ctx context.Context, url string) (*Item, error) {
 		return nil, err
 	}
 
-	tracing.SpanEvent(ctx, "Select Product")
+	tracing.SpanEvent(ctx, "Select Item")
 	tracing.TraceVal(ctx, "SQL", query)
 	for i, arg := range args {
 		tracing.TraceIVal(ctx, "arg-"+strconv.Itoa(i), arg)

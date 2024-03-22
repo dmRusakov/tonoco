@@ -43,3 +43,9 @@ func ErrNoRowForID(id string) error {
 func ErrNoRowForURL(url string) error {
 	return errors.New("no rows found for url: " + url)
 }
+func ErrNoRowForUpdatedAt(id string) error {
+	return errors.New("No rows found for updated_at with id: " + id)
+}
+func ErrNoRowForTableUpdated() error {
+	return errors.New("No rows found for table updated_at")
+}

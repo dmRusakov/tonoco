@@ -4,26 +4,26 @@ import "time"
 
 // ProductCategory is a struct that contains the fields of the product_category table.
 type ProductCategory struct {
-	ID               string
-	Name             string
-	Url              string
-	ShortDescription string
-	Description      string
-	SortOrder        uint32
-	Prime            bool
-	Active           bool
-	CreatedAt        time.Time
-	CreatedBy        string
-	UpdatedAt        time.Time
-	UpdatedBy        string
+	ID               string    `json:"id"`
+	Name             string    `json:"name"`
+	Url              string    `json:"url"`
+	ShortDescription string    `json:"short_description"`
+	Description      string    `json:"description"`
+	SortOrder        uint32    `json:"sort_order"`
+	Prime            bool      `json:"prime"`
+	Active           bool      `json:"active"`
+	CreatedAt        time.Time `json:"created_at"`
+	CreatedBy        string    `json:"created_by"`
+	UpdatedAt        time.Time `json:"updated_at"`
+	UpdatedBy        string    `json:"updated_by"`
 }
 
 type ProductCategoryFilter struct {
-	Active    *bool
-	Prime     *bool
-	Search    *string
-	SortBy    *string
-	SortOrder *string
-	Page      *uint64
-	PerPage   *uint64
+	Active    *bool   `json:"active"`
+	Prime     *bool   `json:"prime"`
+	Search    *string `json:"search"`
+	SortBy    *string `json:"sort_by"`
+	SortOrder *string `json:"sort_order"`
+	Page      *uint64 `json:"page"`
+	PerPage   *uint64 `json:"per_page"`
 }

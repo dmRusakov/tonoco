@@ -9,7 +9,7 @@ import (
 
 func (repo *Model) Create(ctx context.Context, item *Item) (*Item, error) {
 	// build query
-	statement, err := repo.makeInsert(ctx, item)
+	statement := repo.makeInsert(ctx, item)
 
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()

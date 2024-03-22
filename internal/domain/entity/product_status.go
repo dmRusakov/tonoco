@@ -3,22 +3,22 @@ package entity
 import "time"
 
 type ProductStatus struct {
-	ID        string
-	Name      string
-	Url       string
-	SortOrder uint32
-	Active    bool
-	CreatedAt time.Time
-	CreatedBy string
-	UpdatedAt time.Time
-	UpdatedBy string
+	ID        string    `json:"id"`
+	Name      string    `json:"name"`
+	Url       string    `json:"url"`
+	SortOrder uint32    `json:"sort_order"`
+	Active    bool      `json:"active"`
+	CreatedAt time.Time `json:"created_at"`
+	CreatedBy string    `json:"created_by"`
+	UpdatedAt time.Time `json:"updated_at"`
+	UpdatedBy string    `json:"updated_by"`
 }
 
 type ProductStatusFilter struct {
-	Active    *bool
-	Search    *string
-	SortBy    *string
-	SortOrder *string
-	Page      *uint64
-	PerPage   *uint64
+	Active    *bool   `json:"active"`
+	Search    *string `json:"search"`
+	SortBy    *string `json:"sort_by"`
+	SortOrder *string `json:"sort_order"`
+	Page      *uint64 `json:"page"`
+	PerPage   *uint64 `json:"per_page"`
 }

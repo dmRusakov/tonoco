@@ -29,11 +29,11 @@ func (s *Service) Patch(ctx context.Context, id string, fields map[string]interf
 	return s.repository.Patch(ctx, id, fields)
 }
 
-func (s *Service) UpdatedAt(ctx context.Context, id string) (time.Time, error) {
+func (s *Service) UpdatedAt(ctx context.Context, id string) (*time.Time, error) {
 	return s.repository.UpdatedAt(ctx, id)
 }
 
-func (s *Service) TableUpdated(ctx context.Context) (time.Time, error) {
+func (s *Service) TableUpdated(ctx context.Context) (*time.Time, error) {
 	return s.repository.TableUpdated(ctx)
 }
 

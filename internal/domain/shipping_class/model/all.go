@@ -31,16 +31,7 @@ func (repo *Model) All(
 	}
 
 	// build query
-	statement := repo.qb.
-		Select(
-			fieldMap["ID"],
-			fieldMap["Name"],
-			fieldMap["Url"],
-			fieldMap["SortOrder"],
-			fieldMap["Active"],
-		).
-		From(repo.table + " p").
-		OrderBy(fieldMap[*filter.SortBy] + " " + *filter.SortOrder).
+	statement := repo.makeSelect().OrderBy(fieldMap[*filter.SortBy] + " " + *filter.SortOrder).
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 
 	// Active
@@ -75,15 +66,8 @@ func (repo *Model) All(
 	// iterate over the result set
 	var items []*Item
 	for rows.Next() {
-
-		item := &Item{}
-		if err = rows.Scan(
-			&item.ID,
-			&item.Name,
-			&item.Url,
-			&item.SortOrder,
-			&item.Active,
-		); err != nil {
+		item, err := repo.scanGet(ctx, rows)
+		if err != nil {
 			return nil, err
 		}
 
