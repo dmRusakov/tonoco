@@ -34,7 +34,7 @@ func (s *Service) UpdatedAt(ctx context.Context, id *string) (time.Time, error) 
 }
 
 func (s *Service) TableUpdated(ctx context.Context) (time.Time, error) {
-	return s.repository.TableUpdated(ctx)
+	return s.repository.TableIntexCount(ctx)
 }
 
 func (s *Service) MaxSortOrder(ctx context.Context) (*uint32, error) {

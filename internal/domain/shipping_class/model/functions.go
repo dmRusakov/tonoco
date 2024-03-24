@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
+	"github.com/dmRusakov/tonoco/pkg/tracing"
+	"strconv"
 	"time"
 )
 
@@ -164,9 +166,9 @@ func (repo *Model) MaxSortOrder(ctx context.Context) (*uint32, error) {
 	return &sortOrder, nil
 }
 
-func (repo *Model) TableUpdated(ctx context.Context) (*time.Time, error) {
+func (repo *Model) TableIndexCount(ctx context.Context) (*uint64, error) {
 	// build query
-	statement := repo.makeTableUpdatedStatement()
+	statement := repo.qb.Select("n_tup_upd").From("pg_stat_user_tables").Where("relname = ?", repo.table)
 
 	// execute the query
 	rows, err := psql.Get(ctx, repo.client, statement)
@@ -174,6 +176,24 @@ func (repo *Model) TableUpdated(ctx context.Context) (*time.Time, error) {
 		return nil, err
 	}
 
+	defer rows.Close()
+
+	var updatedAt string
+	err = rows.Scan(&updatedAt)
+	if err != nil {
+		err = psql.ErrScan(psql.ParsePgError(err))
+		tracing.Error(ctx, err)
+		return nil, err
+	}
+
+	// convert the string to a uint32
+	count, err := strconv.ParseUint(updatedAt, 10, 32)
+	if err != nil {
+		err = psql.ErrScan(psql.ParsePgError(err))
+		tracing.Error(ctx, err)
+		return nil, err
+	}
+
 	// return the updated at
-	return repo.makeUpdatedAtScan(ctx, rows)
+	return &count, nil
 }

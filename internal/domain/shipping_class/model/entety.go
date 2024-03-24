@@ -7,7 +7,6 @@ import (
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/google/uuid"
-	"time"
 )
 
 type Item = entity.ShippingClass
@@ -199,20 +198,4 @@ func (repo *Model) makePatchStatement(ctx context.Context, id *string, fields *m
 	}
 
 	return statement.Set(fieldMap["UpdatedAt"], "NOW()").Set(fieldMap["UpdatedBy"], by)
-}
-
-func (repo *Model) makeTableUpdatedStatement() sq.SelectBuilder {
-	return repo.qb.Select("max(updated_at)").From(repo.table)
-}
-
-func (repo *Model) makeUpdatedAtScan(ctx context.Context, rows sq.RowScanner) (*time.Time, error) {
-	var updatedAt time.Time
-	err := rows.Scan(&updatedAt)
-	if err != nil {
-		err = psql.ErrScan(psql.ParsePgError(err))
-		tracing.Error(ctx, err)
-		return nil, err
-	}
-
-	return &updatedAt, nil
 }

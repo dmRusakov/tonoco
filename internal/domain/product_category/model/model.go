@@ -32,6 +32,6 @@ func NewStorage(client psql.Client) *Model {
 	return &Model{
 		qb:     sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		client: client,
-		table:  "public.product_category",
+		table:  "product_category",
 	}
 }

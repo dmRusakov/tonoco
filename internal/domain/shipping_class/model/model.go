@@ -14,7 +14,7 @@ type Storage interface {
 	Update(context.Context, *Item) (*Item, error)
 	Patch(context.Context, *string, *map[string]interface{}) (*Item, error)
 	UpdatedAt(context.Context, *string) (*time.Time, error)
-	TableUpdated(context.Context) (*time.Time, error)
+	TableIndexCount(context.Context) (*uint64, error)
 	MaxSortOrder(context.Context) (*uint32, error)
 	Delete(context.Context, string) error
 }
@@ -31,6 +31,6 @@ func NewStorage(client psql.Client) *Model {
 	return &Model{
 		qb:     sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		client: client,
-		table:  "public.shipping_class",
+		table:  "shipping_class",
 	}
 }

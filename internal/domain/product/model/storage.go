@@ -26,6 +26,6 @@ func NewProductStorage(client psql.Client) *ProductModel {
 	return &ProductModel{
 		qb:     sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		client: client,
-		table:  "public.product",
+		table:  "product",
 	}
 }

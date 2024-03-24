@@ -29,8 +29,8 @@ func (s *Service) UpdatedAt(ctx context.Context, id *string) (*time.Time, error)
 	return s.repository.UpdatedAt(ctx, id)
 }
 
-func (s *Service) TableUpdated(ctx context.Context) (*time.Time, error) {
-	return s.repository.TableUpdated(ctx)
+func (s *Service) TableIndexCount(ctx context.Context) (*uint64, error) {
+	return s.repository.TableIndexCount(ctx)
 }
 
 func (s *Service) MaxSortOrder(ctx context.Context) (*uint32, error) {

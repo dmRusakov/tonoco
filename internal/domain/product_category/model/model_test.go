@@ -722,7 +722,7 @@ func updatedAt(t *testing.T) {
 	}
 }
 
-// test TableUpdated
+// test TableIndexCount
 func tableUpdated(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
@@ -745,7 +745,7 @@ func tableUpdated(t *testing.T) {
 	// Run the test cases
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			// Call the TableUpdated method
+			// Call the TableIndexCount method
 			tableUpdatedBefore, err := storage.TableUpdated(context.Background())
 
 			// Assert that there was no error
@@ -760,7 +760,7 @@ func tableUpdated(t *testing.T) {
 			// Assert that there was no error
 			assert.NoError(t, err)
 
-			// Call the TableUpdated method
+			// Call the TableIndexCount method
 			tableUpdatedAfter, err := storage.TableUpdated(context.Background())
 
 			// Assert that there was no error

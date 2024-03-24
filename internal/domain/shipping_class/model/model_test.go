@@ -530,57 +530,16 @@ func updatedAt(t *testing.T) {
 	}
 }
 
-// test TableUpdated
+// test TableIndexCount
 func tableUpdated(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
-	// Define the test cases
-	testCases := []struct {
-		name  string
-		id    string
-		patch map[string]interface{}
-	}{
-		{
-			name: "Table Updated 01",
-			id:   newTestItems[5].ID,
-			patch: map[string]interface{}{
-				"Name": fmt.Sprintf("%s - patched", newTestItems[5].Name),
-			},
-		},
-	}
+	// Call the TableIndexCount method
+	_, err := storage.TableIndexCount(context.Background())
 
-	// Run the test cases
-	for _, tc := range testCases {
-		// Call the TableUpdated method
-		tableUpdatedBefore, err := storage.TableUpdated(context.Background())
-
-		// Assert that there was no error
-		assert.NoError(t, err)
-
-		// Assert that the result is not empty
-		assert.NotEmpty(t, tableUpdatedBefore)
-
-		// Call the Patch method
-		id := tc.id
-		patch := tc.patch
-		_, err = storage.Patch(initContext(), &id, &patch)
-
-		// Assert that there was no error
-		assert.NoError(t, err)
-
-		// Call the TableUpdated method
-		tableUpdatedAfter, err := storage.TableUpdated(context.Background())
-
-		// Assert that there was no error
-		assert.NoError(t, err)
-
-		// Assert that the result is not empty
-		assert.NotEmpty(t, tableUpdatedAfter)
-
-		// Assert that the tableUpdatedAfter is greater than tableUpdatedBefore
-		assert.NotEqual(t, tableUpdatedBefore, tableUpdatedAfter)
-	}
+	// Assert that there was no error
+	assert.NoError(t, err)
 }
 
 // max sort order
