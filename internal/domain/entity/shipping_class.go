@@ -15,10 +15,12 @@ type ShippingClass struct {
 }
 
 type ShippingClassFilter struct {
-	Active    *bool   `json:"active"`
-	Search    *string `json:"search"`
-	SortBy    *string `json:"sort_by"`
-	SortOrder *string `json:"sort_order"`
-	Page      *uint64 `json:"page"`
-	PerPage   *uint64 `json:"per_page"`
+	IDs       *[]string `json:"ids"`
+	Urls      *[]string `json:"urls"`
+	Active    *bool     `json:"active"`
+	Search    *string   `json:"search"`
+	SortBy    *string   `json:"sort_by"`
+	SortOrder *string   `json:"sort_order"`
+	Page      *uint64   `json:"page"`
+	PerPage   *uint64   `json:"per_page"`
 }

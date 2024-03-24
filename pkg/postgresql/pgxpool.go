@@ -60,7 +60,7 @@ func NewClient(
 		return nil
 	}, maxAttempts, maxDelay)
 	if err != nil {
-		log.Fatal("All attempts are exceeded. Unable to connect to PostgreSQL")
+		log.Fatal("List attempts are exceeded. Unable to connect to PostgreSQL")
 	}
 
 	return pool, nil

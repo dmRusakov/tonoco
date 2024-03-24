@@ -225,7 +225,7 @@ func TestProductCategory(t *testing.T) {
 	t.Run("clearTestData", clearTestData)
 	defer t.Run("clearTestData", clearTestData)
 
-	t.Run("all", all)
+	t.Run("list", all)
 	t.Run("get", get)
 	t.Run("getByUrl", getByUrl)
 	t.Run("createWithId", createWithId)
@@ -304,7 +304,7 @@ func all(t *testing.T) {
 		expected []*entity.ProductCategory
 	}{
 		{
-			name:     "Get All",
+			name:     "Get List",
 			filter:   &entity.ProductCategoryFilter{},
 			expected: testItems[:10],
 		}, {
@@ -346,7 +346,7 @@ func all(t *testing.T) {
 	// Run the test cases
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			// Call All method
+			// Call List method
 			result, err := storage.All(initContext(), (*entity.ProductCategoryFilter)(tc.filter))
 
 			// Assert that there was no error

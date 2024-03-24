@@ -6,14 +6,14 @@ import (
 )
 
 func (s *Service) All(ctx context.Context, filter *Filter) ([]*Item, error) {
-	return s.repository.All(ctx, filter)
+	return s.repository.List(ctx, filter)
 }
 
 func (s *Service) Create(ctx context.Context, productStatus *Item) (*Item, error) {
 	return s.repository.Create(ctx, productStatus)
 }
 
-func (s *Service) Get(ctx context.Context, id string) (*Item, error) {
+func (s *Service) Get(ctx context.Context, id *string) (*Item, error) {
 	return s.repository.Get(ctx, id)
 }
 
@@ -29,7 +29,7 @@ func (s *Service) Patch(ctx context.Context, id string, fields map[string]interf
 	return s.repository.Patch(ctx, id, fields)
 }
 
-func (s *Service) UpdatedAt(ctx context.Context, id string) (time.Time, error) {
+func (s *Service) UpdatedAt(ctx context.Context, id *string) (time.Time, error) {
 	return s.repository.UpdatedAt(ctx, id)
 }
 

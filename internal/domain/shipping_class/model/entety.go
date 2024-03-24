@@ -26,8 +26,7 @@ var fieldMap = map[string]string{
 	"UpdatedBy": "updated_by",
 }
 
-// make select
-func (repo *Model) makeSelect() sq.SelectBuilder {
+func (repo *Model) makeStatement() sq.SelectBuilder {
 	return repo.qb.Select(
 		fieldMap["ID"],
 		fieldMap["Name"],
@@ -41,8 +40,107 @@ func (repo *Model) makeSelect() sq.SelectBuilder {
 	).From(repo.table + " p")
 }
 
-// make insert
-func (repo *Model) makeInsert(ctx context.Context, item *Item) sq.InsertBuilder {
+func (repo *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
+	statement := repo.makeStatement()
+
+	// SortBy
+	if filter.SortBy == nil {
+		filter.SortBy = new(string)
+		*filter.SortBy = "SortOrder"
+	}
+
+	// SortOrder
+	if filter.SortOrder == nil {
+		filter.SortOrder = new(string)
+		*filter.SortOrder = "ASC"
+	}
+
+	// Page
+	if filter.Page == nil {
+		filter.Page = new(uint64)
+		*filter.Page = 1
+	}
+
+	// PerPage
+	if filter.PerPage == nil {
+		filter.PerPage = new(uint64)
+		*filter.PerPage = 10
+	}
+
+	// SortBy, SortOrder, Page, Limit
+	statement = statement.OrderBy(fieldMap[*filter.SortBy] + " " + *filter.SortOrder).
+		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
+
+	// Ids
+	if filter.IDs != nil {
+		countIds := len(*filter.IDs)
+
+		if countIds > 0 {
+			statement = statement.Where(sq.Eq{fieldMap["ID"]: *filter.IDs})
+		}
+
+		*filter.Page = 1
+		if (*filter.PerPage) > uint64(countIds) {
+			*filter.PerPage = uint64(countIds)
+		}
+	}
+
+	// Urls
+	if filter.Urls != nil {
+		countUrls := len(*filter.Urls)
+
+		if countUrls > 0 {
+			statement = statement.Where(sq.Eq{fieldMap["Url"]: *filter.Urls})
+		}
+
+		*filter.Page = 1
+		if (*filter.PerPage) > uint64(countUrls) {
+			*filter.PerPage = uint64(countUrls)
+		}
+	}
+
+	// Active
+	if filter.Active != nil {
+		statement = statement.Where(sq.Eq{fieldMap["Active"]: *filter.Active})
+	}
+
+	// Search
+	if filter.Search != nil {
+		statement = statement.Where(
+			sq.Or{
+				sq.Expr("LOWER("+fieldMap["Name"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+fieldMap["Url"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+			},
+		)
+	}
+
+	return statement
+}
+
+func (repo *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
+	var item = &Item{}
+	err := rows.Scan(
+		&item.ID,
+		&item.Name,
+		&item.Url,
+		&item.SortOrder,
+		&item.Active,
+		&item.CreatedAt,
+		&item.CreatedBy,
+		&item.UpdatedAt,
+		&item.UpdatedBy,
+	)
+
+	if err != nil {
+		err = psql.ErrScan(psql.ParsePgError(err))
+		tracing.Error(ctx, err)
+		return nil, err
+	}
+
+	return item, nil
+}
+
+func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) sq.InsertBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
@@ -76,8 +174,7 @@ func (repo *Model) makeInsert(ctx context.Context, item *Item) sq.InsertBuilder 
 		)
 }
 
-// make update
-func (repo *Model) makeUpdate(ctx context.Context, item *Item) sq.UpdateBuilder {
+func (repo *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
@@ -90,14 +187,13 @@ func (repo *Model) makeUpdate(ctx context.Context, item *Item) sq.UpdateBuilder 
 		Set(fieldMap["UpdatedBy"], by)
 }
 
-// make patch
-func (repo *Model) makePatch(ctx context.Context, id string, fields map[string]interface{}) sq.UpdateBuilder {
+func (repo *Model) makePatchStatement(ctx context.Context, id *string, fields *map[string]interface{}) sq.UpdateBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
 	statement := repo.qb.Update(repo.table).Where("id = ?", id)
 
-	for field, value := range fields {
+	for field, value := range *fields {
 		field = fieldMap[field]
 		statement = statement.Set(field, value)
 	}
@@ -105,42 +201,11 @@ func (repo *Model) makePatch(ctx context.Context, id string, fields map[string]i
 	return statement.Set(fieldMap["UpdatedAt"], "NOW()").Set(fieldMap["UpdatedBy"], by)
 }
 
-// make updated at
-func (repo *Model) makeUpdatedAt(id string) sq.SelectBuilder {
-	return repo.qb.Select(fieldMap["UpdatedAt"]).From(repo.table).Where("id = ?", id)
-}
-
-// make table updated
-func (repo *Model) makeTableUpdated() sq.SelectBuilder {
+func (repo *Model) makeTableUpdatedStatement() sq.SelectBuilder {
 	return repo.qb.Select("max(updated_at)").From(repo.table)
 }
 
-// scan get
-func (repo *Model) scanGet(ctx context.Context, rows sq.RowScanner) (*Item, error) {
-	var item = &Item{}
-	err := rows.Scan(
-		&item.ID,
-		&item.Name,
-		&item.Url,
-		&item.SortOrder,
-		&item.Active,
-		&item.CreatedAt,
-		&item.CreatedBy,
-		&item.UpdatedAt,
-		&item.UpdatedBy,
-	)
-
-	if err != nil {
-		err = psql.ErrScan(psql.ParsePgError(err))
-		tracing.Error(ctx, err)
-		return nil, err
-	}
-
-	return item, nil
-}
-
-// scan updated at
-func (repo *Model) scanUpdatedAt(ctx context.Context, rows sq.RowScanner) (*time.Time, error) {
+func (repo *Model) makeUpdatedAtScan(ctx context.Context, rows sq.RowScanner) (*time.Time, error) {
 	var updatedAt time.Time
 	err := rows.Scan(&updatedAt)
 	if err != nil {

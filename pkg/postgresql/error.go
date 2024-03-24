@@ -36,6 +36,10 @@ func ErrDoQuery(err error) error {
 	return errors.Wrap(err, "failed to query")
 }
 
+func ErrNoRows() error {
+	return errors.Wrap(errors.New("no rows found"), "failed to query")
+}
+
 func ErrNoRowForID(id string) error {
 	return errors.New("no rows found for id: " + id)
 }

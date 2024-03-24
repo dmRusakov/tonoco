@@ -5,31 +5,27 @@ import (
 	"time"
 )
 
-func (s *Service) All(ctx context.Context, filter *Filter) ([]*Item, error) {
-	return s.repository.All(ctx, filter)
+func (s *Service) List(ctx context.Context, filter *Filter) ([]*Item, error) {
+	return s.repository.List(ctx, filter)
 }
 
 func (s *Service) Create(ctx context.Context, productStatus *Item) (*Item, error) {
 	return s.repository.Create(ctx, productStatus)
 }
 
-func (s *Service) Get(ctx context.Context, id string) (*Item, error) {
-	return s.repository.Get(ctx, id)
-}
-
-func (s *Service) GetByURL(ctx context.Context, url string) (*Item, error) {
-	return s.repository.GetByURL(ctx, url)
+func (s *Service) Get(ctx context.Context, id *string, url *string) (*Item, error) {
+	return s.repository.Get(ctx, id, url)
 }
 
 func (s *Service) Update(ctx context.Context, productStatus *Item) (*Item, error) {
 	return s.repository.Update(ctx, productStatus)
 }
 
-func (s *Service) Patch(ctx context.Context, id string, fields map[string]interface{}) (*Item, error) {
+func (s *Service) Patch(ctx context.Context, id *string, fields *map[string]interface{}) (*Item, error) {
 	return s.repository.Patch(ctx, id, fields)
 }
 
-func (s *Service) UpdatedAt(ctx context.Context, id string) (*time.Time, error) {
+func (s *Service) UpdatedAt(ctx context.Context, id *string) (*time.Time, error) {
 	return s.repository.UpdatedAt(ctx, id)
 }
 

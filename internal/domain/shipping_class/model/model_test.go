@@ -62,12 +62,12 @@ var newTestItems = []*model.Item{
 	},
 	{
 		Name:      "New4",
-		Url:       "new2",
+		Url:       "new4",
 		SortOrder: 7,
 		Active:    false,
 	}, {
 		Name:      "New5",
-		Url:       "new3",
+		Url:       "new5",
 		SortOrder: 8,
 		Active:    false,
 	},
@@ -80,7 +80,7 @@ func TestShippingClass(t *testing.T) {
 	defer t.Run("clearTestData", clearTestData)
 
 	// run tests
-	t.Run("all", all)
+	t.Run("list", list)
 	t.Run("get", get)
 	t.Run("getByUrl", getByUrl)
 	t.Run("createWithId", createWithId)
@@ -98,13 +98,13 @@ func clearTestData(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
-	// get all data from the table
-	all, err := storage.All(initContext(), &model.Filter{})
+	// get list data from the table
+	all, err := storage.List(initContext(), &model.Filter{})
 
 	// check if there is an error
 	assert.NoError(t, err)
 
-	// go thought all data and del it if is not in the testItems
+	// go thought list data and del it if is not in the testItems
 	for _, v := range all {
 		found := false
 		for _, tv := range testItems {
@@ -124,7 +124,7 @@ func clearTestData(t *testing.T) {
 	for i, v := range testItems {
 		v.SortOrder = uint32(i + 1) // Ensure SortOrder is greater than 0
 		// get the product status by the ID
-		ps, err := storage.Get(initContext(), v.ID)
+		ps, err := storage.Get(initContext(), &v.ID, nil)
 
 		// check if there is an error
 		assert.NoError(t, err)
@@ -140,8 +140,8 @@ func clearTestData(t *testing.T) {
 	}
 }
 
-// test all
-func all(t *testing.T) {
+// test list
+func list(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
@@ -151,6 +151,8 @@ func all(t *testing.T) {
 	perPage2 := uint64(2)
 	page2 := uint64(2)
 	searchSmall := "small"
+	twoIDs := []string{testItems[0].ID, testItems[1].ID}
+	twoUrls := []string{testItems[1].Url, testItems[2].Url}
 
 	// Define the test cases
 	tests := []struct {
@@ -159,11 +161,23 @@ func all(t *testing.T) {
 		expected []*model.Item
 	}{
 		{
-			name:     "Get all",
+			name:     "Get list",
 			filter:   &model.Filter{},
 			expected: testItems,
 		}, {
-			name:     "Get all active",
+			name:     "Get list with 2 IDs",
+			filter:   &model.Filter{IDs: &twoIDs, PerPage: &perPage2},
+			expected: testItems[:2],
+		}, {
+			name: "Get list with 2 Urls",
+			filter: &model.Filter{
+				Urls:   &twoUrls,
+				Active: &isActive,
+			},
+			expected: testItems[1:3],
+		},
+		{
+			name:     "Get list active",
 			filter:   &model.Filter{Active: &isActive},
 			expected: testItems,
 		}, {
@@ -184,8 +198,8 @@ func all(t *testing.T) {
 	// Run the test cases
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			// Call All method
-			result, err := storage.All(initContext(), tc.filter)
+			// Call List method
+			result, err := storage.List(initContext(), tc.filter)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -235,7 +249,8 @@ func get(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Get method
-			result, err := storage.Get(initContext(), tc.id)
+			id := tc.id
+			result, err := storage.Get(initContext(), &id, nil)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -280,7 +295,8 @@ func getByUrl(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Get method
-			result, err := storage.GetByURL(initContext(), tc.url)
+			url := tc.url
+			result, err := storage.Get(initContext(), nil, &url)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -454,7 +470,7 @@ func patch(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Patch method
-			result, err := storage.Patch(initContext(), testProductCategoryNew.ID, tc.fields)
+			result, err := storage.Patch(initContext(), &testProductCategoryNew.ID, &tc.fields)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -489,8 +505,10 @@ func updatedAt(t *testing.T) {
 
 	// Run the test cases
 	for _, tc := range testCases {
+		id := tc.id
+
 		// Call the UpdatedAt method
-		updatedAtBefore, err := storage.UpdatedAt(initContext(), tc.id)
+		updatedAtBefore, err := storage.UpdatedAt(initContext(), &id)
 
 		// Assert that there was no error
 		assert.NoError(t, err)
@@ -502,7 +520,7 @@ func updatedAt(t *testing.T) {
 		assert.NoError(t, err)
 
 		// Call the UpdatedAt method
-		updatedAtAfter, err := storage.UpdatedAt(initContext(), tc.id)
+		updatedAtAfter, err := storage.UpdatedAt(initContext(), &id)
 
 		// Assert that there was no error
 		assert.NoError(t, err)
@@ -544,7 +562,9 @@ func tableUpdated(t *testing.T) {
 		assert.NotEmpty(t, tableUpdatedBefore)
 
 		// Call the Patch method
-		_, err = storage.Patch(initContext(), tc.id, tc.patch)
+		id := tc.id
+		patch := tc.patch
+		_, err = storage.Patch(initContext(), &id, &patch)
 
 		// Assert that there was no error
 		assert.NoError(t, err)
@@ -560,7 +580,6 @@ func tableUpdated(t *testing.T) {
 
 		// Assert that the tableUpdatedAfter is greater than tableUpdatedBefore
 		assert.NotEqual(t, tableUpdatedBefore, tableUpdatedAfter)
-
 	}
 }
 
@@ -619,7 +638,9 @@ func del(t *testing.T) {
 		assert.NoError(t, err)
 
 		// Call the Get method
-		_, err = storage.Get(initContext(), tc.id)
+		id := tc.id
+
+		_, err = storage.Get(initContext(), &id, nil)
 		assert.Error(t, err)
 	}
 }

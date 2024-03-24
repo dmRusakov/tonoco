@@ -88,7 +88,7 @@ func TestProductStatus(t *testing.T) {
 	defer t.Run("clearTestData", clearTestData)
 
 	// run tests
-	t.Run("all", all)
+	t.Run("list", all)
 	t.Run("get", get)
 	t.Run("getByUrl", getByUrl)
 	t.Run("createWithId", createWithId)
@@ -191,7 +191,7 @@ func all(t *testing.T) {
 	// Run the test cases
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			// Call All method
+			// Call List method
 			result, err := storage.All(initContext(), tc.filter)
 
 			// Assert that there was no error
