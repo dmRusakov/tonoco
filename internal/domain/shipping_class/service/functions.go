@@ -33,10 +33,10 @@ func (s *Service) TableIndexCount(ctx context.Context) (*uint64, error) {
 	return s.repository.TableIndexCount(ctx)
 }
 
-func (s *Service) MaxSortOrder(ctx context.Context) (*uint32, error) {
+func (s *Service) MaxSortOrder(ctx context.Context) (*uint64, error) {
 	return s.repository.MaxSortOrder(ctx)
 }
 
-func (s *Service) Delete(ctx context.Context, id string) error {
+func (s *Service) Delete(ctx context.Context, id *string) error {
 	return s.repository.Delete(ctx, id)
 }

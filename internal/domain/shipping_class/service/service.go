@@ -13,8 +13,8 @@ type repository interface {
 	Update(context.Context, *Item) (*Item, error)
 	Patch(context.Context, *string, *map[string]interface{}) (*Item, error)
 	UpdatedAt(context.Context, *string) (*time.Time, error)
-	TableUpdated(context.Context) (*time.Time, error)
-	MaxSortOrder(context.Context) (*uint32, error)
+	TableUpdated(context.Context) (*uint64, error)
+	MaxSortOrder(context.Context) (*uint64, error)
 	Delete(context.Context, *string) error
 }
 

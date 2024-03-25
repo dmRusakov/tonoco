@@ -6,7 +6,7 @@ type ShippingClass struct {
 	ID        string    `json:"id"`
 	Name      string    `json:"name"`
 	Url       string    `json:"url"`
-	SortOrder uint32    `json:"sort_order"`
+	SortOrder uint64    `json:"sort_order"`
 	Active    bool      `json:"active"`
 	CreatedAt time.Time `json:"created_at"`
 	CreatedBy string    `json:"created_by"`
@@ -15,12 +15,12 @@ type ShippingClass struct {
 }
 
 type ShippingClassFilter struct {
-	IDs       *[]string `json:"ids"`
-	Urls      *[]string `json:"urls"`
-	Active    *bool     `json:"active"`
-	Search    *string   `json:"search"`
-	SortBy    *string   `json:"sort_by"`
-	SortOrder *string   `json:"sort_order"`
-	Page      *uint64   `json:"page"`
-	PerPage   *uint64   `json:"per_page"`
+	IDs      *[]string `json:"ids"`
+	Urls     *[]string `json:"urls"`
+	Active   *bool     `json:"active"`
+	Search   *string   `json:"search"`
+	OrderBy  *string   `json:"sort_by"`
+	OrderDir *string   `json:"sort_order"`
+	Page     *uint64   `json:"page"`
+	PerPage  *uint64   `json:"per_page"`
 }

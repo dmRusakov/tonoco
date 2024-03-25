@@ -15,8 +15,8 @@ type Storage interface {
 	Patch(context.Context, *string, *map[string]interface{}) (*Item, error)
 	UpdatedAt(context.Context, *string) (*time.Time, error)
 	TableIndexCount(context.Context) (*uint64, error)
-	MaxSortOrder(context.Context) (*uint32, error)
-	Delete(context.Context, string) error
+	MaxSortOrder(context.Context) (*uint64, error)
+	Delete(context.Context, *string) error
 }
 
 // Model is a struct that contains the SQL statement builder and the PostgreSQL client.

@@ -17,7 +17,7 @@ type SpecificationTypeFilter struct {
 	Active    *bool   `json:"active"`
 	Unit      *string `json:"unit"`
 	Search    *string `json:"search"`
-	SortBy    *string `json:"sort_by"`
+	OrderBy   *string `json:"sort_by"`
 	SortOrder *string `json:"sort_order"`
 	Page      *uint64 `json:"page"`
 	PerPage   *uint64 `json:"per_page"`

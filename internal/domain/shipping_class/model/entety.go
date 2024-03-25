@@ -12,7 +12,6 @@ import (
 type Item = entity.ShippingClass
 type Filter = entity.ShippingClassFilter
 
-// fieldMap
 var fieldMap = map[string]string{
 	"ID":        "id",
 	"Name":      "name",
@@ -25,6 +24,7 @@ var fieldMap = map[string]string{
 	"UpdatedBy": "updated_by",
 }
 
+// makeStatement
 func (repo *Model) makeStatement() sq.SelectBuilder {
 	return repo.qb.Select(
 		fieldMap["ID"],
@@ -39,19 +39,18 @@ func (repo *Model) makeStatement() sq.SelectBuilder {
 	).From(repo.table + " p")
 }
 
+// makeStatementByFilter
 func (repo *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
-	statement := repo.makeStatement()
-
-	// SortBy
-	if filter.SortBy == nil {
-		filter.SortBy = new(string)
-		*filter.SortBy = "SortOrder"
+	// OrderBy
+	if filter.OrderBy == nil {
+		filter.OrderBy = new(string)
+		*filter.OrderBy = "SortOrder"
 	}
 
-	// SortOrder
-	if filter.SortOrder == nil {
-		filter.SortOrder = new(string)
-		*filter.SortOrder = "ASC"
+	// OrderDir
+	if filter.OrderDir == nil {
+		filter.OrderDir = new(string)
+		*filter.OrderDir = "ASC"
 	}
 
 	// Page
@@ -66,8 +65,8 @@ func (repo *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		*filter.PerPage = 10
 	}
 
-	// SortBy, SortOrder, Page, Limit
-	statement = statement.OrderBy(fieldMap[*filter.SortBy] + " " + *filter.SortOrder).
+	// Build query and OrderBy, OrderDir, Page, Limit
+	statement := repo.makeStatement().OrderBy(fieldMap[*filter.OrderBy] + " " + *filter.OrderDir).
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 
 	// Ids
@@ -116,6 +115,7 @@ func (repo *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	return statement
 }
 
+// scanOneRow
 func (repo *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
 	var item = &Item{}
 	err := rows.Scan(
@@ -139,6 +139,7 @@ func (repo *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, e
 	return item, nil
 }
 
+// makeInsertStatement
 func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) sq.InsertBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
@@ -173,6 +174,7 @@ func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) sq.Inser
 		)
 }
 
+// makeUpdateStatement
 func (repo *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
@@ -186,6 +188,7 @@ func (repo *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.Updat
 		Set(fieldMap["UpdatedBy"], by)
 }
 
+// makePatchStatement
 func (repo *Model) makePatchStatement(ctx context.Context, id *string, fields *map[string]interface{}) sq.UpdateBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)

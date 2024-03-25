@@ -12,333 +12,371 @@ import (
 
 var testItems = []*model.Item{
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380107",
-		Name:              "Mounting SpecificationType",
-		Url:               "mounting-type",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         0,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380107",
+		Name:      "Mounting Type",
+		Url:       "mounting-type",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 0,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380108",
-		Name:              "Width",
-		Url:               "width",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         1,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380108",
+		Name:      "Width",
+		Url:       "width",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 1,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380109",
-		Name:              "Depth",
-		Url:               "depth",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         2,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380109",
+		Name:      "Depth",
+		Url:       "depth",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 2,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380110",
-		Name:              "Height",
-		Url:               "height",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         3,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380110",
+		Name:      "Height",
+		Url:       "height",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 3,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380111",
-		Name:              "Recommended Range Width",
-		Url:               "recommended-range-width",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         4,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380111",
+		Name:      "Recommended Range Width",
+		Url:       "recommended-range-width",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 4,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380112",
-		Name:              "Height Above Cooktop",
-		Url:               "height-above-cooktop",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         5,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380112",
+		Name:      "Height Above Cooktop",
+		Url:       "height-above-cooktop",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 5,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380113",
-		Name:              "Color / Finish",
-		Url:               "color-finish",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         6,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380113",
+		Name:      "Color / Finish",
+		Url:       "color-finish",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 6,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380114",
-		Name:              "Design",
-		Url:               "design",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         7,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380114",
+		Name:      "Design",
+		Url:       "design",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 7,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380115",
-		Name:              "Materials",
-		Url:               "materials",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         8,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380115",
+		Name:      "Materials",
+		Url:       "materials",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 8,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380116",
-		Name:              "Lighting SpecificationType",
-		Url:               "lighting-type",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         9,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380116",
+		Name:      "Lighting Type",
+		Url:       "lighting-type",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 9,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380117",
-		Name:              "# of Lights",
-		Url:               "of-lights",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         10,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380117",
+		Name:      "# of Lights",
+		Url:       "of-lights",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 10,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380118",
-		Name:              "# of Speeds",
-		Url:               "of-speeds",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         11,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380118",
+		Name:      "# of Speeds",
+		Url:       "of-speeds",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 11,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380119",
-		Name:              "Control Panel SpecificationType",
-		Url:               "control-panel-type",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         12,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380119",
+		Name:      "Control Panel Type",
+		Url:       "control-panel-type",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 12,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380120",
-		Name:              "Filter SpecificationType",
-		Url:               "filter-type",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         13,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380120",
+		Name:      "Filter Type",
+		Url:       "filter-type",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 13,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380121",
-		Name:              "Airflow",
-		Url:               "airflow",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         14,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380121",
+		Name:      "Airflow",
+		Url:       "airflow",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 14,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380122",
-		Name:              "Blower SpecificationType",
-		Url:               "blower-type",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         15,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380122",
+		Name:      "Blower Type",
+		Url:       "blower-type",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 15,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380123",
-		Name:              "Noise Level",
-		Url:               "noise-level",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         16,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380123",
+		Name:      "Noise Level",
+		Url:       "noise-level",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 16,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380124",
-		Name:              "Duct Size",
-		Url:               "duct-size",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         17,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380124",
+		Name:      "Duct Size",
+		Url:       "duct-size",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 17,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380125",
-		Name:              "Exhaust SpecificationType",
-		Url:               "exhaust-type",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         18,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380125",
+		Name:      "Exhaust Type",
+		Url:       "exhaust-type",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 18,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380126",
-		Name:              "Power Requirements",
-		Url:               "power-requirements",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         19,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380126",
+		Name:      "Power Requirements",
+		Url:       "power-requirements",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 19,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380127",
-		Name:              "Certifications",
-		Url:               "certifications",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         20,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380127",
+		Name:      "Certifications",
+		Url:       "certifications",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 20,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380128",
-		Name:              "Warranty",
-		Url:               "warranty",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         21,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380128",
+		Name:      "Warranty",
+		Url:       "warranty",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 21,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380129",
-		Name:              "Order Processing Time",
-		Url:               "order-processing-time",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         22,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380129",
+		Name:      "Order Processing Time",
+		Url:       "order-processing-time",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 22,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380130",
-		Name:              "Shipping Speed",
-		Url:               "shipping-speed",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         23,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380130",
+		Name:      "Shipping Speed",
+		Url:       "shipping-speed",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 23,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380131",
-		Name:              "Ships Via",
-		Url:               "ships-via",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         24,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380131",
+		Name:      "Ships Via",
+		Url:       "ships-via",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 24,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380132",
-		Name:              "Country of Production",
-		Url:               "country-of-production",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         25,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380132",
+		Name:      "Country of Production",
+		Url:       "country-of-production",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 25,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380133",
-		Name:              "Filter - Width (Group)",
-		Url:               "width-group",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         26,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380133",
+		Name:      "Filter - Width (Group)",
+		Url:       "width-group",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 26,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380135",
-		Name:              "Shipping Weight",
-		Url:               "shipping-weight",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         27,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380135",
+		Name:      "Shipping Weight",
+		Url:       "shipping-weight",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 27,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380136",
-		Name:              "Brand",
-		Url:               "brand",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         28,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380136",
+		Name:      "Brand",
+		Url:       "brand",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 28,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380137",
-		Name:              "Item Weight",
-		Url:               "item-weight",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         29,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380137",
+		Name:      "Item Weight",
+		Url:       "item-weight",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 29,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380138",
-		Name:              "Diameter",
-		Url:               "diameter",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         30,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380138",
+		Name:      "Diameter",
+		Url:       "diameter",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 30,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380139",
-		Name:              "Additional Lighting",
-		Url:               "additional-lighting",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         31,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380139",
+		Name:      "Additional Lighting",
+		Url:       "additional-lighting",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 31,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380142",
-		Name:              "Filter – Color",
-		Url:               "filter-color",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         32,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380142",
+		Name:      "Filter – Color",
+		Url:       "filter-color",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 32,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380143",
-		Name:              "Filter – Material",
-		Url:               "filter-material",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         33,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380143",
+		Name:      "Filter – Material",
+		Url:       "filter-material",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 33,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380144",
-		Name:              "Filter – Exhaust SpecificationType",
-		Url:               "filter-exhaust-type",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         34,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380144",
+		Name:      "Filter – Exhaust Type",
+		Url:       "filter-exhaust-type",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 34,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380145",
-		Name:              "Filter – Design",
-		Url:               "filter-design",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         35,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380145",
+		Name:      "Filter – Design",
+		Url:       "filter-design",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 35,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380146",
-		Name:              "Length",
-		Url:               "max-usable-length",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         36,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380146",
+		Name:      "Length",
+		Url:       "max-usable-length",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 36,
+		Active:    true,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380147",
-		Name:              "Filter – Accessories",
-		Url:               "filter-accessories",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         37,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380147",
+		Name:      "Filter – Accessories",
+		Url:       "filter-accessories",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 37,
+		Active:    true,
 	},
 }
 var newTestItems = []*model.Item{
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380148",
-		Name:              "Test 01",
-		Url:               "test-01",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         39,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380148",
+		Name:      "Test 01",
+		Url:       "test-01",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 39,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380149",
-		Name:              "Test 02",
-		Url:               "test-02",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         40,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380149",
+		Name:      "Test 02",
+		Url:       "test-02",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 40,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380150",
-		Name:              "Test 03",
-		Url:               "test-03",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         41,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380150",
+		Name:      "Test 03",
+		Url:       "test-03",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 41,
 	},
 	{
-		ID:                "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380151",
-		Name:              "Test 04",
-		Url:               "test-04",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         42,
+		ID:        "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380151",
+		Name:      "Test 04",
+		Url:       "test-04",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 42,
 	},
 	{
-		Name:              "Test 05",
-		Url:               "test-05",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         43,
+		Name:      "Test 05",
+		Url:       "test-05",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 43,
 	},
 	{
-		Name:              "Test 06",
-		Url:               "test-06",
-		SpecificationType: "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
-		SortOrder:         44,
+		Name:      "Test 06",
+		Url:       "test-06",
+		Type:      "a0eebc99-9c0b-4ef8-bb6d-7ab9bd380a13",
+		SortOrder: 44,
 	},
 }
 
 // Test Product Status
 func TestSpecifications(t *testing.T) {
 	// prepare data
-	//t.Run("clearTestData", clearTestData)
-	//defer t.Run("clearTestData", clearTestData)
-	//
-	//// run tests
-	//t.Run("list", all)
-	//t.Run("get", get)
-	//t.Run("getByUrl", getByUrl)
-	//t.Run("createWithId", createWithId)
-	//t.Run("createWithoutId", createWithoutId)
-	//t.Run("update", update)
-	//t.Run("patch", patch)
-	//t.Run("updatedAt", updatedAt)
-	//t.Run("tableUpdated", tableUpdated)
-	//t.Run("del", del)
-	//t.Run("maxSortOrder", maxSortOrder)
+	t.Run("clearTestData", clearTestData)
+	defer t.Run("clearTestData", clearTestData)
+
+	// run tests
+	t.Run("list", list)
+	t.Run("get", get)
+	t.Run("getByUrl", getByUrl)
+	t.Run("createWithId", createWithId)
+	t.Run("createWithoutId", createWithoutId)
+	t.Run("update", update)
+	t.Run("patch", patch)
+	t.Run("updatedAt", updatedAt)
+	t.Run("tableUpdated", tableUpdated)
+	t.Run("del", del)
+	t.Run("maxSortOrder", maxSortOrder)
 }
 
 // Create test data for the test cases
@@ -347,7 +385,7 @@ func clearTestData(t *testing.T) {
 	storage := initStorage(t)
 
 	// get all data from the table
-	all, err := storage.All(initContext(), &model.Filter{})
+	all, err := storage.List(initContext(), &model.Filter{})
 
 	// check if there is an error
 	assert.NoError(t, err)
@@ -363,16 +401,18 @@ func clearTestData(t *testing.T) {
 		}
 
 		if !found {
-			err = storage.Delete(initContext(), v.ID)
+			err = storage.Delete(initContext(), &v.ID)
 			assert.NoError(t, err)
 		}
 	}
 
 	// Add this in your clearTestData function
 	for i, v := range testItems {
-		v.SortOrder = uint32(i + 1) // Ensure SortOrder is greater than 0
+		if v.SortOrder == 0 {
+			v.SortOrder = uint64(i + 1)
+		}
 		// get the product status by the ID
-		ps, err := storage.Get(initContext(), v.ID)
+		ps, err := storage.Get(initContext(), &v.ID, nil)
 
 		// check if there is an error
 		assert.NoError(t, err)
@@ -388,8 +428,8 @@ func clearTestData(t *testing.T) {
 	}
 }
 
-// test all
-func all(t *testing.T) {
+// test list
+func list(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
@@ -409,7 +449,7 @@ func all(t *testing.T) {
 		{
 			name:     "Get all",
 			filter:   &model.Filter{},
-			expected: testItems,
+			expected: testItems[0:10],
 		}, {
 			name: "Get all active",
 			filter: &model.Filter{
@@ -436,7 +476,7 @@ func all(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call List method
-			result, err := storage.All(initContext(), tc.filter)
+			result, err := storage.List(initContext(), tc.filter)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -486,7 +526,7 @@ func get(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Get method
-			result, err := storage.Get(initContext(), tc.id)
+			result, err := storage.Get(initContext(), &tc.id, nil)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -531,7 +571,7 @@ func getByUrl(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Get method
-			result, err := storage.GetByURL(initContext(), tc.url)
+			result, err := storage.Get(initContext(), nil, &tc.url)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -707,7 +747,7 @@ func patch(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Patch method
-			result, err := storage.Patch(initContext(), testProductCategoryNew.ID, tc.fields)
+			result, err := storage.Patch(initContext(), &testProductCategoryNew.ID, &tc.fields)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -743,7 +783,7 @@ func updatedAt(t *testing.T) {
 	// Run the test cases
 	for _, tc := range testCases {
 		// Call the UpdatedAt method
-		updatedAtBefore, err := storage.UpdatedAt(initContext(), tc.id)
+		updatedAtBefore, err := storage.UpdatedAt(initContext(), &tc.id)
 
 		// Assert that there was no error
 		assert.NoError(t, err)
@@ -755,7 +795,7 @@ func updatedAt(t *testing.T) {
 		assert.NoError(t, err)
 
 		// Call the UpdatedAt method
-		updatedAtAfter, err := storage.UpdatedAt(initContext(), tc.id)
+		updatedAtAfter, err := storage.UpdatedAt(initContext(), &tc.id)
 
 		// Assert that there was no error
 		assert.NoError(t, err)
@@ -770,51 +810,11 @@ func tableUpdated(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
-	// Define the test cases
-	testCases := []struct {
-		name  string
-		id    string
-		patch map[string]interface{}
-	}{
-		{
-			name: "Table Updated 01",
-			id:   newTestItems[5].ID,
-			patch: map[string]interface{}{
-				"Name": fmt.Sprintf("%s - patched", newTestItems[5].Name),
-			},
-		},
-	}
+	// Call the TableIndexCount method
+	_, err := storage.TableIndexCount(context.Background())
 
-	// Run the test cases
-	for _, tc := range testCases {
-		// Call the TableIndexCount method
-		tableUpdatedBefore, err := storage.TableUpdated(context.Background())
-
-		// Assert that there was no error
-		assert.NoError(t, err)
-
-		// Assert that the result is not empty
-		assert.NotEmpty(t, tableUpdatedBefore)
-
-		// Call the Patch method
-		_, err = storage.Patch(initContext(), tc.id, tc.patch)
-
-		// Assert that there was no error
-		assert.NoError(t, err)
-
-		// Call the TableIndexCount method
-		tableUpdatedAfter, err := storage.TableUpdated(context.Background())
-
-		// Assert that there was no error
-		assert.NoError(t, err)
-
-		// Assert that the result is not empty
-		assert.NotEmpty(t, tableUpdatedAfter)
-
-		// Assert that the tableUpdatedAfter is greater than tableUpdatedBefore
-		assert.NotEqual(t, tableUpdatedBefore, tableUpdatedAfter)
-
-	}
+	// Assert that there was no error
+	assert.NoError(t, err)
 }
 
 // max sort order
@@ -866,14 +866,15 @@ func del(t *testing.T) {
 	// Run the test cases
 	for _, tc := range testCases {
 		// Call the Delete method
-		err := storage.Delete(initContext(), tc.id)
+		err := storage.Delete(initContext(), &tc.id)
 
 		// Assert that there was no error
 		assert.NoError(t, err)
 
 		// Call the Get method
-		_, err = storage.Get(initContext(), tc.id)
+		_, err = storage.Get(initContext(), &tc.id, nil)
 		assert.Error(t, err)
+
 	}
 }
 

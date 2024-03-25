@@ -10,14 +10,14 @@ func (repo *Model) All(
 	filter *Filter,
 ) ([]*Item, error) {
 	// check standard filter parameter
-	if filter.SortBy == nil {
-		filter.SortBy = new(string)
-		*filter.SortBy = "SortOrder"
+	if filter.OrderBy == nil {
+		filter.OrderBy = new(string)
+		*filter.OrderBy = "SortOrder"
 	}
 
-	if filter.SortOrder == nil {
-		filter.SortOrder = new(string)
-		*filter.SortOrder = "ASC"
+	if filter.OrderDir == nil {
+		filter.OrderDir = new(string)
+		*filter.OrderDir = "ASC"
 	}
 
 	if filter.Page == nil {
@@ -43,7 +43,7 @@ func (repo *Model) All(
 			fieldMap["Active"],
 		).
 		From(repo.table + " p").
-		OrderBy(fieldMap[*filter.SortBy] + " " + *filter.SortOrder).
+		OrderBy(fieldMap[*filter.OrderBy] + " " + *filter.OrderDir).
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 
 	// Active

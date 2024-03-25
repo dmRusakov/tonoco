@@ -8,16 +8,15 @@ import (
 )
 
 type Storage interface {
-	All(context.Context, *Filter) ([]*Item, error)
+	List(context.Context, *Filter) ([]*Item, error)
 	Create(context.Context, *Item) (*Item, error)
-	Get(context.Context, string) (*Item, error)
-	GetByURL(context.Context, string) (*Item, error)
+	Get(context.Context, *string, *string) (*Item, error)
 	Update(context.Context, *Item) (*Item, error)
-	Patch(context.Context, string, map[string]interface{}) (*Item, error)
-	UpdatedAt(context.Context, string) (time.Time, error)
-	TableUpdated(context.Context) (time.Time, error)
-	MaxSortOrder(context.Context) (*uint32, error)
-	Delete(context.Context, string) error
+	Patch(context.Context, *string, *map[string]interface{}) (*Item, error)
+	UpdatedAt(context.Context, *string) (*time.Time, error)
+	TableIndexCount(context.Context) (*uint64, error)
+	MaxSortOrder(context.Context) (*uint64, error)
+	Delete(context.Context, *string) error
 }
 
 // Model is a struct that contains the SQL statement builder and the PostgreSQL client.

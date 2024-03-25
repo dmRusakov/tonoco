@@ -89,8 +89,8 @@ func TestShippingClass(t *testing.T) {
 	t.Run("patch", patch)
 	t.Run("updatedAt", updatedAt)
 	t.Run("tableUpdated", tableUpdated)
-	//t.Run("del", del)
-	//t.Run("maxSortOrder", maxSortOrder)
+	t.Run("del", del)
+	t.Run("maxSortOrder", maxSortOrder)
 }
 
 // Create test data for the test cases
@@ -115,14 +115,16 @@ func clearTestData(t *testing.T) {
 		}
 
 		if !found {
-			err = storage.Delete(initContext(), v.ID)
+			err = storage.Delete(initContext(), &v.ID)
 			assert.NoError(t, err)
 		}
 	}
 
 	// Add this in your clearTestData function
 	for i, v := range testItems {
-		v.SortOrder = uint32(i + 1) // Ensure SortOrder is greater than 0
+		if v.SortOrder == 0 {
+			v.SortOrder = uint64(i + 1)
+		}
 		// get the product status by the ID
 		ps, err := storage.Get(initContext(), &v.ID, nil)
 
@@ -536,10 +538,13 @@ func tableUpdated(t *testing.T) {
 	storage := initStorage(t)
 
 	// Call the TableIndexCount method
-	_, err := storage.TableIndexCount(context.Background())
+	tableIndexCount, err := storage.TableIndexCount(context.Background())
 
 	// Assert that there was no error
 	assert.NoError(t, err)
+
+	// Assert that the result is not empty
+	assert.NotEmpty(t, tableIndexCount)
 }
 
 // max sort order
@@ -591,7 +596,7 @@ func del(t *testing.T) {
 	// Run the test cases
 	for _, tc := range testCases {
 		// Call the Delete method
-		err := storage.Delete(initContext(), tc.id)
+		err := storage.Delete(initContext(), &tc.id)
 
 		// Assert that there was no error
 		assert.NoError(t, err)
