@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func (s *Service) All(ctx context.Context, filter *Filter) ([]*Item, error) {
+func (s *Service) List(ctx context.Context, filter *Filter) ([]*Item, error) {
 	return s.repository.List(ctx, filter)
 }
 
