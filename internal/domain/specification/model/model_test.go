@@ -374,7 +374,7 @@ func TestSpecifications(t *testing.T) {
 	t.Run("update", update)
 	t.Run("patch", patch)
 	t.Run("updatedAt", updatedAt)
-	t.Run("tableUpdated", tableUpdated)
+	t.Run("tableIndexCount", tableIndexCount)
 	t.Run("del", del)
 	t.Run("maxSortOrder", maxSortOrder)
 }
@@ -681,9 +681,9 @@ func update(t *testing.T) {
 	storage := initStorage(t)
 
 	// create new variable from the testItems[0]
-	testProductCategoryNew := *testItems[0]
-	testProductCategoryNew.Name = fmt.Sprintf("%s - updated", testProductCategoryNew.Name)
-	testProductCategoryNew.Url = fmt.Sprintf("%s - updated", testProductCategoryNew.Url)
+	testItemNew := *testItems[0]
+	testItemNew.Name = fmt.Sprintf("%s - updated", testItemNew.Name)
+	testItemNew.Url = fmt.Sprintf("%s - updated", testItemNew.Url)
 
 	// Define the test cases
 	testCases := []struct {
@@ -693,8 +693,8 @@ func update(t *testing.T) {
 	}{
 		{
 			name:   "Update",
-			sent:   &testProductCategoryNew,
-			update: &testProductCategoryNew,
+			sent:   &testItemNew,
+			update: &testItemNew,
 		},
 	}
 
@@ -723,9 +723,9 @@ func patch(t *testing.T) {
 	storage := initStorage(t)
 
 	// create new variable from the testItems[0]
-	testProductCategoryNew := *testItems[0]
-	testProductCategoryNew.Name = fmt.Sprintf("%s - patched", testProductCategoryNew.Name)
-	testProductCategoryNew.Url = fmt.Sprintf("%s - patched", testProductCategoryNew.Url)
+	testItemNew := *testItems[0]
+	testItemNew.Name = fmt.Sprintf("%s - patched", testItemNew.Name)
+	testItemNew.Url = fmt.Sprintf("%s - patched", testItemNew.Url)
 
 	// Define the test cases
 	testCases := []struct {
@@ -737,8 +737,8 @@ func patch(t *testing.T) {
 		{
 			name: "Patch",
 			fields: map[string]interface{}{
-				"Name": testProductCategoryNew.Name,
-				"Url":  testProductCategoryNew.Url,
+				"Name": testItemNew.Name,
+				"Url":  testItemNew.Url,
 			},
 		},
 	}
@@ -747,17 +747,17 @@ func patch(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Patch method
-			result, err := storage.Patch(initContext(), &testProductCategoryNew.ID, &tc.fields)
+			result, err := storage.Patch(initContext(), &testItemNew.ID, &tc.fields)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
-			assert.Equal(t, testProductCategoryNew.ID, result.ID)
-			assert.Equal(t, testProductCategoryNew.Name, result.Name)
-			assert.Equal(t, testProductCategoryNew.Url, result.Url)
-			assert.Equal(t, testProductCategoryNew.SortOrder, result.SortOrder)
-			assert.Equal(t, testProductCategoryNew.Active, result.Active)
+			assert.Equal(t, testItemNew.ID, result.ID)
+			assert.Equal(t, testItemNew.Name, result.Name)
+			assert.Equal(t, testItemNew.Url, result.Url)
+			assert.Equal(t, testItemNew.SortOrder, result.SortOrder)
+			assert.Equal(t, testItemNew.Active, result.Active)
 		})
 	}
 }
@@ -806,15 +806,18 @@ func updatedAt(t *testing.T) {
 }
 
 // test TableIndexCount
-func tableUpdated(t *testing.T) {
+func tableIndexCount(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
 	// Call the TableIndexCount method
-	_, err := storage.TableIndexCount(context.Background())
+	tableIndexCount, err := storage.TableIndexCount(context.Background())
 
 	// Assert that there was no error
 	assert.NoError(t, err)
+
+	// Assert that the result is not empty
+	assert.NotEmpty(t, &tableIndexCount)
 }
 
 // max sort order

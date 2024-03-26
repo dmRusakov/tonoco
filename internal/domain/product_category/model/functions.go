@@ -69,11 +69,17 @@ func (repo *Model) List(ctx context.Context, filter *Filter) ([]*Item, error) {
 }
 
 func (repo *Model) Create(ctx context.Context, item *Item) (*Item, error) {
+	// check if the item already exists
+	_, err := repo.Get(ctx, nil, &item.Url)
+	if err == nil {
+		return nil, fmt.Errorf("item with url %s already exists", item.Url)
+	}
+
 	// build query
 	statement := repo.makeInsertStatement(ctx, item)
 
 	// execute the query
-	err := psql.Create(ctx, repo.client, statement)
+	err = psql.Create(ctx, repo.client, statement)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +122,7 @@ func (repo *Model) Delete(ctx context.Context, id *string) error {
 	// build query
 	statement := repo.qb.Delete(repo.table).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), id)
 
-	// execute the query to delete the item
+	// execute the query to del the item
 	return psql.Delete(ctx, repo.client, statement)
 }
 
@@ -124,7 +130,10 @@ func (repo *Model) UpdatedAt(ctx context.Context, id *string) (*time.Time, error
 	// build query
 	statement := repo.qb.Select(fieldMap["UpdatedAt"]).From(repo.table).Where("id = ?", id)
 
-	// execute the query
+	query, args, err := statement.ToSql()
+
+	fmt.Println("statement", query, &args, &id)
+
 	rows, err := psql.Get(ctx, repo.client, statement)
 	if err != nil {
 		return nil, err

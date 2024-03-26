@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"github.com/dmRusakov/tonoco/internal/domain/shipping_class/model"
+	"github.com/dmRusakov/tonoco/internal/domain/specification/model"
 	"time"
 )
 
@@ -22,6 +22,6 @@ type Service struct {
 	repository model.Storage
 }
 
-func NewService(repository model.Storage) *Service {
+func NewService(repository *model.Model) *Service {
 	return &Service{repository: repository}
 }

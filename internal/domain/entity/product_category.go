@@ -19,11 +19,13 @@ type ProductCategory struct {
 }
 
 type ProductCategoryFilter struct {
-	Active   *bool   `json:"active"`
-	Prime    *bool   `json:"prime"`
-	Search   *string `json:"search"`
-	OrderBy  *string `json:"sort_by"`
-	OrderDir *string `json:"sort_order"`
-	Page     *uint64 `json:"page"`
-	PerPage  *uint64 `json:"per_page"`
+	IDs      *[]string `json:"ids"`
+	Urls     *[]string `json:"urls"`
+	Active   *bool     `json:"active"`
+	Prime    *bool     `json:"prime"`
+	Search   *string   `json:"search"`
+	OrderBy  *string   `json:"order_by"`
+	OrderDir *string   `json:"order_dir"`
+	Page     *uint64   `json:"page"`
+	PerPage  *uint64   `json:"per_page"`
 }

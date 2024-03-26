@@ -19,8 +19,8 @@ type ShippingClassFilter struct {
 	Urls     *[]string `json:"urls"`
 	Active   *bool     `json:"active"`
 	Search   *string   `json:"search"`
-	OrderBy  *string   `json:"sort_by"`
-	OrderDir *string   `json:"sort_order"`
+	OrderBy  *string   `json:"order_by"`
+	OrderDir *string   `json:"order_dir"`
 	Page     *uint64   `json:"page"`
 	PerPage  *uint64   `json:"per_page"`
 }

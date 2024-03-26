@@ -9,6 +9,8 @@ import (
 	product_status_service "github.com/dmRusakov/tonoco/internal/domain/product_status/service"
 	shipping_class_model "github.com/dmRusakov/tonoco/internal/domain/shipping_class/model"
 	shipping_class_service "github.com/dmRusakov/tonoco/internal/domain/shipping_class/service"
+	specification_model "github.com/dmRusakov/tonoco/internal/domain/specification/model"
+	specification_service "github.com/dmRusakov/tonoco/internal/domain/specification/service"
 
 	productPolicy "github.com/dmRusakov/tonoco/internal/domain/useCase/product"
 )
@@ -30,7 +32,19 @@ func (a *App) ProductUseCaseInit() (err error) {
 	shippingClassStorage := shipping_class_model.NewStorage(a.SqlDB)
 	shippingClassService := shipping_class_service.NewService(shippingClassStorage)
 
-	a.ProductUseCase = productPolicy.NewProductUseCase(a.generator, a.clock, productService, productCategoryService, productStatusService, shippingClassService)
+	// specification
+	specificationStorage := specification_model.NewStorage(a.SqlDB)
+	specificationService := specification_service.NewService(specificationStorage)
+
+	a.ProductUseCase = productPolicy.NewProductUseCase(
+		a.generator,
+		a.clock,
+		productService,
+		productCategoryService,
+		productStatusService,
+		shippingClassService,
+		specificationService,
+	)
 
 	return nil
 }

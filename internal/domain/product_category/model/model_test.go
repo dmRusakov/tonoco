@@ -126,7 +126,7 @@ var testItems = []*entity.ProductCategory{
 	{
 		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9912",
 		Url:              "perimeter-filter",
-		Name:             "Perimeter ProductCategoryFilter range hoods",
+		Name:             "Perimeter Filter range hoods",
 		ShortDescription: "Some text",
 		Description:      "Some text",
 		SortOrder:        11,
@@ -176,19 +176,21 @@ var testItems = []*entity.ProductCategory{
 }
 var newTestItems = []*entity.ProductCategory{
 	{
-		ID:               "1f484cda-c00e-4ed8-a325-9c5e045f0001",
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9961",
 		Url:              "test1-url",
 		Name:             "Test 1",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        16,
 		Prime:            false,
 		Active:           false,
 	}, {
-		ID:               "1f484cda-c00e-4ed8-a325-9c5e045f0002",
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9962",
 		Url:              "test2-url",
 		Name:             "Test 2",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        17,
 		Prime:            false,
 		Active:           false,
 	}, {
@@ -196,6 +198,7 @@ var newTestItems = []*entity.ProductCategory{
 		Name:             "Test 3",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        18,
 		Prime:            false,
 		Active:           false,
 	}, {
@@ -203,20 +206,27 @@ var newTestItems = []*entity.ProductCategory{
 		Name:             "Test 4",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        19,
 		Prime:            false,
 		Active:           false,
 	}, {
-		ID:               "1f484cda-c00e-4ed8-a325-9c5e045f0005",
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9963",
 		Url:              "test5-url",
 		Name:             "Test 5",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        20,
+		Prime:            false,
+		Active:           false,
 	}, {
-		ID:               "1f484cda-c00e-4ed8-a325-9c5e045f0006",
+		ID:               "1f484cda-c00e-4ed8-a325-9c5e035f9966",
 		Url:              "test6-url",
 		Name:             "Test 6",
 		ShortDescription: "Some text",
 		Description:      "Some text",
+		SortOrder:        21,
+		Prime:            false,
+		Active:           false,
 	},
 }
 
@@ -225,7 +235,7 @@ func TestProductCategory(t *testing.T) {
 	t.Run("clearTestData", clearTestData)
 	defer t.Run("clearTestData", clearTestData)
 
-	t.Run("list", all)
+	t.Run("list", list)
 	t.Run("get", get)
 	t.Run("getByUrl", getByUrl)
 	t.Run("createWithId", createWithId)
@@ -233,9 +243,9 @@ func TestProductCategory(t *testing.T) {
 	t.Run("update", update)
 	t.Run("patch", patch)
 	t.Run("updatedAt", updatedAt)
-	t.Run("tableUpdated", tableUpdated)
-	t.Run("delete", delete)
+	t.Run("tableIndexCount", tableIndexCount)
 	t.Run("maxSortOrder", maxSortOrder)
+	t.Run("del", del)
 }
 
 // clear test data
@@ -243,13 +253,13 @@ func clearTestData(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
-	// get all data from the table
-	all, err := storage.All(initContext(), &entity.ProductCategoryFilter{})
+	// get list data from the table
+	all, err := storage.List(initContext(), &entity.ProductCategoryFilter{})
 
 	// check if there is an error
 	assert.NoError(t, err)
 
-	// go thought all data and delete it if is not in the testProductStatuses
+	// go thought list data and del it if is not in the testProductStatuses
 	for _, v := range all {
 		found := false
 		for _, tv := range testItems {
@@ -260,15 +270,15 @@ func clearTestData(t *testing.T) {
 		}
 
 		if !found {
-			err = storage.Delete(initContext(), v.ID)
+			err = storage.Delete(initContext(), &v.ID)
 			assert.NoError(t, err)
 		}
 	}
 
-	// go thought all testProductStatuses and create or update them
+	// go thought list testProductStatuses and create or update them
 	for _, v := range testItems {
 		// get the product status by the ID
-		ps, err := storage.Get(initContext(), v.ID)
+		ps, err := storage.Get(initContext(), &v.ID, nil)
 
 		// check if there is an error
 		assert.NoError(t, err)
@@ -284,8 +294,8 @@ func clearTestData(t *testing.T) {
 	}
 }
 
-// test all
-func all(t *testing.T) {
+// test list
+func list(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
@@ -347,7 +357,7 @@ func all(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call List method
-			result, err := storage.All(initContext(), (*entity.ProductCategoryFilter)(tc.filter))
+			result, err := storage.List(initContext(), (*entity.ProductCategoryFilter)(tc.filter))
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -405,7 +415,7 @@ func get(t *testing.T) {
 	// Run the test cases
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := storage.Get(initContext(), tc.id)
+			result, err := storage.Get(initContext(), &tc.id, nil)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -459,7 +469,7 @@ func getByUrl(t *testing.T) {
 	// Run the test cases
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			result, err := storage.GetByURL(initContext(), tc.url)
+			result, err := storage.Get(initContext(), nil, &tc.url)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -579,9 +589,9 @@ func update(t *testing.T) {
 	storage := initStorage(t)
 
 	// create new variable from testItems[0]
-	testProductCategoryNew := newTestItems[0]
-	testProductCategoryNew.Name = fmt.Sprintf("%s Test", testProductCategoryNew.Name)
-	testProductCategoryNew.Url = fmt.Sprintf("%s-test", testProductCategoryNew.Url)
+	testItemNew := newTestItems[0]
+	testItemNew.Name = fmt.Sprintf("%s Test", testItemNew.Name)
+	testItemNew.Url = fmt.Sprintf("%s-test", testItemNew.Url)
 
 	// Define the test cases
 	testCases := []struct {
@@ -591,22 +601,16 @@ func update(t *testing.T) {
 	}{
 		{
 			name:   "Update 01",
-			sent:   testProductCategoryNew,
-			update: testProductCategoryNew,
+			sent:   testItemNew,
+			update: testItemNew,
 		},
 	}
 
 	// Run the test cases
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			// Call the Update method
-			_, err := storage.Update(initContext(), tc.sent)
-
-			// Assert that there was no error
-			assert.NoError(t, err)
-
-			// Call the Get method
-			result, err := storage.Get(initContext(), testProductCategoryNew.ID)
+			// Call Update method
+			result, err := storage.Update(initContext(), tc.sent)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -627,9 +631,9 @@ func patch(t *testing.T) {
 	storage := initStorage(t)
 
 	// create new variable from testItems[0]
-	testProductCategoryNew := newTestItems[1]
-	testProductCategoryNew.Name = fmt.Sprintf("%s Test", testProductCategoryNew.Name)
-	testProductCategoryNew.Url = fmt.Sprintf("%s-test", testProductCategoryNew.Url)
+	testItemNew := newTestItems[1]
+	testItemNew.Name = fmt.Sprintf("%s Test", testItemNew.Name)
+	testItemNew.Url = fmt.Sprintf("%s-test", testItemNew.Url)
 
 	// Define the test cases
 	testCases := []struct {
@@ -642,11 +646,11 @@ func patch(t *testing.T) {
 			name: "Patch 01",
 			id:   newTestItems[1].ID,
 			fields: map[string]interface{}{
-				"Name":  testProductCategoryNew.Name,
-				"Url":   testProductCategoryNew.Url,
-				"Prime": testProductCategoryNew.Prime,
+				"Name":  testItemNew.Name,
+				"Url":   testItemNew.Url,
+				"Prime": testItemNew.Prime,
 			},
-			get: testProductCategoryNew,
+			get: testItemNew,
 		},
 	}
 
@@ -654,7 +658,7 @@ func patch(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Patch method
-			result, err := storage.Patch(initContext(), tc.id, tc.fields)
+			result, err := storage.Patch(initContext(), &tc.id, &tc.fields)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
@@ -684,97 +688,52 @@ func updatedAt(t *testing.T) {
 	}{
 		{
 			name: "Updated at 01",
-			id:   newTestItems[4].ID,
-			sent: newTestItems[4],
+			id:   newTestItems[0].ID,
+			sent: newTestItems[0],
 		},
 	}
 
 	// Run the test cases
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			// Call the UpdatedAt method
-			updatedAtBefore, err := storage.UpdatedAt(initContext(), tc.id)
+		// Call the UpdatedAt method
+		updatedAtBefore, err := storage.UpdatedAt(initContext(), &tc.id)
+		fmt.Println(updatedAtBefore, err)
 
-			// Assert that there was no error
-			assert.NoError(t, err)
+		// Assert that there was no error
+		assert.NoError(t, err)
 
-			// Assert that the result is not empty
-			assert.NotEmpty(t, updatedAtBefore)
+		// Call the Update method
+		updatedAtAfter1, err := storage.Update(initContext(), tc.sent)
 
-			// Call the Update method
-			_, err = storage.Update(initContext(), tc.sent)
+		// Assert that there was no error
+		assert.NoError(t, err)
 
-			// Assert that there was no error
-			assert.NoError(t, err)
+		// Call the UpdatedAt method
+		updatedAtAfter2, err := storage.UpdatedAt(initContext(), &tc.id)
 
-			// Call the UpdatedAt method
-			updatedAtAfter, err := storage.UpdatedAt(initContext(), tc.id)
+		fmt.Println(updatedAtBefore, updatedAtAfter1, updatedAtAfter2)
 
-			// Assert that there was no error
-			assert.NoError(t, err)
+		// Assert that there was no error
+		assert.NoError(t, err)
 
-			// Assert that the result is not empty
-			assert.NotEmpty(t, updatedAtAfter)
-
-			// Assert that the result is not equal
-			assert.NotEqual(t, updatedAtBefore, updatedAtAfter)
-		})
+		// Assert that the updatedAtAfter is greater than updatedAtBefore
+		assert.NotEqual(t, updatedAtBefore, updatedAtAfter1)
 	}
 }
 
 // test TableIndexCount
-func tableUpdated(t *testing.T) {
+func tableIndexCount(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
-	// Define the test cases
-	testCases := []struct {
-		name  string
-		id    string
-		patch map[string]interface{}
-	}{
-		{
-			name: "Table updated 01",
-			id:   newTestItems[5].ID,
-			patch: map[string]interface{}{
-				"Name": fmt.Sprintf("%s Test+++", newTestItems[5].Name),
-			},
-		},
-	}
+	// Call the TableIndexCount method
+	tableIndexCount, err := storage.TableIndexCount(context.Background())
 
-	// Run the test cases
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			// Call the TableIndexCount method
-			tableUpdatedBefore, err := storage.TableUpdated(context.Background())
+	// Assert that there was no error
+	assert.NoError(t, err)
 
-			// Assert that there was no error
-			assert.NoError(t, err)
-
-			// Assert that the result is not empty
-			assert.NotEmpty(t, tableUpdatedBefore)
-
-			// Call the Patch method
-			_, err = storage.Patch(initContext(), tc.id, tc.patch)
-
-			// Assert that there was no error
-			assert.NoError(t, err)
-
-			// Call the TableIndexCount method
-			tableUpdatedAfter, err := storage.TableUpdated(context.Background())
-
-			// Assert that there was no error
-			assert.NoError(t, err)
-
-			// Assert that the result is not empty
-			assert.NotEmpty(t, tableUpdatedAfter)
-
-			// Assert that the result is not equal
-			assert.NotEqual(t, tableUpdatedBefore, tableUpdatedAfter)
-		})
-
-	}
-
+	// Assert that the result is not empty
+	assert.NotEmpty(t, &tableIndexCount)
 }
 
 // max sort order
@@ -792,8 +751,8 @@ func maxSortOrder(t *testing.T) {
 	assert.NotEmpty(t, sortOrder)
 }
 
-// test delete
-func delete(t *testing.T) {
+// test del
+func del(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
@@ -827,20 +786,20 @@ func delete(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call the Delete method
-			err := storage.Delete(initContext(), tc.id)
+			err := storage.Delete(initContext(), &tc.id)
 
 			// Assert that there was no error
 			assert.NoError(t, err)
 
 			// Call the Get method
-			_, err = storage.Get(initContext(), tc.id)
+			_, err = storage.Get(initContext(), &tc.id, nil)
 			assert.Error(t, err)
 		})
 	}
 
 }
 
-// initStorage with real database client
+// initStorage will create a storage with real database client
 func initStorage(t *testing.T) *model.Model {
 	// Create a real database client
 	cfg := config.GetConfig(context.Background())

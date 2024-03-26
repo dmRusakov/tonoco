@@ -21,8 +21,8 @@ type SpecificationFilter struct {
 	Active   *bool     `json:"active"`
 	Type     *string   `json:"specification_type"`
 	Search   *string   `json:"search"`
-	OrderBy  *string   `json:"sort_by"`
-	OrderDir *string   `json:"sort_order"`
+	OrderBy  *string   `json:"order_by"`
+	OrderDir *string   `json:"order_dir"`
 	Page     *uint64   `json:"page"`
 	PerPage  *uint64   `json:"per_page"`
 }
