@@ -23,3 +23,5 @@ config/dbData/MqBroker/data
 
 # log
 log
+
+/pkg/mod

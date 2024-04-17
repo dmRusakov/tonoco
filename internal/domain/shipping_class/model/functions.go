@@ -185,8 +185,8 @@ func (repo *Model) TableIndexCount(ctx context.Context) (*uint64, error) {
 		return nil, err
 	}
 
-	// convert the string to a uint32
-	count, err := strconv.ParseUint(updatedAt, 10, 32)
+	// convert the string to a uint64
+	count, err := strconv.ParseUint(updatedAt, 10, 64)
 	if err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
