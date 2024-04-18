@@ -9,7 +9,7 @@ import (
 type repository interface {
 	Get(ctx context.Context, id *string, url *string) (*Item, error)
 	List(context.Context, *Filter) ([]*Item, error)
-	Create(context.Context, *Item) error
+	Create(context.Context, *Item) (*string, error)
 	Update(context.Context, *Item) error
 	Patch(context.Context, *string, *map[string]interface{}) error
 	UpdatedAt(context.Context, *string) (*time.Time, error)

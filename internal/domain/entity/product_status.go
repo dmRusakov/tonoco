@@ -6,7 +6,7 @@ type ProductStatus struct {
 	ID        string    `json:"id"`
 	Name      string    `json:"name"`
 	Url       string    `json:"url"`
-	SortOrder uint32    `json:"sort_order"`
+	SortOrder uint64    `json:"sort_order"`
 	Active    bool      `json:"active"`
 	CreatedAt time.Time `json:"created_at"`
 	CreatedBy string    `json:"created_by"`

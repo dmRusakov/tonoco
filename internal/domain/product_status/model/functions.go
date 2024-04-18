@@ -66,53 +66,44 @@ func (repo *Model) List(ctx context.Context, filter *Filter) ([]*Item, error) {
 	return items, nil
 }
 
-func (repo *Model) Create(ctx context.Context, item *Item) error {
+func (repo *Model) Create(ctx context.Context, item *Item) (*string, error) {
 	// build query
-	statement, err := repo.makeInsertStatement(ctx, item)
+	statement, id, err := repo.makeInsertStatement(ctx, item)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// execute the query
 	err = psql.Create(ctx, repo.client, *statement)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return id, nil
 }
 
-func (repo *Model) Update(ctx context.Context, item *Item) error {
-	// build query
-	statement := repo.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), item.ID)
-
-	// execute the query
-	err := psql.Update(ctx, repo.client, statement)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (repo *Model) Update(ctx context.Context, item *Item) (err error) {
+	return psql.Update(
+		ctx,
+		repo.client,
+		repo.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), item.ID),
+	)
 }
 
 func (repo *Model) Patch(ctx context.Context, id *string, fields *map[string]interface{}) error {
-	// build query
-	statement := repo.makePatchStatement(ctx, id, fields)
-
-	err := psql.Update(ctx, repo.client, statement)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return psql.Update(
+		ctx,
+		repo.client,
+		repo.makePatchStatement(ctx, id, fields),
+	)
 }
 
 func (repo *Model) Delete(ctx context.Context, id *string) error {
-	// build query
-	statement := repo.qb.Delete(repo.table).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), id)
-
-	// execute the query to delete the item
-	return psql.Delete(ctx, repo.client, statement)
+	return psql.Delete(
+		ctx,
+		repo.client,
+		repo.qb.Delete(repo.table).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), id),
+	)
 }
 
 func (repo *Model) UpdatedAt(ctx context.Context, id *string) (*time.Time, error) {
@@ -147,6 +138,8 @@ func (repo *Model) TableIndexCount(ctx context.Context) (*uint64, error) {
 	}
 
 	defer rows.Close()
+
+	// commit the transaction
 
 	var updatedAt string
 	err = rows.Scan(&updatedAt)

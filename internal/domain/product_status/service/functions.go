@@ -13,7 +13,7 @@ func (s *Service) List(ctx context.Context, filter *Filter) ([]*Item, error) {
 	return s.repository.List(ctx, filter)
 }
 
-func (s *Service) Create(ctx context.Context, productStatus *Item) error {
+func (s *Service) Create(ctx context.Context, productStatus *Item) (*string, error) {
 	return s.repository.Create(ctx, productStatus)
 }
 

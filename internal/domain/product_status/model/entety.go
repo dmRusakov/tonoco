@@ -141,7 +141,7 @@ func (repo *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, e
 }
 
 // makeInsertStatement
-func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.InsertBuilder, error) {
+func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.InsertBuilder, *string, error) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
@@ -154,9 +154,9 @@ func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Ins
 	if item.SortOrder == 0 {
 		sortOrder, err := repo.MaxSortOrder(ctx)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		item.SortOrder = uint32(*sortOrder + 1)
+		item.SortOrder = *sortOrder + 1
 	}
 
 	insertItem := repo.qb.Insert(repo.table).Columns(
@@ -181,7 +181,7 @@ func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Ins
 		by,
 	)
 
-	return &insertItem, nil
+	return &insertItem, &item.ID, nil
 }
 
 // makeUpdateStatement

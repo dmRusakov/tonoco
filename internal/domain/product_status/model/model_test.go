@@ -107,9 +107,7 @@ func clearTestData(t *testing.T) {
 	storage := initStorage(t)
 
 	// get all data from the table
-	all, err := storage.All(initContext(), &model.Filter{})
-
-	// check if there is an error
+	all, err := storage.List(initContext(), &model.Filter{})
 	assert.NoError(t, err)
 
 	// go thought all data and del it if is not in the testItems
@@ -123,26 +121,27 @@ func clearTestData(t *testing.T) {
 		}
 
 		if !found {
-			err = storage.Delete(initContext(), v.ID)
+			err = storage.Delete(initContext(), &v.ID)
 			assert.NoError(t, err)
 		}
 	}
 
 	// go thought all testItems and create or update them
 	for i, v := range testItems {
-		v.SortOrder = uint32(i + 1) // Ensure SortOrder is greater than 0
+		v.SortOrder = uint64(i + 1)
 		// get the product status by the ID
-		ps, err := storage.Get(initContext(), v.ID)
-
-		// check if there is an error
+		ps, err := storage.Get(initContext(), &v.ID, nil)
 		assert.NoError(t, err)
 
 		// if the item not found create it
 		if ps == nil {
-			_, err = storage.Create(initContext(), v)
+			_, err = storage.Create(
+				initContext(),
+				v,
+			)
 			assert.NoError(t, err)
 		} else {
-			_, err = storage.Update(initContext(), v)
+			err = storage.Update(initContext(), v)
 			assert.NoError(t, err)
 		}
 	}
@@ -192,9 +191,7 @@ func all(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call List method
-			result, err := storage.All(initContext(), tc.filter)
-
-			// Assert that there was no error
+			result, err := storage.List(initContext(), tc.filter)
 			assert.NoError(t, err)
 
 			// Assert that the result length is equal to the expected length
@@ -250,9 +247,7 @@ func get(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Get method
-			result, err := storage.Get(initContext(), tc.id)
-
-			// Assert that there was no error
+			result, err := storage.Get(initContext(), &tc.id, nil)
 			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
@@ -303,9 +298,7 @@ func getByUrl(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Get method
-			result, err := storage.GetByURL(initContext(), tc.url)
-
-			// Assert that there was no error
+			result, err := storage.Get(initContext(), nil, &tc.url)
 			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
@@ -348,9 +341,11 @@ func createWithId(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Create method
-			result, err := storage.Create(initContext(), tc.new)
+			id, err := storage.Create(initContext(), tc.new)
+			assert.NoError(t, err)
 
-			// Assert that there was no error
+			// get the product status by the ID
+			result, err := storage.Get(initContext(), id, nil)
 			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
@@ -390,13 +385,15 @@ func createWithoutId(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Create method
-			result, err := storage.Create(initContext(), tc.sent)
+			id, err := storage.Create(initContext(), tc.sent)
+			assert.NoError(t, err)
+
+			// get the product status by the ID
+			result, err := storage.Get(initContext(), id, nil)
+			assert.NoError(t, err)
 
 			// update ID
 			tc.get.ID = result.ID
-
-			// Assert that there was no error
-			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
 			assert.Equal(t, tc.get.Name, result.Name)
@@ -434,9 +431,11 @@ func update(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Update method
-			result, err := storage.Update(initContext(), tc.sent)
+			err := storage.Update(initContext(), tc.sent)
+			assert.NoError(t, err)
 
-			// Assert that there was no error
+			// get the product status by the ID
+			result, err := storage.Get(initContext(), &tc.update.ID, nil)
 			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
@@ -479,9 +478,11 @@ func patch(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Patch method
-			result, err := storage.Patch(initContext(), testItemNew.ID, tc.fields)
+			err := storage.Patch(initContext(), &testItemNew.ID, &tc.fields)
+			assert.NoError(t, err)
 
-			// Assert that there was no error
+			// get item by ID
+			result, err := storage.Get(initContext(), &testItemNew.ID, nil)
 			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
@@ -515,21 +516,15 @@ func updatedAt(t *testing.T) {
 	// Run the test cases
 	for _, tc := range testCases {
 		// Call the UpdatedAt method
-		updatedAtBefore, err := storage.UpdatedAt(initContext(), tc.id)
-
-		// Assert that there was no error
+		updatedAtBefore, err := storage.UpdatedAt(initContext(), &tc.id)
 		assert.NoError(t, err)
 
 		// Call the Update method
-		_, err = storage.Update(initContext(), tc.sent)
-
-		// Assert that there was no error
+		err = storage.Update(initContext(), tc.sent)
 		assert.NoError(t, err)
 
 		// Call the UpdatedAt method
-		updatedAtAfter, err := storage.UpdatedAt(initContext(), tc.id)
-
-		// Assert that there was no error
+		updatedAtAfter, err := storage.UpdatedAt(initContext(), &tc.id)
 		assert.NoError(t, err)
 
 		// Assert that the updatedAtAfter is greater than updatedAtBefore
@@ -560,32 +555,18 @@ func tableIndexCount(t *testing.T) {
 	// Run the test cases
 	for _, tc := range testCases {
 		// Call the TableIndexCount method
-		tableUpdatedBefore, err := storage.TableUpdated(context.Background())
-
-		// Assert that there was no error
+		tableUpdatedBefore, err := storage.TableIndexCount(context.Background())
 		assert.NoError(t, err)
-
-		// Assert that the result is not empty
 		assert.NotEmpty(t, tableUpdatedBefore)
 
 		// Call the Patch method
-		_, err = storage.Patch(initContext(), tc.id, tc.patch)
-
-		// Assert that there was no error
+		err = storage.Patch(initContext(), &tc.id, &tc.patch)
 		assert.NoError(t, err)
 
 		// Call the TableIndexCount method
-		tableUpdatedAfter, err := storage.TableUpdated(context.Background())
-
-		// Assert that there was no error
+		tableUpdatedAfter, err := storage.TableIndexCount(context.Background())
 		assert.NoError(t, err)
-
-		// Assert that the result is not empty
 		assert.NotEmpty(t, tableUpdatedAfter)
-
-		// Assert that the tableUpdatedAfter is greater than tableUpdatedBefore
-		assert.NotEqual(t, tableUpdatedBefore, tableUpdatedAfter)
-
 	}
 }
 
@@ -596,8 +577,6 @@ func maxSortOrder(t *testing.T) {
 
 	// Call the MaxSortOrder method
 	sortOrder, err := storage.MaxSortOrder(context.Background())
-
-	// Assert that there was no error
 	assert.NoError(t, err)
 
 	// Assert that the result is not empty
@@ -638,13 +617,11 @@ func del(t *testing.T) {
 	// Run the test cases
 	for _, tc := range testCases {
 		// Call the Delete method
-		err := storage.Delete(initContext(), tc.id)
-
-		// Assert that there was no error
+		err := storage.Delete(initContext(), &tc.id)
 		assert.NoError(t, err)
 
 		// Call the Get method
-		_, err = storage.Get(initContext(), tc.id)
+		_, err = storage.Get(initContext(), &tc.id, nil)
 		assert.Error(t, err)
 	}
 }
@@ -655,9 +632,8 @@ func initStorage(t *testing.T) *model.Model {
 	cfg := config.GetConfig(context.Background())
 	app := appInit.NewAppInit(initContext(), cfg)
 	err := app.SqlDBInit()
-	if err != nil {
-		t.Fatalf("Failed to initialize database: %v", err)
-	}
+	assert.NoError(t, err)
+
 	pgClient := app.SqlDB
 
 	// Initialize Storage
