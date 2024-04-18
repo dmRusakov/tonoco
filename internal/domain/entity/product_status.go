@@ -15,10 +15,12 @@ type ProductStatus struct {
 }
 
 type ProductStatusFilter struct {
-	Active   *bool   `json:"active"`
-	Search   *string `json:"search"`
-	OrderBy  *string `json:"order_by"`
-	OrderDir *string `json:"order_dir"`
-	Page     *uint64 `json:"page"`
-	PerPage  *uint64 `json:"per_page"`
+	IDs      *[]string `json:"ids"`
+	Urls     *[]string `json:"urls"`
+	Active   *bool     `json:"active"`
+	Search   *string   `json:"search"`
+	OrderBy  *string   `json:"order_by"`
+	OrderDir *string   `json:"order_dir"`
+	Page     *uint64   `json:"page"`
+	PerPage  *uint64   `json:"per_page"`
 }

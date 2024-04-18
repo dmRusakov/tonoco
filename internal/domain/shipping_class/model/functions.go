@@ -70,10 +70,13 @@ func (repo *Model) List(ctx context.Context, filter *Filter) ([]*Item, error) {
 
 func (repo *Model) Create(ctx context.Context, item *Item) (*Item, error) {
 	// build query
-	statement := repo.makeInsertStatement(ctx, item)
+	statement, err := repo.makeInsertStatement(ctx, item)
+	if err != nil {
+		return nil, err
+	}
 
 	// execute the query
-	err := psql.Create(ctx, repo.client, statement)
+	err = psql.Create(ctx, repo.client, *statement)
 	if err != nil {
 		return nil, err
 	}

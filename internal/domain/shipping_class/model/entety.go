@@ -140,7 +140,7 @@ func (repo *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, e
 }
 
 // makeInsertStatement
-func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) sq.InsertBuilder {
+func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.InsertBuilder, error) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
@@ -149,7 +149,17 @@ func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) sq.Inser
 		item.ID = uuid.New().String()
 	}
 
-	return repo.qb.Insert(repo.table).
+	// if SortOrder is not set, get the max SortOrder and increment it
+	if item.SortOrder == 0 {
+		sortOrder, err := repo.MaxSortOrder(ctx)
+		if err != nil {
+			return nil, err
+		}
+		item.SortOrder = *sortOrder + 1
+
+	}
+
+	insertItem := repo.qb.Insert(repo.table).
 		Columns(
 			fieldMap["ID"],
 			fieldMap["Name"],
@@ -172,6 +182,8 @@ func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) sq.Inser
 			"NOW()",
 			by,
 		)
+
+	return &insertItem, nil
 }
 
 // makeUpdateStatement
