@@ -82,13 +82,13 @@ var newTestItems = []*model.Item{
 }
 
 // Test Product Status
-func TestProductStatus(t *testing.T) {
+func TestProductStatusModal(t *testing.T) {
 	// prepare data
 	t.Run("clearTestData", clearTestData)
 	defer t.Run("clearTestData", clearTestData)
 
 	// run tests
-	t.Run("list", all)
+	t.Run("list", list)
 	t.Run("get", get)
 	t.Run("getByUrl", getByUrl)
 	t.Run("createWithId", createWithId)
@@ -106,11 +106,11 @@ func clearTestData(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
-	// get all data from the table
+	// get list data from the table
 	all, err := storage.List(initContext(), &model.Filter{})
 	assert.NoError(t, err)
 
-	// go thought all data and del it if is not in the testItems
+	// go thought list data and del it if is not in the testItems
 	for _, v := range all {
 		found := false
 		for _, tv := range testItems {
@@ -126,7 +126,7 @@ func clearTestData(t *testing.T) {
 		}
 	}
 
-	// go thought all testItems and create or update them
+	// go thought list testItems and create or update them
 	for i, v := range testItems {
 		v.SortOrder = uint64(i + 1)
 		// get the product status by the ID
@@ -147,8 +147,8 @@ func clearTestData(t *testing.T) {
 	}
 }
 
-// test all
-func all(t *testing.T) {
+// test list
+func list(t *testing.T) {
 	// Create a storage with real database client
 	storage := initStorage(t)
 
@@ -165,11 +165,11 @@ func all(t *testing.T) {
 		expected []*model.Item
 	}{
 		{
-			name:     "Get all",
+			name:     "Get list",
 			filter:   &model.Filter{},
 			expected: testItems,
 		}, {
-			name:     "Get all active",
+			name:     "Get list active",
 			filter:   &model.Filter{Active: &isActive},
 			expected: testItems,
 		}, {

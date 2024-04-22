@@ -422,7 +422,7 @@ func clearTestData(t *testing.T) {
 			_, err = storage.Create(initContext(), v)
 			assert.NoError(t, err)
 		} else {
-			_, err = storage.Update(initContext(), v)
+			err = storage.Update(initContext(), v)
 			assert.NoError(t, err)
 		}
 	}
@@ -616,9 +616,11 @@ func createWithId(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Create method
-			result, err := storage.Create(initContext(), tc.new)
+			id, err := storage.Create(initContext(), tc.new)
+			assert.NoError(t, err)
 
-			// Assert that there was no error
+			// Call Get method
+			result, err := storage.Get(initContext(), id, nil)
 			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
@@ -658,12 +660,12 @@ func createWithoutId(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Create method
-			result, err := storage.Create(initContext(), tc.sent)
+			id, err := storage.Create(initContext(), tc.sent)
+			assert.NoError(t, err)
+			tc.get.ID = *id
 
-			// update ID
-			tc.get.ID = result.ID
-
-			// Assert that there was no error
+			// Call Get method
+			result, err := storage.Get(initContext(), id, nil)
 			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
@@ -702,9 +704,11 @@ func update(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Update method
-			result, err := storage.Update(initContext(), tc.sent)
+			err := storage.Update(initContext(), tc.sent)
+			assert.NoError(t, err)
 
-			// Assert that there was no error
+			// Call Get method
+			result, err := storage.Get(initContext(), &tc.update.ID, nil)
 			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
@@ -747,9 +751,11 @@ func patch(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Patch method
-			result, err := storage.Patch(initContext(), &testItemNew.ID, &tc.fields)
+			err := storage.Patch(initContext(), &testItemNew.ID, &tc.fields)
+			assert.NoError(t, err)
 
-			// Assert that there was no error
+			// Call Get method
+			result, err := storage.Get(initContext(), &testItemNew.ID, nil)
 			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
@@ -784,20 +790,14 @@ func updatedAt(t *testing.T) {
 	for _, tc := range testCases {
 		// Call the UpdatedAt method
 		updatedAtBefore, err := storage.UpdatedAt(initContext(), &tc.id)
-
-		// Assert that there was no error
 		assert.NoError(t, err)
 
 		// Call the Update method
-		_, err = storage.Update(initContext(), tc.sent)
-
-		// Assert that there was no error
+		err = storage.Update(initContext(), tc.sent)
 		assert.NoError(t, err)
 
 		// Call the UpdatedAt method
 		updatedAtAfter, err := storage.UpdatedAt(initContext(), &tc.id)
-
-		// Assert that there was no error
 		assert.NoError(t, err)
 
 		// Assert that the updatedAtAfter is greater than updatedAtBefore

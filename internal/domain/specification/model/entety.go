@@ -18,8 +18,8 @@ var fieldMap = map[string]string{
 	"Name":      "name",
 	"Url":       "url",
 	"Type":      "specification_type",
-	"Active":    "active",
 	"SortOrder": "sort_order",
+	"Active":    "active",
 	"CreatedAt": "created_at",
 	"CreatedBy": "created_by",
 	"UpdatedAt": "updated_at",
@@ -27,23 +27,41 @@ var fieldMap = map[string]string{
 }
 
 // makeStatement
-func (repo *Model) makeStatement() sq.SelectBuilder {
-	return repo.qb.Select(
+func (m *Model) makeStatement() sq.SelectBuilder {
+	return m.qb.Select(
 		fieldMap["ID"],
 		fieldMap["Name"],
 		fieldMap["Url"],
 		fieldMap["Type"],
-		fieldMap["Active"],
 		fieldMap["SortOrder"],
+		fieldMap["Active"],
 		fieldMap["CreatedAt"],
 		fieldMap["CreatedBy"],
 		fieldMap["UpdatedAt"],
 		fieldMap["UpdatedBy"],
-	).From(repo.table + " p")
+	).From(m.table + " p")
+}
+
+// make Get statement
+func (m *Model) makeGetStatement(id *string, url *string) sq.SelectBuilder {
+	// build query
+	statement := m.makeStatement()
+
+	// id
+	if id != nil {
+		statement = statement.Where(fieldMap["ID"]+" = ?", *id)
+	}
+
+	// url
+	if url != nil {
+		statement = statement.Where(fieldMap["Url"]+" = ?", *url)
+	}
+
+	return statement
 }
 
 // makeStatementByFilter
-func (repo *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
+func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	// OrderBy
 	if filter.OrderBy == nil {
 		filter.OrderBy = new(string)
@@ -68,9 +86,8 @@ func (repo *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		*filter.PerPage = 10
 	}
 
-	// Build query and OrderBy, OrderDir, Page, Limit
-	statement := repo.makeStatement().OrderBy(fieldMap[*filter.OrderBy] + " " + *filter.OrderDir).
-		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
+	// Build query
+	statement := m.makeStatement()
 
 	// Ids
 	if filter.IDs != nil {
@@ -100,14 +117,14 @@ func (repo *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		}
 	}
 
-	// Active
-	if filter.Active != nil {
-		statement = statement.Where(fieldMap["Active"]+" = ?", *filter.Active)
+	// Type
+	if filter.Type != nil {
+		statement = statement.Where(sq.Eq{fieldMap["Type"]: *filter.Type})
 	}
 
-	// SpecificationType
-	if filter.Type != nil {
-		statement = statement.Where(fieldMap["Type"]+" = ?", *filter.Type)
+	// Active
+	if filter.Active != nil {
+		statement = statement.Where(sq.Eq{fieldMap["Active"]: *filter.Active})
 	}
 
 	// Search
@@ -120,19 +137,21 @@ func (repo *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		)
 	}
 
-	return statement
+	// Add OrderBy, OrderDir, Page, Limit and return
+	return statement.OrderBy(fieldMap[*filter.OrderBy] + " " + *filter.OrderDir).
+		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 }
 
 // scanOneRow
-func (repo *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
+func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
 	var item = &Item{}
 	err := rows.Scan(
 		&item.ID,
 		&item.Name,
 		&item.Url,
 		&item.Type,
-		&item.Active,
 		&item.SortOrder,
+		&item.Active,
 		&item.CreatedAt,
 		&item.CreatedBy,
 		&item.UpdatedAt,
@@ -149,7 +168,8 @@ func (repo *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, e
 }
 
 // makeInsertStatement
-func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) sq.InsertBuilder {
+func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.InsertBuilder, *string) {
+
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
@@ -158,55 +178,57 @@ func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) sq.Inser
 		item.ID = uuid.New().String()
 	}
 
-	// build query
-	return repo.qb.Insert(repo.table).
-		Columns(
-			fieldMap["ID"],
-			fieldMap["Name"],
-			fieldMap["Url"],
-			fieldMap["Type"],
-			fieldMap["Active"],
-			fieldMap["SortOrder"],
-			fieldMap["CreatedAt"],
-			fieldMap["CreatedBy"],
-			fieldMap["UpdatedAt"],
-			fieldMap["UpdatedBy"]).
-		Values(
-			item.ID,
-			item.Name,
-			item.Url,
-			item.Type,
-			item.Active,
-			item.SortOrder,
-			"NOW()",
-			by,
-			"NOW()",
-			by,
-		)
+	// set ID to context
+	ctx = context.WithValue(ctx, "itemId", item.ID)
+
+	insertItem := m.qb.Insert(m.table).Columns(
+		fieldMap["ID"],
+		fieldMap["Name"],
+		fieldMap["Url"],
+		fieldMap["Type"],
+		fieldMap["SortOrder"],
+		fieldMap["Active"],
+		fieldMap["CreatedAt"],
+		fieldMap["CreatedBy"],
+		fieldMap["UpdatedAt"],
+		fieldMap["UpdatedBy"],
+	).Values(
+		item.ID,
+		item.Name,
+		item.Url,
+		item.Type,
+		item.SortOrder,
+		item.Active,
+		"NOW()",
+		by,
+		"NOW()",
+		by,
+	)
+
+	return &insertItem, &item.ID
 }
 
 // makeUpdateStatement
-func (repo *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBuilder {
+func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
-	// build query
-	return repo.qb.Update(repo.table).
+	return m.qb.Update(m.table).
 		Set(fieldMap["Name"], item.Name).
 		Set(fieldMap["Url"], item.Url).
 		Set(fieldMap["Type"], item.Type).
-		Set(fieldMap["Active"], item.Active).
 		Set(fieldMap["SortOrder"], item.SortOrder).
+		Set(fieldMap["Active"], item.Active).
 		Set(fieldMap["UpdatedAt"], "NOW()").
 		Set(fieldMap["UpdatedBy"], by)
 }
 
 // makePatchStatement
-func (repo *Model) makePatchStatement(ctx context.Context, id *string, fields *map[string]interface{}) sq.UpdateBuilder {
+func (m *Model) makePatchStatement(ctx context.Context, id *string, fields *map[string]interface{}) sq.UpdateBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
-	statement := repo.qb.Update(repo.table).Where("id = ?", id)
+	statement := m.qb.Update(m.table).Where("id = ?", id)
 
 	for field, value := range *fields {
 		field = fieldMap[field]

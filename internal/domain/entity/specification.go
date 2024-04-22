@@ -7,8 +7,8 @@ type Specification struct {
 	Name      string    `json:"name"`
 	Url       string    `json:"url"`
 	Type      string    `json:"specification_type"`
-	Active    bool      `json:"active"`
 	SortOrder uint64    `json:"sort_order"`
+	Active    bool      `json:"active"`
 	CreatedAt time.Time `json:"created_at"`
 	CreatedBy string    `json:"created_by"`
 	UpdatedAt time.Time `json:"updated_at"`

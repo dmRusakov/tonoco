@@ -8,14 +8,14 @@ import (
 )
 
 type Storage interface {
+	Get(ctx context.Context, id *string, url *string) (*Item, error)
 	List(context.Context, *Filter) ([]*Item, error)
-	Create(context.Context, *Item) (*Item, error)
-	Get(context.Context, *string, *string) (*Item, error)
-	Update(context.Context, *Item) (*Item, error)
-	Patch(context.Context, *string, *map[string]interface{}) (*Item, error)
+	Create(context.Context, *Item) (*string, error)
+	Update(context.Context, *Item) error
+	Patch(context.Context, *string, *map[string]interface{}) error
 	UpdatedAt(context.Context, *string) (*time.Time, error)
-	TableIndexCount(context.Context) (*uint64, error)
 	MaxSortOrder(context.Context) (*uint64, error)
+	TableIndexCount(context.Context) (*uint64, error)
 	Delete(context.Context, *string) error
 }
 

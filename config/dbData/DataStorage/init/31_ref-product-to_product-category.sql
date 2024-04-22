@@ -17,7 +17,7 @@ ALTER TABLE public.ref_product_to_product_category OWNER TO postgres;
 CREATE INDEX ref_product_to_product_category_id ON public.ref_product_to_product_category USING btree (id);
 CREATE INDEX ref_product_to_product_category_product_id ON public.ref_product_to_product_category USING btree (product_id);
 CREATE INDEX ref_product_to_product_category_product_category_id ON public.ref_product_to_product_category USING btree (product_category_id);
-ALTER TABLE public.ref_product_to_product_category ADD CONSTRAINT ref_product_to_product_category_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.product(id);
+ALTER TABLE public.ref_product_to_product_category ADD CONSTRAINT ref_product_to_product_category_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.product_info(id);
 ALTER TABLE public.ref_product_to_product_category ADD CONSTRAINT ref_product_to_product_category_product_category_id_fkey FOREIGN KEY (product_category_id) REFERENCES public.product_category(id);
 COMMENT ON TABLE public.ref_product_to_product_category IS 'Reference table for product and product category';
 

@@ -26,8 +26,8 @@ var fieldMap = map[string]string{
 }
 
 // makeStatement
-func (repo *Model) makeStatement() sq.SelectBuilder {
-	return repo.qb.Select(
+func (m *Model) makeStatement() sq.SelectBuilder {
+	return m.qb.Select(
 		fieldMap["ID"],
 		fieldMap["Name"],
 		fieldMap["Url"],
@@ -37,11 +37,29 @@ func (repo *Model) makeStatement() sq.SelectBuilder {
 		fieldMap["CreatedBy"],
 		fieldMap["UpdatedAt"],
 		fieldMap["UpdatedBy"],
-	).From(repo.table + " p")
+	).From(m.table + " p")
+}
+
+// make Get statement
+func (m *Model) makeGetStatement(id *string, url *string) sq.SelectBuilder {
+	// build query
+	statement := m.makeStatement()
+
+	// id
+	if id != nil {
+		statement = statement.Where(fieldMap["ID"]+" = ?", *id)
+	}
+
+	// url
+	if url != nil {
+		statement = statement.Where(fieldMap["Url"]+" = ?", *url)
+	}
+
+	return statement
 }
 
 // makeStatementByFilter
-func (repo *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
+func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	// OrderBy
 	if filter.OrderBy == nil {
 		filter.OrderBy = new(string)
@@ -66,9 +84,8 @@ func (repo *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		*filter.PerPage = 10
 	}
 
-	// Build query and OrderBy, OrderDir, Page, Limit
-	statement := repo.makeStatement().OrderBy(fieldMap[*filter.OrderBy] + " " + *filter.OrderDir).
-		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
+	// Build query
+	statement := m.makeStatement()
 
 	// Ids
 	if filter.IDs != nil {
@@ -113,11 +130,13 @@ func (repo *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		)
 	}
 
-	return statement
+	// Add OrderBy, OrderDir, Page, Limit and return
+	return statement.OrderBy(fieldMap[*filter.OrderBy] + " " + *filter.OrderDir).
+		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 }
 
 // scanOneRow
-func (repo *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
+func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
 	var item = &Item{}
 	err := rows.Scan(
 		&item.ID,
@@ -141,7 +160,7 @@ func (repo *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, e
 }
 
 // makeInsertStatement
-func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.InsertBuilder, *string, error) {
+func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.InsertBuilder, *string) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
@@ -150,16 +169,10 @@ func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Ins
 		item.ID = uuid.New().String()
 	}
 
-	// if SortOrder is not set, get the max SortOrder and increment it
-	if item.SortOrder == 0 {
-		sortOrder, err := repo.MaxSortOrder(ctx)
-		if err != nil {
-			return nil, nil, err
-		}
-		item.SortOrder = *sortOrder + 1
-	}
+	// set ID to context
+	ctx = context.WithValue(ctx, "itemId", item.ID)
 
-	insertItem := repo.qb.Insert(repo.table).Columns(
+	insertItem := m.qb.Insert(m.table).Columns(
 		fieldMap["ID"],
 		fieldMap["Name"],
 		fieldMap["Url"],
@@ -181,15 +194,16 @@ func (repo *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Ins
 		by,
 	)
 
-	return &insertItem, &item.ID, nil
+	// get itemId from context
+	return &insertItem, &item.ID
 }
 
 // makeUpdateStatement
-func (repo *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBuilder {
+func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
-	return repo.qb.Update(repo.table).
+	return m.qb.Update(m.table).
 		Set(fieldMap["Name"], item.Name).
 		Set(fieldMap["Url"], item.Url).
 		Set(fieldMap["SortOrder"], item.SortOrder).
@@ -199,11 +213,11 @@ func (repo *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.Updat
 }
 
 // makePatchStatement
-func (repo *Model) makePatchStatement(ctx context.Context, id *string, fields *map[string]interface{}) sq.UpdateBuilder {
+func (m *Model) makePatchStatement(ctx context.Context, id *string, fields *map[string]interface{}) sq.UpdateBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
-	statement := repo.qb.Update(repo.table).Where("id = ?", id)
+	statement := m.qb.Update(m.table).Where("id = ?", id)
 
 	for field, value := range *fields {
 		field = fieldMap[field]

@@ -7,6 +7,7 @@ import (
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/jackc/pgx/v5"
 	"strconv"
+	"time"
 )
 
 // List - List items.
@@ -66,7 +67,7 @@ func Get(ctx context.Context, client Client, statement sq.SelectBuilder) (pgx.Ro
 }
 
 // Create - Create item.
-func Create(ctx context.Context, client Client, statement sq.InsertBuilder) error {
+func Create(ctx context.Context, client Client, statement *sq.InsertBuilder) error {
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()
 	if err != nil {
@@ -172,4 +173,76 @@ func Delete(ctx context.Context, client Client, statement sq.DeleteBuilder) erro
 
 	// return the result
 	return nil
+}
+
+func UpdatedAt(ctx context.Context, client Client, statement sq.SelectBuilder) (*time.Time, error) {
+	rows, err := Get(ctx, client, statement)
+	if err != nil {
+		return nil, err
+	}
+
+	// scan the result set into a slice of Item structs
+	var updatedAt *time.Time
+	if err = rows.Scan(
+		&updatedAt,
+	); err != nil {
+		return nil, err
+	}
+
+	// return the updated at
+	return updatedAt, nil
+}
+
+func TableIndexCount(ctx context.Context, client Client, statement sq.SelectBuilder) (*uint64, error) {
+	// execute the query
+	rows, err := Get(ctx, client, statement)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var updatedAt string
+	err = rows.Scan(&updatedAt)
+	if err != nil {
+		err = ErrScan(ParsePgError(err))
+		tracing.Error(ctx, err)
+		return nil, err
+	}
+
+	// convert the string to a uint64
+	count, err := strconv.ParseUint(updatedAt, 10, 64)
+	if err != nil {
+		err = ErrScan(ParsePgError(err))
+		tracing.Error(ctx, err)
+		return nil, err
+	}
+
+	// return the updated at
+	return &count, nil
+}
+
+func MaxSortOrder(ctx context.Context, client Client, qb sq.StatementBuilderType, tableName *string) (*uint64, error) {
+	// build query
+	statement := qb.
+		Select("max(sort_order)").
+		From(*tableName).
+		GroupBy("sort_order")
+
+	// execute the query
+	rows, err := Get(ctx, client, statement)
+	if err != nil {
+		return nil, err
+	}
+
+	// scan the result set into a slice of Item structs
+	var sortOrder uint64
+	if err = rows.Scan(
+		&sortOrder,
+	); err != nil {
+		return nil, err
+	}
+
+	// return the max sort order
+	return &sortOrder, nil
 }

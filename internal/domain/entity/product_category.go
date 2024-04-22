@@ -9,7 +9,7 @@ type ProductCategory struct {
 	Url              string    `json:"url"`
 	ShortDescription string    `json:"short_description"`
 	Description      string    `json:"description"`
-	SortOrder        uint32    `json:"sort_order"`
+	SortOrder        uint64    `json:"sort_order"`
 	Prime            bool      `json:"prime"`
 	Active           bool      `json:"active"`
 	CreatedAt        time.Time `json:"created_at"`

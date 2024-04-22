@@ -4,197 +4,93 @@ import (
 	"context"
 	"fmt"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
-	"github.com/dmRusakov/tonoco/pkg/tracing"
-	"strconv"
 	"time"
 )
 
-func (repo *Model) Get(ctx context.Context, id *string, url *string) (*Item, error) {
-	// build query
-	statement := repo.makeStatement()
-
-	isParamSet := false
-
-	// id
-	if id != nil {
-		statement = statement.Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), *id)
-		isParamSet = true
-	}
-
-	// url
-	if url != nil {
-		statement = statement.Where(fmt.Sprintf("%s = ?", fieldMap["Url"]), *url)
-		isParamSet = true
-	}
-
-	if !isParamSet {
-		return nil, fmt.Errorf("id or url must be set")
-	}
-
-	// execute the query
-	rows, err := psql.Get(ctx, repo.client, statement)
+func (m *Model) Get(ctx context.Context, id *string, url *string) (*Item, error) {
+	rows, err := psql.Get(ctx, m.client, m.makeGetStatement(id, url))
 	if err != nil {
 		return nil, err
 	}
 
 	// return the Item
-	return repo.scanOneRow(ctx, rows)
+	return m.scanOneRow(ctx, rows)
 }
 
-func (repo *Model) List(ctx context.Context, filter *Filter) ([]*Item, error) {
-	// build query
-	statement := repo.makeStatementByFilter(filter)
-
-	// execute the query
-	rows, err := psql.List(ctx, repo.client, statement)
+func (m *Model) List(ctx context.Context, filter *Filter) ([]*Item, error) {
+	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter))
 	if err != nil {
 		return nil, err
 	}
-
 	defer rows.Close()
 
 	// iterate over the result set
 	var items []*Item
 	for rows.Next() {
-		item, err := repo.scanOneRow(ctx, rows)
+		item, err := m.scanOneRow(ctx, rows)
 		if err != nil {
 			return nil, err
 		}
-
 		items = append(items, item)
 	}
 
-	// done
 	return items, nil
 }
 
-func (repo *Model) Create(ctx context.Context, item *Item) (*Item, error) {
-	// build query
-	statement := repo.makeInsertStatement(ctx, item)
-
-	// execute the query
-	err := psql.Create(ctx, repo.client, statement)
-	if err != nil {
-		return nil, err
-	}
-
-	// return the newly created item
-	id := item.ID
-	return repo.Get(ctx, &id, nil)
+func (m *Model) Create(ctx context.Context, item *Item) (*string, error) {
+	statement, id := m.makeInsertStatement(ctx, item)
+	return id, psql.Create(
+		ctx,
+		m.client,
+		statement,
+	)
 }
 
-func (repo *Model) Update(ctx context.Context, item *Item) (*Item, error) {
-	// build query
-	statement := repo.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), item.ID)
-
-	// execute the query
-	err := psql.Update(ctx, repo.client, statement)
-	if err != nil {
-		return nil, err
-	}
-
-	// return the updated item
-	id := item.ID
-	return repo.Get(ctx, &id, nil)
+func (m *Model) Update(ctx context.Context, item *Item) (err error) {
+	return psql.Update(
+		ctx,
+		m.client,
+		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), item.ID),
+	)
 }
 
-func (repo *Model) Patch(ctx context.Context, id *string, fields *map[string]interface{}) (*Item, error) {
-	// build query
-	statement := repo.makePatchStatement(ctx, id, fields)
-
-	// execute the query
-	err := psql.Update(ctx, repo.client, statement)
-	if err != nil {
-		return nil, err
-	}
-
-	// return the updated item
-	return repo.Get(ctx, id, nil)
+func (m *Model) Patch(ctx context.Context, id *string, fields *map[string]interface{}) error {
+	return psql.Update(
+		ctx,
+		m.client,
+		m.makePatchStatement(ctx, id, fields),
+	)
 }
 
-func (repo *Model) Delete(ctx context.Context, id *string) error {
-	// build query
-	statement := repo.qb.Delete(repo.table).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), id)
-
-	// execute the query to delete the item
-	return psql.Delete(ctx, repo.client, statement)
+func (m *Model) Delete(ctx context.Context, id *string) error {
+	return psql.Delete(
+		ctx,
+		m.client,
+		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), id),
+	)
 }
 
-func (repo *Model) UpdatedAt(ctx context.Context, id *string) (*time.Time, error) {
-	// build query
-	statement := repo.qb.Select(fieldMap["UpdatedAt"]).From(repo.table).Where("id = ?", id)
-
-	// execute the query
-	rows, err := psql.Get(ctx, repo.client, statement)
-	if err != nil {
-		return nil, err
-	}
-
-	// scan the result set into a slice of Item structs
-	var updatedAt *time.Time
-	if err = rows.Scan(
-		&updatedAt,
-	); err != nil {
-		return nil, err
-	}
-
-	// return the updated at
-	return updatedAt, nil
+func (m *Model) UpdatedAt(ctx context.Context, id *string) (*time.Time, error) {
+	return psql.UpdatedAt(
+		ctx,
+		m.client,
+		m.qb.Select(fieldMap["UpdatedAt"]).From(m.table).Where("id = ?", id),
+	)
 }
 
-func (repo *Model) MaxSortOrder(ctx context.Context) (*uint64, error) {
-	// build query
-	statement := repo.qb.
-		Select("max(sort_order)").
-		From(repo.table).
-		GroupBy("sort_order")
-
-	// execute the query
-	rows, err := psql.Get(ctx, repo.client, statement)
-	if err != nil {
-		return nil, err
-	}
-
-	// scan the result set into a slice of Item structs
-	var sortOrder uint64
-	if err = rows.Scan(
-		&sortOrder,
-	); err != nil {
-		return nil, err
-	}
-
-	// return the max sort order
-	return &sortOrder, nil
+func (m *Model) TableIndexCount(ctx context.Context) (*uint64, error) {
+	return psql.TableIndexCount(
+		ctx,
+		m.client,
+		m.qb.Select("n_tup_upd").From("pg_stat_user_tables").Where("relname = ?", m.table),
+	)
 }
 
-func (repo *Model) TableIndexCount(ctx context.Context) (*uint64, error) {
-	// build query
-	statement := repo.qb.Select("n_tup_upd").From("pg_stat_user_tables").Where("relname = ?", repo.table)
-
-	// execute the query
-	rows, err := psql.Get(ctx, repo.client, statement)
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	var updatedAt string
-	err = rows.Scan(&updatedAt)
-	if err != nil {
-		err = psql.ErrScan(psql.ParsePgError(err))
-		tracing.Error(ctx, err)
-		return nil, err
-	}
-
-	// convert the string to a uint64
-	count, err := strconv.ParseUint(updatedAt, 10, 64)
-	if err != nil {
-		err = psql.ErrScan(psql.ParsePgError(err))
-		tracing.Error(ctx, err)
-		return nil, err
-	}
-
-	// return the updated at
-	return &count, nil
+func (m *Model) MaxSortOrder(ctx context.Context) (*uint64, error) {
+	return psql.MaxSortOrder(
+		ctx,
+		m.client,
+		m.qb,
+		&m.table,
+	)
 }
