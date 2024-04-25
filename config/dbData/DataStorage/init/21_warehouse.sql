@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS public.warehouse
 (
     id             UUID UNIQUE DEFAULT uuid_generate_v4() NOT NULL,
     name           VARCHAR(255)                           NOT NULL,
+    abbreviation   VARCHAR(10)                            DEFAULT NULL,
     sort_order     INTEGER                                NOT NULL,
     active         BOOLEAN     DEFAULT TRUE               NOT NULL,
     address_line_1 VARCHAR(255)                           NOT NULL,
@@ -11,7 +12,7 @@ CREATE TABLE IF NOT EXISTS public.warehouse
     state          VARCHAR(255)                           NOT NULL,
     zip            VARCHAR(255)                           NOT NULL,
     country        VARCHAR(255)                           NOT NULL,
-    url            VARCHAR(255)                           NOT NULL,
+    web_site       VARCHAR(255)                           NOT NULL,
     phone          VARCHAR(255)                           NOT NULL,
     email          VARCHAR(255)                           NOT NULL,
 
@@ -27,7 +28,7 @@ CREATE TABLE IF NOT EXISTS public.warehouse
 ALTER TABLE public.warehouse OWNER TO postgres;
 CREATE INDEX warehouse_id ON public.warehouse USING btree (id);
 CREATE INDEX warehouse_name ON public.warehouse USING btree (name);
-CREATE INDEX warehouse_url ON public.warehouse USING btree (url);
+CREATE INDEX warehouse_abbreviation ON public.warehouse USING btree (abbreviation);
 CREATE INDEX warehouse_sort_order ON public.warehouse USING btree (sort_order);
 CREATE INDEX warehouse_updated_at ON public.warehouse USING btree (updated_at);
 
@@ -35,7 +36,7 @@ CREATE INDEX warehouse_updated_at ON public.warehouse USING btree (updated_at);
 COMMENT ON TABLE public.warehouse IS 'Reference table for warehouse';
 COMMENT ON COLUMN public.warehouse.id IS 'Unique identifier for warehouse';
 COMMENT ON COLUMN public.warehouse.name IS 'Name of warehouse';
-COMMENT ON COLUMN public.warehouse.url IS 'URL of warehouse';
+COMMENT ON COLUMN public.warehouse.abbreviation IS 'Abbreviation of warehouse';
 COMMENT ON COLUMN public.warehouse.sort_order IS 'Sort order of warehouse';
 COMMENT ON COLUMN public.warehouse.active IS 'Active status of warehouse';
 COMMENT ON COLUMN public.warehouse.address_line_1 IS 'Address line 1 of warehouse';
@@ -44,7 +45,7 @@ COMMENT ON COLUMN public.warehouse.city IS 'City of warehouse';
 COMMENT ON COLUMN public.warehouse.state IS 'State of warehouse';
 COMMENT ON COLUMN public.warehouse.zip IS 'Zip code of warehouse';
 COMMENT ON COLUMN public.warehouse.country IS 'Country of warehouse';
-COMMENT ON COLUMN public.warehouse.url IS 'URL of warehouse';
+COMMENT ON COLUMN public.warehouse.web_site IS 'Website of warehouse';
 COMMENT ON COLUMN public.warehouse.phone IS 'Phone number of warehouse';
 COMMENT ON COLUMN public.warehouse.email IS 'Email of warehouse';
 COMMENT ON COLUMN public.warehouse.created_at IS 'Creation time of warehouse';
@@ -67,8 +68,8 @@ CREATE TRIGGER warehouse_order
     EXECUTE FUNCTION set_order_column_universal();
 
 -- default data
-INSERT INTO public.warehouse (name, sort_order, address_line_1, city, state, zip, country, url, phone, email)
-VALUES ('Futuro Factory Direct ', 1, '2201 John P Lyons Lane', 'Hallandale', 'FL', '33009', 'USA', 'https://www.futurofuturo.com', '800-230-3565', 'general@futurofuturo.com');
+INSERT INTO public.warehouse (name, abbreviation, sort_order, address_line_1, city, state, zip, country, web_site, phone, email)
+VALUES ('Futuro Factory Direct', 'FLL', 1, '2201 John P Lyons Lane', 'Hallandale', 'FL', '33009', 'USA', 'https://www.futurofuturo.com', '800-230-3565', 'general@futurofuturo.com');
 
 -- get data
 SELECT * FROM public.warehouse;

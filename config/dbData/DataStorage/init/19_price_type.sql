@@ -51,9 +51,9 @@ CREATE TRIGGER price_type_updated_at
 
 -- demo data
 INSERT INTO public.price_type (name, url, sort_order)
-VALUES ('Regular', 'regular', 1),
+VALUES ('Special', 'special', 1),
        ('Sale', 'sale', 2),
-       ('Special', 'special', 3),
+       ('Regular', 'regular', 3),
        ('Purchase/Factory', 'purchase-factory', 4);
 
 -- get data

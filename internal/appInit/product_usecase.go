@@ -9,6 +9,8 @@ import (
 	folder_service "github.com/dmRusakov/tonoco/internal/domain/folder/service"
 	price_model "github.com/dmRusakov/tonoco/internal/domain/price/model"
 	price_service "github.com/dmRusakov/tonoco/internal/domain/price/service"
+	price_type_model "github.com/dmRusakov/tonoco/internal/domain/price_type/model"
+	price_type_service "github.com/dmRusakov/tonoco/internal/domain/price_type/service"
 	product_category_model "github.com/dmRusakov/tonoco/internal/domain/product_category/model"
 	product_category_service "github.com/dmRusakov/tonoco/internal/domain/product_category/service"
 	product_info_model "github.com/dmRusakov/tonoco/internal/domain/product_info/model"
@@ -23,6 +25,8 @@ import (
 	specification_type_service "github.com/dmRusakov/tonoco/internal/domain/specification_type/service"
 	specification_value_model "github.com/dmRusakov/tonoco/internal/domain/specification_value/model"
 	specification_value_service "github.com/dmRusakov/tonoco/internal/domain/specification_value/service"
+	warehouse_model "github.com/dmRusakov/tonoco/internal/domain/warehouse/model"
+	warehouse_service "github.com/dmRusakov/tonoco/internal/domain/warehouse/service"
 
 	productPolicy "github.com/dmRusakov/tonoco/internal/domain/useCase/product"
 )
@@ -43,6 +47,10 @@ func (a *App) ProductUseCaseInit() (err error) {
 	// price
 	priceStorage := price_model.NewStorage(a.SqlDB)
 	priceService := price_service.NewService(priceStorage)
+
+	// price type
+	priceTypeStorage := price_type_model.NewStorage(a.SqlDB)
+	priceTypeService := price_type_service.NewService(priceTypeStorage)
 
 	// product status
 	productStatusStorage := product_status_model.NewStorage(a.SqlDB)
@@ -72,6 +80,10 @@ func (a *App) ProductUseCaseInit() (err error) {
 	productInfoStorage := product_info_model.NewStorage(a.SqlDB)
 	productInfoService := product_info_service.NewService(productInfoStorage)
 
+	// warehouse
+	warehouseStorage := warehouse_model.NewStorage(a.SqlDB)
+	warehouseService := warehouse_service.NewService(warehouseStorage)
+
 	a.ProductUseCase = productPolicy.NewProductUseCase(
 		a.generator,
 		a.clock,
@@ -79,6 +91,7 @@ func (a *App) ProductUseCaseInit() (err error) {
 		fileService,
 		folderService,
 		priceService,
+		priceTypeService,
 		productStatusService,
 		productCategoryService,
 		shippingClassService,
@@ -86,6 +99,7 @@ func (a *App) ProductUseCaseInit() (err error) {
 		specificationTypeService,
 		specificationValueService,
 		productInfoService,
+		warehouseService,
 	)
 
 	return nil

@@ -5,6 +5,7 @@ import (
 	file_service "github.com/dmRusakov/tonoco/internal/domain/file/service"
 	folder_service "github.com/dmRusakov/tonoco/internal/domain/folder/service"
 	price_service "github.com/dmRusakov/tonoco/internal/domain/price/service"
+	price_type_service "github.com/dmRusakov/tonoco/internal/domain/price_type/service"
 	product_category_service "github.com/dmRusakov/tonoco/internal/domain/product_category/service"
 	product_info_service "github.com/dmRusakov/tonoco/internal/domain/product_info/service"
 	product_status_service "github.com/dmRusakov/tonoco/internal/domain/product_status/service"
@@ -12,6 +13,7 @@ import (
 	specification_service "github.com/dmRusakov/tonoco/internal/domain/specification/service"
 	specification_type_service "github.com/dmRusakov/tonoco/internal/domain/specification_type/service"
 	specification_value_service "github.com/dmRusakov/tonoco/internal/domain/specification_value/service"
+	warehouse_service "github.com/dmRusakov/tonoco/internal/domain/warehouse/service"
 	"github.com/dmRusakov/tonoco/pkg/common/core/clock"
 	"time"
 )
@@ -32,6 +34,7 @@ type UseCase struct {
 	fileService               *file_service.Service
 	folderService             *folder_service.Service
 	priceService              *price_service.Service
+	priceTypeService          *price_type_service.Service
 	productStatusService      *product_status_service.Service
 	productCategoryService    *product_category_service.Service
 	shippingClassService      *shipping_class_service.Service
@@ -39,6 +42,7 @@ type UseCase struct {
 	specificationTypeService  *specification_type_service.Service
 	specificationValueService *specification_value_service.Service
 	productInfoService        *product_info_service.Service
+	warehouseService          *warehouse_service.Service
 }
 
 func NewProductUseCase(
@@ -48,6 +52,7 @@ func NewProductUseCase(
 	fileService *file_service.Service,
 	folderService *folder_service.Service,
 	priceService *price_service.Service,
+	priceTypeService *price_type_service.Service,
 	productStatusService *product_status_service.Service,
 	productCategoryService *product_category_service.Service,
 	shippingClassService *shipping_class_service.Service,
@@ -55,12 +60,14 @@ func NewProductUseCase(
 	specificationTypeService *specification_type_service.Service,
 	specificationValueService *specification_value_service.Service,
 	productInfoService *product_info_service.Service,
+	warehouseService *warehouse_service.Service,
 ) *UseCase {
 	return &UseCase{
 		currencyService:           currencyService,
 		fileService:               fileService,
 		folderService:             folderService,
 		priceService:              priceService,
+		priceTypeService:          priceTypeService,
 		productStatusService:      productStatusService,
 		productCategoryService:    productCategoryService,
 		shippingClassService:      shippingClassService,
@@ -68,6 +75,7 @@ func NewProductUseCase(
 		specificationTypeService:  specificationTypeService,
 		specificationValueService: specificationValueService,
 		productInfoService:        productInfoService,
+		warehouseService:          warehouseService,
 
 		identity: identity,
 		clock:    clock,
