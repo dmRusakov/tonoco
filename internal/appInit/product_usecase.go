@@ -1,12 +1,18 @@
 package appInit
 
 import (
+	currency_model "github.com/dmRusakov/tonoco/internal/domain/currency/model"
+	currency_service "github.com/dmRusakov/tonoco/internal/domain/currency/service"
 	file_model "github.com/dmRusakov/tonoco/internal/domain/file/model"
 	file_service "github.com/dmRusakov/tonoco/internal/domain/file/service"
 	folder_model "github.com/dmRusakov/tonoco/internal/domain/folder/model"
 	folder_service "github.com/dmRusakov/tonoco/internal/domain/folder/service"
+	price_model "github.com/dmRusakov/tonoco/internal/domain/price/model"
+	price_service "github.com/dmRusakov/tonoco/internal/domain/price/service"
 	product_category_model "github.com/dmRusakov/tonoco/internal/domain/product_category/model"
 	product_category_service "github.com/dmRusakov/tonoco/internal/domain/product_category/service"
+	product_info_model "github.com/dmRusakov/tonoco/internal/domain/product_info/model"
+	product_info_service "github.com/dmRusakov/tonoco/internal/domain/product_info/service"
 	product_status_model "github.com/dmRusakov/tonoco/internal/domain/product_status/model"
 	product_status_service "github.com/dmRusakov/tonoco/internal/domain/product_status/service"
 	shipping_class_model "github.com/dmRusakov/tonoco/internal/domain/shipping_class/model"
@@ -18,13 +24,14 @@ import (
 	specification_value_model "github.com/dmRusakov/tonoco/internal/domain/specification_value/model"
 	specification_value_service "github.com/dmRusakov/tonoco/internal/domain/specification_value/service"
 
-	//product_model "github.com/dmRusakov/tonoco/internal/domain/product/model"
-	//product_service "github.com/dmRusakov/tonoco/internal/domain/product/service"
-
 	productPolicy "github.com/dmRusakov/tonoco/internal/domain/useCase/product"
 )
 
 func (a *App) ProductUseCaseInit() (err error) {
+	// currency
+	currencyStorage := currency_model.NewStorage(a.SqlDB)
+	currencyService := currency_service.NewService(currencyStorage)
+
 	// file
 	fileStorage := file_model.NewStorage(a.SqlDB)
 	fileService := file_service.NewService(fileStorage)
@@ -32,6 +39,10 @@ func (a *App) ProductUseCaseInit() (err error) {
 	// folder
 	folderStorage := folder_model.NewStorage(a.SqlDB)
 	folderService := folder_service.NewService(folderStorage)
+
+	// price
+	priceStorage := price_model.NewStorage(a.SqlDB)
+	priceService := price_service.NewService(priceStorage)
 
 	// product status
 	productStatusStorage := product_status_model.NewStorage(a.SqlDB)
@@ -57,23 +68,24 @@ func (a *App) ProductUseCaseInit() (err error) {
 	specificationValueStorage := specification_value_model.NewStorage(a.SqlDB)
 	specificationValueService := specification_value_service.NewService(specificationValueStorage)
 
-	//// product
-	//productStorage := product_model.NewProductStorage(a.SqlDB)
-	//productService := product_service.NewProductService(productStorage)
+	// product
+	productInfoStorage := product_info_model.NewStorage(a.SqlDB)
+	productInfoService := product_info_service.NewService(productInfoStorage)
 
 	a.ProductUseCase = productPolicy.NewProductUseCase(
 		a.generator,
 		a.clock,
+		currencyService,
 		fileService,
 		folderService,
+		priceService,
 		productStatusService,
 		productCategoryService,
 		shippingClassService,
 		specificationService,
 		specificationTypeService,
 		specificationValueService,
-		//productService,
-
+		productInfoService,
 	)
 
 	return nil

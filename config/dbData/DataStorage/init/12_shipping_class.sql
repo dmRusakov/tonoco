@@ -40,7 +40,7 @@ EXECUTE FUNCTION set_order_column_universal();
 -- auto update updated_at
 CREATE TRIGGER shipping_class_updated_at
     BEFORE UPDATE
-    ON public.user
+    ON public.shipping_class
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();
 

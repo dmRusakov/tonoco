@@ -39,7 +39,7 @@ COMMENT ON COLUMN public.specification.updated_by IS 'Record Updated By';
 -- auto update updated_at
 CREATE TRIGGER specification_updated_at
     BEFORE UPDATE
-    ON public.user
+    ON public.specification
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();
 
