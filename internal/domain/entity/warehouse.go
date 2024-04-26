@@ -6,7 +6,6 @@ type Warehouse struct {
 	ID           string    `json:"id"`
 	Name         string    `json:"name"`
 	Abbreviation string    `json:"abbreviation"`
-	Url          string    `json:"url"`
 	SortOrder    uint64    `json:"sort_order"`
 	Active       bool      `json:"active"`
 	AddressLine1 string    `json:"address_line1"`
@@ -26,7 +25,6 @@ type Warehouse struct {
 
 type WarehouseFilter struct {
 	IDs           *[]string `json:"ids"`
-	Urls          *[]string `json:"urls"`
 	Abbreviations *[]string `json:"abbreviations"`
 	Active        *bool     `json:"active"`
 	Prime         *bool     `json:"prime"`

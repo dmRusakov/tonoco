@@ -17,7 +17,6 @@ var fieldMap = map[string]string{
 	"ID":           "id",
 	"Name":         "name",
 	"Abbreviation": "abbreviation",
-	"Url":          "url",
 	"SortOrder":    "sort_order",
 	"Active":       "active",
 	"AddressLine1": "address_line1",
@@ -59,7 +58,6 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 // make Get statement
 func (m *Model) makeGetStatement(
 	id *string,
-	url *string,
 	abbreviation *string,
 ) sq.SelectBuilder {
 	// build query
@@ -68,11 +66,6 @@ func (m *Model) makeGetStatement(
 	// id
 	if id != nil {
 		statement = statement.Where(fieldMap["ID"]+" = ?", *id)
-	}
-
-	// url
-	if url != nil {
-		statement = statement.Where(fieldMap["Url"]+" = ?", *url)
 	}
 
 	// abbreviation
@@ -102,20 +95,6 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		}
 	}
 
-	// Urls
-	if filter.Urls != nil {
-		countUrls := len(*filter.Urls)
-
-		if countUrls > 0 {
-			statement = statement.Where(sq.Eq{fieldMap["Url"]: *filter.Urls})
-		}
-
-		*filter.Page = 1
-		if (*filter.PerPage) > uint64(countUrls) {
-			*filter.PerPage = uint64(countUrls)
-		}
-	}
-
 	// Active
 	if filter.Active != nil {
 		statement = statement.Where(sq.Eq{fieldMap["Active"]: *filter.Active})
@@ -126,7 +105,6 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		statement = statement.Where(
 			sq.Or{
 				sq.Expr("LOWER("+fieldMap["Name"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["Url"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+fieldMap["Abbreviations"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+fieldMap["AddressLine1"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+fieldMap["AddressLine2"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
@@ -172,7 +150,6 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 		&item.ID,
 		&item.Name,
 		&item.Abbreviation,
-		&item.Url,
 		&item.SortOrder,
 		&item.Active,
 		&item.AddressLine1,
@@ -216,7 +193,6 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		fieldMap["ID"],
 		fieldMap["Name"],
 		fieldMap["Abbreviation"],
-		fieldMap["Url"],
 		fieldMap["SortOrder"],
 		fieldMap["Active"],
 		fieldMap["AddressLine1"],
@@ -236,7 +212,6 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		item.ID,
 		item.Name,
 		item.Abbreviation,
-		item.Url,
 		item.SortOrder,
 		item.Active,
 		item.AddressLine1,
@@ -266,7 +241,6 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 	return m.qb.Update(m.table).
 		Set(fieldMap["Name"], item.Name).
 		Set(fieldMap["Abbreviation"], item.Abbreviation).
-		Set(fieldMap["Url"], item.Url).
 		Set(fieldMap["SortOrder"], item.SortOrder).
 		Set(fieldMap["Active"], item.Active).
 		Set(fieldMap["AddressLine1"], item.AddressLine1).
