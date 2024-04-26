@@ -13,6 +13,7 @@ import (
 	specification_service "github.com/dmRusakov/tonoco/internal/domain/specification/service"
 	specification_type_service "github.com/dmRusakov/tonoco/internal/domain/specification_type/service"
 	specification_value_service "github.com/dmRusakov/tonoco/internal/domain/specification_value/service"
+	store_service "github.com/dmRusakov/tonoco/internal/domain/store/service"
 	warehouse_service "github.com/dmRusakov/tonoco/internal/domain/warehouse/service"
 	"github.com/dmRusakov/tonoco/pkg/common/core/clock"
 	"time"
@@ -43,6 +44,7 @@ type UseCase struct {
 	specificationValueService *specification_value_service.Service
 	productInfoService        *product_info_service.Service
 	warehouseService          *warehouse_service.Service
+	storeService              *store_service.Service
 }
 
 func NewProductUseCase(
@@ -61,6 +63,7 @@ func NewProductUseCase(
 	specificationValueService *specification_value_service.Service,
 	productInfoService *product_info_service.Service,
 	warehouseService *warehouse_service.Service,
+	storeService *store_service.Service,
 ) *UseCase {
 	return &UseCase{
 		currencyService:           currencyService,
@@ -76,6 +79,7 @@ func NewProductUseCase(
 		specificationValueService: specificationValueService,
 		productInfoService:        productInfoService,
 		warehouseService:          warehouseService,
+		storeService:              storeService,
 
 		identity: identity,
 		clock:    clock,

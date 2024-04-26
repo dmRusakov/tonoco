@@ -25,6 +25,8 @@ import (
 	specification_type_service "github.com/dmRusakov/tonoco/internal/domain/specification_type/service"
 	specification_value_model "github.com/dmRusakov/tonoco/internal/domain/specification_value/model"
 	specification_value_service "github.com/dmRusakov/tonoco/internal/domain/specification_value/service"
+	store_model "github.com/dmRusakov/tonoco/internal/domain/store/model"
+	store_service "github.com/dmRusakov/tonoco/internal/domain/store/service"
 	warehouse_model "github.com/dmRusakov/tonoco/internal/domain/warehouse/model"
 	warehouse_service "github.com/dmRusakov/tonoco/internal/domain/warehouse/service"
 
@@ -84,6 +86,10 @@ func (a *App) ProductUseCaseInit() (err error) {
 	warehouseStorage := warehouse_model.NewStorage(a.SqlDB)
 	warehouseService := warehouse_service.NewService(warehouseStorage)
 
+	// store
+	storeStorage := store_model.NewStorage(a.SqlDB)
+	storeService := store_service.NewService(storeStorage)
+
 	a.ProductUseCase = productPolicy.NewProductUseCase(
 		a.generator,
 		a.clock,
@@ -100,6 +106,7 @@ func (a *App) ProductUseCaseInit() (err error) {
 		specificationValueService,
 		productInfoService,
 		warehouseService,
+		storeService,
 	)
 
 	return nil
