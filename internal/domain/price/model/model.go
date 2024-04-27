@@ -8,7 +8,7 @@ import (
 )
 
 type Storage interface {
-	Get(ctx context.Context, id *string, url *string) (*Item, error)
+	Get(ctx context.Context, id *string, productID *string, priceTypeID *string, currencyID *string, warehouseID *string, storeId *string) (*Item, error)
 	List(context.Context, *Filter) ([]*Item, error)
 	Create(context.Context, *Item) (*string, error)
 	Update(context.Context, *Item) error

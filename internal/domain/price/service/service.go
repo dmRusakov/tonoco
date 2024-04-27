@@ -11,7 +11,7 @@ type Item = entity.Price
 type Filter = entity.PriceFilter
 
 type repository interface {
-	Get(ctx context.Context, id *string, url *string) (*Item, []error)
+	Get(ctx context.Context, id *string, productID *string, priceTypeID *string, currencyID *string, warehouseID *string, storeId *string) (*Item, []error)
 	List(context.Context, *Filter) ([]*Item, []error)
 	Create(context.Context, *Item) (*string, []error)
 	Update(context.Context, *Item) []error
@@ -30,8 +30,8 @@ func NewService(repository model.Storage) *Service {
 	return &Service{repository: repository}
 }
 
-func (s *Service) Get(ctx context.Context, id *string, url *string) (*Item, error) {
-	return s.repository.Get(ctx, id, url)
+func (s *Service) Get(ctx context.Context, id *string, productID *string, priceTypeID *string, currencyID *string, warehouseID *string, storeId *string) (*Item, error) {
+	return s.repository.Get(ctx, id, productID, priceTypeID, currencyID, warehouseID, storeId)
 }
 
 func (s *Service) List(ctx context.Context, filter *Filter) ([]*Item, error) {

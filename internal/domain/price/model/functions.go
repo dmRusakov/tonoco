@@ -7,8 +7,23 @@ import (
 	"time"
 )
 
-func (m *Model) Get(ctx context.Context, id *string, url *string) (*Item, error) {
-	rows, err := psql.Get(ctx, m.client, m.makeGetStatement(id, url))
+func (m *Model) Get(
+	ctx context.Context,
+	id *string,
+	productID *string,
+	priceTypeID *string,
+	currencyID *string,
+	warehouseID *string,
+	storeId *string,
+) (*Item, error) {
+	rows, err := psql.Get(ctx, m.client, m.makeGetStatement(
+		id,
+		productID,
+		priceTypeID,
+		currencyID,
+		warehouseID,
+		storeId,
+	))
 	if err != nil {
 		return nil, err
 	}
