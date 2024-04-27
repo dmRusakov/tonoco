@@ -30,8 +30,8 @@ type App struct {
 	SqlDB   *pgxpool.Pool
 
 	// cache
-	AppCacheService  *appCacheService.AppCacheService
-	UserCacheService *userCacheService.UserCacheService
+	AppCacheService  *appCacheService.Service
+	UserCacheService *userCacheService.Service
 
 	// usaCase
 	ProductUseCase *productUsecase.UseCase

@@ -65,7 +65,7 @@ func init() {
 	logging.L(ctx).Info("Product Controller (Getter) initialized")
 
 	// adminAppWeb server
-	app.WebServer, err = web_v1.NewWebServer()
+	app.WebServer, err = web_v1.NewWebServer(app.ProductUseCase, app.AppCacheService, app.UserCacheService)
 	if err != nil {
 		logging.WithError(ctx, err).Fatal("web_v1.NewWebServer")
 	}
