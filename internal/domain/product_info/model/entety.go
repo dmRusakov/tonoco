@@ -22,11 +22,7 @@ var fieldMap = map[string]string{
 	"SortOrder":             "sort_order",
 	"StatusID":              "status_id",
 	"Url":                   "url",
-	"RegularPrice":          "regular_price",
-	"SalePrice":             "sale_price",
-	"FactoryPrice":          "factory_price",
 	"IsTaxable":             "is_taxable",
-	"Quantity":              "quantity",
 	"ReturnToStockDate":     "return_to_stock_date",
 	"IsTrackStock":          "is_track_stock",
 	"ShippingClassID":       "shipping_class_id",
@@ -56,12 +52,7 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 		fieldMap["SortOrder"],
 		fieldMap["StatusID"],
 		fieldMap["Url"],
-		fieldMap["RegularPrice"],
-		fieldMap["SalePrice"],
-		fieldMap["FactoryPrice"],
 		fieldMap["IsTaxable"],
-		fieldMap["Quantity"],
-		fieldMap["ReturnToStockDate"],
 		fieldMap["IsTrackStock"],
 		fieldMap["ShippingClassID"],
 		fieldMap["ShippingWeight"],
@@ -198,12 +189,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 		&item.SortOrder,
 		&item.StatusID,
 		&item.Url,
-		&item.RegularPrice,
-		&item.SalePrice,
-		&item.FactoryPrice,
 		&item.IsTaxable,
-		&item.Quantity,
-		&item.ReturnToStockDate,
 		&item.IsTrackStock,
 		&item.ShippingClassID,
 		&item.ShippingWeight,
@@ -252,12 +238,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		fieldMap["SortOrder"],
 		fieldMap["StatusID"],
 		fieldMap["Url"],
-		fieldMap["RegularPrice"],
-		fieldMap["SalePrice"],
-		fieldMap["FactoryPrice"],
 		fieldMap["IsTaxable"],
-		fieldMap["Quantity"],
-		fieldMap["ReturnToStockDate"],
 		fieldMap["IsTrackStock"],
 		fieldMap["ShippingClassID"],
 		fieldMap["ShippingWeight"],
@@ -282,12 +263,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		item.SortOrder,
 		item.StatusID,
 		item.Url,
-		item.RegularPrice,
-		item.SalePrice,
-		item.FactoryPrice,
 		item.IsTaxable,
-		item.Quantity,
-		item.ReturnToStockDate,
 		item.IsTrackStock,
 		item.ShippingClassID,
 		item.ShippingWeight,
@@ -321,12 +297,7 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 		Set(fieldMap["SortOrder"], item.SortOrder).
 		Set(fieldMap["StatusID"], item.StatusID).
 		Set(fieldMap["Url"], item.Url).
-		Set(fieldMap["RegularPrice"], item.RegularPrice).
-		Set(fieldMap["SalePrice"], item.SalePrice).
-		Set(fieldMap["FactoryPrice"], item.FactoryPrice).
 		Set(fieldMap["IsTaxable"], item.IsTaxable).
-		Set(fieldMap["Quantity"], item.Quantity).
-		Set(fieldMap["ReturnToStockDate"], item.ReturnToStockDate).
 		Set(fieldMap["IsTrackStock"], item.IsTrackStock).
 		Set(fieldMap["ShippingClassID"], item.ShippingClassID).
 		Set(fieldMap["ShippingWeight"], item.ShippingWeight).

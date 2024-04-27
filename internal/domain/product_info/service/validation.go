@@ -11,7 +11,6 @@ var (
 	NoShortDescription = validation.NewValidation("Short description is required", "Short description is required", "yutyi6", "short_description")
 	NoDescription      = validation.NewValidation("Description is required", "Description is required", "0934jr", "description")
 	NoStatusID         = validation.NewValidation("Status ID is required", "Status ID is required", "9fj3j3", "status_id")
-	NoRegularPrice     = validation.NewValidation("Regular price is required", "Regular price is required", "9fj3j5", "regular_price")
 	NoShippingClassID  = validation.NewValidation("Shipping class ID is required", "Shipping class ID is required", "9fj3j7", "shipping_class_id")
 )
 
@@ -54,18 +53,12 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 
 		go func() {
 			var validations []entity.Validation
-			s.validateRegularPrice(item.RegularPrice, &validations)
-			results <- validations
-		}()
-
-		go func() {
-			var validations []entity.Validation
 			s.validateShippingClassID(item.ShippingClassID, &validations)
 			results <- validations
 		}()
 
 		// Collect results from the channel
-		for i := 0; i < 7; i++ {
+		for i := 0; i < 6; i++ {
 			v := <-results
 			validations = append(validations, v...)
 		}
@@ -93,9 +86,6 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 					break
 				case "StatusID":
 					s.validateStatusID(value.(string), &v)
-					break
-				case "RegularPrice":
-					s.validateRegularPrice(value.(float32), &v)
 					break
 				case "ShippingClassID":
 					s.validateShippingClassID(value.(string), &v)
@@ -142,12 +132,6 @@ func (s *Service) validateDescription(description string, validations *[]entity.
 func (s *Service) validateStatusID(statusID string, validations *[]entity.Validation) {
 	if statusID == "" {
 		*validations = append(*validations, NoStatusID)
-	}
-}
-
-func (s *Service) validateRegularPrice(regularPrice float32, validations *[]entity.Validation) {
-	if regularPrice < 0 {
-		*validations = append(*validations, NoRegularPrice)
 	}
 }
 

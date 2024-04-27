@@ -11,12 +11,7 @@ type ProductInfo struct {
 	SortOrder             uint64    `json:"sort_order"`
 	StatusID              string    `json:"status_id"`
 	Url                   string    `json:"url"`
-	RegularPrice          float32   `json:"regular_price"`
-	SalePrice             float32   `json:"sale_price"`
-	FactoryPrice          float32   `json:"factory_price"`
 	IsTaxable             bool      `json:"is_taxable"`
-	Quantity              int32     `json:"quantity"`
-	ReturnToStockDate     int64     `json:"return_to_stock_date"`
 	IsTrackStock          bool      `json:"is_track_stock"`
 	ShippingClassID       string    `json:"shipping_class_id"`
 	ShippingWeight        float32   `json:"shipping_weight"`
