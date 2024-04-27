@@ -3,7 +3,7 @@ package model
 import (
 	"context"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/dmRusakov/tonoco/internal/domain/entity"
+	"github.com/dmRusakov/tonoco/internal/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/google/uuid"

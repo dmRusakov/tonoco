@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/dmRusakov/tonoco/internal/domain/entity"
+	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/pkg/common/validation"
 )
 

@@ -29,8 +29,7 @@ import (
 	store_service "github.com/dmRusakov/tonoco/internal/domain/store/service"
 	warehouse_model "github.com/dmRusakov/tonoco/internal/domain/warehouse/model"
 	warehouse_service "github.com/dmRusakov/tonoco/internal/domain/warehouse/service"
-
-	productPolicy "github.com/dmRusakov/tonoco/internal/domain/useCase/product"
+	productPolicy "github.com/dmRusakov/tonoco/internal/useCase/product"
 )
 
 func (a *App) ProductUseCaseInit() (err error) {

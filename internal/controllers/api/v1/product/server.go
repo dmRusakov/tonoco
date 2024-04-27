@@ -2,7 +2,7 @@ package product
 
 import (
 	productService "github.com/dmRusakov/tonoco-grpc/gen/go/proto/service/v1"
-	productUsecase "github.com/dmRusakov/tonoco/internal/domain/useCase/product"
+	productUsecase "github.com/dmRusakov/tonoco/internal/useCase/product"
 )
 
 type Server struct {

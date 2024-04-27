@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	"github.com/dmRusakov/tonoco/internal/domain/entity"
 	"github.com/dmRusakov/tonoco/internal/domain/specification_type/model"
+	"github.com/dmRusakov/tonoco/internal/entity"
 	"time"
 )
 

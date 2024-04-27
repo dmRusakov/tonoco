@@ -5,7 +5,7 @@ import (
 	productServire "github.com/dmRusakov/tonoco-grpc/gen/go/proto/service/v1"
 	"github.com/dmRusakov/tonoco/internal/config"
 	webController "github.com/dmRusakov/tonoco/internal/controllers/adminAppWeb/v1"
-	productUsecase "github.com/dmRusakov/tonoco/internal/domain/useCase/product"
+	productUsecase "github.com/dmRusakov/tonoco/internal/useCase/product"
 	"github.com/dmRusakov/tonoco/pkg/appCacheService"
 	"github.com/dmRusakov/tonoco/pkg/common/core/clock"
 	"github.com/dmRusakov/tonoco/pkg/common/core/identity"
