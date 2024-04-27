@@ -1,6 +1,8 @@
 package admin_app_web_v1
 
 import (
+	"fmt"
+	"github.com/dmRusakov/tonoco/internal/entity"
 	"html/template"
 	"net/http"
 	"reflect"
@@ -9,15 +11,11 @@ import (
 )
 
 // URL params for products page
-type ProductsUrlParameters struct {
-	ID       string
-	Category string
-}
 
 func (s server) RenderProducts(w http.ResponseWriter, r *http.Request) {
 	var wg sync.WaitGroup
 	var tmpl *template.Template
-	var params *ProductsUrlParameters
+	var params *entity.ProductsUrlParameters
 
 	wg.Add(2)
 
@@ -33,6 +31,11 @@ func (s server) RenderProducts(w http.ResponseWriter, r *http.Request) {
 
 	wg.Wait()
 
+	// get products
+	products := s.productUseCase.GetProducts(params)
+
+	fmt.Println(products, "products:37")
+
 	// Use tmpl and params here
 	// render page
 	if err := tmpl.Execute(w, params); err != nil {
@@ -43,8 +46,8 @@ func (s server) RenderProducts(w http.ResponseWriter, r *http.Request) {
 }
 
 // ReadProductsUrlPara read page parameters from url
-func (s server) ReadProductsUrlPara(r *http.Request) *ProductsUrlParameters {
-	params := &ProductsUrlParameters{}
+func (s server) ReadProductsUrlPara(r *http.Request) *entity.ProductsUrlParameters {
+	params := &entity.ProductsUrlParameters{}
 	v := reflect.ValueOf(params).Elem()
 	t := v.Type()
 

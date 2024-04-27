@@ -46,10 +46,3 @@ type ProductInfoFilter struct {
 	Page     *uint64   `json:"page"`
 	PerPage  *uint64   `json:"per_page"`
 }
-
-type Product struct {
-	Product        ProductInfo
-	Status         ProductStatus
-	Categories     []ProductCategory
-	Specifications []Specification
-}
