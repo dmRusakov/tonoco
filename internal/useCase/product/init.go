@@ -31,57 +31,58 @@ type UseCase struct {
 	identity IdentityGenerator
 	clock    Clock
 
-	currencyService           *currency_service.Service
-	fileService               *file_service.Service
-	folderService             *folder_service.Service
-	priceService              *price_service.Service
-	priceTypeService          *price_type_service.Service
-	productStatusService      *product_status_service.Service
-	productCategoryService    *product_category_service.Service
-	shippingClassService      *shipping_class_service.Service
-	specificationService      *specification_service.Service
-	specificationTypeService  *specification_type_service.Service
-	specificationValueService *specification_value_service.Service
-	productInfoService        *product_info_service.Service
-	warehouseService          *warehouse_service.Service
-	storeService              *store_service.Service
+	currency           *currency_service.Service
+	file               *file_service.Service
+	folder             *folder_service.Service
+	price              *price_service.Service
+	priceType          *price_type_service.Service
+	productCategory    *product_category_service.Service
+	productInfo        *product_info_service.Service
+	productStatus      *product_status_service.Service
+	shippingClass      *shipping_class_service.Service
+	specification      *specification_service.Service
+	specificationType  *specification_type_service.Service
+	specificationValue *specification_value_service.Service
+	store              *store_service.Service
+	warehouse          *warehouse_service.Service
 }
 
 func NewProductUseCase(
 	identity IdentityGenerator,
 	clock clock.Clock,
+
 	currencyService *currency_service.Service,
 	fileService *file_service.Service,
 	folderService *folder_service.Service,
 	priceService *price_service.Service,
 	priceTypeService *price_type_service.Service,
-	productStatusService *product_status_service.Service,
 	productCategoryService *product_category_service.Service,
+	productInfoService *product_info_service.Service,
+	productStatusService *product_status_service.Service,
 	shippingClassService *shipping_class_service.Service,
 	specificationService *specification_service.Service,
 	specificationTypeService *specification_type_service.Service,
 	specificationValueService *specification_value_service.Service,
-	productInfoService *product_info_service.Service,
-	warehouseService *warehouse_service.Service,
 	storeService *store_service.Service,
+	warehouseService *warehouse_service.Service,
 ) *UseCase {
 	return &UseCase{
-		currencyService:           currencyService,
-		fileService:               fileService,
-		folderService:             folderService,
-		priceService:              priceService,
-		priceTypeService:          priceTypeService,
-		productStatusService:      productStatusService,
-		productCategoryService:    productCategoryService,
-		shippingClassService:      shippingClassService,
-		specificationService:      specificationService,
-		specificationTypeService:  specificationTypeService,
-		specificationValueService: specificationValueService,
-		productInfoService:        productInfoService,
-		warehouseService:          warehouseService,
-		storeService:              storeService,
-
 		identity: identity,
 		clock:    clock,
+
+		currency:           currencyService,
+		file:               fileService,
+		folder:             folderService,
+		price:              priceService,
+		priceType:          priceTypeService,
+		productCategory:    productCategoryService,
+		productInfo:        productInfoService,
+		productStatus:      productStatusService,
+		shippingClass:      shippingClassService,
+		specification:      specificationService,
+		specificationType:  specificationTypeService,
+		specificationValue: specificationValueService,
+		store:              storeService,
+		warehouse:          warehouseService,
 	}
 }

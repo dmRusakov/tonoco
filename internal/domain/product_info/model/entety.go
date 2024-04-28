@@ -172,9 +172,11 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		)
 	}
 
-	// Add OrderBy, OrderDir, Page, Limit and return
-	return statement.OrderBy(fieldMap[*filter.OrderBy] + " " + *filter.OrderDir).
+	statement = statement.OrderBy(fieldMap[*filter.OrderBy] + " " + *filter.OrderDir).
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
+
+	// Add OrderBy, OrderDir, Page, Limit and return
+	return statement
 }
 
 // scanOneRow

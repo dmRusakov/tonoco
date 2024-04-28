@@ -1,6 +1,7 @@
 package admin_app_web_v1
 
 import (
+	"context"
 	"fmt"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	"html/template"
@@ -12,7 +13,11 @@ import (
 
 // URL params for products page
 
-func (s server) RenderProducts(w http.ResponseWriter, r *http.Request) {
+func (s server) RenderProducts(
+	ctx context.Context,
+	w http.ResponseWriter,
+	r *http.Request,
+) {
 	var wg sync.WaitGroup
 	var tmpl *template.Template
 	var params *entity.ProductsUrlParameters
@@ -32,7 +37,11 @@ func (s server) RenderProducts(w http.ResponseWriter, r *http.Request) {
 	wg.Wait()
 
 	// get products
-	products := s.productUseCase.GetProducts(params)
+	products, err := s.productUseCase.GetProductList(ctx, params)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	fmt.Println(products, "products:37")
 

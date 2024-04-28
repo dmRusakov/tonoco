@@ -92,20 +92,21 @@ func (a *App) ProductUseCaseInit() (err error) {
 	a.ProductUseCase = productPolicy.NewProductUseCase(
 		a.generator,
 		a.clock,
+
 		currencyService,
 		fileService,
 		folderService,
 		priceService,
 		priceTypeService,
-		productStatusService,
 		productCategoryService,
+		productInfoService,
+		productStatusService,
 		shippingClassService,
 		specificationService,
 		specificationTypeService,
 		specificationValueService,
-		productInfoService,
-		warehouseService,
 		storeService,
+		warehouseService,
 	)
 
 	return nil

@@ -20,6 +20,7 @@ func List(ctx context.Context, client Client, statement sq.SelectBuilder) (pgx.R
 
 	// execute the SQL query
 	rows, err := client.Query(ctx, query, args...)
+
 	if err != nil {
 		return nil, err
 	}

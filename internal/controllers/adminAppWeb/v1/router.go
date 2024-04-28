@@ -1,8 +1,11 @@
 package admin_app_web_v1
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+)
 
-func (s server) router() {
+func (s server) router(ctx context.Context) {
 	// dashboard
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		s.Render(w, "dashboard.page.gohtml")
@@ -18,7 +21,7 @@ func (s server) router() {
 
 	// product
 	http.HandleFunc("/products/", func(w http.ResponseWriter, r *http.Request) {
-		s.RenderProducts(w, r)
+		s.RenderProducts(r.Context(), w, r)
 	})
 	http.HandleFunc("/product/", func(w http.ResponseWriter, r *http.Request) {
 		s.Render(w, "product.page.gohtml")

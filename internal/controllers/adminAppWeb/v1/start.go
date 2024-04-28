@@ -23,7 +23,7 @@ func (s server) Start(ctx context.Context, port string) error {
 	})
 
 	// router
-	s.router()
+	s.router(ctx)
 
 	// start server
 	err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
