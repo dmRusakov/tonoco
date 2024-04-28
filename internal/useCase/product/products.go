@@ -9,11 +9,8 @@ func (uc *UseCase) GetProductList(
 	ctx context.Context,
 	parameters *entity.ProductsUrlParameters,
 ) ([]entity.ProductListItem, error) {
-	ids := []string{"a0eebc99-9c0b-4ef8-bb6d-6bb9bd325673"}
 	// get products
-	products, err := uc.productInfo.List(ctx, &entity.ProductInfoFilter{
-		IDs: &ids,
-	})
+	products, err := uc.productInfo.List(ctx, &entity.ProductInfoFilter{})
 	if err != nil {
 		return nil, err
 	}
