@@ -50,11 +50,11 @@ CREATE TRIGGER price_type_updated_at
     EXECUTE FUNCTION update_update_at_column();
 
 -- demo data
-INSERT INTO public.price_type (name, url, sort_order)
-VALUES ('Special', 'special', 1),
-       ('Sale', 'sale', 2),
-       ('Regular', 'regular', 3),
-       ('Purchase/Factory', 'purchase-factory', 4);
+INSERT INTO public.price_type (id, name, url, sort_order)
+VALUES ('0d1d9e2a-5cf7-4dc3-81e1-47c1dee4b2f1', 'Special', 'special', 1),
+       ('0d1d9e2a-5cf7-4dc3-81e1-47c1dee4b2f2', 'Sale', 'sale', 2),
+       ('0d1d9e2a-5cf7-4dc3-81e1-47c1dee4b2f3', 'Regular', 'regular', 3),
+       ('0d1d9e2a-5cf7-4dc3-81e1-47c1dee4b2f4', 'Purchase/Factory', 'purchase-factory', 4);
 
 -- get data
 select * from public.price_type;

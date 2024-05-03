@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS public.warehouse
 (
     id             UUID UNIQUE DEFAULT uuid_generate_v4() NOT NULL,
     name           VARCHAR(255)                           NOT NULL,
+    url            VARCHAR(255)                           DEFAULT NULL,
     abbreviation   VARCHAR(10)                            DEFAULT NULL,
     sort_order     INTEGER                                NOT NULL,
     active         BOOLEAN     DEFAULT TRUE               NOT NULL,
@@ -28,6 +29,7 @@ CREATE TABLE IF NOT EXISTS public.warehouse
 ALTER TABLE public.warehouse OWNER TO postgres;
 CREATE INDEX warehouse_id ON public.warehouse USING btree (id);
 CREATE INDEX warehouse_name ON public.warehouse USING btree (name);
+CREATE INDEX warehouse_url ON public.warehouse USING btree (url);
 CREATE INDEX warehouse_abbreviation ON public.warehouse USING btree (abbreviation);
 CREATE INDEX warehouse_sort_order ON public.warehouse USING btree (sort_order);
 CREATE INDEX warehouse_updated_at ON public.warehouse USING btree (updated_at);
@@ -36,6 +38,7 @@ CREATE INDEX warehouse_updated_at ON public.warehouse USING btree (updated_at);
 COMMENT ON TABLE public.warehouse IS 'Reference table for warehouse';
 COMMENT ON COLUMN public.warehouse.id IS 'Unique identifier for warehouse';
 COMMENT ON COLUMN public.warehouse.name IS 'Name of warehouse';
+COMMENT ON COLUMN public.warehouse.url IS 'URL of warehouse';
 COMMENT ON COLUMN public.warehouse.abbreviation IS 'Abbreviation of warehouse';
 COMMENT ON COLUMN public.warehouse.sort_order IS 'Sort order of warehouse';
 COMMENT ON COLUMN public.warehouse.active IS 'Active status of warehouse';

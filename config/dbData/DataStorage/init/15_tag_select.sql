@@ -48,14 +48,14 @@ CREATE TRIGGER tag_select_updated_at
 EXECUTE FUNCTION update_update_at_column();
 
 -- auto set sort_order column
-CREATE TRIGGER tag_select_order
+CREATE TRIGGER ttag_select_order
     BEFORE INSERT
     ON public.tag_select
     FOR EACH ROW
 EXECUTE FUNCTION set_order_column_universal();
 
 -- insert data
-INSERT INTO public.tag_select (id, specification_id, name, url, sort_order)
+INSERT INTO public.tag_select (id, tag_type_id, name, url, sort_order)
 VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382160', (select id from public.tag_type where url = 'additional-lighting'), '4x energy-efficient LED lights', '4x-energy-efficient-led-lights', '2160'),
        ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381875', (select id from public.tag_type where url = 'additional-lighting'), '4x Internal Body Illumination LED Lights', '4x-internal-body-illumination-led-lights', '1875'),
        ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381844', (select id from public.tag_type where url = 'airflow'), '150-800 CFM. CFM can be reduced upon customer request, to accommodate local building code requirements.', '150-800-cfm-cfm-can-be-reduced-upon-customer-request-to-accommodate-local-building-code-requirements', '1844'),
@@ -275,15 +275,10 @@ VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382160', (select id from public.tag_type 
        ('a0eebc98-9c0b-4ef8-bb6d-5bb9bd381507', (select id from public.tag_type where url = 'shipping-class'), 'Oversize Freight ', 'oversize-freight', '2'),
        ('a0eebc98-9c0b-4ef8-bb6d-5bb9bd381508', (select id from public.tag_type where url = 'shipping-class'), 'Ground', 'ground', '3'),
        ('a0eebc98-9c0b-4ef8-bb6d-5bb9bd381509', (select id from public.tag_type where url = 'status'), 'Public', 'public', '1'),
-       ('a0eebc98-9c0b-4ef8-bb6d-5bb9bd381509', (select id from public.tag_type where url = 'status'), 'Private', 'private', '2'),
-       ('a0eebc98-9c0b-4ef8-bb6d-5bb9bd381509', (select id from public.tag_type where url = 'status'), 'Out of stock', 'out-of-stock', '3'),
-       ('a0eebc98-9c0b-4ef8-bb6d-5bb9bd381509', (select id from public.tag_type where url = 'status'), 'Discontinued', 'discontinued', '4'),
-       ('a0eebc98-9c0b-4ef8-bb6d-5bb9bd381509', (select id from public.tag_type where url = 'status'), 'Archived', 'archived', '5'),
-
-
-
-
-;
+       ('a0eebc98-9c0b-4ef8-bb6d-5bb9bd381510', (select id from public.tag_type where url = 'status'), 'Private', 'private', '2'),
+       ('a0eebc98-9c0b-4ef8-bb6d-5bb9bd381511', (select id from public.tag_type where url = 'status'), 'Out of stock', 'out-of-stock', '3'),
+       ('a0eebc98-9c0b-4ef8-bb6d-5bb9bd381512', (select id from public.tag_type where url = 'status'), 'Discontinued', 'discontinued', '4'),
+       ('a0eebc98-9c0b-4ef8-bb6d-5bb9bd381513', (select id from public.tag_type where url = 'status'), 'Archived', 'archived', '5');
 
 -- get data
 select *
