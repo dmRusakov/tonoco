@@ -387,8 +387,7 @@ INSERT INTO public.tag_select (id, tag_type_id, name, url, sort_order) VALUES
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382000', (select id from public.tag_type where url = 'filter-type'), '2-Stage Filtering System', '2-stage-filtering-system', '2000'),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382001', (select id from public.tag_type where url = 'filter-stage-1'), 'Dishwasher-safe metal grease filters', 'dishwasher-safe-metal-grease-filters', '2001'),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382002', (select id from public.tag_type where url = 'filter-stage-2'), 'Micro Carbon Infusion Filter (MCIF), rechargeable every 5 years', 'micro-carbon-infusion-filter-mcif-rechargeable-every-5-years', '2002'),
-    ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382003', (select id from public.tag_type where url = 'duct-size'), 'N/A - Ductless', 'n-a-ductless', '2003');
-INSERT INTO public.tag_select (id, tag_type_id, name, url, sort_order) VALUES
+    ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382003', (select id from public.tag_type where url = 'duct-size'), 'N/A - Ductless', 'n-a-ductless', '2003'),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382004', (select id from public.tag_type where url = 'exhaust-type'), 'Ductless, with high-performance MCIF filter', 'ductless-with-high-performance-mcif-filter', '2004'),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382106', (select id from public.tag_type where url = 'filter-exhaust-type'), 'Air Loop', 'air-loop', '2106'),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382513', (select id from public.tag_type where url = 'height'), '27 1/2″ min - 44 3/4″ max adjustable', '27-1-2%e2%80%b3-min-44-3-4%e2%80%b3-max-adjustable', '2513'),
