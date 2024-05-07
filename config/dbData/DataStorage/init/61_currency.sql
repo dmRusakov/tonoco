@@ -52,5 +52,5 @@ EXECUTE FUNCTION update_update_at_column();
 
 -- default data
 INSERT INTO public.currency (id, name, symbol, url)
-VALUES ('c475a6f3-55ad-4641-8caa-a76bfae13fb0', 'USD', '$', 'usd'),
-       ('c475a6f3-55ad-4641-8caa-a76bfae13fb1', 'Euro', '€', 'eur');
+VALUES ('c475a6f3-55ad-4641-8caa-a76bfae13fb0', 'USD', '$', 'USD'),
+       ('c475a6f3-55ad-4641-8caa-a76bfae13fb1', 'Euro', '€', 'EUR');
