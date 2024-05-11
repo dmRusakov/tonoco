@@ -44,4 +44,3 @@ CREATE TRIGGER tag_updated_at
     ON public.user
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();
-
