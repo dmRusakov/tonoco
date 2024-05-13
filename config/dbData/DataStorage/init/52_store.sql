@@ -3,7 +3,6 @@ CREATE TABLE IF NOT EXISTS public.store
 (
     id             UUID UNIQUE DEFAULT uuid_generate_v4() NOT NULL,
     name           VARCHAR(255)                           NOT NULL,
-    url            VARCHAR(255)                           DEFAULT NULL,
     abbreviation   VARCHAR(10)                            DEFAULT NULL,
     config         JSONB                                  DEFAULT NULL,
     sort_order     INTEGER                                NOT NULL,
@@ -30,7 +29,6 @@ CREATE TABLE IF NOT EXISTS public.store
 ALTER TABLE public.store OWNER TO postgres;
 CREATE INDEX store_id ON public.store USING btree (id);
 CREATE INDEX store_name ON public.store USING btree (name);
-CREATE INDEX store_url ON public.store USING btree (url);
 CREATE INDEX store_sort_order ON public.store USING btree (sort_order);
 CREATE INDEX store_updated_at ON public.store USING btree (updated_at);
 
@@ -38,7 +36,6 @@ CREATE INDEX store_updated_at ON public.store USING btree (updated_at);
 COMMENT ON TABLE public.store IS 'Reference table for store';
 COMMENT ON COLUMN public.store.id IS 'Unique identifier for store';
 COMMENT ON COLUMN public.store.name IS 'Name of store';
-COMMENT ON COLUMN public.store.url IS 'URL of store';
 COMMENT ON COLUMN public.store.abbreviation IS 'Abbreviation of store';
 COMMENT ON COLUMN public.store.config IS 'JSON configuration of store';
 COMMENT ON COLUMN public.store.sort_order IS 'Sort order of store';

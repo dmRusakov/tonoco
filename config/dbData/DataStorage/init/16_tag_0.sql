@@ -50,37 +50,52 @@ EXECUTE FUNCTION update_update_at_column();
 --     CONCAT('(select id from public.tag_type where url = "', T.tag_type_url, '")') as tag_type_id,
 --     CONCAT('(select id from public.tag_select where tag_type_id = (select id from public.tag_type where url = "', T.tag_type_url, '") and url = "', T.tag_select_url , '")') as tag_select_id
 -- FROM (
---     SELECT
---         pm.meta_value as product_sku,
---         SUBSTRING(tt.taxonomy, 4) as tag_type_url,
---         t.slug as tag_select_url
---     FROM wp_posts p
---     JOIN wp_postmeta pm ON p.ID = pm.post_id AND pm.meta_key = '_sku'
---     JOIN wp_term_relationships tr ON p.ID = tr.object_id
---     JOIN wp_term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id AND tt.taxonomy LIKE 'pa_%'
---     JOIN wp_terms t ON tt.term_id = t.term_id
---     WHERE p.post_type = 'product'
--- ) AS T;
-
--- Categories
--- SELECT
---     CONCAT('(select id from public.product_info where sql = "', T.product_sku, '")') as product_id,
---     CONCAT('(select id from public.tag_type where url = "', T.tag_type_url, '")') as tag_type_id,
---     CONCAT('(select id from public.tag_select where tag_type_id = (select id from public.tag_type where url = "', T.tag_type_url, '") and url = "', T.tag_select_url , '")') as tag_select_id
--- FROM (SELECT
---           pm.meta_value AS product_sku,
---           'category' AS tag_type_url,
---           t.slug AS tag_select_url
---       FROM
---           wp_posts p
---               JOIN
---           wp_postmeta pm ON p.ID = pm.post_id AND pm.meta_key = '_sku'
---               JOIN
---           wp_term_relationships tr ON p.ID = tr.object_id
---               JOIN
---           wp_term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id AND tt.taxonomy = 'product_cat'
---               JOIN
---           wp_terms t ON tt.term_id = t.term_id
---       WHERE
---           p.post_type = 'product'
---      ) AS T;
+--          SELECT
+--              pm.meta_value as product_sku,
+--              SUBSTRING(tt.taxonomy, 4) as tag_type_url,
+--              t.slug as tag_select_url
+--          FROM wp_posts p
+--                   JOIN wp_postmeta pm ON p.ID = pm.post_id AND pm.meta_key = '_sku'
+--                   JOIN wp_term_relationships tr ON p.ID = tr.object_id
+--                   JOIN wp_term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id AND tt.taxonomy LIKE 'pa_%'
+--                   JOIN wp_terms t ON tt.term_id = t.term_id
+--          WHERE p.post_type = 'product'
+--
+--          UNION ALL
+--
+--          SELECT
+--              pm.meta_value AS product_sku,
+--              'category' AS tag_type_url,
+--              t.slug AS tag_select_url
+--          FROM
+--              wp_posts p
+--                  JOIN
+--              wp_postmeta pm ON p.ID = pm.post_id AND pm.meta_key = '_sku'
+--                  JOIN
+--              wp_term_relationships tr ON p.ID = tr.object_id
+--                  JOIN
+--              wp_term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id AND tt.taxonomy = 'product_cat'
+--                  JOIN
+--              wp_terms t ON tt.term_id = t.term_id
+--          WHERE
+--              p.post_type = 'product'
+--
+--          UNION ALL
+--
+--          SELECT
+--              pm.meta_value AS product_sku,
+--              'shipping-class' AS tag_type_url,
+--              t.slug AS tag_select_url
+--          FROM
+--              wp_posts p
+--                  JOIN
+--              wp_postmeta pm ON p.ID = pm.post_id AND pm.meta_key = '_sku'
+--                  JOIN
+--              wp_term_relationships tr ON p.ID = tr.object_id
+--                  JOIN
+--              wp_term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id AND tt.taxonomy = 'product_shipping_class'
+--                  JOIN
+--              wp_terms t ON tt.term_id = t.term_id
+--          WHERE
+--              p.post_type = 'product') as T
+--     ) AS T;

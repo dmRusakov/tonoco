@@ -20,7 +20,7 @@ DECLARE
     max_sort_order BIGINT;
 BEGIN
     EXECUTE format('SELECT COALESCE(MAX(sort_order), 0) + 1 FROM %I', TG_TABLE_NAME) INTO max_sort_order;
-    IF NEW.sort_order IS NULL THEN
+    IF NEW.sort_order IS NULL or NEW.sort_order = 0 THEN
         NEW.sort_order = max_sort_order;
     END IF;
     RETURN NEW;

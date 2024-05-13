@@ -48,6 +48,31 @@ CREATE TRIGGER price_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_update_at_column();
 
+-- auto set sort_order column by product_id
+CREATE OR REPLACE FUNCTION set_sort_order()
+    RETURNS TRIGGER AS
+$BODY$
+DECLARE
+    max_sort_order BIGINT ;
+BEGIN
+    EXECUTE format('SELECT COALESCE(MAX(sort_order), 0) + 1 FROM %I WHERE product_id = $1', TG_TABLE_NAME)
+        USING NEW.product_id INTO max_sort_order;
+    IF NEW.sort_order IS NULL or NEW.sort_order = 0 THEN
+        NEW.sort_order = max_sort_order;
+    ELSE
+        NEW.sort_order = NEW.sort_order + max_sort_order;
+    END IF;
+    RETURN NEW;
+END;
+$BODY$
+    LANGUAGE plpgsql;
+
+CREATE TRIGGER set_sort_order
+    BEFORE INSERT
+    ON public.price
+    FOR EACH ROW
+    EXECUTE FUNCTION set_sort_order();
+
 -- demo data
 INSERT INTO public.price (product_id, price_type_id, currency_id, price) VALUES
     ((select id from public.product_info where sku = 'IS48LUXOR'), (select id from public.price_type where url = 'sale'), (select id from public.currency where url = 'USD'), '2695'),
