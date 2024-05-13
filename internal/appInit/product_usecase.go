@@ -11,14 +11,8 @@ import (
 	price_service "github.com/dmRusakov/tonoco/internal/domain/price/service"
 	price_type_model "github.com/dmRusakov/tonoco/internal/domain/price_type/model"
 	price_type_service "github.com/dmRusakov/tonoco/internal/domain/price_type/service"
-	product_category_model "github.com/dmRusakov/tonoco/internal/domain/product_category/model"
-	product_category_service "github.com/dmRusakov/tonoco/internal/domain/product_category/service"
 	product_info_model "github.com/dmRusakov/tonoco/internal/domain/product_info/model"
 	product_info_service "github.com/dmRusakov/tonoco/internal/domain/product_info/service"
-	product_status_model "github.com/dmRusakov/tonoco/internal/domain/product_status/model"
-	product_status_service "github.com/dmRusakov/tonoco/internal/domain/product_status/service"
-	shipping_class_model "github.com/dmRusakov/tonoco/internal/domain/shipping_class/model"
-	shipping_class_service "github.com/dmRusakov/tonoco/internal/domain/shipping_class/service"
 	specification_model "github.com/dmRusakov/tonoco/internal/domain/specification/model"
 	specification_service "github.com/dmRusakov/tonoco/internal/domain/specification/service"
 	specification_type_model "github.com/dmRusakov/tonoco/internal/domain/specification_type/model"
@@ -53,18 +47,6 @@ func (a *App) ProductUseCaseInit() (err error) {
 	priceTypeStorage := price_type_model.NewStorage(a.SqlDB)
 	priceTypeService := price_type_service.NewService(priceTypeStorage)
 
-	// product status
-	productStatusStorage := product_status_model.NewStorage(a.SqlDB)
-	productStatusService := product_status_service.NewService(productStatusStorage)
-
-	// product category
-	productCategoryStorage := product_category_model.NewStorage(a.SqlDB)
-	productCategoryService := product_category_service.NewService(productCategoryStorage)
-
-	// shipping class
-	shippingClassStorage := shipping_class_model.NewStorage(a.SqlDB)
-	shippingClassService := shipping_class_service.NewService(shippingClassStorage)
-
 	// specification
 	specificationStorage := specification_model.NewStorage(a.SqlDB)
 	specificationService := specification_service.NewService(specificationStorage)
@@ -98,10 +80,7 @@ func (a *App) ProductUseCaseInit() (err error) {
 		folderService,
 		priceService,
 		priceTypeService,
-		productCategoryService,
 		productInfoService,
-		productStatusService,
-		shippingClassService,
 		specificationService,
 		specificationTypeService,
 		specificationValueService,

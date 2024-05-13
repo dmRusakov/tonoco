@@ -8,8 +8,6 @@ type ProductInfo struct {
 	Name                  string    `json:"name"`
 	ShortDescription      string    `json:"short_description"`
 	Description           string    `json:"description"`
-	SortOrder             uint64    `json:"sort_order"`
-	StatusID              string    `json:"status_id"`
 	Url                   string    `json:"url"`
 	IsTaxable             bool      `json:"is_taxable"`
 	IsTrackStock          bool      `json:"is_track_stock"`
@@ -33,7 +31,6 @@ type ProductInfoFilter struct {
 	IDs      *[]string `json:"ids"`
 	Urls     *[]string `json:"urls"`
 	SKUs     *[]string `json:"skus"`
-	StatusID *[]string `json:"status_ids"`
 	Active   *bool     `json:"active"`
 	Search   *string   `json:"search"`
 	OrderBy  *string   `json:"order_by"`
