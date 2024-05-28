@@ -19,7 +19,6 @@ import (
 func TestTagType(t *testing.T) {
 	t.Run("testItemValidations", testItemValidations)
 	t.Run("testValidateFields", testValidateFields)
-
 	t.Run("clearTestData", clearTestData)
 	defer t.Run("clearTestData", clearTestData)
 	t.Run("list", list)
