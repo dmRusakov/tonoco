@@ -19,10 +19,10 @@ var fieldMap = map[string]string{
 	"Name":                  "name",
 	"ShortDescription":      "short_description",
 	"Description":           "description",
+	"SortOrder":             "sort_order",
 	"Url":                   "url",
 	"IsTaxable":             "is_taxable",
 	"IsTrackStock":          "is_track_stock",
-	"ShippingClassID":       "shipping_class_id",
 	"ShippingWeight":        "shipping_weight",
 	"ShippingWidth":         "shipping_width",
 	"ShippingHeight":        "shipping_height",
@@ -46,10 +46,10 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 		fieldMap["Name"],
 		fieldMap["ShortDescription"],
 		fieldMap["Description"],
+		fieldMap["SortOrder"],
 		fieldMap["Url"],
 		fieldMap["IsTaxable"],
 		fieldMap["IsTrackStock"],
-		fieldMap["ShippingClassID"],
 		fieldMap["ShippingWeight"],
 		fieldMap["ShippingWidth"],
 		fieldMap["ShippingHeight"],
@@ -178,10 +178,10 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 		&item.Name,
 		&item.ShortDescription,
 		&item.Description,
+		&item.SortOrder,
 		&item.Url,
 		&item.IsTaxable,
 		&item.IsTrackStock,
-		&item.ShippingClassID,
 		&item.ShippingWeight,
 		&item.ShippingWidth,
 		&item.ShippingHeight,
@@ -225,10 +225,10 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		fieldMap["Name"],
 		fieldMap["ShortDescription"],
 		fieldMap["Description"],
+		fieldMap["SortOrder"],
 		fieldMap["Url"],
 		fieldMap["IsTaxable"],
 		fieldMap["IsTrackStock"],
-		fieldMap["ShippingClassID"],
 		fieldMap["ShippingWeight"],
 		fieldMap["ShippingWidth"],
 		fieldMap["ShippingHeight"],
@@ -248,10 +248,10 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		item.Name,
 		item.ShortDescription,
 		item.Description,
+		item.SortOrder,
 		item.Url,
 		item.IsTaxable,
 		item.IsTrackStock,
-		item.ShippingClassID,
 		item.ShippingWeight,
 		item.ShippingWidth,
 		item.ShippingHeight,
@@ -276,15 +276,14 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 	by := ctx.Value("user_id").(string)
 
 	return m.qb.Update(m.table).
-		Set(fieldMap["Name"], item.Name).
 		Set(fieldMap["SKU"], item.SKU).
 		Set(fieldMap["Name"], item.Name).
 		Set(fieldMap["ShortDescription"], item.ShortDescription).
 		Set(fieldMap["Description"], item.Description).
+		Set(fieldMap["SortOrder"], item.SortOrder).
 		Set(fieldMap["Url"], item.Url).
 		Set(fieldMap["IsTaxable"], item.IsTaxable).
 		Set(fieldMap["IsTrackStock"], item.IsTrackStock).
-		Set(fieldMap["ShippingClassID"], item.ShippingClassID).
 		Set(fieldMap["ShippingWeight"], item.ShippingWeight).
 		Set(fieldMap["ShippingWidth"], item.ShippingWidth).
 		Set(fieldMap["ShippingHeight"], item.ShippingHeight).

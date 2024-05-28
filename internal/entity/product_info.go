@@ -8,10 +8,10 @@ type ProductInfo struct {
 	Name                  string    `json:"name"`
 	ShortDescription      string    `json:"short_description"`
 	Description           string    `json:"description"`
+	SortOrder             uint64    `json:"sort_order"`
 	Url                   string    `json:"url"`
 	IsTaxable             bool      `json:"is_taxable"`
 	IsTrackStock          bool      `json:"is_track_stock"`
-	ShippingClassID       string    `json:"shipping_class_id"`
 	ShippingWeight        float32   `json:"shipping_weight"`
 	ShippingWidth         float32   `json:"shipping_width"`
 	ShippingHeight        float32   `json:"shipping_height"`
