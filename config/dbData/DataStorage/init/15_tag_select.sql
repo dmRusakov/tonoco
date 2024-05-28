@@ -14,9 +14,9 @@ CREATE TABLE IF NOT EXISTS public.tag_select
     sort_order          INTEGER                 NOT NULL,
 
     created_at          TIMESTAMP               DEFAULT NOW() NOT NULL,
-    created_by          UUID                    DEFAULT NULL,
+    created_by          UUID                    DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' NOT NULL,
     updated_at          TIMESTAMP               DEFAULT NOW() NOT NULL,
-    updated_by          UUID                    DEFAULT NULL,
+    updated_by          UUID                    DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' NOT NULL,
 
     CONSTRAINT tag_select_pkey PRIMARY KEY (id)
 );
@@ -52,7 +52,7 @@ CREATE TRIGGER tag_select_updated_at
 EXECUTE FUNCTION update_update_at_column();
 
 -- auto set sort_order column
-CREATE TRIGGER ttag_select_order
+CREATE TRIGGER tag_select_order
     BEFORE INSERT
     ON public.tag_select
     FOR EACH ROW
@@ -533,9 +533,9 @@ INSERT INTO public.tag_select (id, tag_type_id, name, url, sort_order) VALUES
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd383302', (select id from public.tag_type where url = 'height'), '26 1/2″ - 41 1/4″ (ducted) / 11 3/4″ - 41 1/4 (ductless)', '26-1-2%e2%80%b3-41-1-4%e2%80%b3-ducted-11-3-4%e2%80%b3-41-1-4-ductless', '3302'),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd383305', (select id from public.tag_type where url = 'depth'), '16 3/4″', '16-3-4%e2%80%b3', '3305'),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd383306', (select id from public.tag_type where url = 'height'), '1/4″', '1-4%e2%80%b3', '3306');
+
 -- get data
-select *
-from public.tag_select;
+select * from public.tag_select;
 
 -- Adding Categories
 -- SELECT CONCAT(SUBSTRING('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380000', 1, (36 - CHAR_LENGTH(T.id))), T.id) as id,

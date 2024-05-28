@@ -1,3 +1,7 @@
+-- drop table if exists
+DROP TABLE IF EXISTS public.tag;
+
+-- create table
 CREATE TABLE IF NOT EXISTS public.tag
 (
     id            UUID UNIQUE  DEFAULT uuid_generate_v4(),
@@ -6,23 +10,23 @@ CREATE TABLE IF NOT EXISTS public.tag
     tag_select_id UUID         DEFAULT NULL,
     value         VARCHAR(255) DEFAULT NULL,
     active        BOOLEAN      DEFAULT TRUE,
-    sort_order    INTEGER      DEFAULT NULL,
+    sort_order    INTEGER      DEFAULT 0,
     created_at    TIMESTAMP    DEFAULT NOW() NOT NULL,
-    created_by    UUID         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    created_by    UUID         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
     updated_at    TIMESTAMP    DEFAULT NOW() NOT NULL,
-    updated_by    UUID         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    updated_by    UUID         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
 
     CONSTRAINT tag_pkey PRIMARY KEY (id)
 );
 
 -- ownership and index
 ALTER TABLE public.tag  OWNER TO postgres;
-CREATE INDEX tag_id ON public.tag (id);
-CREATE INDEX tag_product_id ON public.tag (product_id);
-CREATE INDEX tag_tag_type_id ON public.tag (tag_type_id);
-CREATE INDEX tag_tag_select_id ON public.tag (tag_select_id);
-CREATE INDEX tag_sort_order ON public.tag (sort_order);
-CREATE INDEX tag_updated_at ON public.tag (updated_at);
+CREATE INDEX IF NOT EXISTS tag_id ON public.tag (id);
+CREATE INDEX IF NOT EXISTS tag_product_id ON public.tag (product_id);
+CREATE INDEX IF NOT EXISTS tag_tag_type_id ON public.tag (tag_type_id);
+CREATE INDEX IF NOT EXISTS tag_tag_select_id ON public.tag (tag_select_id);
+CREATE INDEX IF NOT EXISTS tag_sort_order ON public.tag (sort_order);
+CREATE INDEX IF NOT EXISTS tag_updated_at ON public.tag (updated_at);
 
 -- add comment to table
 COMMENT ON TABLE public.tag IS 'Product Tag';

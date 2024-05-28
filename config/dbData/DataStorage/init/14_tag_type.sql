@@ -20,12 +20,12 @@ CREATE TABLE IF NOT EXISTS public.tag_type
     suffix            VARCHAR(50)   DEFAULT '',
 
     created_at TIMESTAMP    DEFAULT NOW()               NOT NULL,
-    created_by UUID         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    created_by UUID         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' NOT NULL,
     updated_at TIMESTAMP    DEFAULT NOW()               NOT NULL,
-    updated_by UUID         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    updated_by UUID         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' NOT NULL,
 
     CONSTRAINT tag_type_pkey PRIMARY KEY (id)
-    );
+);
 
 -- ownership and index
 ALTER TABLE public.tag_type OWNER TO postgres;
@@ -55,15 +55,6 @@ COMMENT ON COLUMN public.tag_type.sort_order IS 'Sort order of the tag type';
 COMMENT ON COLUMN public.tag_type.type IS 'Type of the tag type';
 COMMENT ON COLUMN public.tag_type.prefix IS 'Prefix of the tag type';
 COMMENT ON COLUMN public.tag_type.suffix IS 'Suffix of the tag type';
-
--- auto update updated_at
-CREATE OR REPLACE FUNCTION update_update_at_column()
-    RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER update_update_at_column
     BEFORE UPDATE

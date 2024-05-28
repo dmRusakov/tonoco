@@ -18,21 +18,21 @@ CREATE TABLE IF NOT EXISTS public.warehouse
     email          VARCHAR(255)                           NOT NULL,
 
     created_at TIMESTAMP   DEFAULT NOW()               NOT NULL,
-    created_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    created_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
     updated_at TIMESTAMP   DEFAULT NOW()               NOT NULL,
-    updated_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    updated_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
 
     CONSTRAINT warehouse_pkey PRIMARY KEY (id)
 );
 
 -- ownership and index
 ALTER TABLE public.warehouse OWNER TO postgres;
-CREATE INDEX warehouse_id ON public.warehouse USING btree (id);
-CREATE INDEX warehouse_name ON public.warehouse USING btree (name);
-CREATE INDEX warehouse_url ON public.warehouse USING btree (url);
-CREATE INDEX warehouse_abbreviation ON public.warehouse USING btree (abbreviation);
-CREATE INDEX warehouse_sort_order ON public.warehouse USING btree (sort_order);
-CREATE INDEX warehouse_updated_at ON public.warehouse USING btree (updated_at);
+CREATE INDEX IF NOT EXISTS warehouse_id ON public.warehouse USING btree (id);
+CREATE INDEX IF NOT EXISTS warehouse_name ON public.warehouse USING btree (name);
+CREATE INDEX IF NOT EXISTS warehouse_url ON public.warehouse USING btree (url);
+CREATE INDEX IF NOT EXISTS warehouse_abbreviation ON public.warehouse USING btree (abbreviation);
+CREATE INDEX IF NOT EXISTS warehouse_sort_order ON public.warehouse USING btree (sort_order);
+CREATE INDEX IF NOT EXISTS warehouse_updated_at ON public.warehouse USING btree (updated_at);
 
 -- comment on table
 COMMENT ON TABLE public.warehouse IS 'Reference table for warehouse';

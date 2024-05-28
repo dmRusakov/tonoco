@@ -1,3 +1,6 @@
+-- drop table if exists
+DROP TABLE IF EXISTS public.user CASCADE;
+
 -- create table
 CREATE TABLE IF NOT EXISTS public.user
 (
@@ -5,16 +8,21 @@ CREATE TABLE IF NOT EXISTS public.user
     email      VARCHAR(255) NOT NULL UNIQUE,
     first_name VARCHAR(255),
     last_name  VARCHAR(255),
-    password   VARCHAR(60),
+    password   VARCHAR(100),
     active     BOOLEAN     DEFAULT TRUE,
 
     created_at TIMESTAMP   DEFAULT NOW() NOT NULL,
-    created_by UUID        DEFAULT NULL REFERENCES public.user (id),
+    created_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' NOT NULL,
     updated_at TIMESTAMP   DEFAULT NOW() NOT NULL,
-    updated_by UUID        DEFAULT NULL REFERENCES public.user (id),
+    updated_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' NOT NULL,
 
     CONSTRAINT user_pkey PRIMARY KEY (id)
 );
+
+-- index, constraint and ownership
+ALTER TABLE public.user OWNER TO postgres;
+CREATE INDEX IF NOT EXISTS user_user_id ON public.user (id);
+CREATE INDEX IF NOT EXISTS user_email ON public.user (email);
 
 -- comment on columns
 COMMENT ON COLUMN public.user.id IS 'Unique identifier';
@@ -24,13 +32,9 @@ COMMENT ON COLUMN public.user.last_name IS 'Last name';
 COMMENT ON COLUMN public.user.password IS 'Hash of Password';
 COMMENT ON COLUMN public.user.active IS 'Active status';
 
--- index, constraint and ownership
-ALTER TABLE public.user OWNER TO postgres;
-CREATE INDEX user_user_id ON public.user (id);
-CREATE INDEX user_email ON public.user (email);
 
 -- auto update updated_at
-CREATE TRIGGER user_set_updated_at
+CREATE OR REPLACE TRIGGER user_set_updated_at
     BEFORE UPDATE ON public.user
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();

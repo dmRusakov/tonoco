@@ -1,3 +1,6 @@
+-- drop table if exists
+DROP TABLE IF EXISTS public.product_info;
+
 -- ownership and index
 CREATE TABLE IF NOT EXISTS public.product_info
 (
@@ -23,21 +26,18 @@ CREATE TABLE IF NOT EXISTS public.product_info
     google_product_type     VARCHAR(100)        NOT NULL DEFAULT '',
 
     created_at              TIMESTAMP           NOT NULL DEFAULT NOW(),
-    created_by              UUID                         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    created_by              UUID                         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
     updated_at              TIMESTAMP           NOT NULL DEFAULT NOW(),
-    updated_by              UUID                         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    updated_by              UUID                         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
 
     CONSTRAINT product_id_pkey PRIMARY KEY (id)
 );
 
 -- create table
-ALTER TABLE public.product_info
-    OWNER TO postgres;
-
-
-CREATE INDEX product_id ON public.product_info (id);
-CREATE INDEX product_sku ON public.product_info (sku);
-CREATE INDEX product_url ON public.product_info (url);
+ALTER TABLE public.product_info OWNER TO postgres;
+CREATE INDEX IF NOT EXISTS product_id ON public.product_info (id);
+CREATE INDEX IF NOT EXISTS product_sku ON public.product_info (sku);
+CREATE INDEX IF NOT EXISTS product_url ON public.product_info (url);
 
 -- add comments
 COMMENT ON TABLE public.product_info IS 'Product information';

@@ -9,9 +9,9 @@ CREATE TABLE IF NOT EXISTS public.folder
     sort_order INTEGER     DEFAULT NULL,
 
     created_at TIMESTAMP   DEFAULT NOW()               NOT NULL,
-    created_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    created_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
     updated_at TIMESTAMP   DEFAULT NOW()               NOT NULL,
-    updated_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    updated_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
 
     CONSTRAINT folder_pkey PRIMARY KEY (id)
 );
