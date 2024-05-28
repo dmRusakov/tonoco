@@ -13,14 +13,14 @@ import (
 	price_type_service "github.com/dmRusakov/tonoco/internal/domain/price_type/service"
 	product_info_model "github.com/dmRusakov/tonoco/internal/domain/product_info/model"
 	product_info_service "github.com/dmRusakov/tonoco/internal/domain/product_info/service"
-	specification_model "github.com/dmRusakov/tonoco/internal/domain/specification/model"
-	specification_service "github.com/dmRusakov/tonoco/internal/domain/specification/service"
-	specification_type_model "github.com/dmRusakov/tonoco/internal/domain/specification_type/model"
-	specification_type_service "github.com/dmRusakov/tonoco/internal/domain/specification_type/service"
-	specification_value_model "github.com/dmRusakov/tonoco/internal/domain/specification_value/model"
-	specification_value_service "github.com/dmRusakov/tonoco/internal/domain/specification_value/service"
 	store_model "github.com/dmRusakov/tonoco/internal/domain/store/model"
 	store_service "github.com/dmRusakov/tonoco/internal/domain/store/service"
+	specification_model "github.com/dmRusakov/tonoco/internal/domain/tag/model"
+	specification_service "github.com/dmRusakov/tonoco/internal/domain/tag/service"
+	specification_value_model "github.com/dmRusakov/tonoco/internal/domain/tag_select/model"
+	specification_value_service "github.com/dmRusakov/tonoco/internal/domain/tag_select/service"
+	specification_type_model "github.com/dmRusakov/tonoco/internal/domain/tag_type/model"
+	specification_type_service "github.com/dmRusakov/tonoco/internal/domain/tag_type/service"
 	warehouse_model "github.com/dmRusakov/tonoco/internal/domain/warehouse/model"
 	warehouse_service "github.com/dmRusakov/tonoco/internal/domain/warehouse/service"
 	productPolicy "github.com/dmRusakov/tonoco/internal/useCase/product"
@@ -47,15 +47,15 @@ func (a *App) ProductUseCaseInit() (err error) {
 	priceTypeStorage := price_type_model.NewStorage(a.SqlDB)
 	priceTypeService := price_type_service.NewService(priceTypeStorage)
 
-	// specification
+	// tag
 	specificationStorage := specification_model.NewStorage(a.SqlDB)
 	specificationService := specification_service.NewService(specificationStorage)
 
-	// specification type
+	// tag type
 	specificationTypeStorage := specification_type_model.NewStorage(a.SqlDB)
 	specificationTypeService := specification_type_service.NewService(specificationTypeStorage)
 
-	// specification value
+	// tag value
 	specificationValueStorage := specification_value_model.NewStorage(a.SqlDB)
 	specificationValueService := specification_value_service.NewService(specificationValueStorage)
 

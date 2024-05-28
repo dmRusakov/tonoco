@@ -1,18 +1,22 @@
+-- drop table if exists
+DROP TABLE IF EXISTS public.tag_select;
+
+-- create table
 CREATE TABLE IF NOT EXISTS public.tag_select
 (
     id                  UUID UNIQUE DEFAULT uuid_generate_v4(),
-    tag_type_id UUID    NOT NULL REFERENCES public.tag_type (id),
+    tag_type_id         UUID,
     name                VARCHAR(255)            NOT NULL,
+    url                 VARCHAR(255)            NOT NULL,
     short_description   VARCHAR(255)            DEFAULT NULL,
     description         VARCHAR(6000)           DEFAULT NULL,
-    url                 VARCHAR(255)            NOT NULL,
     active              BOOLEAN                 DEFAULT TRUE,
     sort_order          INTEGER                 NOT NULL,
 
     created_at          TIMESTAMP               DEFAULT NOW() NOT NULL,
-    created_by          UUID                    DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    created_by          UUID                    DEFAULT NULL,
     updated_at          TIMESTAMP               DEFAULT NOW() NOT NULL,
-    updated_by          UUID                    DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' REFERENCES public.user (id),
+    updated_by          UUID                    DEFAULT NULL,
 
     CONSTRAINT tag_select_pkey PRIMARY KEY (id)
 );

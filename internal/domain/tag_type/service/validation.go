@@ -6,12 +6,14 @@ import (
 )
 
 var (
-	NoName = validation.NewValidation("Name is required", "Name is required", "98234d", "name")
-	NoUrl  = validation.NewValidation("Url is required", "Url is required", "98g4fs", "url")
+	NoName      = validation.NewValidation("Name is required", "Name is required", "ls22wa", "Name")
+	NoUrl       = validation.NewValidation("Url is required", "Url is required", "00gfgf", "Url")
+	NoType      = validation.NewValidation("Type is required", "Type is required", "00ghgf", "Type")
+	InvalidType = validation.NewValidation("Type is invalid", "Type is invalid", "02ghgf", "Type")
 )
 
 func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.Error {
-	var validations []entity.Error
+	var errors []entity.Error
 
 	// validate Item
 	if item != nil {
@@ -30,10 +32,16 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 			results <- validations
 		}()
 
+		go func() {
+			var validations []entity.Error
+			s.validateType(item.Type, &validations)
+			results <- validations
+		}()
+
 		// Collect results from the channel
-		for i := 0; i < 2; i++ {
+		for i := 0; i < 3; i++ {
 			v := <-results
-			validations = append(validations, v...)
+			errors = append(errors, v...)
 		}
 	}
 
@@ -51,7 +59,10 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 				case "Url":
 					s.validateUrl(value.(string), &v)
 					break
+				case "Type":
+					s.validateType(value.(string), &v)
 				}
+
 				results <- v
 			}(field, value)
 		}
@@ -59,11 +70,11 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 		// Collect results from the channel
 		for range *fields {
 			v := <-results
-			validations = append(validations, v...)
+			errors = append(errors, v...)
 		}
 	}
 
-	return validations
+	return errors
 }
 
 func (s *Service) validateName(name string, validations *[]entity.Error) {
@@ -75,5 +86,20 @@ func (s *Service) validateName(name string, validations *[]entity.Error) {
 func (s *Service) validateUrl(url string, validations *[]entity.Error) {
 	if url == "" {
 		*validations = append(*validations, NoUrl)
+	}
+}
+
+func (s *Service) validateType(t string, validations *[]entity.Error) {
+	if t == "" {
+		*validations = append(*validations, NoType)
+	} else {
+		switch t {
+		case "select":
+			break
+		case "text":
+			break
+		default:
+			*validations = append(*validations, InvalidType)
+		}
 	}
 }

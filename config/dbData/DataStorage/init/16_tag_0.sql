@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS public.tag
 (
     id            UUID UNIQUE  DEFAULT uuid_generate_v4(),
-    product_id    UUID         NOT NULL REFERENCES public.product_info (id),
-    tag_type_id   UUID         NOT NULL REFERENCES public.tag_type (id),
-    tag_select_id UUID         DEFAULT NULL REFERENCES public.tag_select (id),
+    product_id    UUID         DEFAULT NULL,
+    tag_type_id   UUID         DEFAULT NULL,
+    tag_select_id UUID         DEFAULT NULL,
     value         VARCHAR(255) DEFAULT NULL,
     active        BOOLEAN      DEFAULT TRUE,
     sort_order    INTEGER      DEFAULT NULL,

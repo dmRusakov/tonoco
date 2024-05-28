@@ -1,3 +1,6 @@
+-- drop table if exists
+DROP TABLE IF EXISTS public.tag_type CASCADE;
+
 -- create table
 CREATE TABLE IF NOT EXISTS public.tag_type
 (
@@ -26,15 +29,15 @@ CREATE TABLE IF NOT EXISTS public.tag_type
 
 -- ownership and index
 ALTER TABLE public.tag_type OWNER TO postgres;
-CREATE INDEX tag_type_id ON public.tag_type (id);
-CREATE INDEX tag_type_url ON public.tag_type (url);
-CREATE INDEX tag_type_prime ON public.tag_type (prime);
-CREATE INDEX tag_type_active ON public.tag_type (active);
-CREATE INDEX tag_type_list_item ON public.tag_type (list_item);
-CREATE INDEX tag_type_filter ON public.tag_type (filter);
-CREATE INDEX tag_type_type ON public.tag_type (type);
-CREATE INDEX tag_type_sort_order ON public.tag_type (sort_order);
-CREATE INDEX tag_type_updated_at ON public.tag_type (updated_at);
+CREATE INDEX IF NOT EXISTS tag_type_id ON public.tag_type (id);
+CREATE INDEX IF NOT EXISTS tag_type_url ON public.tag_type (url);
+CREATE INDEX IF NOT EXISTS tag_type_prime ON public.tag_type (prime);
+CREATE INDEX IF NOT EXISTS tag_type_active ON public.tag_type (active);
+CREATE INDEX IF NOT EXISTS tag_type_list_item ON public.tag_type (list_item);
+CREATE INDEX IF NOT EXISTS tag_type_filter ON public.tag_type (filter);
+CREATE INDEX IF NOT EXISTS tag_type_type ON public.tag_type (type);
+CREATE INDEX IF NOT EXISTS tag_type_sort_order ON public.tag_type (sort_order);
+CREATE INDEX IF NOT EXISTS tag_type_updated_at ON public.tag_type (updated_at);
 
 -- add comments
 COMMENT ON TABLE  public.tag_type IS 'Tag type table';
@@ -54,21 +57,38 @@ COMMENT ON COLUMN public.tag_type.prefix IS 'Prefix of the tag type';
 COMMENT ON COLUMN public.tag_type.suffix IS 'Suffix of the tag type';
 
 -- auto update updated_at
-CREATE TRIGGER tag_type_updated_at
+CREATE OR REPLACE FUNCTION update_update_at_column()
+    RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER update_update_at_column
     BEFORE UPDATE
     ON public.tag_type
     FOR EACH ROW
-    EXECUTE FUNCTION update_update_at_column();
+EXECUTE FUNCTION update_update_at_column();
 
 -- auto set sort_order column
-CREATE TRIGGER tag_type_order
+CREATE OR REPLACE FUNCTION set_order_column_universal()
+    RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.sort_order IS NULL OR NEW.sort_order = 0 THEN
+        NEW.sort_order = (SELECT COALESCE(MAX(sort_order), 0) + 1 FROM public.tag_type);
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER set_order_column_universal
     BEFORE INSERT
     ON public.tag_type
     FOR EACH ROW
-    EXECUTE FUNCTION set_order_column_universal();
+EXECUTE FUNCTION set_order_column_universal();
 
--- default data
--- insert data
+-- insert default data
 INSERT INTO public.tag_type (id, url, name, type, prime, list_item, filter, required, suffix)
     VALUES
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381001', 'category', 'Category', 'select', true, true, true, true, ''),
@@ -115,11 +135,19 @@ INSERT INTO public.tag_type (id, url, name, type, prime, list_item, filter, requ
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382368', 'diameter', 'Diameter', 'select', false, false, false, false, ''),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382530', 'filter-accessories', 'Filter accessories', 'select', false, false, false, false, ''),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd383138', 'qty-per-box', 'Qty per box', 'select', false, false, false, false, ''),
-    ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd383139', 'keywords', 'Keywords', 'select', false, false, false, false, '');
+    ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd383139', 'keywords', 'Keywords', 'select', false, false, false, false, '')
+    ON CONFLICT (id) DO UPDATE
+    SET url = EXCLUDED.url,
+        name = EXCLUDED.name,
+        type = EXCLUDED.type,
+        prime = EXCLUDED.prime,
+        list_item = EXCLUDED.list_item,
+        filter = EXCLUDED.filter,
+        required = EXCLUDED.required,
+        suffix = EXCLUDED.suffix;
 
 -- get data
 select * from public.tag_type;
-
 
 -- woocommerce data
 -- SELECT

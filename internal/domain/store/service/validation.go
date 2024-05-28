@@ -16,65 +16,65 @@ var (
 	NoEmail        = validation.NewValidation("Email is required", "Email is required", "282349", "Email")
 )
 
-func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.Validation {
-	var validations []entity.Validation
+func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.Error {
+	var validations []entity.Error
 
 	// validate Item
 	if item != nil {
-		results := make(chan []entity.Validation)
+		results := make(chan []entity.Error)
 
 		// Name
 		go func() {
-			var validations []entity.Validation
+			var validations []entity.Error
 			s.validateName(item.Name, &validations)
 			results <- validations
 		}()
 
 		// Abbreviation
 		go func() {
-			var validations []entity.Validation
+			var validations []entity.Error
 			s.validateAbbreviation(item.Abbreviation, &validations)
 			results <- validations
 		}()
 
 		// AddressLine1
 		go func() {
-			var validations []entity.Validation
+			var validations []entity.Error
 			s.validateAddressLine1(item.AddressLine1, &validations)
 			results <- validations
 		}()
 
 		// City
 		go func() {
-			var validations []entity.Validation
+			var validations []entity.Error
 			s.validateCity(item.City, &validations)
 			results <- validations
 		}()
 
 		// State
 		go func() {
-			var validations []entity.Validation
+			var validations []entity.Error
 			s.validateState(item.State, &validations)
 			results <- validations
 		}()
 
 		// ZipCode
 		go func() {
-			var validations []entity.Validation
+			var validations []entity.Error
 			s.validateZipCode(item.ZipCode, &validations)
 			results <- validations
 		}()
 
 		// Country
 		go func() {
-			var validations []entity.Validation
+			var validations []entity.Error
 			s.validateCountry(item.Country, &validations)
 			results <- validations
 		}()
 
 		// Email
 		go func() {
-			var validations []entity.Validation
+			var validations []entity.Error
 			s.validateEmail(item.Email, &validations)
 			results <- validations
 		}()
@@ -88,11 +88,11 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 
 	// validate fields using goroutines and switch
 	if fields != nil {
-		results := make(chan []entity.Validation)
+		results := make(chan []entity.Error)
 
 		for field, value := range *fields {
 			go func(field string, value interface{}) {
-				var v []entity.Validation
+				var v []entity.Error
 				switch field {
 				case "Name":
 					s.validateName(value.(string), &v)
@@ -133,49 +133,49 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 	return validations
 }
 
-func (s *Service) validateName(name string, validations *[]entity.Validation) {
+func (s *Service) validateName(name string, validations *[]entity.Error) {
 	if name == "" {
 		*validations = append(*validations, NoName)
 	}
 }
 
-func (s *Service) validateAbbreviation(abbreviation string, validations *[]entity.Validation) {
+func (s *Service) validateAbbreviation(abbreviation string, validations *[]entity.Error) {
 	if abbreviation == "" {
 		*validations = append(*validations, NoAbbreviation)
 	}
 }
 
-func (s *Service) validateAddressLine1(addressLine1 string, validations *[]entity.Validation) {
+func (s *Service) validateAddressLine1(addressLine1 string, validations *[]entity.Error) {
 	if addressLine1 == "" {
 		*validations = append(*validations, NoAddressLine1)
 	}
 }
 
-func (s *Service) validateCity(city string, validations *[]entity.Validation) {
+func (s *Service) validateCity(city string, validations *[]entity.Error) {
 	if city == "" {
 		*validations = append(*validations, NoCity)
 	}
 }
 
-func (s *Service) validateState(state string, validations *[]entity.Validation) {
+func (s *Service) validateState(state string, validations *[]entity.Error) {
 	if state == "" {
 		*validations = append(*validations, NoState)
 	}
 }
 
-func (s *Service) validateZipCode(zipCode string, validations *[]entity.Validation) {
+func (s *Service) validateZipCode(zipCode string, validations *[]entity.Error) {
 	if zipCode == "" {
 		*validations = append(*validations, NoZipCode)
 	}
 }
 
-func (s *Service) validateCountry(country string, validations *[]entity.Validation) {
+func (s *Service) validateCountry(country string, validations *[]entity.Error) {
 	if country == "" {
 		*validations = append(*validations, NoCountry)
 	}
 }
 
-func (s *Service) validateEmail(email string, validations *[]entity.Validation) {
+func (s *Service) validateEmail(email string, validations *[]entity.Error) {
 	if email == "" {
 		*validations = append(*validations, NoEmail)
 	}

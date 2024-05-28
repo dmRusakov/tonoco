@@ -6,8 +6,9 @@ import (
 )
 
 var (
-	NoName = validation.NewValidation("Name is required", "Name is required", "98234d", "name")
-	NoUrl  = validation.NewValidation("Url is required", "Url is required", "98g4fs", "url")
+	NoName    = validation.NewValidation("Name is required", "Name is required", "98adfd", "Name")
+	NoUrl     = validation.NewValidation("Url is required", "Url is required", "00iad2", "Url")
+	TagTypeId = validation.NewValidation("TagTypeId is required", "Tag Type Id is required", "98unfd", "TagTypeId")
 )
 
 func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.Error {
@@ -30,8 +31,14 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 			results <- validations
 		}()
 
+		go func() {
+			var validations []entity.Error
+			s.validateTagTypeId(item.TagTypeId, &validations)
+			results <- validations
+		}()
+
 		// Collect results from the channel
-		for i := 0; i < 2; i++ {
+		for i := 0; i < 3; i++ {
 			v := <-results
 			validations = append(validations, v...)
 		}
@@ -51,7 +58,11 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 				case "Url":
 					s.validateUrl(value.(string), &v)
 					break
+				case "TagTypeId":
+					s.validateTagTypeId(value.(string), &v)
+					break
 				}
+
 				results <- v
 			}(field, value)
 		}
@@ -75,5 +86,11 @@ func (s *Service) validateName(name string, validations *[]entity.Error) {
 func (s *Service) validateUrl(url string, validations *[]entity.Error) {
 	if url == "" {
 		*validations = append(*validations, NoUrl)
+	}
+}
+
+func (s *Service) validateTagTypeId(t string, validations *[]entity.Error) {
+	if t == "" {
+		*validations = append(*validations, TagTypeId)
 	}
 }

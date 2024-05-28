@@ -9,56 +9,36 @@ import (
 	"github.com/google/uuid"
 )
 
-type Item = entity.ProductInfo
-type Filter = entity.ProductInfoFilter
+type Item = entity.Tag
+type Filter = entity.TagFilter
 
 // fieldMap
 var fieldMap = map[string]string{
-	"ID":                    "id",
-	"SKU":                   "sku",
-	"Name":                  "name",
-	"ShortDescription":      "short_description",
-	"Description":           "description",
-	"Url":                   "url",
-	"IsTaxable":             "is_taxable",
-	"IsTrackStock":          "is_track_stock",
-	"ShippingClassID":       "shipping_class_id",
-	"ShippingWeight":        "shipping_weight",
-	"ShippingWidth":         "shipping_width",
-	"ShippingHeight":        "shipping_height",
-	"ShippingLength":        "shipping_length",
-	"SeoTitle":              "seo_title",
-	"SeoDescription":        "seo_description",
-	"GTIN":                  "gtin",
-	"GoogleProductCategory": "google_product_category",
-	"GoogleProductType":     "google_product_type",
-	"CreatedAt":             "created_at",
-	"CreatedBy":             "created_by",
-	"UpdatedAt":             "updated_at",
-	"UpdatedBy":             "updated_by",
+	"ID":               "id",
+	"TagTypeId":        "tag_type_id",
+	"Name":             "name",
+	"ShortDescription": "short_description",
+	"Description":      "description",
+	"Url":              "url",
+	"Active":           "active",
+	"SortOrder":        "sort_order",
+	"CreatedAt":        "created_at",
+	"CreatedBy":        "created_by",
+	"UpdatedAt":        "updated_at",
+	"UpdatedBy":        "updated_by",
 }
 
 // makeStatement
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
 		fieldMap["ID"],
-		fieldMap["SKU"],
+		fieldMap["TagTypeId"],
 		fieldMap["Name"],
 		fieldMap["ShortDescription"],
 		fieldMap["Description"],
 		fieldMap["Url"],
-		fieldMap["IsTaxable"],
-		fieldMap["IsTrackStock"],
-		fieldMap["ShippingClassID"],
-		fieldMap["ShippingWeight"],
-		fieldMap["ShippingWidth"],
-		fieldMap["ShippingHeight"],
-		fieldMap["ShippingLength"],
-		fieldMap["SeoTitle"],
-		fieldMap["SeoDescription"],
-		fieldMap["GTIN"],
-		fieldMap["GoogleProductCategory"],
-		fieldMap["GoogleProductType"],
+		fieldMap["Active"],
+		fieldMap["SortOrder"],
 		fieldMap["CreatedAt"],
 		fieldMap["CreatedBy"],
 		fieldMap["UpdatedAt"],
@@ -114,38 +94,41 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	statement := m.makeStatement()
 
 	// Ids
-	if filter.IDs != nil && len(*filter.IDs) > 0 {
-		statement = statement.Where(sq.Eq{fieldMap["ID"]: *filter.IDs})
+	if filter.IDs != nil {
+		countIds := len(*filter.IDs)
+
+		if countIds > 0 {
+			statement = statement.Where(sq.Eq{fieldMap["ID"]: *filter.IDs})
+		}
 
 		*filter.Page = 1
-		if (*filter.PerPage) > uint64(len(*filter.IDs)) {
-			*filter.PerPage = uint64(len(*filter.IDs))
+		if (*filter.PerPage) > uint64(countIds) {
+			*filter.PerPage = uint64(countIds)
 		}
 	}
 
 	// Urls
-	if filter.Urls != nil && len(*filter.Urls) > 0 {
-		statement = statement.Where(sq.Eq{fieldMap["Url"]: *filter.Urls})
+	if filter.Urls != nil {
+		countUrls := len(*filter.Urls)
+
+		if countUrls > 0 {
+			statement = statement.Where(sq.Eq{fieldMap["Url"]: *filter.Urls})
+		}
 
 		*filter.Page = 1
-		if (*filter.PerPage) > uint64(len(*filter.Urls)) {
-			*filter.PerPage = uint64(len(*filter.Urls))
+		if (*filter.PerPage) > uint64(countUrls) {
+			*filter.PerPage = uint64(countUrls)
 		}
 	}
 
-	// SKUs
-	if filter.SKUs != nil {
-		countSKUs := len(*filter.SKUs)
+	// Type
+	if filter.TagTypeId != nil {
+		statement = statement.Where(sq.Eq{fieldMap["Type"]: *filter.TagTypeId})
+	}
 
-		if countSKUs > 0 {
-			statement = statement.Where(sq.Eq{fieldMap["SKU"]: *filter.SKUs})
-		}
-
-		*filter.Page = 1
-		if (*filter.PerPage) > uint64(countSKUs) {
-			*filter.PerPage = uint64(countSKUs)
-		}
-
+	// Active
+	if filter.Active != nil {
+		statement = statement.Where(sq.Eq{fieldMap["Active"]: *filter.Active})
 	}
 
 	// Search
@@ -156,17 +139,13 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 				sq.Expr("LOWER("+fieldMap["Url"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+fieldMap["ShortDescription"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+fieldMap["Description"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["SeoTitle"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["SeoDescription"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 			},
 		)
 	}
 
-	statement = statement.OrderBy(fieldMap[*filter.OrderBy] + " " + *filter.OrderDir).
-		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
-
 	// Add OrderBy, OrderDir, Page, Limit and return
-	return statement
+	return statement.OrderBy(fieldMap[*filter.OrderBy] + " " + *filter.OrderDir).
+		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 }
 
 // scanOneRow
@@ -174,23 +153,13 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	var item = &Item{}
 	err := rows.Scan(
 		&item.ID,
-		&item.SKU,
+		&item.TagTypeId,
 		&item.Name,
 		&item.ShortDescription,
 		&item.Description,
 		&item.Url,
-		&item.IsTaxable,
-		&item.IsTrackStock,
-		&item.ShippingClassID,
-		&item.ShippingWeight,
-		&item.ShippingWidth,
-		&item.ShippingHeight,
-		&item.ShippingLength,
-		&item.SeoTitle,
-		&item.SeoDescription,
-		&item.GTIN,
-		&item.GoogleProductCategory,
-		&item.GoogleProductType,
+		&item.Active,
+		&item.SortOrder,
 		&item.CreatedAt,
 		&item.CreatedBy,
 		&item.UpdatedAt,
@@ -208,6 +177,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 
 // makeInsertStatement
 func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.InsertBuilder, *string) {
+
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
@@ -221,46 +191,26 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 
 	insertItem := m.qb.Insert(m.table).Columns(
 		fieldMap["ID"],
-		fieldMap["SKU"],
+		fieldMap["TagTypeId"],
 		fieldMap["Name"],
 		fieldMap["ShortDescription"],
 		fieldMap["Description"],
 		fieldMap["Url"],
-		fieldMap["IsTaxable"],
-		fieldMap["IsTrackStock"],
-		fieldMap["ShippingClassID"],
-		fieldMap["ShippingWeight"],
-		fieldMap["ShippingWidth"],
-		fieldMap["ShippingHeight"],
-		fieldMap["ShippingLength"],
-		fieldMap["SeoTitle"],
-		fieldMap["SeoDescription"],
-		fieldMap["GTIN"],
-		fieldMap["GoogleProductCategory"],
-		fieldMap["GoogleProductType"],
+		fieldMap["Active"],
+		fieldMap["SortOrder"],
 		fieldMap["CreatedAt"],
 		fieldMap["CreatedBy"],
 		fieldMap["UpdatedAt"],
 		fieldMap["UpdatedBy"],
 	).Values(
 		item.ID,
-		item.SKU,
+		item.TagTypeId,
 		item.Name,
 		item.ShortDescription,
 		item.Description,
 		item.Url,
-		item.IsTaxable,
-		item.IsTrackStock,
-		item.ShippingClassID,
-		item.ShippingWeight,
-		item.ShippingWidth,
-		item.ShippingHeight,
-		item.ShippingLength,
-		item.SeoTitle,
-		item.SeoDescription,
-		item.GTIN,
-		item.GoogleProductCategory,
-		item.GoogleProductType,
+		item.Active,
+		item.SortOrder,
 		"NOW()",
 		by,
 		"NOW()",
@@ -276,27 +226,15 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 	by := ctx.Value("user_id").(string)
 
 	return m.qb.Update(m.table).
-		Set(fieldMap["Name"], item.Name).
-		Set(fieldMap["SKU"], item.SKU).
+		Set(fieldMap["TagTypeId"], item.TagTypeId).
 		Set(fieldMap["Name"], item.Name).
 		Set(fieldMap["ShortDescription"], item.ShortDescription).
 		Set(fieldMap["Description"], item.Description).
 		Set(fieldMap["Url"], item.Url).
-		Set(fieldMap["IsTaxable"], item.IsTaxable).
-		Set(fieldMap["IsTrackStock"], item.IsTrackStock).
-		Set(fieldMap["ShippingClassID"], item.ShippingClassID).
-		Set(fieldMap["ShippingWeight"], item.ShippingWeight).
-		Set(fieldMap["ShippingWidth"], item.ShippingWidth).
-		Set(fieldMap["ShippingHeight"], item.ShippingHeight).
-		Set(fieldMap["ShippingLength"], item.ShippingLength).
-		Set(fieldMap["SeoTitle"], item.SeoTitle).
-		Set(fieldMap["SeoDescription"], item.SeoDescription).
-		Set(fieldMap["GTIN"], item.GTIN).
-		Set(fieldMap["GoogleProductCategory"], item.GoogleProductCategory).
-		Set(fieldMap["GoogleProductType"], item.GoogleProductType).
+		Set(fieldMap["Active"], item.Active).
+		Set(fieldMap["SortOrder"], item.SortOrder).
 		Set(fieldMap["UpdatedAt"], "NOW()").
-		Set(fieldMap["UpdatedBy"], by).
-		Where(fieldMap["ID"]+" = ?", item.ID)
+		Set(fieldMap["UpdatedBy"], by)
 }
 
 // makePatchStatement

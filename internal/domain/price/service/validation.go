@@ -12,34 +12,34 @@ var (
 	NoPrice       = validation.NewValidation("Price is required", "Price is required", "934725", "Price")
 )
 
-func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.Validation {
-	var validations []entity.Validation
+func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.Error {
+	var validations []entity.Error
 
 	// validate Item
 	if item != nil {
-		results := make(chan []entity.Validation)
+		results := make(chan []entity.Error)
 
 		// Start goroutines for validateName and validateUrl
 		go func() {
-			var validations []entity.Validation
+			var validations []entity.Error
 			s.validateProductID(item.ProductID, &validations)
 			results <- validations
 		}()
 
 		go func() {
-			var validations []entity.Validation
+			var validations []entity.Error
 			s.validatePriceTypeID(item.PriceTypeID, &validations)
 			results <- validations
 		}()
 
 		go func() {
-			var validations []entity.Validation
+			var validations []entity.Error
 			s.validateCurrencyID(item.CurrencyID, &validations)
 			results <- validations
 		}()
 
 		go func() {
-			var validations []entity.Validation
+			var validations []entity.Error
 			s.validatePrice(item.Price, &validations)
 			results <- validations
 		}()
@@ -53,11 +53,11 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 
 	// validate fields using goroutines and switch
 	if fields != nil {
-		results := make(chan []entity.Validation)
+		results := make(chan []entity.Error)
 
 		for field, value := range *fields {
 			go func(field string, value interface{}) {
-				var v []entity.Validation
+				var v []entity.Error
 				switch field {
 				case "ProductID":
 					s.validateProductID(value.(string), &v)
@@ -86,25 +86,25 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 	return validations
 }
 
-func (s *Service) validateProductID(productID string, validations *[]entity.Validation) {
+func (s *Service) validateProductID(productID string, validations *[]entity.Error) {
 	if productID == "" {
 		*validations = append(*validations, NoProductID)
 	}
 }
 
-func (s *Service) validatePriceTypeID(priceTypeID string, validations *[]entity.Validation) {
+func (s *Service) validatePriceTypeID(priceTypeID string, validations *[]entity.Error) {
 	if priceTypeID == "" {
 		*validations = append(*validations, NoPriceTypeID)
 	}
 }
 
-func (s *Service) validateCurrencyID(currencyID string, validations *[]entity.Validation) {
+func (s *Service) validateCurrencyID(currencyID string, validations *[]entity.Error) {
 	if currencyID == "" {
 		*validations = append(*validations, NoCurrencyID)
 	}
 }
 
-func (s *Service) validatePrice(price uint64, validations *[]entity.Validation) {
+func (s *Service) validatePrice(price uint64, validations *[]entity.Error) {
 	if price == 0 {
 		*validations = append(*validations, NoPrice)
 	}

@@ -19,7 +19,7 @@ type Tag struct {
 
 type TagFilter struct {
 	IDs       *[]string `json:"ids"`
-	URLs      *[]string `json:"urls"`
+	Urls      *[]string `json:"urls"`
 	TagTypeId *[]string `json:"tag_type_id"`
 	Active    *bool     `json:"active"`
 	Search    *string   `json:"search"`

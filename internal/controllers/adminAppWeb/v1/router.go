@@ -35,12 +35,12 @@ func (s server) router(ctx context.Context) {
 		s.Render(w, "category.page.gohtml")
 	})
 
-	// specification
+	// tag
 	http.HandleFunc("/specifications/", func(w http.ResponseWriter, r *http.Request) {
 		s.Render(w, "specifications.page.gohtml")
 	})
 	http.HandleFunc("/specification/", func(w http.ResponseWriter, r *http.Request) {
-		s.Render(w, "specification.page.gohtml")
+		s.Render(w, "tag.page.gohtml")
 	})
 
 	// page

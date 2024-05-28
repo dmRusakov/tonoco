@@ -125,6 +125,13 @@ func Update(ctx context.Context, client Client, statement sq.UpdateBuilder) erro
 		tracing.TraceVal(ctx, "Arg"+strconv.Itoa(i), argStr)
 	}
 
+	// start a transaction
+	tx, err := client.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
 	// execute the query
 	cmd, err := client.Exec(ctx, query, args...)
 	if err != nil {
@@ -135,6 +142,12 @@ func Update(ctx context.Context, client Client, statement sq.UpdateBuilder) erro
 		err = ErrNothingInserted
 		tracing.Error(ctx, err)
 
+		return err
+	}
+
+	// commit the transaction
+	err = tx.Commit(ctx)
+	if err != nil {
 		return err
 	}
 
