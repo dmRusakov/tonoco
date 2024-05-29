@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	NoName    = validation.NewValidation("Name is required", "Name is required", "jhasqq", "Name")
-	NoUrl     = validation.NewValidation("Url is required", "Url is required", "ofyjfd", "Url")
-	NoTagType = validation.NewValidation("Tag Type is required", "Type is required", "jhassq", "Type")
+	NoProduct   = validation.NewValidation("Product is required", "Product is required", "j2assq", "ProductId")
+	NoTagType   = validation.NewValidation("Tag Type is required", "Type is required", "jhassq", "TagTypeId")
+	NoTagSelect = validation.NewValidation("Tag Select is required", "Select is required", "jhafsq", "TagSelectId")
 )
 
 func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.Error {
@@ -17,28 +17,34 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 	// validate Item
 	if item != nil {
 		results := make(chan []entity.Error)
+		countTests := 0
 
-		// Start goroutines for validateName and validateUrl
+		// ProductId
 		go func() {
 			var validations []entity.Error
-			s.validateName(item.Name, &validations)
+			s.validateProduct(item.ProductId, &validations)
 			results <- validations
 		}()
+		countTests++
 
-		go func() {
-			var validations []entity.Error
-			s.validateUrl(item.Url, &validations)
-			results <- validations
-		}()
-
+		// TagTypeId
 		go func() {
 			var validations []entity.Error
 			s.validateType(item.TagTypeId, &validations)
 			results <- validations
 		}()
+		countTests++
+
+		// TagSelectId
+		go func() {
+			var validations []entity.Error
+			s.validateSelect(item.TagSelectId, &validations)
+			results <- validations
+		}()
+		countTests++
 
 		// Collect results from the channel
-		for i := 0; i < 3; i++ {
+		for i := 0; i < countTests; i++ {
 			v := <-results
 			validations = append(validations, v...)
 		}
@@ -52,14 +58,14 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 			go func(field string, value interface{}) {
 				var v []entity.Error
 				switch field {
-				case "Name":
-					s.validateName(value.(string), &v)
+				case "ProductId":
+					s.validateProduct(value.(string), &v)
 					break
-				case "Url":
-					s.validateUrl(value.(string), &v)
-					break
-				case "Type":
+				case "TagTypeId":
 					s.validateType(value.(string), &v)
+					break
+				case "TagSelectId":
+					s.validateSelect(value.(string), &v)
 					break
 				}
 
@@ -77,20 +83,23 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 	return validations
 }
 
-func (s *Service) validateName(name string, validations *[]entity.Error) {
-	if name == "" {
-		*validations = append(*validations, NoName)
+// ProductId
+func (s *Service) validateProduct(p string, validations *[]entity.Error) {
+	if p == "" {
+		*validations = append(*validations, NoProduct)
 	}
 }
 
-func (s *Service) validateUrl(url string, validations *[]entity.Error) {
-	if url == "" {
-		*validations = append(*validations, NoUrl)
-	}
-}
-
+// TagTypeId
 func (s *Service) validateType(t string, validations *[]entity.Error) {
 	if t == "" {
 		*validations = append(*validations, NoTagType)
+	}
+}
+
+// TagSelectId
+func (s *Service) validateSelect(t string, validations *[]entity.Error) {
+	if t == "" {
+		*validations = append(*validations, NoTagSelect)
 	}
 }

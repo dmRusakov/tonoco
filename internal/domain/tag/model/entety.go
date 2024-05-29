@@ -14,29 +14,27 @@ type Filter = entity.TagFilter
 
 // fieldMap
 var fieldMap = map[string]string{
-	"ID":               "id",
-	"TagTypeId":        "tag_type_id",
-	"Name":             "name",
-	"ShortDescription": "short_description",
-	"Description":      "description",
-	"Url":              "url",
-	"Active":           "active",
-	"SortOrder":        "sort_order",
-	"CreatedAt":        "created_at",
-	"CreatedBy":        "created_by",
-	"UpdatedAt":        "updated_at",
-	"UpdatedBy":        "updated_by",
+	"ID":          "id",
+	"ProductId":   "product_id",
+	"TagTypeId":   "tag_type_id",
+	"TagSelectId": "tag_select_id",
+	"Value":       "value",
+	"Active":      "active",
+	"SortOrder":   "sort_order",
+	"CreatedAt":   "created_at",
+	"CreatedBy":   "created_by",
+	"UpdatedAt":   "updated_at",
+	"UpdatedBy":   "updated_by",
 }
 
 // makeStatement
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
 		fieldMap["ID"],
+		fieldMap["ProductId"],
 		fieldMap["TagTypeId"],
-		fieldMap["Name"],
-		fieldMap["ShortDescription"],
-		fieldMap["Description"],
-		fieldMap["Url"],
+		fieldMap["TagSelectId"],
+		fieldMap["Value"],
 		fieldMap["Active"],
 		fieldMap["SortOrder"],
 		fieldMap["CreatedAt"],
@@ -107,40 +105,24 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		}
 	}
 
-	// Urls
-	if filter.Urls != nil {
-		countUrls := len(*filter.Urls)
-
-		if countUrls > 0 {
-			statement = statement.Where(sq.Eq{fieldMap["Url"]: *filter.Urls})
-		}
-
-		*filter.Page = 1
-		if (*filter.PerPage) > uint64(countUrls) {
-			*filter.PerPage = uint64(countUrls)
-		}
+	// ProductIDs
+	if filter.ProductIDs != nil {
+		statement = statement.Where(sq.Eq{fieldMap["ProductId"]: *filter.ProductIDs})
 	}
 
-	// Type
-	if filter.TagTypeId != nil {
-		statement = statement.Where(sq.Eq{fieldMap["Type"]: *filter.TagTypeId})
+	// TagTypeId
+	if filter.TagTypeIDs != nil {
+		statement = statement.Where(sq.Eq{fieldMap["Type"]: *filter.TagTypeIDs})
+	}
+
+	// TagSelectIDs
+	if filter.TagSelectIDs != nil {
+		statement = statement.Where(sq.Eq{fieldMap["TagSelectId"]: *filter.TagSelectIDs})
 	}
 
 	// Active
 	if filter.Active != nil {
 		statement = statement.Where(sq.Eq{fieldMap["Active"]: *filter.Active})
-	}
-
-	// Search
-	if filter.Search != nil {
-		statement = statement.Where(
-			sq.Or{
-				sq.Expr("LOWER("+fieldMap["Name"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["Url"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["ShortDescription"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["Description"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-			},
-		)
 	}
 
 	// Add OrderBy, OrderDir, Page, Limit and return
@@ -153,11 +135,10 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	var item = &Item{}
 	err := rows.Scan(
 		&item.ID,
+		&item.ProductId,
 		&item.TagTypeId,
-		&item.Name,
-		&item.ShortDescription,
-		&item.Description,
-		&item.Url,
+		&item.TagSelectId,
+		&item.Value,
 		&item.Active,
 		&item.SortOrder,
 		&item.CreatedAt,
@@ -191,11 +172,10 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 
 	insertItem := m.qb.Insert(m.table).Columns(
 		fieldMap["ID"],
+		fieldMap["ProductId"],
 		fieldMap["TagTypeId"],
-		fieldMap["Name"],
-		fieldMap["ShortDescription"],
-		fieldMap["Description"],
-		fieldMap["Url"],
+		fieldMap["TagSelectId"],
+		fieldMap["Value"],
 		fieldMap["Active"],
 		fieldMap["SortOrder"],
 		fieldMap["CreatedAt"],
@@ -204,11 +184,10 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		fieldMap["UpdatedBy"],
 	).Values(
 		item.ID,
+		item.ProductId,
 		item.TagTypeId,
-		item.Name,
-		item.ShortDescription,
-		item.Description,
-		item.Url,
+		item.TagSelectId,
+		item.Value,
 		item.Active,
 		item.SortOrder,
 		"NOW()",
@@ -226,11 +205,10 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 	by := ctx.Value("user_id").(string)
 
 	return m.qb.Update(m.table).
+		Set(fieldMap["ProductId"], item.ProductId).
 		Set(fieldMap["TagTypeId"], item.TagTypeId).
-		Set(fieldMap["Name"], item.Name).
-		Set(fieldMap["ShortDescription"], item.ShortDescription).
-		Set(fieldMap["Description"], item.Description).
-		Set(fieldMap["Url"], item.Url).
+		Set(fieldMap["TagSelectId"], item.TagSelectId).
+		Set(fieldMap["Value"], item.Value).
 		Set(fieldMap["Active"], item.Active).
 		Set(fieldMap["SortOrder"], item.SortOrder).
 		Set(fieldMap["UpdatedAt"], "NOW()").

@@ -23,8 +23,14 @@ func (uc *UseCase) GetProductList(
 		return nil, err
 	}
 
+	// get tags
+	tag, err := uc.tag.List(ctx, &entity.TagFilter{
+		ProductIDs: productIds,
+		TagTypeIDs: tagTypeIds,
+	})
+
 	fmt.Println(tagTypes, "products:26")
-	fmt.Println(tagTypeIds, "products:27")
+	fmt.Println(tag, "products:27")
 	fmt.Println(productIds, "products:28")
 
 	// dto
