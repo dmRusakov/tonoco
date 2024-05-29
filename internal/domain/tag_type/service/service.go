@@ -12,7 +12,7 @@ type Filter = entity.TagTypeFilter
 
 type repository interface {
 	Get(ctx context.Context, id *string, url *string) (*Item, []error)
-	List(context.Context, *Filter) ([]*Item, []error)
+	List(context.Context, *Filter) (*[]Item, *[]string, []error)
 	Create(context.Context, *Item) (*string, []error)
 	Update(context.Context, *Item) []error
 	Patch(context.Context, *string, *map[string]interface{}) []error
@@ -34,7 +34,7 @@ func (s *Service) Get(ctx context.Context, id *string, url *string) (*Item, erro
 	return s.repository.Get(ctx, id, url)
 }
 
-func (s *Service) List(ctx context.Context, filter *Filter) ([]*Item, error) {
+func (s *Service) List(ctx context.Context, filter *Filter) (*[]Item, *[]string, error) {
 	return s.repository.List(ctx, filter)
 }
 

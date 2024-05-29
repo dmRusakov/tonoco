@@ -8,9 +8,9 @@ import (
 	price_type_service "github.com/dmRusakov/tonoco/internal/domain/price_type/service"
 	product_info_service "github.com/dmRusakov/tonoco/internal/domain/product_info/service"
 	store_service "github.com/dmRusakov/tonoco/internal/domain/store/service"
-	specification_service "github.com/dmRusakov/tonoco/internal/domain/tag/service"
-	specification_value_service "github.com/dmRusakov/tonoco/internal/domain/tag_select/service"
-	specification_type_service "github.com/dmRusakov/tonoco/internal/domain/tag_type/service"
+	tag_service "github.com/dmRusakov/tonoco/internal/domain/tag/service"
+	tag_select_service "github.com/dmRusakov/tonoco/internal/domain/tag_select/service"
+	tag_type_service "github.com/dmRusakov/tonoco/internal/domain/tag_type/service"
 	warehouse_service "github.com/dmRusakov/tonoco/internal/domain/warehouse/service"
 	"github.com/dmRusakov/tonoco/pkg/common/core/clock"
 	"time"
@@ -28,17 +28,17 @@ type UseCase struct {
 	identity IdentityGenerator
 	clock    Clock
 
-	currency           *currency_service.Service
-	file               *file_service.Service
-	folder             *folder_service.Service
-	price              *price_service.Service
-	priceType          *price_type_service.Service
-	productInfo        *product_info_service.Service
-	specification      *specification_service.Service
-	specificationType  *specification_type_service.Service
-	specificationValue *specification_value_service.Service
-	store              *store_service.Service
-	warehouse          *warehouse_service.Service
+	currency    *currency_service.Service
+	file        *file_service.Service
+	folder      *folder_service.Service
+	price       *price_service.Service
+	priceType   *price_type_service.Service
+	productInfo *product_info_service.Service
+	tag         *tag_service.Service
+	tagType     *tag_type_service.Service
+	tagSelect   *tag_select_service.Service
+	store       *store_service.Service
+	warehouse   *warehouse_service.Service
 }
 
 func NewProductUseCase(
@@ -51,9 +51,9 @@ func NewProductUseCase(
 	priceService *price_service.Service,
 	priceTypeService *price_type_service.Service,
 	productInfoService *product_info_service.Service,
-	specificationService *specification_service.Service,
-	specificationTypeService *specification_type_service.Service,
-	specificationValueService *specification_value_service.Service,
+	tagService *tag_service.Service,
+	tagTypeService *tag_type_service.Service,
+	tagSelect *tag_select_service.Service,
 	storeService *store_service.Service,
 	warehouseService *warehouse_service.Service,
 ) *UseCase {
@@ -61,16 +61,16 @@ func NewProductUseCase(
 		identity: identity,
 		clock:    clock,
 
-		currency:           currencyService,
-		file:               fileService,
-		folder:             folderService,
-		price:              priceService,
-		priceType:          priceTypeService,
-		productInfo:        productInfoService,
-		specification:      specificationService,
-		specificationType:  specificationTypeService,
-		specificationValue: specificationValueService,
-		store:              storeService,
-		warehouse:          warehouseService,
+		currency:    currencyService,
+		file:        fileService,
+		folder:      folderService,
+		price:       priceService,
+		priceType:   priceTypeService,
+		productInfo: productInfoService,
+		tag:         tagService,
+		tagType:     tagTypeService,
+		tagSelect:   tagSelect,
+		store:       storeService,
+		warehouse:   warehouseService,
 	}
 }

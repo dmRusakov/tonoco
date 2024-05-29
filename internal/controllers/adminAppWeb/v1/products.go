@@ -43,7 +43,9 @@ func (s server) RenderProducts(
 		return
 	}
 
-	fmt.Println(products, "products:37")
+	// get tag_types with `list_item` type
+
+	fmt.Println(products[2], "products:37")
 
 	// Use tmpl and params here
 	// render page

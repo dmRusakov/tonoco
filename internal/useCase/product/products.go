@@ -2,6 +2,7 @@ package product
 
 import (
 	"context"
+	"fmt"
 	"github.com/dmRusakov/tonoco/internal/entity"
 )
 
@@ -10,14 +11,25 @@ func (uc *UseCase) GetProductList(
 	parameters *entity.ProductsUrlParameters,
 ) ([]entity.ProductListItem, error) {
 	// get products
-	products, err := uc.productInfo.List(ctx, &entity.ProductInfoFilter{})
+	products, productIds, err := uc.productInfo.List(ctx, &entity.ProductInfoFilter{})
 	if err != nil {
 		return nil, err
 	}
 
+	// get tag_types with `list_item` type
+	listItem := true
+	tagTypes, tagTypeIds, err := uc.tagType.List(ctx, &entity.TagTypeFilter{ListItem: &listItem})
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(tagTypes, "products:26")
+	fmt.Println(tagTypeIds, "products:27")
+	fmt.Println(productIds, "products:28")
+
 	// dto
 	var productsDto []entity.ProductListItem
-	for _, product := range products {
+	for _, product := range *products {
 		productsDto = append(productsDto, entity.ProductListItem{
 			ID:               product.ID,
 			SKU:              product.SKU,

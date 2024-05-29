@@ -9,7 +9,7 @@ import (
 
 type Storage interface {
 	Get(ctx context.Context, id *string, url *string) (*Item, error)
-	List(context.Context, *Filter) ([]*Item, error)
+	List(context.Context, *Filter) (*[]Item, *[]string, error)
 	Create(context.Context, *Item) (*string, error)
 	Update(context.Context, *Item) error
 	Patch(context.Context, *string, *map[string]interface{}) error

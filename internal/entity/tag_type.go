@@ -26,6 +26,7 @@ type TagType struct {
 type TagTypeFilter struct {
 	IDs      *[]string
 	URLs     *[]string
+	Required *bool
 	Active   *bool
 	Prime    *bool
 	ListItem *bool
