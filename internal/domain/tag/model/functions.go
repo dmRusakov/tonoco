@@ -17,24 +17,25 @@ func (m *Model) Get(ctx context.Context, id *string, url *string) (*Item, error)
 	return m.scanOneRow(ctx, rows)
 }
 
-func (m *Model) List(ctx context.Context, filter *Filter) ([]*Item, error) {
-	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter))
+func (m *Model) List(ctx context.Context, filter *Filter) (*[]Item, error) {
+	statement := m.makeStatementByFilter(filter)
+	rows, err := psql.List(ctx, m.client, statement)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
 	// iterate over the result set
-	var items []*Item
+	var items []Item
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
 		if err != nil {
 			return nil, err
 		}
-		items = append(items, item)
+		items = append(items, *item)
 	}
+	defer rows.Close()
 
-	return items, nil
+	return &items, nil
 }
 
 func (m *Model) Create(ctx context.Context, item *Item) (*string, error) {

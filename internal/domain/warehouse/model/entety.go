@@ -129,16 +129,20 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		*filter.OrderDir = "ASC"
 	}
 
+	// PerPage
+	if filter.PerPage == nil {
+		filter.PerPage = new(uint64)
+		if filter.Page == nil {
+			*filter.PerPage = 999999999999999999
+		} else {
+			*filter.PerPage = 10
+		}
+	}
+
 	// Page
 	if filter.Page == nil {
 		filter.Page = new(uint64)
 		*filter.Page = 1
-	}
-
-	// PerPage
-	if filter.PerPage == nil {
-		filter.PerPage = new(uint64)
-		*filter.PerPage = 10
 	}
 
 	// Add OrderBy, OrderDir, Page, Limit and return

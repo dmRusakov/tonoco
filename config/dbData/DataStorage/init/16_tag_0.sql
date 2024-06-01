@@ -49,6 +49,29 @@ CREATE TRIGGER tag_updated_at
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();
 
+-- auto update sort_order by product_id, tag_type_id and tag_select_id
+CREATE OR REPLACE FUNCTION update_tag_sort_order_for_tag()
+    RETURNS TRIGGER
+    LANGUAGE PLPGSQL
+AS $$
+BEGIN
+    UPDATE public.tag
+    SET sort_order = sort_order + 1
+    WHERE product_id = NEW.product_id
+      AND tag_type_id = NEW.tag_type_id
+      AND tag_select_id = NEW.tag_select_id
+      AND sort_order >= NEW.sort_order;
+
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER update_tag_sort_order_for_tag
+    BEFORE INSERT
+    ON public.tag
+    FOR EACH ROW
+EXECUTE FUNCTION update_tag_sort_order_for_tag();
+
 -- SELECT
 --     CONCAT('(select id from public.product_info where sku = "', T.product_sku, '")') as product_id,
 --     CONCAT('(select id from public.tag_type where url = "', T.tag_type_url, '")') as tag_type_id,

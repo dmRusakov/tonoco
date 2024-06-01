@@ -2,7 +2,6 @@ package admin_app_web_v1
 
 import (
 	"context"
-	"fmt"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	"html/template"
 	"net/http"
@@ -37,15 +36,13 @@ func (s server) RenderProducts(
 	wg.Wait()
 
 	// get products
-	products, err := s.productUseCase.GetProductList(ctx, params)
+	_, err := s.productUseCase.GetProductList(ctx, params)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// get tag_types with `list_item` type
-
-	fmt.Println(products[2], "products:37")
 
 	// Use tmpl and params here
 	// render page

@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
@@ -76,16 +77,20 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		*filter.OrderDir = "ASC"
 	}
 
+	// PerPage
+	if filter.PerPage == nil {
+		filter.PerPage = new(uint64)
+		if filter.Page == nil {
+			*filter.PerPage = 999999999999999999
+		} else {
+			*filter.PerPage = 10
+		}
+	}
+
 	// Page
 	if filter.Page == nil {
 		filter.Page = new(uint64)
 		*filter.Page = 1
-	}
-
-	// PerPage
-	if filter.PerPage == nil {
-		filter.PerPage = new(uint64)
-		*filter.PerPage = 10
 	}
 
 	// Build query
@@ -112,7 +117,7 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 	// TagTypeId
 	if filter.TagTypeIDs != nil {
-		statement = statement.Where(sq.Eq{fieldMap["Type"]: *filter.TagTypeIDs})
+		statement = statement.Where(sq.Eq{fieldMap["TagTypeId"]: *filter.TagTypeIDs})
 	}
 
 	// TagSelectIDs
@@ -132,13 +137,15 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 // scanOneRow
 func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
-	var item = &Item{}
+	var item = Item{}
+	var productId, tagTypeId, tagSelectId, value sql.NullString
+
 	err := rows.Scan(
 		&item.ID,
-		&item.ProductId,
-		&item.TagTypeId,
-		&item.TagSelectId,
-		&item.Value,
+		&productId,
+		&tagTypeId,
+		&tagSelectId,
+		&value,
 		&item.Active,
 		&item.SortOrder,
 		&item.CreatedAt,
@@ -153,7 +160,35 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 		return nil, err
 	}
 
-	return item, nil
+	// if productId if null, set it to empty string
+	if productId.Valid {
+		item.ProductId = productId.String
+	} else {
+		item.ProductId = ""
+	}
+
+	// if tagTypeId if null, set it to empty string
+	if tagTypeId.Valid {
+		item.TagTypeId = tagTypeId.String
+	} else {
+		item.TagTypeId = ""
+	}
+
+	// if tagSelectId if null, set it to empty string
+	if tagSelectId.Valid {
+		item.TagSelectId = tagSelectId.String
+	} else {
+		item.TagSelectId = ""
+	}
+
+	// if value if null, set it to empty string
+	if value.Valid {
+		item.Value = value.String
+	} else {
+		item.Value = ""
+	}
+
+	return &item, nil
 }
 
 // makeInsertStatement

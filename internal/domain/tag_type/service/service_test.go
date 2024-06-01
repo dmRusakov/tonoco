@@ -290,11 +290,11 @@ func list(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call List method
-			result, err := storage.List(initContext(), tc.filter)
+			result, _, err := storage.List(initContext(), tc.filter)
 			assert.NoError(t, err)
 
 			// Assert that the result length is equal to the expected length
-			assert.Len(t, result, tc.count)
+			assert.Len(t, *result, tc.count)
 		})
 	}
 }

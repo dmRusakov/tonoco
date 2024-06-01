@@ -18,7 +18,9 @@ func (uc *UseCase) GetProductList(
 
 	// get tag_types with `list_item` type
 	listItem := true
-	tagTypes, tagTypeIds, err := uc.tagType.List(ctx, &entity.TagTypeFilter{ListItem: &listItem})
+	_, tagTypeIds, err := uc.tagType.List(ctx, &entity.TagTypeFilter{
+		ListItem: &listItem,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -28,10 +30,11 @@ func (uc *UseCase) GetProductList(
 		ProductIDs: productIds,
 		TagTypeIDs: tagTypeIds,
 	})
+	if err != nil {
+		return nil, err
+	}
 
-	fmt.Println(tagTypes, "products:26")
-	fmt.Println(tag, "products:27")
-	fmt.Println(productIds, "products:28")
+	fmt.Println(tag, "products:37")
 
 	// dto
 	var productsDto []entity.ProductListItem
