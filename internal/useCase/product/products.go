@@ -11,10 +11,19 @@ func (uc *UseCase) GetProductList(
 	parameters *entity.ProductsUrlParameters,
 ) ([]entity.ProductListItem, error) {
 	// get products
-	products, productIds, err := uc.productInfo.List(ctx, &entity.ProductInfoFilter{})
+	page := uint64(2)
+	perPage := uint64(10)
+	productFilter := entity.ProductInfoFilter{
+		Page:    &page,
+		PerPage: &perPage,
+	}
+	products, err := uc.productInfo.List(ctx, &productFilter)
 	if err != nil {
+		fmt.Println(err, "products:17")
 		return nil, err
 	}
+
+	fmt.Println(products, "products:20")
 
 	// get tag_types with `list_item` type
 	listItem := true
@@ -26,15 +35,16 @@ func (uc *UseCase) GetProductList(
 	}
 
 	// get tags
-	tag, err := uc.tag.List(ctx, &entity.TagFilter{
-		ProductIDs: productIds,
+	tagFilter := entity.TagFilter{
+		ProductIDs: productFilter.IDs,
 		TagTypeIDs: tagTypeIds,
-	})
+	}
+	_, err = uc.tag.List(ctx, &tagFilter)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println(tag, "products:37")
+	fmt.Printf("%+v\nproducts:38\n", tagFilter.TagTypeIDs)
 
 	// dto
 	var productsDto []entity.ProductListItem

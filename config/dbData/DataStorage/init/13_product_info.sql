@@ -6,29 +6,26 @@ CREATE TABLE IF NOT EXISTS public.product_info
 (
     id                      UUID UNIQUE         DEFAULT uuid_generate_v4(),
     sku                     VARCHAR(100) UNIQUE NOT NULL,
-    name                    VARCHAR(255)        NOT NULL,
-    short_description       VARCHAR(1000)       NOT NULL DEFAULT '',
-    description             VARCHAR(4000)       NOT NULL DEFAULT '',
-    sort_order              INTEGER             NOT NULL,
+    name                    VARCHAR(255)        DEFAULT NULL,
+    short_description       VARCHAR(1000)       DEFAULT NULL,
+    description             VARCHAR(4000)       DEFAULT NULL,
+    sort_order              INTEGER             DEFAULT NULL,
     url                     VARCHAR(255) UNIQUE NOT NULL,
-    is_taxable              BOOLEAN             NOT NULL DEFAULT true,
-    is_track_stock          BOOLEAN             NOT NULL DEFAULT TRUE,
-
-    shipping_weight         REAL                NOT NULL DEFAULT 0 ,
-    shipping_width          REAL                NOT NULL DEFAULT 0,
-    shipping_height         REAL                NOT NULL DEFAULT 0,
-    shipping_length         REAL                NOT NULL DEFAULT 0,
-
-    seo_title               VARCHAR(100)        NOT NULL DEFAULT '',
-    seo_description         VARCHAR(4000)       NOT NULL DEFAULT '',
-    gtin                    VARCHAR(50)         NOT NULL DEFAULT '',
-    google_product_category VARCHAR(50)         NOT NULL DEFAULT '',
-    google_product_type     VARCHAR(100)        NOT NULL DEFAULT '',
-
+    is_taxable              BOOLEAN             DEFAULT TRUE,
+    is_track_stock          BOOLEAN             DEFAULT TRUE,
+    shipping_weight         INTEGER             DEFAULT NULL ,
+    shipping_width          INTEGER             DEFAULT NULL,
+    shipping_height         INTEGER             DEFAULT NULL,
+    shipping_length         INTEGER             DEFAULT NULL,
+    seo_title               VARCHAR(100)        DEFAULT NULL,
+    seo_description         VARCHAR(4000)       DEFAULT NULL,
+    gtin                    VARCHAR(50)         DEFAULT NULL,
+    google_product_category VARCHAR(50)         DEFAULT NULL,
+    google_product_type     VARCHAR(100)        DEFAULT NULL,
     created_at              TIMESTAMP           NOT NULL DEFAULT NOW(),
-    created_by              UUID                         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
+    created_by              UUID                         DEFAULT NULL,
     updated_at              TIMESTAMP           NOT NULL DEFAULT NOW(),
-    updated_by              UUID                         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
+    updated_by              UUID                         DEFAULT NULL,
 
     CONSTRAINT product_id_pkey PRIMARY KEY (id)
 );
@@ -78,7 +75,7 @@ CREATE TRIGGER product_order
 EXECUTE FUNCTION set_order_column_universal();
 
 -- show table
-SELECT * FROM public.product_info;
+SELECT * FROM public.product_info where id = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd333398';
 
 -- demo data
 INSERT INTO public.product_info (id, sku, name, short_description, description, sort_order, url, shipping_weight, shipping_length, shipping_width, shipping_height, seo_title, seo_description, gtin, google_product_category, google_product_type)

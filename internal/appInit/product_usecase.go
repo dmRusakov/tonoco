@@ -62,7 +62,6 @@ func (a *App) ProductUseCaseInit() (err error) {
 	// product
 	productInfoStorage := product_info_model.NewStorage(a.SqlDB)
 	productInfoService := product_info_service.NewService(productInfoStorage)
-
 	// warehouse
 	warehouseStorage := warehouse_model.NewStorage(a.SqlDB)
 	warehouseService := warehouse_service.NewService(warehouseStorage)

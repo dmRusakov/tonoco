@@ -17,24 +17,49 @@ func (m *Model) Get(ctx context.Context, id *string, url *string) (*Item, error)
 	return m.scanOneRow(ctx, rows)
 }
 
-func (m *Model) List(ctx context.Context, filter *Filter) (*[]Item, error) {
-	statement := m.makeStatementByFilter(filter)
-	rows, err := psql.List(ctx, m.client, statement)
+func (m *Model) List(ctx context.Context, filter *Filter) (*map[string]Item, error) {
+	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter))
+	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
 
 	// iterate over the result set
-	var items []Item
+	items := make(map[string]Item)
+	var IDs, ProductIDs, TagTypeIDs, TagSelectIDs []string
+	idsMap := make(map[string]bool)
+	productIDsMap := make(map[string]bool)
+	tagTypeIDsMap := make(map[string]bool)
+	tagSelectIDsMap := make(map[string]bool)
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
 		if err != nil {
 			return nil, err
 		}
-		items = append(items, *item)
-	}
-	defer rows.Close()
+		items[item.ID] = *item
+		IDs = append(IDs, item.ID)
+		idsMap[item.ID] = true
 
+		if item.ProductId != "" && !productIDsMap[item.ProductId] {
+			ProductIDs = append(ProductIDs, item.ProductId)
+			productIDsMap[item.ProductId] = true
+		}
+		if item.TagTypeId != "" && !tagTypeIDsMap[item.TagTypeId] {
+			TagTypeIDs = append(TagTypeIDs, item.TagTypeId)
+			tagTypeIDsMap[item.TagTypeId] = true
+		}
+		if item.TagSelectId != "" && !tagSelectIDsMap[item.TagSelectId] {
+			TagSelectIDs = append(TagSelectIDs, item.TagSelectId)
+			tagSelectIDsMap[item.TagSelectId] = true
+		}
+	}
+
+	// update the filter
+	filter.IDs = &IDs
+	filter.ProductIDs = &ProductIDs
+	filter.TagTypeIDs = &TagTypeIDs
+
+	// done
 	return &items, nil
 }
 
@@ -51,7 +76,7 @@ func (m *Model) Update(ctx context.Context, item *Item) (err error) {
 	return psql.Update(
 		ctx,
 		m.client,
-		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), item.ID),
+		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.fieldMap("ID")), item.ID),
 	)
 }
 
@@ -67,7 +92,7 @@ func (m *Model) Delete(ctx context.Context, id *string) error {
 	return psql.Delete(
 		ctx,
 		m.client,
-		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), id),
+		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.fieldMap("ID")), id),
 	)
 }
 
@@ -75,7 +100,7 @@ func (m *Model) UpdatedAt(ctx context.Context, id *string) (*time.Time, error) {
 	return psql.UpdatedAt(
 		ctx,
 		m.client,
-		m.qb.Select(fieldMap["UpdatedAt"]).From(m.table).Where("id = ?", id),
+		m.qb.Select(m.fieldMap("UpdatedAt")).From(m.table).Where("id = ?", id),
 	)
 }
 

@@ -12,9 +12,9 @@ CREATE TABLE IF NOT EXISTS public.tag
     active        BOOLEAN      DEFAULT TRUE,
     sort_order    INTEGER      DEFAULT 0,
     created_at    TIMESTAMP    DEFAULT NOW() NOT NULL,
-    created_by    UUID         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
+    created_by    UUID         DEFAULT NULL,
     updated_at    TIMESTAMP    DEFAULT NOW() NOT NULL,
-    updated_by    UUID         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
+    updated_by    UUID         DEFAULT NULL,
 
     CONSTRAINT tag_pkey PRIMARY KEY (id)
 );
@@ -45,7 +45,7 @@ COMMENT ON COLUMN public.tag.updated_by IS 'Updated By';
 -- auto update updated_at
 CREATE TRIGGER tag_updated_at
     BEFORE UPDATE
-    ON public.user
+    ON public.tag
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();
 
