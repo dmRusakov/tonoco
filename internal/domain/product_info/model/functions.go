@@ -18,11 +18,12 @@ func (m *Model) Get(ctx context.Context, id *string, url *string) (*Item, error)
 }
 
 func (m *Model) List(ctx context.Context, filter *Filter) (*map[string]Item, error) {
-	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter))
-	defer rows.Close()
+	statement := m.makeStatementByFilter(filter)
+	rows, err := psql.List(ctx, m.client, statement)
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	// iterate over the result set
 	items := make(map[string]Item)

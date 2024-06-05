@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS public.tag
     tag_select_id UUID         DEFAULT NULL,
     value         VARCHAR(255) DEFAULT NULL,
     active        BOOLEAN      DEFAULT TRUE,
-    sort_order    INTEGER      DEFAULT 0,
+    sort_order    INTEGER      DEFAULT NULL,
     created_at    TIMESTAMP    DEFAULT NOW() NOT NULL,
     created_by    UUID         DEFAULT NULL,
     updated_at    TIMESTAMP    DEFAULT NOW() NOT NULL,

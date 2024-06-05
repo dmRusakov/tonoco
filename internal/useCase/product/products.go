@@ -10,45 +10,40 @@ func (uc *UseCase) GetProductList(
 	ctx context.Context,
 	parameters *entity.ProductsUrlParameters,
 ) ([]entity.ProductListItem, error) {
-	// get products
-	page := uint64(2)
-	perPage := uint64(10)
-	productFilter := entity.ProductInfoFilter{
-		Page:    &page,
-		PerPage: &perPage,
+	// get productInfos
+	productInfoFilter := entity.ProductInfoFilter{
+		Page:    entity.Uint64Ptr(2),
+		PerPage: entity.Uint64Ptr(10),
 	}
-	products, err := uc.productInfo.List(ctx, &productFilter)
+	productInfos, err := uc.productInfo.List(ctx, &productInfoFilter)
 	if err != nil {
-		fmt.Println(err, "products:17")
 		return nil, err
 	}
 
-	fmt.Println(products, "products:20")
-
 	// get tag_types with `list_item` type
-	listItem := true
-	_, tagTypeIds, err := uc.tagType.List(ctx, &entity.TagTypeFilter{
-		ListItem: &listItem,
-	})
+	tagTypeFilter := entity.TagTypeFilter{
+		ListItem: entity.BoolPtr(true),
+	}
+	_, err = uc.tagType.List(ctx, &tagTypeFilter)
 	if err != nil {
 		return nil, err
 	}
 
 	// get tags
 	tagFilter := entity.TagFilter{
-		ProductIDs: productFilter.IDs,
-		TagTypeIDs: tagTypeIds,
+		ProductIDs: productInfoFilter.IDs,
+		TagTypeIDs: tagTypeFilter.IDs,
 	}
 	_, err = uc.tag.List(ctx, &tagFilter)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Printf("%+v\nproducts:38\n", tagFilter.TagTypeIDs)
+	fmt.Printf("%+v\nproductInfos:38\n", tagFilter.TagTypeIDs)
 
 	// dto
 	var productsDto []entity.ProductListItem
-	for _, product := range *products {
+	for _, product := range *productInfos {
 		productsDto = append(productsDto, entity.ProductListItem{
 			ID:               product.ID,
 			SKU:              product.SKU,

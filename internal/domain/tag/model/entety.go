@@ -60,30 +60,26 @@ func (m *Model) makeGetStatement(id *string, url *string) sq.SelectBuilder {
 func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	// OrderBy
 	if filter.OrderBy == nil {
-		filter.OrderBy = new(string)
-		*filter.OrderBy = "SortOrder"
+		filter.OrderBy = entity.StringPtr("SortOrder")
 	}
 
 	// OrderDir
 	if filter.OrderDir == nil {
-		filter.OrderDir = new(string)
-		*filter.OrderDir = "ASC"
+		filter.OrderDir = entity.StringPtr("ASC")
 	}
 
 	// PerPage
 	if filter.PerPage == nil {
-		filter.PerPage = new(uint64)
 		if filter.Page == nil {
-			*filter.PerPage = 999999999999999999
+			filter.PerPage = entity.Uint64Ptr(999999999999999999)
 		} else {
-			*filter.PerPage = 10
+			filter.PerPage = entity.Uint64Ptr(10)
 		}
 	}
 
 	// Page
 	if filter.Page == nil {
-		filter.Page = new(uint64)
-		*filter.Page = 1
+		filter.Page = entity.Uint64Ptr(1)
 	}
 
 	// Build query

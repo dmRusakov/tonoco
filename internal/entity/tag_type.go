@@ -3,24 +3,24 @@ package entity
 import "time"
 
 type TagType struct {
-	ID               string    `json:"id" sql:"id"`
-	Name             string    `json:"name" sql:"name"`
-	Url              string    `json:"url" sql:"url"`
-	ShortDescription string    `json:"short_description" sql:"short_description"`
-	Description      string    `json:"description" sql:"description"`
-	Required         bool      `json:"required" sql:"required"`
-	Active           bool      `json:"active" sql:"active"`
-	Prime            bool      `json:"prime" sql:"prime"`
-	ListItem         bool      `json:"list_item" sql:"list_item"`
-	Filter           bool      `json:"filter" sql:"filter"`
-	SortOrder        uint64    `json:"sort_order" sql:"sort_order"`
-	Type             string    `json:"type" sql:"type"`
-	Prefix           string    `json:"prefix" sql:"prefix"`
-	Suffix           string    `json:"suffix" sql:"suffix"`
-	CreatedAt        time.Time `json:"created_at" sql:"created_at"`
-	CreatedBy        string    `json:"created_by" sql:"created_by"`
-	UpdatedAt        time.Time `json:"updated_at" sql:"updated_at"`
-	UpdatedBy        string    `json:"updated_by" sql:"updated_by"`
+	ID               string    `json:"id" db:"id"`
+	Name             string    `json:"name" db:"name"`
+	Url              string    `json:"url" db:"url"`
+	ShortDescription string    `json:"short_description" db:"short_description"`
+	Description      string    `json:"description" db:"description"`
+	Required         bool      `json:"required" db:"required"`
+	Active           bool      `json:"active" db:"active"`
+	Prime            bool      `json:"prime" db:"prime"`
+	ListItem         bool      `json:"list_item" db:"list_item"`
+	Filter           bool      `json:"filter" db:"filter"`
+	SortOrder        uint64    `json:"sort_order" db:"sort_order"`
+	Type             string    `json:"type" db:"type"`
+	Prefix           string    `json:"prefix" db:"prefix"`
+	Suffix           string    `json:"suffix" db:"suffix"`
+	CreatedAt        time.Time `json:"created_at" db:"created_at"`
+	CreatedBy        string    `json:"created_by" db:"created_by"`
+	UpdatedAt        time.Time `json:"updated_at" db:"updated_at"`
+	UpdatedBy        string    `json:"updated_by" db:"updated_by"`
 }
 
 type TagTypeFilter struct {

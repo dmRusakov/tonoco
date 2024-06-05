@@ -5,24 +5,24 @@ DROP TABLE IF EXISTS public.tag_type CASCADE;
 CREATE TABLE IF NOT EXISTS public.tag_type
 (
     id                UUID UNIQUE DEFAULT uuid_generate_v4() NOT NULL,
-    name              varchar(255)  NOT NULL,
-    url               varchar(255)  NOT NULL,
-    short_description VARCHAR(255)  DEFAULT '',
-    description       VARCHAR(6000) DEFAULT '',
+    name              varchar(255)  DEFAULT NULL,
+    url               varchar(255)  DEFAULT NULL,
+    short_description VARCHAR(255)  DEFAULT NULL,
+    description       VARCHAR(6000) DEFAULT NULL,
     required          BOOLEAN       DEFAULT FALSE,
     active            BOOLEAN       DEFAULT TRUE,
     prime             BOOLEAN       DEFAULT FALSE,
     list_item         BOOLEAN       DEFAULT FALSE,
     filter            BOOLEAN       DEFAULT FALSE,
-    sort_order        INTEGER       DEFAULT 0,
-    type              VARCHAR(50)   DEFAULT '',
-    prefix            VARCHAR(50)   DEFAULT '',
-    suffix            VARCHAR(50)   DEFAULT '',
+    sort_order        INTEGER       DEFAULT NULL,
+    type              VARCHAR(50)   DEFAULT NULL,
+    prefix            VARCHAR(50)   DEFAULT NULL,
+    suffix            VARCHAR(50)   DEFAULT NULL,
 
     created_at TIMESTAMP    DEFAULT NOW()               NOT NULL,
-    created_by UUID         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' NOT NULL,
+    created_by UUID         DEFAULT NULL,
     updated_at TIMESTAMP    DEFAULT NOW()               NOT NULL,
-    updated_by UUID         DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' NOT NULL,
+    updated_by UUID         DEFAULT NULL,
 
     CONSTRAINT tag_type_pkey PRIMARY KEY (id)
 );

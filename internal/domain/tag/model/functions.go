@@ -58,6 +58,7 @@ func (m *Model) List(ctx context.Context, filter *Filter) (*map[string]Item, err
 	filter.IDs = &IDs
 	filter.ProductIDs = &ProductIDs
 	filter.TagTypeIDs = &TagTypeIDs
+	filter.TagSelectIDs = &TagSelectIDs
 
 	// done
 	return &items, nil
