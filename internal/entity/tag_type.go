@@ -3,7 +3,7 @@ package entity
 import "time"
 
 type TagType struct {
-	ID               string    `json:"id" db:"id"`
+	Id               string    `json:"id" db:"id"`
 	Name             string    `json:"name" db:"name"`
 	Url              string    `json:"url" db:"url"`
 	ShortDescription string    `json:"short_description" db:"short_description"`
@@ -24,15 +24,18 @@ type TagType struct {
 }
 
 type TagTypeFilter struct {
-	IDs      *[]string
-	URLs     *[]string
+	Ids  *[]string
+	Urls *[]string
+
 	Required *bool
 	Active   *bool
 	Prime    *bool
 	ListItem *bool
 	Filter   *bool
 	Type     *string
-	Search   *string
+
+	Search *string
+
 	OrderBy  *string
 	OrderDir *string
 	Page     *uint64

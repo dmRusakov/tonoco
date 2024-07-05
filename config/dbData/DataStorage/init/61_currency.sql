@@ -1,17 +1,17 @@
 -- create table
 CREATE TABLE IF NOT EXISTS public.currency
 (
-    id          UUID UNIQUE DEFAULT uuid_generate_v4() NOT NULL,
-    name        VARCHAR(255)                           NOT NULL,
-    symbol      VARCHAR(10)                            NOT NULL,
-    url         VARCHAR(255)                           NOT NULL,
-    sort_order  INTEGER                                NOT NULL,
-    active      BOOLEAN     DEFAULT TRUE               NOT NULL,
+    id         UUID UNIQUE  DEFAULT uuid_generate_v4() NOT NULL,
+    name       VARCHAR(255) DEFAULT NULL,
+    symbol     VARCHAR(10)  DEFAULT NULL,
+    url        VARCHAR(255) DEFAULT NULL,
+    sort_order INTEGER      DEFAULT NULL,
+    active     BOOLEAN      DEFAULT TRUE,
 
-    created_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
-    created_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
-    updated_at TIMESTAMP   DEFAULT NOW()              NOT NULL,
-    updated_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
+    created_at TIMESTAMP    DEFAULT NOW(),
+    created_by UUID         DEFAULT NULL,
+    updated_at TIMESTAMP    DEFAULT NOW(),
+    updated_by UUID         DEFAULT NULL,
 
     CONSTRAINT currency_pkey PRIMARY KEY (id)
 );
@@ -52,5 +52,5 @@ EXECUTE FUNCTION update_update_at_column();
 
 -- default data
 INSERT INTO public.currency (id, name, symbol, url)
-VALUES ('c475a6f3-55ad-4641-8caa-a76bfae13fb0', 'USD', '$', 'USD'),
-       ('c475a6f3-55ad-4641-8caa-a76bfae13fb1', 'Euro', '€', 'EUR');
+VALUES ('c475a6f3-55ad-4641-8caa-a76bfae13fb0', 'USD', '$', 'usd'),
+       ('c475a6f3-55ad-4641-8caa-a76bfae13fb1', 'Euro', '€', 'eur');

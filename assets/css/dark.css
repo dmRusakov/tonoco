@@ -1,18 +1,17 @@
-/* varietals */
 :root {
-    /* icons */
-    --logoColor: #fff;
-    --iconColor: #fff;
 
     /* background */
-    --accentBG1: #333;
-    --accentBG2: #444;
-    --accentBG3: #555;
-    --footer: #222;
+    --lineBackground1: #323639FF;
+    --lineBackground2: #262829FF;
+    --accentBG: #eeeeee;
 
     /* text */
     --textColor: #fff;
+    --accentText: #000;
+    --deAccentText: #777;
+    --deAccentText1: #999;
 
-
-
+    --invertTextColor: #000;
 }
+/* varietals */
+

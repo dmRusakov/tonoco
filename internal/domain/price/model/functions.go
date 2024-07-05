@@ -7,32 +7,17 @@ import (
 	"time"
 )
 
-func (m *Model) Get(
-	ctx context.Context,
-	id *string,
-	productID *string,
-	priceTypeID *string,
-	currencyID *string,
-	warehouseID *string,
-	storeId *string,
-) (*Item, error) {
-	rows, err := psql.Get(ctx, m.client, m.makeGetStatement(
-		id,
-		productID,
-		priceTypeID,
-		currencyID,
-		warehouseID,
-		storeId,
-	))
+func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
+	row, err := psql.Get(ctx, m.client, m.makeGetStatement(filter))
 	if err != nil {
 		return nil, err
 	}
 
 	// return the Item
-	return m.scanOneRow(ctx, rows)
+	return m.scanOneRow(ctx, row)
 }
 
-func (m *Model) List(ctx context.Context, filter *Filter) ([]*Item, error) {
+func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (*map[string]Item, error) {
 	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter))
 	if err != nil {
 		return nil, err
@@ -40,16 +25,58 @@ func (m *Model) List(ctx context.Context, filter *Filter) ([]*Item, error) {
 	defer rows.Close()
 
 	// iterate over the result set
-	var items []*Item
+	items := make(map[string]Item)
+	idsMap := make(map[string]bool)
+	productIdsMap := make(map[string]bool)
+	currencyIdsMap := make(map[string]bool)
+	warehouseIdsMap := make(map[string]bool)
+	storeIdsMap := make(map[string]bool)
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
 		if err != nil {
 			return nil, err
 		}
-		items = append(items, item)
+		items[item.Id] = *item
+		idsMap[item.Id] = true
+		if isUpdateFilter {
+			productIdsMap[item.ProductID] = true
+			currencyIdsMap[item.CurrencyID] = true
+			warehouseIdsMap[item.WarehouseID] = true
+			storeIdsMap[item.StoreId] = true
+		}
 	}
 
-	return items, nil
+	if !isUpdateFilter {
+		ids := make([]string, 0, len(idsMap))
+		for id := range idsMap {
+			ids = append(ids, id)
+		}
+		productIds := make([]string, 0, len(productIdsMap))
+		for productId := range productIdsMap {
+			productIds = append(productIds, productId)
+		}
+		currencyIds := make([]string, 0, len(currencyIdsMap))
+		for currencyId := range currencyIdsMap {
+			currencyIds = append(currencyIds, currencyId)
+		}
+		warehouseIds := make([]string, 0, len(warehouseIdsMap))
+		for warehouseId := range warehouseIdsMap {
+			warehouseIds = append(warehouseIds, warehouseId)
+		}
+		storeIds := make([]string, 0, len(storeIdsMap))
+		for storeId := range storeIdsMap {
+			storeIds = append(storeIds, storeId)
+		}
+
+		// update filter
+		filter.Ids = &ids
+		filter.ProductIds = &productIds
+		filter.CurrencyIds = &currencyIds
+		filter.WarehouseIds = &warehouseIds
+		filter.StoreIds = &storeIds
+	}
+
+	return &items, nil
 }
 
 func (m *Model) Create(ctx context.Context, item *Item) (*string, error) {
@@ -65,7 +92,7 @@ func (m *Model) Update(ctx context.Context, item *Item) (err error) {
 	return psql.Update(
 		ctx,
 		m.client,
-		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), item.ID),
+		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), item.Id),
 	)
 }
 
@@ -81,7 +108,7 @@ func (m *Model) Delete(ctx context.Context, id *string) error {
 	return psql.Delete(
 		ctx,
 		m.client,
-		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", fieldMap["ID"]), id),
+		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), id),
 	)
 }
 
@@ -89,7 +116,7 @@ func (m *Model) UpdatedAt(ctx context.Context, id *string) (*time.Time, error) {
 	return psql.UpdatedAt(
 		ctx,
 		m.client,
-		m.qb.Select(fieldMap["UpdatedAt"]).From(m.table).Where("id = ?", id),
+		m.qb.Select(m.fieldMap("UpdatedAt")).From(m.table).Where("id = ?", id),
 	)
 }
 

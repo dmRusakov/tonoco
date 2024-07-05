@@ -3,21 +3,21 @@ CREATE TABLE IF NOT EXISTS public.price
 (
     id            UUID UNIQUE    DEFAULT uuid_generate_v4() NOT NULL,
 
-    product_id    UUID           NOT NULL REFERENCES public.product_info (id),
-    price_type_id UUID           NOT NULL REFERENCES public.price_type (id),
-    currency_id   UUID           NOT NULL REFERENCES public.currency (id),
-    warehouse_id  UUID           DEFAULT NULL REFERENCES public.warehouse (id),
-    store_id      UUID           DEFAULT NULL REFERENCES public.store (id),
+    product_id    UUID           DEFAULT NULL,
+    price_type_id UUID           DEFAULT NULL,
+    currency_id   UUID           DEFAULT NULL,
+    warehouse_id  UUID           DEFAULT NULL,
+    store_id      UUID           DEFAULT NULL,
 
-    price         DECIMAL(10, 2) NOT NULL,
+    price         DECIMAL(10, 2) DEFAULT NULL,
 
-    sort_order  INTEGER,
-    active      BOOLEAN           DEFAULT TRUE               NOT NULL,
+    sort_order    INTEGER,
+    active        BOOLEAN        DEFAULT TRUE,
 
-    created_at TIMESTAMP         DEFAULT NOW()               NOT NULL,
-    created_by UUID              DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
-    updated_at TIMESTAMP         DEFAULT NOW()               NOT NULL,
-    updated_by UUID              DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
+    created_at    TIMESTAMP      DEFAULT NOW()              NOT NULL,
+    created_by    UUID           DEFAULT NULL,
+    updated_at    TIMESTAMP      DEFAULT NOW()              NOT NULL,
+    updated_by    UUID           DEFAULT NULL,
 
     CONSTRAINT price_pkey PRIMARY KEY (id)
 );

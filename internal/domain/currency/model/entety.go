@@ -2,59 +2,63 @@ package model
 
 import (
 	"context"
+	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/google/uuid"
+	"reflect"
 )
 
-type Item = entity.Currency
-type Filter = entity.CurrencyFilter
-
 // fieldMap
-var fieldMap = map[string]string{
-	"ID":        "id",
-	"Name":      "name",
-	"Symbol":    "symbol",
-	"Url":       "url",
-	"SortOrder": "sort_order",
-	"Active":    "active",
-	"CreatedAt": "created_at",
-	"CreatedBy": "created_by",
-	"UpdatedAt": "updated_at",
-	"UpdatedBy": "updated_by",
+func (m *Model) fieldMap(field string) string {
+	// check if field is in the cash
+	if dbField, ok := m.dbFieldCash[field]; ok {
+		return dbField
+	}
+
+	// get field from struct
+	typeOf := reflect.TypeOf(Item{})
+	byName, _ := typeOf.FieldByName(field)
+	dbField := byName.Tag.Get("db")
+
+	// set field to cash
+	m.dbFieldCash[field] = dbField
+
+	// done
+	return dbField
 }
 
 // makeStatement
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
-		fieldMap["ID"],
-		fieldMap["Name"],
-		fieldMap["Symbol"],
-		fieldMap["Url"],
-		fieldMap["SortOrder"],
-		fieldMap["Active"],
-		fieldMap["CreatedAt"],
-		fieldMap["CreatedBy"],
-		fieldMap["UpdatedAt"],
-		fieldMap["UpdatedBy"],
+		m.fieldMap("Id"),
+		m.fieldMap("Name"),
+		m.fieldMap("Symbol"),
+		m.fieldMap("Url"),
+		m.fieldMap("SortOrder"),
+		m.fieldMap("Active"),
+		m.fieldMap("CreatedAt"),
+		m.fieldMap("CreatedBy"),
+		m.fieldMap("UpdatedAt"),
+		m.fieldMap("UpdatedBy"),
 	).From(m.table + " p")
 }
 
 // make Get statement
-func (m *Model) makeGetStatement(id *string, url *string) sq.SelectBuilder {
+func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 	// build query
 	statement := m.makeStatement()
 
 	// id
-	if id != nil {
-		statement = statement.Where(fieldMap["ID"]+" = ?", *id)
+	if filter.Ids != nil {
+		statement = statement.Where(m.fieldMap("Id")+" = ?", (*filter.Ids)[0])
 	}
 
 	// url
-	if url != nil {
-		statement = statement.Where(fieldMap["Url"]+" = ?", *url)
+	if filter.Urls != nil {
+		statement = statement.Where(m.fieldMap("Url")+" = ?", (*filter.Urls)[0])
 	}
 
 	return statement
@@ -90,11 +94,11 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	statement := m.makeStatement()
 
 	// Ids
-	if filter.IDs != nil {
-		countIds := len(*filter.IDs)
+	if filter.Ids != nil {
+		countIds := len(*filter.Ids)
 
 		if countIds > 0 {
-			statement = statement.Where(sq.Eq{fieldMap["ID"]: *filter.IDs})
+			statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
 		}
 
 		*filter.Page = 1
@@ -108,7 +112,7 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		countUrls := len(*filter.Urls)
 
 		if countUrls > 0 {
-			statement = statement.Where(sq.Eq{fieldMap["Url"]: *filter.Urls})
+			statement = statement.Where(sq.Eq{m.fieldMap("Url"): *filter.Urls})
 		}
 
 		*filter.Page = 1
@@ -119,39 +123,43 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 	// Active
 	if filter.Active != nil {
-		statement = statement.Where(sq.Eq{fieldMap["Active"]: *filter.Active})
+		statement = statement.Where(sq.Eq{m.fieldMap("Active"): *filter.Active})
 	}
 
 	// Search
 	if filter.Search != nil {
 		statement = statement.Where(
 			sq.Or{
-				sq.Expr("LOWER("+fieldMap["Name"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["Url"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["Symbol"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("Symbol")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 			},
 		)
 	}
 
 	// Add OrderBy, OrderDir, Page, Limit and return
-	return statement.OrderBy(fieldMap[*filter.OrderBy] + " " + *filter.OrderDir).
+	return statement.OrderBy(m.fieldMap(*filter.OrderBy) + " " + *filter.OrderDir).
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 }
 
 // scanOneRow
 func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
-	var item = &Item{}
+	var id, name, symbol, url, createdBy, updatedBy sql.NullString
+	var sortOrder sql.NullInt64
+	var active sql.NullBool
+	var createdAt, updatedAt sql.NullTime
+
 	err := rows.Scan(
-		&item.ID,
-		&item.Name,
-		&item.Symbol,
-		&item.Url,
-		&item.SortOrder,
-		&item.Active,
-		&item.CreatedAt,
-		&item.CreatedBy,
-		&item.UpdatedAt,
-		&item.UpdatedBy,
+		&id,
+		&name,
+		&symbol,
+		&url,
+		&sortOrder,
+		&active,
+		&createdAt,
+		&createdBy,
+		&updatedAt,
+		&updatedBy,
 	)
 
 	if err != nil {
@@ -160,7 +168,49 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 		return nil, err
 	}
 
-	return item, nil
+	var item = Item{}
+
+	if id.Valid {
+		item.Id = id.String
+	}
+
+	if name.Valid {
+		item.Name = name.String
+	}
+
+	if symbol.Valid {
+		item.Symbol = symbol.String
+	}
+
+	if url.Valid {
+		item.Url = url.String
+	}
+
+	if sortOrder.Valid {
+		item.SortOrder = uint64(sortOrder.Int64)
+	}
+
+	if active.Valid {
+		item.Active = active.Bool
+	}
+
+	if createdAt.Valid {
+		item.CreatedAt = createdAt.Time
+	}
+
+	if createdBy.Valid {
+		item.CreatedBy = createdBy.String
+	}
+
+	if updatedAt.Valid {
+		item.UpdatedAt = updatedAt.Time
+	}
+
+	if updatedBy.Valid {
+		item.UpdatedBy = updatedBy.String
+	}
+
+	return &item, nil
 }
 
 // makeInsertStatement
@@ -168,27 +218,27 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
-	// if ID is not set, generate a new UUID
-	if item.ID == "" {
-		item.ID = uuid.New().String()
+	// if Id is not set, generate a new UUID
+	if item.Id == "" {
+		item.Id = uuid.New().String()
 	}
 
-	// set ID to context
-	ctx = context.WithValue(ctx, "itemId", item.ID)
+	// set Id to context
+	ctx = context.WithValue(ctx, "itemId", item.Id)
 
 	insertItem := m.qb.Insert(m.table).Columns(
-		fieldMap["ID"],
-		fieldMap["Name"],
-		fieldMap["Symbol"],
-		fieldMap["Url"],
-		fieldMap["SortOrder"],
-		fieldMap["Active"],
-		fieldMap["CreatedAt"],
-		fieldMap["CreatedBy"],
-		fieldMap["UpdatedAt"],
-		fieldMap["UpdatedBy"],
+		m.fieldMap("Id"),
+		m.fieldMap("Name"),
+		m.fieldMap("Symbol"),
+		m.fieldMap("Url"),
+		m.fieldMap("SortOrder"),
+		m.fieldMap("Active"),
+		m.fieldMap("CreatedAt"),
+		m.fieldMap("CreatedBy"),
+		m.fieldMap("UpdatedAt"),
+		m.fieldMap("UpdatedBy"),
 	).Values(
-		item.ID,
+		item.Id,
 		item.Name,
 		item.Symbol,
 		item.Url,
@@ -201,7 +251,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	)
 
 	// get itemId from context
-	return &insertItem, &item.ID
+	return &insertItem, &item.Id
 }
 
 // makeUpdateStatement
@@ -210,13 +260,13 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 	by := ctx.Value("user_id").(string)
 
 	return m.qb.Update(m.table).
-		Set(fieldMap["Name"], item.Name).
-		Set(fieldMap["Symbol"], item.Symbol).
-		Set(fieldMap["Url"], item.Url).
-		Set(fieldMap["SortOrder"], item.SortOrder).
-		Set(fieldMap["Active"], item.Active).
-		Set(fieldMap["UpdatedAt"], "NOW()").
-		Set(fieldMap["UpdatedBy"], by)
+		Set(m.fieldMap("Name"), item.Name).
+		Set(m.fieldMap("Symbol"), item.Symbol).
+		Set(m.fieldMap("Url"), item.Url).
+		Set(m.fieldMap("SortOrder"), item.SortOrder).
+		Set(m.fieldMap("Active"), item.Active).
+		Set(m.fieldMap("UpdatedAt"), "NOW()").
+		Set(m.fieldMap("UpdatedBy"), by)
 }
 
 // makePatchStatement
@@ -227,9 +277,9 @@ func (m *Model) makePatchStatement(ctx context.Context, id *string, fields *map[
 	statement := m.qb.Update(m.table).Where("id = ?", id)
 
 	for field, value := range *fields {
-		field = fieldMap[field]
+		field = m.fieldMap(field)
 		statement = statement.Set(field, value)
 	}
 
-	return statement.Set(fieldMap["UpdatedAt"], "NOW()").Set(fieldMap["UpdatedBy"], by)
+	return statement.Set(m.fieldMap("UpdatedAt"), "NOW()").Set(m.fieldMap("UpdatedBy"), by)
 }

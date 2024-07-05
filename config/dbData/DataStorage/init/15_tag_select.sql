@@ -11,12 +11,12 @@ CREATE TABLE IF NOT EXISTS public.tag_select
     short_description   VARCHAR(255)            DEFAULT NULL,
     description         VARCHAR(6000)           DEFAULT NULL,
     active              BOOLEAN                 DEFAULT TRUE,
-    sort_order          INTEGER                 NOT NULL,
+    sort_order          INTEGER                 DEFAULT NULL,
 
     created_at          TIMESTAMP               DEFAULT NOW() NOT NULL,
-    created_by          UUID                    DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' NOT NULL,
+    created_by          UUID                    DEFAULT NULL,
     updated_at          TIMESTAMP               DEFAULT NOW() NOT NULL,
-    updated_by          UUID                    DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1' NOT NULL,
+    updated_by          UUID                    DEFAULT NULL,
 
     CONSTRAINT tag_select_pkey PRIMARY KEY (id)
 );

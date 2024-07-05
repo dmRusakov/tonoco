@@ -2,59 +2,81 @@ package product
 
 import (
 	"context"
-	"fmt"
 	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dustin/go-humanize"
 )
 
 func (uc *UseCase) GetProductList(
 	ctx context.Context,
-	parameters *entity.ProductsUrlParameters,
-) ([]entity.ProductListItem, error) {
+	parameters *entity.ProductsPgeUrlParams,
+) (*map[string]entity.ProductListItem, error) {
 	// get productInfos
 	productInfoFilter := entity.ProductInfoFilter{
-		Page:    entity.Uint64Ptr(2),
-		PerPage: entity.Uint64Ptr(10),
+		Page:    parameters.Page,
+		PerPage: parameters.PerPage,
 	}
-	productInfos, err := uc.productInfo.List(ctx, &productInfoFilter)
+	productInfos, err := uc.productInfo.List(ctx, &productInfoFilter, true)
 	if err != nil {
 		return nil, err
 	}
 
-	// get tag_types with `list_item` type
-	tagTypeFilter := entity.TagTypeFilter{
-		ListItem: entity.BoolPtr(true),
-	}
-	_, err = uc.tagType.List(ctx, &tagTypeFilter)
-	if err != nil {
-		return nil, err
-	}
+	//// get currencies
+	//currency, err := uc.currency.Get(ctx, nil, parameters.Currency)
+	//if err != nil {
+	//	return nil, err
+	//}
 
-	// get tags
-	tagFilter := entity.TagFilter{
-		ProductIDs: productInfoFilter.IDs,
-		TagTypeIDs: tagTypeFilter.IDs,
-	}
-	_, err = uc.tag.List(ctx, &tagFilter)
-	if err != nil {
-		return nil, err
-	}
+	// get price types
 
-	fmt.Printf("%+v\nproductInfos:38\n", tagFilter.TagTypeIDs)
+	//// get tag_types with `list_item` type
+	//tagTypeFilter := entity.TagTypeFilter{
+	//	ListItem: entity.BoolPtr(true),
+	//}
+	//_, err = uc.tagType.List(ctx, &tagTypeFilter)
+	//if err != nil {
+	//	return nil, err
+	//}
+
+	//// get tags
+	//tagFilter := entity.TagFilter{
+	//	ProductIds: productInfoFilter.Ids,
+	//	TagTypeIds: tagTypeFilter.Ids,
+	//}
+	//_, err = uc.tag.List(ctx, &tagFilter)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//// get tag selects
+	//tagSelectFilter := entity.TagSelectFilter{
+	//	Ids:        tagFilter.TagSelectIds,
+	//	TagTypeIds: tagTypeFilter.Ids,
+	//}
+	//_, err = uc.tagSelect.List(ctx, &tagSelectFilter)
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	// dto
-	var productsDto []entity.ProductListItem
-	for _, product := range *productInfos {
-		productsDto = append(productsDto, entity.ProductListItem{
-			ID:               product.ID,
-			SKU:              product.SKU,
+	productsDto := make(map[string]entity.ProductListItem)
+	counter := 0
+	for id, product := range *productInfos {
+		productsDto[id] = entity.ProductListItem{
+			Id:               product.Id,
+			Sku:              product.Sku,
+			Quantity:         1,
 			Name:             product.Name,
 			ShortDescription: product.ShortDescription,
 			Url:              product.Url,
-			IsTaxable:        product.IsTaxable,
-			SeoTitle:         product.SeoTitle,
-			SeoDescription:   product.SeoDescription,
-		})
+			//Currency:         currency.Symbol,
+			Price:          humanize.FormatFloat("#,###.##", 2195),
+			IsTaxable:      product.IsTaxable,
+			SeoTitle:       product.SeoTitle,
+			SeoDescription: product.SeoDescription,
+		}
+
+		counter++
 	}
 
-	return productsDto, nil
+	return &productsDto, nil
 }

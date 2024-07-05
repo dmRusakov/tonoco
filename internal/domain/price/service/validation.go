@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	NoProductID   = validation.NewValidation("Product ID is required", "Product ID is required", "934722", "ProductID")
-	NoPriceTypeID = validation.NewValidation("Price Type ID is required", "Price Type ID is required", "934723", "PriceTypeID")
-	NoCurrencyID  = validation.NewValidation("Currency ID is required", "Currency ID is required", "934724", "CurrencyID")
+	NoProductID   = validation.NewValidation("Product Id is required", "Product Id is required", "934722", "ProductIds")
+	NoPriceTypeID = validation.NewValidation("Price Type Id is required", "Price Type Id is required", "934723", "PriceTypeIds")
+	NoCurrencyID  = validation.NewValidation("Currency Id is required", "Currency Id is required", "934724", "CurrencyIds")
 	NoPrice       = validation.NewValidation("Price is required", "Price is required", "934725", "Price")
 )
 
@@ -59,13 +59,13 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 			go func(field string, value interface{}) {
 				var v []entity.Error
 				switch field {
-				case "ProductID":
+				case "ProductIds":
 					s.validateProductID(value.(string), &v)
 					break
-				case "PriceTypeID":
+				case "PriceTypeIds":
 					s.validatePriceTypeID(value.(string), &v)
 					break
-				case "CurrencyID":
+				case "CurrencyIds":
 					s.validateCurrencyID(value.(string), &v)
 					break
 				case "Price":

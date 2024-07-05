@@ -3,7 +3,7 @@ package entity
 import "time"
 
 type Error struct {
-	ID         string    `json:"id"`
+	Id         string    `json:"id"`
 	Type       string    `json:"type"`
 	Message    string    `json:"message"`
 	DevMessage string    `json:"dev_message"`
@@ -16,7 +16,7 @@ type Error struct {
 }
 
 type ErrorFilter struct {
-	IDs    *[]string `json:"ids"`
+	Ids    *[]string `json:"ids"`
 	Codes  *[]string `json:"codes"`
 	Active *bool     `json:"active"`
 	Type   *string   `json:"type"`

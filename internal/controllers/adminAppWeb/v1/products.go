@@ -17,9 +17,10 @@ func (s server) RenderProducts(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
+
 	var wg sync.WaitGroup
 	var tmpl *template.Template
-	var params *entity.ProductsUrlParameters
+	var params *entity.ProductsPgeUrlParams
 
 	wg.Add(2)
 
@@ -30,32 +31,36 @@ func (s server) RenderProducts(
 
 	go func() {
 		defer wg.Done()
-		params = s.ReadProductsUrlPara(r)
+		params = s.ReadProductsUrlParam(r)
 	}()
 
 	wg.Wait()
 
 	// get products
-	_, err := s.productUseCase.GetProductList(ctx, params)
+	products, err := s.productUseCase.GetProductList(ctx, params)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// get tag_types with `list_item` type
+	productPage := entity.ProductPage{
+		Name: "Range Hoods",
 
-	// Use tmpl and params here
+		Products:   products,
+		ProductUrl: "range-hood",
+	}
+
 	// render page
-	if err := tmpl.Execute(w, params); err != nil {
+	if err := tmpl.Execute(w, productPage); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	return
 }
 
-// ReadProductsUrlPara read page parameters from url
-func (s server) ReadProductsUrlPara(r *http.Request) *entity.ProductsUrlParameters {
-	params := &entity.ProductsUrlParameters{}
+// ReadProductsUrlParam read page parameters from url
+func (s server) ReadProductsUrlParam(r *http.Request) *entity.ProductsPgeUrlParams {
+	params := &entity.ProductsPgeUrlParams{}
 	v := reflect.ValueOf(params).Elem()
 	t := v.Type()
 
@@ -63,8 +68,29 @@ func (s server) ReadProductsUrlPara(r *http.Request) *entity.ProductsUrlParamete
 		fieldName := t.Field(i).Name
 		value := r.URL.Query().Get(strings.ToLower(fieldName))
 		if value != "" {
-			v.Field(i).SetString(value)
+			field := v.Field(i)
+			if field.Kind() == reflect.Ptr && !field.IsNil() {
+				field = field.Elem()
+			}
+			if field.Kind() == reflect.String {
+				field.SetString(value)
+			}
 		}
+	}
+
+	// default Currency
+	if params.Currency == nil {
+		params.Currency = entity.StringPtr("usd")
+	}
+
+	// default Page
+	if params.Page == nil {
+		params.Page = entity.Uint64Ptr(1)
+	}
+
+	// default PerPage
+	if params.PerPage == nil {
+		params.PerPage = entity.Uint64Ptr(18)
 	}
 
 	return params

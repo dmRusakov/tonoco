@@ -1,17 +1,17 @@
 -- create table
 CREATE TABLE IF NOT EXISTS public.folder
 (
-    id         UUID UNIQUE DEFAULT uuid_generate_v4() NOT NULL,
-    name       varchar(255) NOT NULL,
-    url        varchar(255) NOT NULL,
-    parent_id  uuid        default null REFERENCES public.folder (id),
-    active     BOOLEAN     DEFAULT TRUE,
-    sort_order INTEGER     DEFAULT NULL,
+    id         UUID UNIQUE  DEFAULT uuid_generate_v4() NOT NULL,
+    name       varchar(255) DEFAULT NULL,
+    url        varchar(255) DEFAULT NULL,
+    parent_id  uuid         DEFAULT null,
+    active     BOOLEAN      DEFAULT TRUE,
+    sort_order INTEGER      DEFAULT NULL,
 
-    created_at TIMESTAMP   DEFAULT NOW()               NOT NULL,
-    created_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
-    updated_at TIMESTAMP   DEFAULT NOW()               NOT NULL,
-    updated_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
+    created_at TIMESTAMP    DEFAULT NOW()              NOT NULL,
+    created_by UUID         DEFAULT NULL,
+    updated_at TIMESTAMP    DEFAULT NOW()              NOT NULL,
+    updated_by UUID         DEFAULT NULL,
 
     CONSTRAINT folder_pkey PRIMARY KEY (id)
 );

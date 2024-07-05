@@ -9,22 +9,31 @@ import (
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/google/uuid"
 	"reflect"
-	"time"
 )
 
-type Item = entity.Tag
-type Filter = entity.TagFilter
-
+// fieldMap
 func (m *Model) fieldMap(field string) string {
+	// check if field is in the cash
+	if dbField, ok := m.dbFieldCash[field]; ok {
+		return dbField
+	}
+
+	// get field from struct
 	typeOf := reflect.TypeOf(Item{})
 	byName, _ := typeOf.FieldByName(field)
-	return byName.Tag.Get("db")
+	dbField := byName.Tag.Get("db")
+
+	// set field to cash
+	m.dbFieldCash[field] = dbField
+
+	// done
+	return dbField
 }
 
 // makeStatement
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
-		m.fieldMap("ID"),
+		m.fieldMap("Id"),
 		m.fieldMap("ProductId"),
 		m.fieldMap("TagTypeId"),
 		m.fieldMap("TagSelectId"),
@@ -39,18 +48,14 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 }
 
 // make Get statement
-func (m *Model) makeGetStatement(id *string, url *string) sq.SelectBuilder {
+// make Get statement
+func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 	// build query
 	statement := m.makeStatement()
 
 	// id
-	if id != nil {
-		statement = statement.Where(m.fieldMap("ID")+" = ?", *id)
-	}
-
-	// url
-	if url != nil {
-		statement = statement.Where(m.fieldMap("Url")+" = ?", *url)
+	if filter.Ids != nil {
+		statement = statement.Where(m.fieldMap("Id")+" = ?", (*filter.Ids)[0])
 	}
 
 	return statement
@@ -86,11 +91,11 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	statement := m.makeStatement()
 
 	// Ids
-	if filter.IDs != nil {
-		countIds := len(*filter.IDs)
+	if filter.Ids != nil {
+		countIds := len(*filter.Ids)
 
 		if countIds > 0 {
-			statement = statement.Where(sq.Eq{m.fieldMap("ID"): *filter.IDs})
+			statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
 		}
 
 		*filter.Page = 1
@@ -99,24 +104,33 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		}
 	}
 
-	// ProductIDs
-	if filter.ProductIDs != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("ProductId"): *filter.ProductIDs})
+	// ProductIds
+	if filter.ProductIds != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("ProductId"): *filter.ProductIds})
 	}
 
 	// TagTypeId
-	if filter.TagTypeIDs != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("TagTypeId"): *filter.TagTypeIDs})
+	if filter.TagTypeIds != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("TagTypeId"): *filter.TagTypeIds})
 	}
 
-	// TagSelectIDs
-	if filter.TagSelectIDs != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("TagSelectId"): *filter.TagSelectIDs})
+	// TagSelectIds
+	if filter.TagSelectIds != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("TagSelectId"): *filter.TagSelectIds})
 	}
 
 	// Active
 	if filter.Active != nil {
 		statement = statement.Where(sq.Eq{m.fieldMap("Active"): *filter.Active})
+	}
+
+	// Search
+	if filter.Search != nil {
+		statement = statement.Where(
+			sq.Or{
+				sq.Expr("LOWER("+m.fieldMap("Value")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+			},
+		)
 	}
 
 	// Add OrderBy, OrderDir, Page, Limit and return
@@ -126,12 +140,12 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 // scanOneRow
 func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
-	var ID, ProductId, TagTypeId, TagSelectId, Value, CreatedBy, UpdatedBy sql.NullString
+	var Id, ProductId, TagTypeId, TagSelectId, Value, CreatedBy, UpdatedBy sql.NullString
 	var Active sql.NullBool
 	var SortOrder sql.NullInt64
 	var CreatedAt, UpdatedAt sql.NullTime
 	err := rows.Scan(
-		&ID,
+		&Id,
 		&ProductId,
 		&TagTypeId,
 		&TagSelectId,
@@ -152,81 +166,59 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 
 	var item = Item{}
 
-	// ID if null, set it to empty string
-	if ID.Valid {
-		item.ID = ID.String
-	} else {
-		item.ID = ""
+	// Id if null, set it to empty string
+	if Id.Valid {
+		item.Id = Id.String
 	}
 
 	// ProductId if null, set it to empty string
 	if ProductId.Valid {
 		item.ProductId = ProductId.String
-	} else {
-		item.ProductId = ""
 	}
 
 	// TagTypeId if null, set it to empty string
 	if TagTypeId.Valid {
 		item.TagTypeId = TagTypeId.String
-	} else {
-		item.TagTypeId = ""
 	}
 
 	// TagSelectId if null, set it to empty string
 	if TagSelectId.Valid {
 		item.TagSelectId = TagSelectId.String
-	} else {
-		item.TagSelectId = ""
 	}
 
 	// Value if null, set it to empty string
 	if Value.Valid {
 		item.Value = Value.String
-	} else {
-		item.Value = ""
 	}
 
 	// Active if null, set it to false
 	if Active.Valid {
 		item.Active = Active.Bool
-	} else {
-		item.Active = false
 	}
 
 	// SortOrder if null, set it to 0
 	if SortOrder.Valid {
 		item.SortOrder = uint64(SortOrder.Int64)
-	} else {
-		item.SortOrder = 0
 	}
 
 	// CreatedAt if null, set it to time.Time{}
 	if CreatedAt.Valid {
 		item.CreatedAt = CreatedAt.Time
-	} else {
-		item.CreatedAt = time.Time{}
 	}
 
 	// CreatedBy if null, set it to empty string
 	if CreatedBy.Valid {
 		item.CreatedBy = CreatedBy.String
-	} else {
-		item.CreatedBy = ""
 	}
 
 	// UpdatedAt if null, set it to time.Time{}
 	if UpdatedAt.Valid {
 		item.UpdatedAt = UpdatedAt.Time
-	} else {
-		item.UpdatedAt = time.Time{}
 	}
 
 	// UpdatedBy if null, set it to empty string
 	if UpdatedBy.Valid {
 		item.UpdatedBy = UpdatedBy.String
-	} else {
-		item.UpdatedBy = ""
 	}
 
 	return &item, nil
@@ -238,16 +230,16 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
-	// if ID is not set, generate a new UUID
-	if item.ID == "" {
-		item.ID = uuid.New().String()
+	// if Id is not set, generate a new UUID
+	if item.Id == "" {
+		item.Id = uuid.New().String()
 	}
 
-	// set ID to context
-	ctx = context.WithValue(ctx, "itemId", item.ID)
+	// set Id to context
+	ctx = context.WithValue(ctx, "itemId", item.Id)
 
 	insertItem := m.qb.Insert(m.table).Columns(
-		m.fieldMap("ID"),
+		m.fieldMap("Id"),
 		m.fieldMap("ProductId"),
 		m.fieldMap("TagTypeId"),
 		m.fieldMap("TagSelectId"),
@@ -259,7 +251,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		m.fieldMap("UpdatedAt"),
 		m.fieldMap("UpdatedBy"),
 	).Values(
-		item.ID,
+		item.Id,
 		item.ProductId,
 		item.TagTypeId,
 		item.TagSelectId,
@@ -272,7 +264,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		by,
 	)
 
-	return &insertItem, &item.ID
+	return &insertItem, &item.Id
 }
 
 // makeUpdateStatement

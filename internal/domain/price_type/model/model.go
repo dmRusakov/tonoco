@@ -8,8 +8,8 @@ import (
 )
 
 type Storage interface {
-	Get(ctx context.Context, id *string, url *string) (*Item, error)
-	List(context.Context, *Filter) (*map[string]Item, error)
+	Get(context.Context, *Filter) (*Item, error)
+	List(context.Context, *Filter, bool) (*map[string]Item, error)
 	Create(context.Context, *Item) (*string, error)
 	Update(context.Context, *Item) error
 	Patch(context.Context, *string, *map[string]interface{}) error
@@ -21,16 +21,18 @@ type Storage interface {
 
 // Model is a struct that contains the SQL statement builder and the PostgreSQL client.
 type Model struct {
-	table  string
-	qb     sq.StatementBuilderType
-	client psql.Client
+	table       string
+	qb          sq.StatementBuilderType
+	client      psql.Client
+	dbFieldCash map[string]string
 }
 
 // NewStorage is a constructor function that returns a new instance of the Model.
 func NewStorage(client psql.Client) *Model {
 	return &Model{
-		qb:     sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
-		client: client,
-		table:  "price_type",
+		qb:          sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
+		client:      client,
+		table:       "price_type",
+		dbFieldCash: map[string]string{},
 	}
 }

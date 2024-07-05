@@ -3,8 +3,8 @@ package entity
 import "time"
 
 type ProductInfo struct {
-	ID                    string    `json:"id" db:"id"`
-	SKU                   string    `json:"sku" db:"sku"`
+	Id                    string    `json:"id" db:"id"`
+	Sku                   string    `json:"sku" db:"sku"`
 	Name                  string    `json:"name" db:"name"`
 	ShortDescription      string    `json:"short_description" db:"short_description"`
 	Description           string    `json:"description" db:"description"`
@@ -28,9 +28,9 @@ type ProductInfo struct {
 }
 
 type ProductInfoFilter struct {
-	IDs      *[]string `json:"ids"`
+	Ids      *[]string `json:"ids"`
 	Urls     *[]string `json:"urls"`
-	SKUs     *[]string `json:"skus"`
+	Skus     *[]string `json:"skus"`
 	Active   *bool     `json:"active"`
 	Search   *string   `json:"search"`
 	OrderBy  *string   `json:"order_by"`

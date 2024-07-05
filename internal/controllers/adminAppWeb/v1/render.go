@@ -32,6 +32,7 @@ func (s server) makeTemplate(pageTemplate string) *template.Template {
 		"element/menu.partial",
 		"element/footer.partial",
 		"element/footer_file_imports.partial",
+		"element/grid_product_in_list.partial",
 	}
 	for _, x := range partials {
 		templateSlice = append(templateSlice, fmt.Sprintf("%s%s.gohtml", s.tmlPath, x))

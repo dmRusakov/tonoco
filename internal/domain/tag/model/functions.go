@@ -7,60 +7,76 @@ import (
 	"time"
 )
 
-func (m *Model) Get(ctx context.Context, id *string, url *string) (*Item, error) {
-	rows, err := psql.Get(ctx, m.client, m.makeGetStatement(id, url))
+func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
+	row, err := psql.Get(ctx, m.client, m.makeGetStatement(filter))
 	if err != nil {
 		return nil, err
 	}
 
 	// return the Item
-	return m.scanOneRow(ctx, rows)
+	return m.scanOneRow(ctx, row)
 }
 
-func (m *Model) List(ctx context.Context, filter *Filter) (*map[string]Item, error) {
+func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (*map[string]Item, error) {
 	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter))
-	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	// iterate over the result set
 	items := make(map[string]Item)
-	var IDs, ProductIDs, TagTypeIDs, TagSelectIDs []string
 	idsMap := make(map[string]bool)
-	productIDsMap := make(map[string]bool)
-	tagTypeIDsMap := make(map[string]bool)
-	tagSelectIDsMap := make(map[string]bool)
+	productIdsMap := make(map[string]bool)
+	tagTypeIdsMap := make(map[string]bool)
+	tagSelectIdsMap := make(map[string]bool)
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
 		if err != nil {
 			return nil, err
 		}
-		items[item.ID] = *item
-		IDs = append(IDs, item.ID)
-		idsMap[item.ID] = true
+		items[item.Id] = *item
 
-		if item.ProductId != "" && !productIDsMap[item.ProductId] {
-			ProductIDs = append(ProductIDs, item.ProductId)
-			productIDsMap[item.ProductId] = true
+		if !isUpdateFilter {
+			continue
 		}
-		if item.TagTypeId != "" && !tagTypeIDsMap[item.TagTypeId] {
-			TagTypeIDs = append(TagTypeIDs, item.TagTypeId)
-			tagTypeIDsMap[item.TagTypeId] = true
-		}
-		if item.TagSelectId != "" && !tagSelectIDsMap[item.TagSelectId] {
-			TagSelectIDs = append(TagSelectIDs, item.TagSelectId)
-			tagSelectIDsMap[item.TagSelectId] = true
-		}
+		idsMap[item.Id] = true
+		productIdsMap[item.ProductId] = true
+		tagTypeIdsMap[item.TagTypeId] = true
+		tagSelectIdsMap[item.TagSelectId] = true
 	}
 
-	// update the filter
-	filter.IDs = &IDs
-	filter.ProductIDs = &ProductIDs
-	filter.TagTypeIDs = &TagTypeIDs
-	filter.TagSelectIDs = &TagSelectIDs
+	if !isUpdateFilter {
+		return &items, nil
+	}
 
-	// done
+	// convert map keys to slices
+	ids := make([]string, 0, len(idsMap))
+	for id := range idsMap {
+		ids = append(ids, id)
+	}
+	productIds := make([]string, 0, len(productIdsMap))
+	for productId := range productIdsMap {
+		productIds = append(productIds, productId)
+	}
+
+	tagTypeIds := make([]string, 0, len(tagTypeIdsMap))
+	for tagTypeId := range tagTypeIdsMap {
+		tagTypeIds = append(tagTypeIds, tagTypeId)
+	}
+
+	tagSelectIds := make([]string, 0, len(tagSelectIdsMap))
+	for tagSelectId := range tagSelectIdsMap {
+		tagSelectIds = append(tagSelectIds, tagSelectId)
+	}
+
+	// update filter
+	filter.Ids = &ids
+	filter.ProductIds = &productIds
+	filter.TagTypeIds = &tagTypeIds
+	filter.TagSelectIds = &tagSelectIds
+
+	// return the items
 	return &items, nil
 }
 
@@ -77,7 +93,7 @@ func (m *Model) Update(ctx context.Context, item *Item) (err error) {
 	return psql.Update(
 		ctx,
 		m.client,
-		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.fieldMap("ID")), item.ID),
+		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), item.Id),
 	)
 }
 
@@ -93,7 +109,7 @@ func (m *Model) Delete(ctx context.Context, id *string) error {
 	return psql.Delete(
 		ctx,
 		m.client,
-		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.fieldMap("ID")), id),
+		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), id),
 	)
 }
 

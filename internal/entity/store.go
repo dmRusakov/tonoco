@@ -3,8 +3,9 @@ package entity
 import "time"
 
 type Store struct {
-	ID           string    `json:"id"`
+	Id           string    `json:"id"`
 	Name         string    `json:"name"`
+	Url          string    `json:"url"`
 	Abbreviation string    `json:"abbreviation"`
 	Config       string    `json:"config"`
 	SortOrder    uint64    `json:"sort_order"`
@@ -25,12 +26,15 @@ type Store struct {
 }
 
 type StoreFilter struct {
-	IDs           *[]string `json:"ids"`
+	Ids           *[]string `json:"ids"`
+	Urls          *[]string `json:"urls"`
 	Abbreviations *[]string `json:"abbreviations"`
-	Active        *bool     `json:"active"`
-	Search        *string   `json:"search"`
-	OrderBy       *string   `json:"order_by"`
-	OrderDir      *string   `json:"order_dir"`
-	Page          *uint64   `json:"page"`
-	PerPage       *uint64   `json:"per_page"`
+
+	Active *bool   `json:"active"`
+	Search *string `json:"search"`
+
+	OrderBy  *string `json:"order_by"`
+	OrderDir *string `json:"order_dir"`
+	Page     *uint64 `json:"page"`
+	PerPage  *uint64 `json:"per_page"`
 }

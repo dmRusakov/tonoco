@@ -11,21 +11,30 @@ import (
 	"reflect"
 )
 
-type Item = entity.ProductInfo
-type Filter = entity.ProductInfoFilter
-
 // fieldMap
 func (m *Model) fieldMap(field string) string {
+	// check if field is in the cash
+	if dbField, ok := m.dbFieldCash[field]; ok {
+		return dbField
+	}
+
+	// get field from struct
 	typeOf := reflect.TypeOf(Item{})
 	byName, _ := typeOf.FieldByName(field)
-	return byName.Tag.Get("db")
+	dbField := byName.Tag.Get("db")
+
+	// set field to cash
+	m.dbFieldCash[field] = dbField
+
+	// done
+	return dbField
 }
 
 // makeStatement
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
-		m.fieldMap("ID"),
-		m.fieldMap("SKU"),
+		m.fieldMap("Id"),
+		m.fieldMap("Sku"),
 		m.fieldMap("Name"),
 		m.fieldMap("ShortDescription"),
 		m.fieldMap("Description"),
@@ -50,18 +59,18 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 }
 
 // make Get statement
-func (m *Model) makeGetStatement(id *string, url *string) sq.SelectBuilder {
+func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 	// build query
 	statement := m.makeStatement()
 
 	// id
-	if id != nil {
-		statement = statement.Where(m.fieldMap("ID")+" = ?", *id)
+	if filter.Ids != nil {
+		statement = statement.Where(m.fieldMap("Id")+" = ?", (*filter.Ids)[0])
 	}
 
 	// url
-	if url != nil {
-		statement = statement.Where(m.fieldMap("Url")+" = ?", *url)
+	if filter.Urls != nil {
+		statement = statement.Where(m.fieldMap("Url")+" = ?", (*filter.Urls)[0])
 	}
 
 	return statement
@@ -97,12 +106,12 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	statement := m.makeStatement()
 
 	// Ids
-	if filter.IDs != nil && len(*filter.IDs) > 0 {
-		statement = statement.Where(sq.Eq{m.fieldMap("ID"): *filter.IDs})
+	if filter.Ids != nil && len(*filter.Ids) > 0 {
+		statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
 
 		*filter.Page = 1
-		if (*filter.PerPage) > uint64(len(*filter.IDs)) {
-			*filter.PerPage = uint64(len(*filter.IDs))
+		if (*filter.PerPage) > uint64(len(*filter.Ids)) {
+			*filter.PerPage = uint64(len(*filter.Ids))
 		}
 	}
 
@@ -116,17 +125,17 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		}
 	}
 
-	// SKUs
-	if filter.SKUs != nil {
-		countSKUs := len(*filter.SKUs)
+	// Skus
+	if filter.Skus != nil {
+		countSkus := len(*filter.Skus)
 
-		if countSKUs > 0 {
-			statement = statement.Where(sq.Eq{m.fieldMap("SKU"): *filter.SKUs})
+		if countSkus > 0 {
+			statement = statement.Where(sq.Eq{m.fieldMap("Sku"): *filter.Skus})
 		}
 
 		*filter.Page = 1
-		if (*filter.PerPage) > uint64(countSKUs) {
-			*filter.PerPage = uint64(countSKUs)
+		if (*filter.PerPage) > uint64(countSkus) {
+			*filter.PerPage = uint64(countSkus)
 		}
 
 	}
@@ -193,10 +202,10 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	}
 
 	if id.Valid {
-		item.ID = id.String
+		item.Id = id.String
 	}
 	if sku.Valid {
-		item.SKU = sku.String
+		item.Sku = sku.String
 	}
 	if name.Valid {
 		item.Name = name.String
@@ -267,17 +276,17 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
-	// if ID is not set, generate a new UUID
-	if item.ID == "" {
-		item.ID = uuid.New().String()
+	// if Id is not set, generate a new UUID
+	if item.Id == "" {
+		item.Id = uuid.New().String()
 	}
 
-	// set ID to context
-	ctx = context.WithValue(ctx, "itemId", item.ID)
+	// set Id to context
+	ctx = context.WithValue(ctx, "itemId", item.Id)
 
 	insertItem := m.qb.Insert(m.table).Columns(
-		m.fieldMap("ID"),
-		m.fieldMap("SKU"),
+		m.fieldMap("Id"),
+		m.fieldMap("Sku"),
 		m.fieldMap("Name"),
 		m.fieldMap("ShortDescription"),
 		m.fieldMap("Description"),
@@ -299,8 +308,8 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		m.fieldMap("UpdatedAt"),
 		m.fieldMap("UpdatedBy"),
 	).Values(
-		item.ID,
-		item.SKU,
+		item.Id,
+		item.Sku,
 		item.Name,
 		item.ShortDescription,
 		item.Description,
@@ -323,7 +332,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		by,
 	)
 
-	return &insertItem, &item.ID
+	return &insertItem, &item.Id
 }
 
 // makeUpdateStatement
@@ -332,7 +341,7 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 	by := ctx.Value("user_id").(string)
 
 	return m.qb.Update(m.table).
-		Set(m.fieldMap("SKU"), item.SKU).
+		Set(m.fieldMap("Sku"), item.Sku).
 		Set(m.fieldMap("Name"), item.Name).
 		Set(m.fieldMap("ShortDescription"), item.ShortDescription).
 		Set(m.fieldMap("Description"), item.Description).
@@ -351,7 +360,7 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 		Set(m.fieldMap("GoogleProductType"), item.GoogleProductType).
 		Set(m.fieldMap("UpdatedAt"), "NOW()").
 		Set(m.fieldMap("UpdatedBy"), by).
-		Where(m.fieldMap("ID")+" = ?", item.ID)
+		Where(m.fieldMap("Id")+" = ?", item.Id)
 }
 
 // makePatchStatement

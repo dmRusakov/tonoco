@@ -1,12 +1,12 @@
 {{template "base" .}}
 
 {{define "content" }}
-    <div class="container" style="color: black;">
-        <div class="row">
-            <div class="col">
-                <h1 class="mt-5">Products</h1>
-            </div>
+    <div class="contentBody">
+        <h1>{{.Name}}</h1>
+        <div class="gridContainer">
+            {{range .Products}}
+                {{template "grid_product_item_in_list" .}}
+            {{end}}
         </div>
-        <div class="row"></div>
     </div>
 {{end}}

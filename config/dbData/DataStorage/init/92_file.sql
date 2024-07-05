@@ -1,16 +1,16 @@
 -- create table
 CREATE TABLE IF NOT EXISTS public.file
 (
-    id          UUID UNIQUE DEFAULT uuid_generate_v4() NOT NULL,
-    name        VARCHAR(255)                           NOT NULL,
-    url         VARCHAR(255)                           NOT NULL,
-    sort_order  INTEGER                                NOT NULL,
-    active      BOOLEAN     DEFAULT TRUE               NOT NULL,
+    id         UUID UNIQUE  DEFAULT uuid_generate_v4() NOT NULL,
+    name       VARCHAR(255) DEFAULT NULL,
+    url        VARCHAR(255) DEFAULT NULL,
+    sort_order INTEGER      DEFAULT NULL,
+    active     BOOLEAN      DEFAULT TRUE,
 
-    created_at TIMESTAMP   DEFAULT NOW()               NOT NULL,
-    created_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
-    updated_at TIMESTAMP   DEFAULT NOW()               NOT NULL,
-    updated_by UUID        DEFAULT '0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1',
+    created_at TIMESTAMP    DEFAULT NOW(),
+    created_by UUID         DEFAULT NULL,
+    updated_at TIMESTAMP    DEFAULT NOW(),
+    updated_by UUID         DEFAULT NULL,
 
     CONSTRAINT file_pkey PRIMARY KEY (id)
 );

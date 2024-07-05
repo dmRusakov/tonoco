@@ -3,10 +3,11 @@ package entity
 import "time"
 
 type PriceType struct {
-	ID        string    `json:"id" db:"id"`
+	Id        string    `json:"id" db:"id"`
 	Name      string    `json:"name" db:"name"`
 	Url       string    `json:"url" db:"url"`
 	SortOrder uint64    `json:"sort_order" db:"sort_order"`
+	IsPublic  bool      `json:"is_public" db:"is_public"`
 	Active    bool      `json:"active" db:"active"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	CreatedBy string    `json:"created_by" db:"created_by"`
@@ -15,10 +16,10 @@ type PriceType struct {
 }
 
 type PriceTypeFilter struct {
-	IDs      *[]string `json:"ids"`
+	Ids      *[]string `json:"ids"`
 	Urls     *[]string `json:"urls"`
 	Active   *bool     `json:"active"`
-	Prime    *bool     `json:"prime"`
+	IsPublic *bool     `json:"prime"`
 	Search   *string   `json:"search"`
 	OrderBy  *string   `json:"order_by"`
 	OrderDir *string   `json:"order_dir"`

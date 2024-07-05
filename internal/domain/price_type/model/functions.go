@@ -7,39 +7,61 @@ import (
 	"time"
 )
 
-func (m *Model) Get(ctx context.Context, id *string, url *string) (*Item, error) {
-	rows, err := psql.Get(ctx, m.client, m.makeGetStatement(id, url))
+func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
+	row, err := psql.Get(ctx, m.client, m.makeGetStatement(filter))
 	if err != nil {
 		return nil, err
 	}
 
 	// return the Item
-	return m.scanOneRow(ctx, rows)
+	return m.scanOneRow(ctx, row)
 }
 
-func (m *Model) List(ctx context.Context, filter *Filter) (*map[string]Item, error) {
+func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (*map[string]Item, error) {
 	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter))
-	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	// iterate over the result set
 	items := make(map[string]Item)
-	var ids []string
 	idsMap := make(map[string]bool)
+	urlsMap := make(map[string]bool)
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
 		if err != nil {
 			return nil, err
 		}
-		items[item.ID] = *item
-		ids = append(ids, item.ID)
-		idsMap[item.ID] = true
+
+		items[item.Id] = *item
+		if !isUpdateFilter {
+			continue
+		}
+
+		idsMap[item.Id] = true
+		urlsMap[item.Url] = true
+
 	}
 
-	filter.IDs = &ids
+	if !isUpdateFilter {
+		return &items, nil
+	}
 
+	ids := make([]string, 0, len(idsMap))
+	for id := range idsMap {
+		ids = append(ids, id)
+	}
+	urls := make([]string, 0, len(urlsMap))
+	for url := range urlsMap {
+		urls = append(urls, url)
+	}
+
+	// update filter
+	filter.Ids = &ids
+	filter.Urls = &urls
+
+	// return the Items
 	return &items, nil
 }
 
@@ -56,7 +78,7 @@ func (m *Model) Update(ctx context.Context, item *Item) (err error) {
 	return psql.Update(
 		ctx,
 		m.client,
-		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.fieldMap("ID")), item.ID),
+		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), item.Id),
 	)
 }
 
@@ -72,7 +94,7 @@ func (m *Model) Delete(ctx context.Context, id *string) error {
 	return psql.Delete(
 		ctx,
 		m.client,
-		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.fieldMap("ID")), id),
+		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), id),
 	)
 }
 

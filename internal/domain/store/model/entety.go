@@ -2,80 +2,81 @@ package model
 
 import (
 	"context"
+	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/google/uuid"
+	"reflect"
 )
 
-type Item = entity.Store
-type Filter = entity.StoreFilter
-
 // fieldMap
-var fieldMap = map[string]string{
-	"ID":           "id",
-	"Name":         "name",
-	"Abbreviation": "abbreviation",
-	"Config":       "config",
-	"SortOrder":    "sort_order",
-	"Active":       "active",
-	"AddressLine1": "address_line1",
-	"AddressLine2": "address_line2",
-	"City":         "city",
-	"State":        "state",
-	"ZipCode":      "zip_code",
-	"Country":      "country",
-	"WebSite":      "web_site",
-	"Phone":        "phone",
-	"Email":        "email",
-	"CreatedAt":    "created_at",
-	"CreatedBy":    "created_by",
-	"UpdatedAt":    "updated_at",
-	"UpdatedBy":    "updated_by",
+func (m *Model) fieldMap(field string) string {
+	// check if field is in the cash
+	if dbField, ok := m.dbFieldCash[field]; ok {
+		return dbField
+	}
+
+	// get field from struct
+	typeOf := reflect.TypeOf(Item{})
+	byName, _ := typeOf.FieldByName(field)
+	dbField := byName.Tag.Get("db")
+
+	// set field to cash
+	m.dbFieldCash[field] = dbField
+
+	// done
+	return dbField
 }
 
 // makeStatement
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
-		fieldMap["ID"],
-		fieldMap["Name"],
-		fieldMap["Abbreviation"],
-		fieldMap["Config"],
-		fieldMap["SortOrder"],
-		fieldMap["Active"],
-		fieldMap["AddressLine1"],
-		fieldMap["AddressLine2"],
-		fieldMap["City"],
-		fieldMap["State"],
-		fieldMap["ZipCode"],
-		fieldMap["Country"],
-		fieldMap["WebSite"],
-		fieldMap["Phone"],
-		fieldMap["Email"],
-		fieldMap["CreatedAt"],
-		fieldMap["CreatedBy"],
-		fieldMap["UpdatedAt"],
-		fieldMap["UpdatedBy"],
+		m.fieldMap("Id"),
+		m.fieldMap("Name"),
+		m.fieldMap("Url"),
+		m.fieldMap("Abbreviation"),
+		m.fieldMap("Config"),
+		m.fieldMap("SortOrder"),
+		m.fieldMap("Active"),
+		m.fieldMap("AddressLine1"),
+		m.fieldMap("AddressLine2"),
+		m.fieldMap("City"),
+		m.fieldMap("State"),
+		m.fieldMap("ZipCode"),
+		m.fieldMap("Country"),
+		m.fieldMap("WebSite"),
+		m.fieldMap("Phone"),
+		m.fieldMap("Email"),
+		m.fieldMap("CreatedAt"),
+		m.fieldMap("CreatedBy"),
+		m.fieldMap("UpdatedAt"),
+		m.fieldMap("UpdatedBy"),
 	).From(m.table + " p")
 }
 
 // make Get statement
 func (m *Model) makeGetStatement(
-	id *string,
-	abbreviation *string,
+	filter *Filter,
 ) sq.SelectBuilder {
 	// build query
 	statement := m.makeStatement()
 
 	// id
-	if id != nil {
-		statement = statement.Where(fieldMap["ID"]+" = ?", *id)
+	if filter.Ids != nil {
+		statement = statement.Where(m.fieldMap("Id")+" = ?", (*filter.Ids)[0])
+	}
+
+	// url
+	if filter.Urls != nil {
+		statement = statement.Where(m.fieldMap("Url")+" = ?", (*filter.Urls)[0])
 	}
 
 	// abbreviation
-	if abbreviation != nil {
-		statement = statement.Where(fieldMap["Abbreviation"]+" = ?", *abbreviation)
+	if filter.Abbreviations != nil {
+		statement = statement.Where(m.fieldMap("Abbreviation")+" = ?", (*filter.Abbreviations)[0])
+
 	}
 
 	return statement
@@ -83,42 +84,6 @@ func (m *Model) makeGetStatement(
 
 // makeStatementByFilter
 func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
-	// Build query
-	statement := m.makeStatement()
-
-	// Ids
-	if filter.IDs != nil {
-		countIds := len(*filter.IDs)
-
-		if countIds > 0 {
-			statement = statement.Where(sq.Eq{fieldMap["ID"]: *filter.IDs})
-		}
-
-		*filter.Page = 1
-		if (*filter.PerPage) > uint64(countIds) {
-			*filter.PerPage = uint64(countIds)
-		}
-	}
-
-	// Active
-	if filter.Active != nil {
-		statement = statement.Where(sq.Eq{fieldMap["Active"]: *filter.Active})
-	}
-
-	// Search
-	if filter.Search != nil {
-		statement = statement.Where(
-			sq.Or{
-				sq.Expr("LOWER("+fieldMap["Name"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["Abbreviations"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["AddressLine1"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["AddressLine2"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["City"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+fieldMap["State"]+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-			},
-		)
-	}
-
 	// OrderBy
 	if filter.OrderBy == nil {
 		filter.OrderBy = entity.StringPtr("SortOrder")
@@ -143,34 +108,106 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		filter.Page = entity.Uint64Ptr(1)
 	}
 
+	// Build query
+	statement := m.makeStatement()
+
+	// Ids
+	if filter.Ids != nil {
+		countIds := len(*filter.Ids)
+
+		if countIds > 0 {
+			statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
+		}
+
+		*filter.Page = 1
+		if (*filter.PerPage) > uint64(countIds) {
+			*filter.PerPage = uint64(countIds)
+		}
+	}
+
+	// Urls
+	if filter.Urls != nil {
+		countUrls := len(*filter.Urls)
+
+		if countUrls > 0 {
+			statement = statement.Where(sq.Eq{m.fieldMap("Url"): *filter.Urls})
+		}
+
+		*filter.Page = 1
+		if (*filter.PerPage) > uint64(countUrls) {
+			*filter.PerPage = uint64(countUrls)
+		}
+
+	}
+
+	// Abbreviations
+	if filter.Abbreviations != nil {
+		countAbbreviations := len(*filter.Abbreviations)
+
+		if countAbbreviations > 0 {
+			statement = statement.Where(sq.Eq{m.fieldMap("Abbreviation"): *filter.Abbreviations})
+		}
+
+		*filter.Page = 1
+		if (*filter.PerPage) > uint64(countAbbreviations) {
+			*filter.PerPage = uint64(countAbbreviations)
+		}
+
+	}
+
+	// Active
+	if filter.Active != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("Active"): *filter.Active})
+	}
+
+	// Search
+	if filter.Search != nil {
+		statement = statement.Where(
+			sq.Or{
+				sq.Expr("LOWER("+m.fieldMap("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("Abbreviations")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("AddressLine1")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("AddressLine2")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("City")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("State")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+			},
+		)
+	}
+
 	// Add OrderBy, OrderDir, Page, Limit and return
-	return statement.OrderBy(fieldMap[*filter.OrderBy] + " " + *filter.OrderDir).
+	return statement.OrderBy(m.fieldMap(*filter.OrderBy) + " " + *filter.OrderDir).
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 }
 
 // scanOneRow
 func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
-	var item = &Item{}
+	var id, url, name, abbreviation, config, addressLine1, addressLine2, city, state, zipCode, country, webSite, phone, email, createdBy, updatedBy sql.NullString
+	var sortOrder sql.NullInt64
+	var active sql.NullBool
+	var createdAt, updatedAt sql.NullTime
+
 	err := rows.Scan(
-		&item.ID,
-		&item.Name,
-		&item.Abbreviation,
-		&item.Config,
-		&item.SortOrder,
-		&item.Active,
-		&item.AddressLine1,
-		&item.AddressLine2,
-		&item.City,
-		&item.State,
-		&item.ZipCode,
-		&item.Country,
-		&item.WebSite,
-		&item.Phone,
-		&item.Email,
-		&item.CreatedAt,
-		&item.CreatedBy,
-		&item.UpdatedAt,
-		&item.UpdatedBy,
+		&id,
+		&name,
+		&url,
+		&abbreviation,
+		&config,
+		&sortOrder,
+		&active,
+		&addressLine1,
+		&addressLine2,
+		&city,
+		&state,
+		&zipCode,
+		&country,
+		&webSite,
+		&phone,
+		&email,
+		&createdAt,
+		&createdBy,
+		&updatedAt,
+		&updatedBy,
 	)
 
 	if err != nil {
@@ -179,7 +216,89 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 		return nil, err
 	}
 
-	return item, nil
+	var item = Item{}
+
+	if id.Valid {
+		item.Id = id.String
+	}
+
+	if name.Valid {
+		item.Name = name.String
+	}
+
+	if url.Valid {
+		item.Url = url.String
+	}
+
+	if abbreviation.Valid {
+		item.Abbreviation = abbreviation.String
+	}
+
+	if config.Valid {
+		item.Config = config.String
+	}
+
+	if sortOrder.Valid {
+		item.SortOrder = uint64(sortOrder.Int64)
+	}
+
+	if active.Valid {
+		item.Active = active.Bool
+	}
+
+	if addressLine1.Valid {
+		item.AddressLine1 = addressLine1.String
+	}
+
+	if addressLine2.Valid {
+		item.AddressLine2 = addressLine2.String
+	}
+
+	if city.Valid {
+		item.City = city.String
+	}
+
+	if state.Valid {
+		item.State = state.String
+	}
+
+	if zipCode.Valid {
+		item.ZipCode = zipCode.String
+	}
+
+	if country.Valid {
+		item.Country = country.String
+	}
+
+	if webSite.Valid {
+		item.WebSite = webSite.String
+	}
+
+	if phone.Valid {
+		item.Phone = phone.String
+	}
+
+	if email.Valid {
+		item.Email = email.String
+	}
+
+	if createdAt.Valid {
+		item.CreatedAt = createdAt.Time
+	}
+
+	if createdBy.Valid {
+		item.CreatedBy = createdBy.String
+	}
+
+	if updatedAt.Valid {
+		item.UpdatedAt = updatedAt.Time
+	}
+
+	if updatedBy.Valid {
+		item.UpdatedBy = updatedBy.String
+	}
+
+	return &item, nil
 }
 
 // makeInsertStatement
@@ -187,37 +306,39 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
-	// if ID is not set, generate a new UUID
-	if item.ID == "" {
-		item.ID = uuid.New().String()
+	// if Id is not set, generate a new UUID
+	if item.Id == "" {
+		item.Id = uuid.New().String()
 	}
 
-	// set ID to context
-	ctx = context.WithValue(ctx, "itemId", item.ID)
+	// set Id to context
+	ctx = context.WithValue(ctx, "itemId", item.Id)
 
 	insertItem := m.qb.Insert(m.table).Columns(
-		fieldMap["ID"],
-		fieldMap["Name"],
-		fieldMap["Abbreviation"],
-		fieldMap["Config"],
-		fieldMap["SortOrder"],
-		fieldMap["Active"],
-		fieldMap["AddressLine1"],
-		fieldMap["AddressLine2"],
-		fieldMap["City"],
-		fieldMap["State"],
-		fieldMap["ZipCode"],
-		fieldMap["Country"],
-		fieldMap["WebSite"],
-		fieldMap["Phone"],
-		fieldMap["Email"],
-		fieldMap["CreatedAt"],
-		fieldMap["CreatedBy"],
-		fieldMap["UpdatedAt"],
-		fieldMap["UpdatedBy"],
+		m.fieldMap("Id"),
+		m.fieldMap("Name"),
+		m.fieldMap("Url"),
+		m.fieldMap("Abbreviation"),
+		m.fieldMap("Config"),
+		m.fieldMap("SortOrder"),
+		m.fieldMap("Active"),
+		m.fieldMap("AddressLine1"),
+		m.fieldMap("AddressLine2"),
+		m.fieldMap("City"),
+		m.fieldMap("State"),
+		m.fieldMap("ZipCode"),
+		m.fieldMap("Country"),
+		m.fieldMap("WebSite"),
+		m.fieldMap("Phone"),
+		m.fieldMap("Email"),
+		m.fieldMap("CreatedAt"),
+		m.fieldMap("CreatedBy"),
+		m.fieldMap("UpdatedAt"),
+		m.fieldMap("UpdatedBy"),
 	).Values(
-		item.ID,
+		item.Id,
 		item.Name,
+		item.Url,
 		item.Abbreviation,
 		item.Config,
 		item.SortOrder,
@@ -238,7 +359,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	)
 
 	// get itemId from context
-	return &insertItem, &item.ID
+	return &insertItem, &item.Id
 }
 
 // makeUpdateStatement
@@ -247,22 +368,23 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 	by := ctx.Value("user_id").(string)
 
 	return m.qb.Update(m.table).
-		Set(fieldMap["Name"], item.Name).
-		Set(fieldMap["Abbreviation"], item.Abbreviation).
-		Set(fieldMap["Config"], item.Config).
-		Set(fieldMap["SortOrder"], item.SortOrder).
-		Set(fieldMap["Active"], item.Active).
-		Set(fieldMap["AddressLine1"], item.AddressLine1).
-		Set(fieldMap["AddressLine2"], item.AddressLine2).
-		Set(fieldMap["City"], item.City).
-		Set(fieldMap["State"], item.State).
-		Set(fieldMap["ZipCode"], item.ZipCode).
-		Set(fieldMap["Country"], item.Country).
-		Set(fieldMap["WebSite"], item.WebSite).
-		Set(fieldMap["Phone"], item.Phone).
-		Set(fieldMap["Email"], item.Email).
-		Set(fieldMap["UpdatedAt"], "NOW()").
-		Set(fieldMap["UpdatedBy"], by)
+		Set(m.fieldMap("Name"), item.Name).
+		Set(m.fieldMap("Url"), item.Url).
+		Set(m.fieldMap("Abbreviation"), item.Abbreviation).
+		Set(m.fieldMap("Config"), item.Config).
+		Set(m.fieldMap("SortOrder"), item.SortOrder).
+		Set(m.fieldMap("Active"), item.Active).
+		Set(m.fieldMap("AddressLine1"), item.AddressLine1).
+		Set(m.fieldMap("AddressLine2"), item.AddressLine2).
+		Set(m.fieldMap("City"), item.City).
+		Set(m.fieldMap("State"), item.State).
+		Set(m.fieldMap("ZipCode"), item.ZipCode).
+		Set(m.fieldMap("Country"), item.Country).
+		Set(m.fieldMap("WebSite"), item.WebSite).
+		Set(m.fieldMap("Phone"), item.Phone).
+		Set(m.fieldMap("Email"), item.Email).
+		Set(m.fieldMap("UpdatedAt"), "NOW()").
+		Set(m.fieldMap("UpdatedBy"), by)
 }
 
 // makePatchStatement
@@ -273,9 +395,9 @@ func (m *Model) makePatchStatement(ctx context.Context, id *string, fields *map[
 	statement := m.qb.Update(m.table).Where("id = ?", id)
 
 	for field, value := range *fields {
-		field = fieldMap[field]
+		field = m.fieldMap(field)
 		statement = statement.Set(field, value)
 	}
 
-	return statement.Set(fieldMap["UpdatedAt"], "NOW()").Set(fieldMap["UpdatedBy"], by)
+	return statement.Set(m.fieldMap("UpdatedAt"), "NOW()").Set(m.fieldMap("UpdatedBy"), by)
 }

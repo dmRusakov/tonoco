@@ -11,20 +11,29 @@ import (
 	"reflect"
 )
 
-type Item = entity.TagType
-type Filter = entity.TagTypeFilter
-
 // fieldMap
 func (m *Model) fieldMap(field string) string {
+	// check if field is in the cash
+	if dbField, ok := m.dbFieldCash[field]; ok {
+		return dbField
+	}
+
+	// get field from struct
 	typeOf := reflect.TypeOf(Item{})
 	byName, _ := typeOf.FieldByName(field)
-	return byName.Tag.Get("db")
+	dbField := byName.Tag.Get("db")
+
+	// set field to cash
+	m.dbFieldCash[field] = dbField
+
+	// done
+	return dbField
 }
 
 // makeStatement
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
-		m.fieldMap("ID"),
+		m.fieldMap("Id"),
 		m.fieldMap("Name"),
 		m.fieldMap("Url"),
 		m.fieldMap("ShortDescription"),
@@ -46,18 +55,18 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 }
 
 // make Get statement
-func (m *Model) makeGetStatement(id *string, url *string) sq.SelectBuilder {
+func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 	// build query
 	statement := m.makeStatement()
 
 	// id
-	if id != nil {
-		statement = statement.Where(m.fieldMap("ID")+" = ?", *id)
+	if filter.Ids != nil {
+		statement = statement.Where(m.fieldMap("Id")+" = ?", (*filter.Ids)[0])
 	}
 
 	// url
-	if url != nil {
-		statement = statement.Where(m.fieldMap("Url")+" = ?", *url)
+	if filter.Urls != nil {
+		statement = statement.Where(m.fieldMap("Url")+" = ?", (*filter.Urls)[0])
 	}
 
 	return statement
@@ -93,11 +102,11 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	statement := m.makeStatement()
 
 	// Ids
-	if filter.IDs != nil {
-		countIds := len(*filter.IDs)
+	if filter.Ids != nil {
+		countIds := len(*filter.Ids)
 
 		if countIds > 0 {
-			statement = statement.Where(sq.Eq{m.fieldMap("ID"): *filter.IDs})
+			statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
 		}
 
 		*filter.Page = 1
@@ -107,11 +116,11 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	}
 
 	// Urls
-	if filter.URLs != nil {
-		countUrls := len(*filter.URLs)
+	if filter.Urls != nil {
+		countUrls := len(*filter.Urls)
 
 		if countUrls > 0 {
-			statement = statement.Where(sq.Eq{m.fieldMap("Url"): *filter.URLs})
+			statement = statement.Where(sq.Eq{m.fieldMap("Url"): *filter.Urls})
 		}
 
 		*filter.Page = 1
@@ -164,7 +173,6 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 // scanOneRow
 func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
-	var item = &Item{}
 	var id, name, url, shortDescription, description, typeField, prefix, suffix, createdBy, updatedBy sql.NullString
 	var required, active, prime, listItem, filter sql.NullBool
 	var sortOrder sql.NullInt64
@@ -197,8 +205,10 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 		return nil, err
 	}
 
+	var item = Item{}
+
 	if id.Valid {
-		item.ID = id.String
+		item.Id = id.String
 	}
 	if name.Valid {
 		item.Name = name.String
@@ -252,7 +262,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 		item.UpdatedBy = updatedBy.String
 	}
 
-	return item, nil
+	return &item, nil
 }
 
 // makeInsertStatement
@@ -261,16 +271,16 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
-	// if ID is not set, generate a new UUID
-	if item.ID == "" {
-		item.ID = uuid.New().String()
+	// if Id is not set, generate a new UUID
+	if item.Id == "" {
+		item.Id = uuid.New().String()
 	}
 
-	// set ID to context
-	ctx = context.WithValue(ctx, "itemId", item.ID)
+	// set Id to context
+	ctx = context.WithValue(ctx, "itemId", item.Id)
 
 	insertItem := m.qb.Insert(m.table).Columns(
-		m.fieldMap("ID"),
+		m.fieldMap("Id"),
 		m.fieldMap("Name"),
 		m.fieldMap("Url"),
 		m.fieldMap("ShortDescription"),
@@ -289,7 +299,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		m.fieldMap("UpdatedAt"),
 		m.fieldMap("UpdatedBy"),
 	).Values(
-		item.ID,
+		item.Id,
 		item.Name,
 		item.Url,
 		item.ShortDescription,
@@ -309,7 +319,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		by,
 	)
 
-	return &insertItem, &item.ID
+	return &insertItem, &item.Id
 }
 
 // makeUpdateStatement

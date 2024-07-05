@@ -2,98 +2,86 @@ package model
 
 import (
 	"context"
+	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/google/uuid"
+	"reflect"
 )
 
-type Item = entity.Price
-type Filter = entity.PriceFilter
-
 // fieldMap
-var fieldMap = map[string]string{
-	"ID":          "id",
-	"ProductID":   "product_id",
-	"PriceTypeID": "price_type_id",
-	"CurrencyID":  "currency_id",
-	"WarehouseID": "warehouse_id",
-	"StoreId":     "store_id",
-	"Price":       "price",
-	"SortOrder":   "sort_order",
-	"Active":      "active",
-	"CreatedAt":   "created_at",
-	"CreatedBy":   "created_by",
-	"UpdatedAt":   "updated_at",
-	"UpdatedBy":   "updated_by",
+func (m *Model) fieldMap(field string) string {
+	// check if field is in the cash
+	if dbField, ok := m.dbFieldCash[field]; ok {
+		return dbField
+	}
+
+	// get field from struct
+	typeOf := reflect.TypeOf(Item{})
+	byName, _ := typeOf.FieldByName(field)
+	dbField := byName.Tag.Get("db")
+
+	// set field to cash
+	m.dbFieldCash[field] = dbField
+
+	// done
+	return dbField
 }
 
 // makeStatement
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
-		fieldMap["ID"],
-		fieldMap["ProductID"],
-		fieldMap["PriceTypeID"],
-		fieldMap["CurrencyID"],
-		fieldMap["WarehouseID"],
-		fieldMap["StoreId"],
-		fieldMap["Price"],
-		fieldMap["SortOrder"],
-		fieldMap["Active"],
-		fieldMap["CreatedAt"],
-		fieldMap["CreatedBy"],
-		fieldMap["UpdatedAt"],
-		fieldMap["UpdatedBy"],
+		m.fieldMap("Id"),
+		m.fieldMap("ProductIds"),
+		m.fieldMap("PriceTypeIds"),
+		m.fieldMap("CurrencyIds"),
+		m.fieldMap("WarehouseIds"),
+		m.fieldMap("StoreIds"),
+		m.fieldMap("Price"),
+		m.fieldMap("SortOrder"),
+		m.fieldMap("Active"),
+		m.fieldMap("CreatedAt"),
+		m.fieldMap("CreatedBy"),
+		m.fieldMap("UpdatedAt"),
+		m.fieldMap("UpdatedBy"),
 	).From(m.table + " p")
 }
 
 // make Get statement
-func (m *Model) makeGetStatement(
-	id *string,
-	productID *string,
-	priceTypeID *string,
-	currencyID *string,
-	warehouseID *string,
-	storeId *string,
-) sq.SelectBuilder {
+func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 	// build query
 	statement := m.makeStatement()
 
 	// id
-	if id != nil {
-		statement = statement.Where("id = ?", *id)
+	if filter.Ids != nil {
+		statement = statement.Where(m.fieldMap("Id")+" = ?", (*filter.Ids)[0])
 	}
 
 	// productID
-	if productID != nil {
-		statement = statement.Where("product_id = ?", *productID)
+	if filter.ProductIds != nil {
+		statement = statement.Where(m.fieldMap("ProductIds")+" = ?", (*filter.ProductIds)[0])
 	}
 
 	// priceTypeID
-	if priceTypeID != nil {
-		statement = statement.Where("price_type_id = ?", *priceTypeID)
+	if filter.PriceTypeIds != nil {
+		statement = statement.Where(m.fieldMap("PriceTypeIds")+" = ?", (*filter.PriceTypeIds)[0])
 	}
 
-	// currencyID
-	if currencyID != nil {
-		statement = statement.Where("currency_id = ?", *currencyID)
+	// CurrencyIds
+	if filter.CurrencyIds != nil {
+		statement = statement.Where(m.fieldMap("CurrencyIds")+" = ?", (*filter.CurrencyIds)[0])
 	}
 
-	// warehouseID
-	if warehouseID != nil {
-		statement = statement.
-			Where("warehouse_id = ?", *warehouseID).
-			Where("store_id IS NULL").
-			OrderBy("store_id")
+	// WarehouseIds
+	if filter.WarehouseIds != nil {
+		statement = statement.Where(m.fieldMap("WarehouseIds")+" = ?", (*filter.WarehouseIds)[0])
 	}
 
-	// storeId
-	if storeId != nil {
-		statement = statement.
-			Where("store_id = ?", *storeId).
-			Where("warehouse_id IS NULL").
-			OrderBy("warehouse_id")
+	// StoreIds
+	if filter.StoreIds != nil {
+		statement = statement.Where(m.fieldMap("StoreIds")+" = ?", (*filter.StoreIds)[0])
 	}
 
 	return statement
@@ -101,59 +89,97 @@ func (m *Model) makeGetStatement(
 
 // makeStatementByFilter
 func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
+	// OrderBy
+	if filter.OrderBy == nil {
+		filter.OrderBy = entity.StringPtr("SortOrder")
+	}
+
+	// OrderDir
+	if filter.OrderDir == nil {
+		filter.OrderDir = entity.StringPtr("ASC")
+	}
+
+	// PerPage
+	if filter.PerPage == nil {
+		if filter.Page == nil {
+			filter.PerPage = entity.Uint64Ptr(999999999999999999)
+		} else {
+			filter.PerPage = entity.Uint64Ptr(10)
+		}
+	}
+
+	// Page
+	if filter.Page == nil {
+		filter.Page = entity.Uint64Ptr(1)
+	}
+
 	// Build query
 	statement := m.makeStatement()
 
 	// Ids
-	if filter.IDs != nil && len(*filter.IDs) > 0 {
-		statement = statement.Where(sq.Eq{fieldMap["ID"]: *filter.IDs})
+	if filter.Ids != nil && len(*filter.Ids) > 0 {
+		statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
 	}
 
-	// ProductID
-	if filter.ProductID != nil {
-		statement = statement.Where(sq.Eq{fieldMap["ProductID"]: *filter.ProductID})
+	// ProductIds
+	if filter.ProductIds != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("ProductIds"): *filter.ProductIds})
 	}
 
-	// CurrencyID
-	if filter.CurrencyID != nil {
-		statement = statement.Where(sq.Eq{fieldMap["CurrencyID"]: *filter.CurrencyID})
+	// CurrencyIds
+	if filter.CurrencyIds != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("CurrencyIds"): *filter.CurrencyIds})
 	}
 
-	// WarehouseID
-	if filter.WarehouseID != nil {
-		statement = statement.Where(sq.Eq{fieldMap["WarehouseID"]: *filter.WarehouseID})
+	// WarehouseIds
+	if filter.WarehouseIds != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("WarehouseIds"): *filter.WarehouseIds})
 	}
 
-	// StoreId
-	if filter.StoreId != nil {
-		statement = statement.Where(sq.Eq{fieldMap["StoreId"]: *filter.StoreId}).Where("warehouse_id IS NULL").OrderBy("warehouse_id")
+	// StoreIds
+	if filter.StoreIds != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("StoreIds"): *filter.StoreIds}).Where("warehouse_id IS NULL").OrderBy("warehouse_id")
 	}
 
 	// Active
 	if filter.Active != nil {
-		statement = statement.Where(sq.Eq{fieldMap["Active"]: *filter.Active})
+		statement = statement.Where(sq.Eq{m.fieldMap("Active"): *filter.Active})
+	}
+
+	// Search
+	if filter.Search != nil {
+		statement = statement.Where(
+			sq.Or{
+				sq.Expr("LOWER("+m.fieldMap("Price")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+			},
+		)
 	}
 
 	// Add OrderBy, OrderDir, Page, Limit and return
-	return statement
+	return statement.OrderBy(m.fieldMap(*filter.OrderBy) + " " + *filter.OrderDir).
+		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 }
 
 // scanOneRow
 func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
-	var item = &Item{}
+	var id, productID, priceTypeID, currencyID, warehouseID, storeId, createdBy, updatedBy sql.NullString
+	var active sql.NullBool
+	var price sql.NullInt64
+	var createdAt, updatedAt sql.NullString
+
 	err := rows.Scan(
-		&item.ID,
-		&item.ProductID,
-		&item.PriceTypeID,
-		&item.CurrencyID,
-		&item.WarehouseID,
-		&item.StoreId,
-		&item.Price,
-		&item.Active,
-		&item.CreatedAt,
-		&item.CreatedBy,
-		&item.UpdatedAt,
-		&item.UpdatedBy,
+		&id,
+		&productID,
+		&priceTypeID,
+		&currencyID,
+		&warehouseID,
+		&storeId,
+		&price,
+		&active,
+		&createdAt,
+		&createdBy,
+		&updatedAt,
+		&updatedBy,
 	)
 
 	if err != nil {
@@ -162,7 +188,57 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 		return nil, err
 	}
 
-	return item, nil
+	var item = Item{}
+
+	if id.Valid {
+		item.Id = id.String
+	}
+
+	if productID.Valid {
+		item.ProductID = productID.String
+	}
+
+	if priceTypeID.Valid {
+		item.PriceTypeID = priceTypeID.String
+	}
+
+	if currencyID.Valid {
+		item.CurrencyID = currencyID.String
+	}
+
+	if warehouseID.Valid {
+		item.WarehouseID = warehouseID.String
+	}
+
+	if storeId.Valid {
+		item.StoreId = storeId.String
+	}
+
+	if price.Valid {
+		item.Price = uint64(price.Int64)
+	}
+
+	if active.Valid {
+		item.Active = active.Bool
+	}
+
+	if createdAt.Valid {
+		item.CreatedAt = createdAt.String
+	}
+
+	if createdBy.Valid {
+		item.CreatedBy = createdBy.String
+	}
+
+	if updatedAt.Valid {
+		item.UpdatedAt = updatedAt.String
+	}
+
+	if updatedBy.Valid {
+		item.UpdatedBy = updatedBy.String
+	}
+
+	return &item, nil
 }
 
 // makeInsertStatement
@@ -170,29 +246,29 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
-	// if ID is not set, generate a new UUID
-	if item.ID == "" {
-		item.ID = uuid.New().String()
+	// if Id is not set, generate a new UUID
+	if item.Id == "" {
+		item.Id = uuid.New().String()
 	}
 
-	// set ID to context
-	ctx = context.WithValue(ctx, "itemId", item.ID)
+	// set Id to context
+	ctx = context.WithValue(ctx, "itemId", item.Id)
 
 	insertItem := m.qb.Insert(m.table).Columns(
-		fieldMap["ID"],
-		fieldMap["ProductID"],
-		fieldMap["PriceTypeID"],
-		fieldMap["CurrencyID"],
-		fieldMap["WarehouseID"],
-		fieldMap["StoreId"],
-		fieldMap["Price"],
-		fieldMap["Active"],
-		fieldMap["CreatedAt"],
-		fieldMap["CreatedBy"],
-		fieldMap["UpdatedAt"],
-		fieldMap["UpdatedBy"],
+		m.fieldMap("Id"),
+		m.fieldMap("ProductIds"),
+		m.fieldMap("PriceTypeIds"),
+		m.fieldMap("CurrencyIds"),
+		m.fieldMap("WarehouseIds"),
+		m.fieldMap("StoreIds"),
+		m.fieldMap("Price"),
+		m.fieldMap("Active"),
+		m.fieldMap("CreatedAt"),
+		m.fieldMap("CreatedBy"),
+		m.fieldMap("UpdatedAt"),
+		m.fieldMap("UpdatedBy"),
 	).Values(
-		item.ID,
+		item.Id,
 		item.ProductID,
 		item.PriceTypeID,
 		item.CurrencyID,
@@ -207,7 +283,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	)
 
 	// get itemId from context
-	return &insertItem, &item.ID
+	return &insertItem, &item.Id
 }
 
 // makeUpdateStatement
@@ -216,15 +292,15 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 	by := ctx.Value("user_id").(string)
 
 	return m.qb.Update(m.table).
-		Set(fieldMap["ProductID"], item.ProductID).
-		Set(fieldMap["PriceTypeID"], item.PriceTypeID).
-		Set(fieldMap["CurrencyID"], item.CurrencyID).
-		Set(fieldMap["WarehouseID"], item.WarehouseID).
-		Set(fieldMap["StoreId"], item.StoreId).
-		Set(fieldMap["Price"], item.Price).
-		Set(fieldMap["Active"], item.Active).
-		Set(fieldMap["UpdatedAt"], "NOW()").
-		Set(fieldMap["UpdatedBy"], by)
+		Set(m.fieldMap("ProductIds"), item.ProductID).
+		Set(m.fieldMap("PriceTypeIds"), item.PriceTypeID).
+		Set(m.fieldMap("CurrencyIds"), item.CurrencyID).
+		Set(m.fieldMap("WarehouseIds"), item.WarehouseID).
+		Set(m.fieldMap("StoreIds"), item.StoreId).
+		Set(m.fieldMap("Price"), item.Price).
+		Set(m.fieldMap("Active"), item.Active).
+		Set(m.fieldMap("UpdatedAt"), "NOW()").
+		Set(m.fieldMap("UpdatedBy"), by)
 }
 
 // makePatchStatement
@@ -235,9 +311,9 @@ func (m *Model) makePatchStatement(ctx context.Context, id *string, fields *map[
 	statement := m.qb.Update(m.table).Where("id = ?", id)
 
 	for field, value := range *fields {
-		field = fieldMap[field]
+		field = m.fieldMap(field)
 		statement = statement.Set(field, value)
 	}
 
-	return statement.Set(fieldMap["UpdatedAt"], "NOW()").Set(fieldMap["UpdatedBy"], by)
+	return statement.Set(m.fieldMap("UpdatedAt"), "NOW()").Set(m.fieldMap("UpdatedBy"), by)
 }

@@ -1,0 +1,16 @@
+{{define "grid_product_item_in_list"}}
+    <a class="gridItem" data-id="{{.Id}}" href="/{{.Url}}">
+        <img src="/assets/images/elements/no-image.svg" title="{{.SeoTitle}}" alt="{{.SeoDescription}}">
+        <h3>{{.Name}}</h3>
+        <p class="text">{{.ShortDescription}}</p>
+        <div class="detail-container">
+            <p class="details">Shop this</p>
+            <p class="price">{{.Currency}}{{.Price}}</p>
+        </div>
+        <div class="sku-container">
+            <p class="sku">{{.Sku}}<span> - {{.Quantity}}</span></p>
+            <p class="itemNo"></p>
+        </div>
+    </a>
+{{end}}
+
