@@ -36,9 +36,12 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 		if err != nil {
 			return nil, err
 		}
+
 		items[item.Id] = *item
-		idsMap[item.Id] = true
+
+		// update filters if needed
 		if isUpdateFilter {
+			idsMap[item.Id] = true
 			productIdsMap[item.ProductID] = true
 			currencyIdsMap[item.CurrencyID] = true
 			warehouseIdsMap[item.WarehouseID] = true
@@ -46,7 +49,8 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 		}
 	}
 
-	if !isUpdateFilter {
+	// update filters if needed
+	if isUpdateFilter {
 		ids := make([]string, 0, len(idsMap))
 		for id := range idsMap {
 			ids = append(ids, id)

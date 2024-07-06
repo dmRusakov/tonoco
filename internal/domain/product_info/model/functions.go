@@ -35,31 +35,29 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 		}
 
 		items[item.Id] = *item
-		if !isUpdateFilter {
-			continue
+
+		// update filters if needed
+		if isUpdateFilter {
+			idsMap[item.Id] = true
+			urlsMap[item.Url] = true
+		}
+	}
+
+	// update filters if needed
+	if isUpdateFilter {
+		ids := make([]string, 0, len(idsMap))
+		for id := range idsMap {
+			ids = append(ids, id)
+		}
+		urls := make([]string, 0, len(urlsMap))
+		for url := range urlsMap {
+			urls = append(urls, url)
 		}
 
-		idsMap[item.Id] = true
-		urlsMap[item.Url] = true
-
+		// update filter
+		filter.Ids = &ids
+		filter.Urls = &urls
 	}
-
-	if !isUpdateFilter {
-		return &items, nil
-	}
-
-	ids := make([]string, 0, len(idsMap))
-	for id := range idsMap {
-		ids = append(ids, id)
-	}
-	urls := make([]string, 0, len(urlsMap))
-	for url := range urlsMap {
-		urls = append(urls, url)
-	}
-
-	// update filter
-	filter.Ids = &ids
-	filter.Urls = &urls
 
 	// return the Items
 	return &items, nil

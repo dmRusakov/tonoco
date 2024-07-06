@@ -35,39 +35,41 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 		if err != nil {
 			return nil, err
 		}
+
 		items[item.Id] = *item
-		if !isUpdateFilter {
-			continue
+
+		// update filters if needed
+		if isUpdateFilter {
+			idsMap[item.Id] = true
+			urlsMap[item.Url] = true
+			tagTypeIdsMap[item.TagTypeId] = true
 		}
-		idsMap[item.Id] = true
-		urlsMap[item.Url] = true
-		tagTypeIdsMap[item.TagTypeId] = true
+
 	}
 
-	if !isUpdateFilter {
-		return &items, nil
-	}
+	// update filters if needed
+	if isUpdateFilter {
+		// convert map keys to slices
+		ids := make([]string, 0, len(idsMap))
+		for id := range idsMap {
+			ids = append(ids, id)
+		}
 
-	// convert map keys to slices
-	ids := make([]string, 0, len(idsMap))
-	for id := range idsMap {
-		ids = append(ids, id)
-	}
+		urls := make([]string, 0, len(urlsMap))
+		for url := range urlsMap {
+			urls = append(urls, url)
+		}
 
-	urls := make([]string, 0, len(urlsMap))
-	for url := range urlsMap {
-		urls = append(urls, url)
-	}
+		tagTypeIds := make([]string, 0, len(tagTypeIdsMap))
+		for tagTypeId := range tagTypeIdsMap {
+			tagTypeIds = append(tagTypeIds, tagTypeId)
+		}
 
-	tagTypeIds := make([]string, 0, len(tagTypeIdsMap))
-	for tagTypeId := range tagTypeIdsMap {
-		tagTypeIds = append(tagTypeIds, tagTypeId)
+		// update the filter
+		filter.Ids = &ids
+		filter.Urls = &urls
+		filter.TagTypeIds = &tagTypeIds
 	}
-
-	// update the filter
-	filter.Ids = &ids
-	filter.Urls = &urls
-	filter.TagTypeIds = &tagTypeIds
 
 	// done
 	return &items, nil

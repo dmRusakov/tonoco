@@ -34,7 +34,10 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 		if err != nil {
 			return nil, err
 		}
+
 		items[item.Id] = *item
+
+		// update filters if needed
 		if isUpdateFilter {
 			idsMap[item.Id] = true
 			urlsMap[item.Url] = true
@@ -42,26 +45,26 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 		}
 	}
 
-	if !isUpdateFilter {
-		return &items, nil
-	}
-	ids := make([]string, 0, len(idsMap))
-	for id := range idsMap {
-		ids = append(ids, id)
-	}
-	urls := make([]string, 0, len(urlsMap))
-	for url := range urlsMap {
-		urls = append(urls, url)
-	}
-	abbreviations := make([]string, 0, len(abbreviationsMap))
-	for abbreviation := range abbreviationsMap {
-		abbreviations = append(abbreviations, abbreviation)
-	}
+	// update filters if needed
+	if isUpdateFilter {
+		ids := make([]string, 0, len(idsMap))
+		for id := range idsMap {
+			ids = append(ids, id)
+		}
+		urls := make([]string, 0, len(urlsMap))
+		for url := range urlsMap {
+			urls = append(urls, url)
+		}
+		abbreviations := make([]string, 0, len(abbreviationsMap))
+		for abbreviation := range abbreviationsMap {
+			abbreviations = append(abbreviations, abbreviation)
+		}
 
-	// update filter
-	filter.Ids = &ids
-	filter.Urls = &urls
-	filter.Abbreviations = &abbreviations
+		// update filter
+		filter.Ids = &ids
+		filter.Urls = &urls
+		filter.Abbreviations = &abbreviations
+	}
 
 	return &items, nil
 }

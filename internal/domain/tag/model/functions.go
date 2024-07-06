@@ -37,44 +37,43 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 		}
 		items[item.Id] = *item
 
-		if !isUpdateFilter {
-			continue
+		// update filters if needed
+		if isUpdateFilter {
+			idsMap[item.Id] = true
+			productIdsMap[item.ProductId] = true
+			tagTypeIdsMap[item.TagTypeId] = true
+			tagSelectIdsMap[item.TagSelectId] = true
 		}
-		idsMap[item.Id] = true
-		productIdsMap[item.ProductId] = true
-		tagTypeIdsMap[item.TagTypeId] = true
-		tagSelectIdsMap[item.TagSelectId] = true
 	}
 
-	if !isUpdateFilter {
-		return &items, nil
-	}
+	// update filters if needed
+	if isUpdateFilter {
+		// convert map keys to slices
+		ids := make([]string, 0, len(idsMap))
+		for id := range idsMap {
+			ids = append(ids, id)
+		}
+		productIds := make([]string, 0, len(productIdsMap))
+		for productId := range productIdsMap {
+			productIds = append(productIds, productId)
+		}
 
-	// convert map keys to slices
-	ids := make([]string, 0, len(idsMap))
-	for id := range idsMap {
-		ids = append(ids, id)
-	}
-	productIds := make([]string, 0, len(productIdsMap))
-	for productId := range productIdsMap {
-		productIds = append(productIds, productId)
-	}
+		tagTypeIds := make([]string, 0, len(tagTypeIdsMap))
+		for tagTypeId := range tagTypeIdsMap {
+			tagTypeIds = append(tagTypeIds, tagTypeId)
+		}
 
-	tagTypeIds := make([]string, 0, len(tagTypeIdsMap))
-	for tagTypeId := range tagTypeIdsMap {
-		tagTypeIds = append(tagTypeIds, tagTypeId)
-	}
+		tagSelectIds := make([]string, 0, len(tagSelectIdsMap))
+		for tagSelectId := range tagSelectIdsMap {
+			tagSelectIds = append(tagSelectIds, tagSelectId)
+		}
 
-	tagSelectIds := make([]string, 0, len(tagSelectIdsMap))
-	for tagSelectId := range tagSelectIdsMap {
-		tagSelectIds = append(tagSelectIds, tagSelectId)
+		// update filter
+		filter.Ids = &ids
+		filter.ProductIds = &productIds
+		filter.TagTypeIds = &tagTypeIds
+		filter.TagSelectIds = &tagSelectIds
 	}
-
-	// update filter
-	filter.Ids = &ids
-	filter.ProductIds = &productIds
-	filter.TagTypeIds = &tagTypeIds
-	filter.TagSelectIds = &tagSelectIds
 
 	// return the items
 	return &items, nil
