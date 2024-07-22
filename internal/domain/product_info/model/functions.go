@@ -43,22 +43,6 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 		}
 	}
 
-	// update filters if needed
-	if isUpdateFilter {
-		ids := make([]string, 0, len(idsMap))
-		for id := range idsMap {
-			ids = append(ids, id)
-		}
-		urls := make([]string, 0, len(urlsMap))
-		for url := range urlsMap {
-			urls = append(urls, url)
-		}
-
-		// update filter
-		filter.Ids = &ids
-		filter.Urls = &urls
-	}
-
 	// count the number of rows
 	count := uint64(0)
 	if filter.IsCount != nil && *filter.IsCount == true {
@@ -74,6 +58,22 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 				return nil, nil, err
 			}
 		}
+	}
+
+	// update filters if needed
+	if isUpdateFilter {
+		ids := make([]string, 0, len(idsMap))
+		for id := range idsMap {
+			ids = append(ids, id)
+		}
+		urls := make([]string, 0, len(urlsMap))
+		for url := range urlsMap {
+			urls = append(urls, url)
+		}
+
+		// update filter
+		filter.Ids = &ids
+		filter.Urls = &urls
 	}
 
 	// return the Items

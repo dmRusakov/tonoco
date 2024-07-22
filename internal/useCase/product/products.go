@@ -15,6 +15,7 @@ func (uc *UseCase) GetProductList(
 	productInfoFilter := entity.ProductInfoFilter{
 		Page:    parameters.Page,
 		PerPage: parameters.PerPage,
+		IsCount: entity.BoolPtr(true),
 	}
 	productInfos, count, err := uc.productInfo.List(ctx, &productInfoFilter, true)
 	if err != nil {
