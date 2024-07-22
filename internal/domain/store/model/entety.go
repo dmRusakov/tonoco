@@ -180,6 +180,61 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 }
 
+// makeCountStatementByFilter - make count statement by filter for pagination
+func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
+	// Build query
+	statement := m.qb.Select("COUNT(*)").From(m.table + " p")
+
+	// Ids
+	if filter.Ids != nil {
+		countIds := len(*filter.Ids)
+
+		if countIds > 0 {
+			statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
+		}
+	}
+
+	// Urls
+	if filter.Urls != nil {
+		countUrls := len(*filter.Urls)
+
+		if countUrls > 0 {
+			statement = statement.Where(sq.Eq{m.fieldMap("Url"): *filter.Urls})
+		}
+	}
+
+	// Abbreviations
+	if filter.Abbreviations != nil {
+		countAbbreviations := len(*filter.Abbreviations)
+
+		if countAbbreviations > 0 {
+			statement = statement.Where(sq.Eq{m.fieldMap("Abbreviation"): *filter.Abbreviations})
+		}
+	}
+
+	// Active
+	if filter.Active != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("Active"): *filter.Active})
+	}
+
+	// Search
+	if filter.Search != nil {
+		statement = statement.Where(
+			sq.Or{
+				sq.Expr("LOWER("+m.fieldMap("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("Abbreviations")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("AddressLine1")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("AddressLine2")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("City")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("State")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+			},
+		)
+	}
+
+	return statement
+}
+
 // scanOneRow
 func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
 	var id, url, name, abbreviation, config, addressLine1, addressLine2, city, state, zipCode, country, webSite, phone, email, createdBy, updatedBy sql.NullString

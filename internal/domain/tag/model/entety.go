@@ -48,7 +48,6 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 }
 
 // make Get statement
-// make Get statement
 func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 	// build query
 	statement := m.makeStatement()
@@ -136,6 +135,52 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	// Add OrderBy, OrderDir, Page, Limit and return
 	return statement.OrderBy(m.fieldMap(*filter.OrderBy) + " " + *filter.OrderDir).
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
+}
+
+// makeCountStatementByFilter - make count statement by filter for pagination
+func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
+	// Build query
+	statement := m.qb.Select("COUNT(*)").From(m.table + " p")
+
+	// Ids
+	if filter.Ids != nil {
+		countIds := len(*filter.Ids)
+
+		if countIds > 0 {
+			statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
+		}
+	}
+
+	// ProductIds
+	if filter.ProductIds != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("ProductId"): *filter.ProductIds})
+	}
+
+	// TagTypeId
+	if filter.TagTypeIds != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("TagTypeId"): *filter.TagTypeIds})
+	}
+
+	// TagSelectIds
+	if filter.TagSelectIds != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("TagSelectId"): *filter.TagSelectIds})
+	}
+
+	// Active
+	if filter.Active != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("Active"): *filter.Active})
+	}
+
+	// Search
+	if filter.Search != nil {
+		statement = statement.Where(
+			sq.Or{
+				sq.Expr("LOWER("+m.fieldMap("Value")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+			},
+		)
+	}
+
+	return statement
 }
 
 // scanOneRow
