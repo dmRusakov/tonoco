@@ -61,7 +61,7 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 
 	// count the number of rows
 	count := uint64(0)
-	if *filter.IsCount {
+	if filter.IsCount != nil && *filter.IsCount == true {
 		rows, err = psql.List(ctx, m.client, m.makeCountStatementByFilter(filter))
 		if err != nil {
 			return nil, nil, err
