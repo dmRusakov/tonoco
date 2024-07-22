@@ -264,23 +264,23 @@ func list(t *testing.T) {
 		count  int
 	}{
 		{
-			name:   "Get list",
+			name:   "GetModel list",
 			filter: &service.Filter{},
 			count:  10,
 		}, {
-			name:   "Get list active",
+			name:   "GetModel list active",
 			filter: &service.Filter{Active: &isActive},
 			count:  10,
 		}, {
-			name:   "Get with name like 'status'",
+			name:   "GetModel with name like 'status'",
 			filter: &service.Filter{Search: &searchText},
 			count:  1,
 		}, {
-			name:   "Get with perPage 3",
+			name:   "GetModel with perPage 3",
 			filter: &service.Filter{PerPage: &perPage3},
 			count:  3,
 		}, {
-			name:   "Get with perPage 3 and page 1",
+			name:   "GetModel with perPage 3 and page 1",
 			filter: &service.Filter{PerPage: &perPage3, Page: &page1},
 			count:  3,
 		},
@@ -311,7 +311,7 @@ func get(t *testing.T) {
 		get  *service.Item
 	}{
 		{
-			name: "Get by Id",
+			name: "GetModel by Id",
 			id:   "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381001",
 			get: &service.Item{
 				Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381001",
@@ -331,7 +331,7 @@ func get(t *testing.T) {
 				UpdatedBy:        "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1",
 			},
 		}, {
-			name: "Get by Id",
+			name: "GetModel by Id",
 			id:   "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381002",
 			get: &service.Item{
 				Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381002",
@@ -356,7 +356,7 @@ func get(t *testing.T) {
 	// Run the test cases
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			// Call Get method
+			// Call GetModel method
 			result, err := storage.Get(initContext(), &tc.id, nil)
 			assert.NoError(t, err)
 
@@ -390,7 +390,7 @@ func getByUrl(t *testing.T) {
 		get  *service.Item
 	}{
 		{
-			name: "Get by URL",
+			name: "GetModel by URL",
 			url:  "shipping-class",
 			get: &service.Item{
 				Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381003",
@@ -415,7 +415,7 @@ func getByUrl(t *testing.T) {
 	// Run the test cases
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			// Call Get method
+			// Call GetModel method
 			result, err := storage.Get(initContext(), nil, &tc.url)
 			assert.NoError(t, err)
 
@@ -725,7 +725,7 @@ func del(t *testing.T) {
 		err := storage.Delete(initContext(), &tc.id)
 		assert.NoError(t, err)
 
-		// Call the Get method
+		// Call the GetModel method
 		_, err = storage.Get(initContext(), &tc.id, nil)
 		assert.Error(t, err)
 	}

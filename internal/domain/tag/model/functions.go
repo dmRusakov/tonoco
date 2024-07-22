@@ -17,10 +17,10 @@ func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	return m.scanOneRow(ctx, row)
 }
 
-func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (*map[string]Item, error) {
+func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (*map[string]Item, *uint64, error) {
 	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer rows.Close()
 
@@ -33,7 +33,7 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		items[item.Id] = *item
 
@@ -76,7 +76,7 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 	}
 
 	// return the items
-	return &items, nil
+	return &items, nil, nil
 }
 
 func (m *Model) Create(ctx context.Context, item *Item) (*string, error) {

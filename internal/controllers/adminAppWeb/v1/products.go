@@ -20,7 +20,7 @@ func (s server) RenderProducts(
 
 	var wg sync.WaitGroup
 	var tmpl *template.Template
-	var params *entity.ProductsPgeUrlParams
+	var params *entity.ProductsPageUrlParams
 
 	wg.Add(2)
 
@@ -59,8 +59,8 @@ func (s server) RenderProducts(
 }
 
 // ReadProductsUrlParam read page parameters from url
-func (s server) ReadProductsUrlParam(r *http.Request) *entity.ProductsPgeUrlParams {
-	params := &entity.ProductsPgeUrlParams{}
+func (s server) ReadProductsUrlParam(r *http.Request) *entity.ProductsPageUrlParams {
+	params := &entity.ProductsPageUrlParams{}
 	v := reflect.ValueOf(params).Elem()
 	t := v.Type()
 

@@ -6,38 +6,6 @@ import (
 	"time"
 )
 
-// clear cashes
-func (s *Service) clearCashes() {
-	s.itemCash = make(map[string]Item)
-	s.itemsCash = make(map[string]map[string]Item)
-}
-
-// get item cash
-func (s *Service) getItemCash(cacheKey string) *Item {
-	if item, ok := s.itemCash[cacheKey]; ok {
-		return &item
-	}
-	return nil
-}
-
-// set item cash
-func (s *Service) setItemCash(cacheKey string, item Item) {
-	s.itemCash[cacheKey] = item
-}
-
-// get items cash
-func (s *Service) getItemsCash(cacheKey string) *map[string]Item {
-	if items, ok := s.itemsCash[cacheKey]; ok {
-		return &items
-	}
-	return nil
-}
-
-// set items cash
-func (s *Service) setItemsCash(cacheKey string, items map[string]Item) {
-	s.itemsCash[cacheKey] = items
-}
-
 func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	// Generate a itemCash key based on id and url
 	cacheKey, err := entity.HashFilter(filter)
@@ -57,34 +25,36 @@ func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	}
 
 	// Store the item in the itemCash
-	s.setItemCash(cacheKey, *item)
+	s.setItemCash(cacheKey, item)
 
 	return item, nil
 }
 
-func (s *Service) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (*map[string]Item, error) {
+func (s *Service) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (*map[string]Item, *uint64, error) {
 	// Generate a itemCash key based on the filter
 	cacheKey, err := entity.HashFilter(filter)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Try to get the items from the itemsCash
-	if items, ok := s.itemsCash[cacheKey]; ok {
-		return &items, nil
+	items, count, err := s.getItemsCash(cacheKey)
+	if err == nil {
+		return items, count, nil
 	}
 
 	// If the items are not in the itemsCash, get them from the repository
-	items, err := s.repository.List(ctx, filter, isUpdateFilter)
+	items, count, err = s.repository.List(ctx, filter, isUpdateFilter)
 	if err != nil {
-		return nil, err
+
+		return nil, nil, err
 	}
 
 	// Store the items in the itemsCash
-	s.itemsCash[cacheKey] = *items
+	s.setItemsCash(cacheKey, items, count)
 
 	// Return the items
-	return items, nil
+	return items, count, nil
 }
 
 func (s *Service) Create(ctx context.Context, item *Item) (*string, error) {
@@ -117,4 +87,41 @@ func (s *Service) MaxSortOrder(ctx context.Context) (*uint64, error) {
 func (s *Service) Delete(ctx context.Context, id *string) error {
 	s.clearCashes()
 	return s.repository.Delete(ctx, id)
+}
+
+// clear cashes
+func (s *Service) clearCashes() {
+	s.itemCash = make(map[string]Item)
+	s.itemsCash = make(map[string]map[string]Item)
+	s.countCash = make(map[string]uint64)
+}
+
+// get item cash
+func (s *Service) getItemCash(cacheKey string) *Item {
+	if item, ok := s.itemCash[cacheKey]; ok {
+		return &item
+	}
+	return nil
+}
+
+// set item cash
+func (s *Service) setItemCash(cacheKey string, item *Item) {
+	s.itemCash[cacheKey] = *item
+}
+
+// get items cash
+func (s *Service) getItemsCash(cacheKey string) (*map[string]Item, *uint64, error) {
+	items := s.itemsCash[cacheKey]
+	count := s.countCash[cacheKey]
+	if items != nil && count != 0 {
+		return &items, &count, nil
+	}
+
+	return nil, nil, entity.ErrCacheNotFound
+}
+
+// set items cash
+func (s *Service) setItemsCash(cacheKey string, items *map[string]Item, count *uint64) {
+	s.itemsCash[cacheKey] = *items
+	s.countCash[cacheKey] = *count
 }

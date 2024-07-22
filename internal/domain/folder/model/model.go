@@ -13,7 +13,7 @@ type Filter = entity.FolderFilter
 
 type Storage interface {
 	Get(context.Context, *Filter) (*Item, error)
-	List(context.Context, *Filter, bool) (*map[string]Item, error)
+	List(context.Context, *Filter, bool) (*map[string]Item, *uint64, error)
 	Create(context.Context, *Item) (*string, error)
 	Update(context.Context, *Item) error
 	Patch(context.Context, *string, *map[string]interface{}) error

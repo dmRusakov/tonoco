@@ -2,26 +2,29 @@ package product
 
 import (
 	"context"
+	"fmt"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dustin/go-humanize"
 )
 
 func (uc *UseCase) GetProductList(
 	ctx context.Context,
-	parameters *entity.ProductsPgeUrlParams,
+	parameters *entity.ProductsPageUrlParams,
 ) (*map[string]entity.ProductListItem, error) {
 	// get productInfos
 	productInfoFilter := entity.ProductInfoFilter{
 		Page:    parameters.Page,
 		PerPage: parameters.PerPage,
 	}
-	productInfos, err := uc.productInfo.List(ctx, &productInfoFilter, true)
+	productInfos, count, err := uc.productInfo.List(ctx, &productInfoFilter, true)
 	if err != nil {
 		return nil, err
 	}
 
+	fmt.Println(*count, "products:24")
+
 	//// get currencies
-	//currency, err := uc.currency.Get(ctx, nil, parameters.Currency)
+	//currency, err := uc.currency.GetModel(ctx, nil, parameters.Currency)
 	//if err != nil {
 	//	return nil, err
 	//}

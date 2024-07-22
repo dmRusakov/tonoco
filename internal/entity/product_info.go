@@ -28,13 +28,17 @@ type ProductInfo struct {
 }
 
 type ProductInfoFilter struct {
-	Ids      *[]string `json:"ids"`
-	Urls     *[]string `json:"urls"`
-	Skus     *[]string `json:"skus"`
-	Active   *bool     `json:"active"`
-	Search   *string   `json:"search"`
-	OrderBy  *string   `json:"order_by"`
-	OrderDir *string   `json:"order_dir"`
-	Page     *uint64   `json:"page"`
-	PerPage  *uint64   `json:"per_page"`
+	Ids  *[]string `json:"ids"`
+	Urls *[]string `json:"urls"`
+	Skus *[]string `json:"skus"`
+
+	Active *bool   `json:"active"`
+	Search *string `json:"search"`
+
+	OrderBy  *string `json:"order_by"`
+	OrderDir *string `json:"order_dir"`
+	Page     *uint64 `json:"page"`
+	PerPage  *uint64 `json:"per_page"`
+
+	IsCount *bool `json:"is_count"`
 }

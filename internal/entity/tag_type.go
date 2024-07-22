@@ -40,4 +40,6 @@ type TagTypeFilter struct {
 	OrderDir *string
 	Page     *uint64
 	PerPage  *uint64
+
+	IsCount *bool `json:"is_count"`
 }

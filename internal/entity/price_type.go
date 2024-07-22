@@ -16,13 +16,17 @@ type PriceType struct {
 }
 
 type PriceTypeFilter struct {
-	Ids      *[]string `json:"ids"`
-	Urls     *[]string `json:"urls"`
-	Active   *bool     `json:"active"`
-	IsPublic *bool     `json:"prime"`
-	Search   *string   `json:"search"`
-	OrderBy  *string   `json:"order_by"`
-	OrderDir *string   `json:"order_dir"`
-	Page     *uint64   `json:"page"`
-	PerPage  *uint64   `json:"per_page"`
+	Ids  *[]string `json:"ids"`
+	Urls *[]string `json:"urls"`
+
+	Active   *bool   `json:"active"`
+	IsPublic *bool   `json:"prime"`
+	Search   *string `json:"search"`
+
+	OrderBy  *string `json:"order_by"`
+	OrderDir *string `json:"order_dir"`
+	Page     *uint64 `json:"page"`
+	PerPage  *uint64 `json:"per_page"`
+
+	IsCount *bool `json:"is_count"`
 }

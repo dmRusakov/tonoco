@@ -28,11 +28,15 @@ type WarehouseFilter struct {
 	Ids           *[]string `json:"ids"`
 	Urls          *[]string `json:"urls"`
 	Abbreviations *[]string `json:"abbreviations"`
-	Active        *bool     `json:"active"`
-	Prime         *bool     `json:"prime"`
-	Search        *string   `json:"search"`
-	OrderBy       *string   `json:"order_by"`
-	OrderDir      *string   `json:"order_dir"`
-	Page          *uint64   `json:"page"`
-	PerPage       *uint64   `json:"per_page"`
+
+	Active *bool   `json:"active"`
+	Prime  *bool   `json:"prime"`
+	Search *string `json:"search"`
+
+	OrderBy  *string `json:"order_by"`
+	OrderDir *string `json:"order_dir"`
+	Page     *uint64 `json:"page"`
+	PerPage  *uint64 `json:"per_page"`
+
+	IsCount *bool `json:"is_count"`
 }

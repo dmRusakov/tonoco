@@ -16,7 +16,7 @@ type ProductListItem struct {
 	Categories       []string `json:"categories"`
 }
 
-type ProductsPgeUrlParams struct {
+type ProductsPageUrlParams struct {
 	Id       *string
 	Category *string
 	Currency *string
