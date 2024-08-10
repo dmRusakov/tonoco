@@ -37,7 +37,6 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 		m.fieldMap("Name"),
 		m.fieldMap("Url"),
 		m.fieldMap("Abbreviation"),
-		m.fieldMap("Config"),
 		m.fieldMap("SortOrder"),
 		m.fieldMap("Active"),
 		m.fieldMap("AddressLine1"),
@@ -49,6 +48,7 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 		m.fieldMap("WebSite"),
 		m.fieldMap("Phone"),
 		m.fieldMap("Email"),
+		m.fieldMap("CurrencyUrl"),
 		m.fieldMap("CreatedAt"),
 		m.fieldMap("CreatedBy"),
 		m.fieldMap("UpdatedAt"),
@@ -237,7 +237,7 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 // scanOneRow
 func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
-	var id, url, name, abbreviation, config, addressLine1, addressLine2, city, state, zipCode, country, webSite, phone, email, createdBy, updatedBy sql.NullString
+	var id, url, name, abbreviation, addressLine1, addressLine2, city, state, zipCode, country, webSite, phone, email, currencyUrl, createdBy, updatedBy sql.NullString
 	var sortOrder sql.NullInt64
 	var active sql.NullBool
 	var createdAt, updatedAt sql.NullTime
@@ -247,7 +247,6 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 		&name,
 		&url,
 		&abbreviation,
-		&config,
 		&sortOrder,
 		&active,
 		&addressLine1,
@@ -259,6 +258,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 		&webSite,
 		&phone,
 		&email,
+		&currencyUrl,
 		&createdAt,
 		&createdBy,
 		&updatedAt,
@@ -287,10 +287,6 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 
 	if abbreviation.Valid {
 		item.Abbreviation = abbreviation.String
-	}
-
-	if config.Valid {
-		item.Config = config.String
 	}
 
 	if sortOrder.Valid {
@@ -337,6 +333,10 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 		item.Email = email.String
 	}
 
+	if currencyUrl.Valid {
+		item.CurrencyUrl = currencyUrl.String
+	}
+
 	if createdAt.Valid {
 		item.CreatedAt = createdAt.Time
 	}
@@ -374,7 +374,6 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		m.fieldMap("Name"),
 		m.fieldMap("Url"),
 		m.fieldMap("Abbreviation"),
-		m.fieldMap("Config"),
 		m.fieldMap("SortOrder"),
 		m.fieldMap("Active"),
 		m.fieldMap("AddressLine1"),
@@ -386,6 +385,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		m.fieldMap("WebSite"),
 		m.fieldMap("Phone"),
 		m.fieldMap("Email"),
+		m.fieldMap("CurrencyUrl"),
 		m.fieldMap("CreatedAt"),
 		m.fieldMap("CreatedBy"),
 		m.fieldMap("UpdatedAt"),
@@ -395,7 +395,6 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		item.Name,
 		item.Url,
 		item.Abbreviation,
-		item.Config,
 		item.SortOrder,
 		item.Active,
 		item.AddressLine1,
@@ -407,6 +406,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		item.WebSite,
 		item.Phone,
 		item.Email,
+		item.CurrencyUrl,
 		"NOW()",
 		by,
 		"NOW()",
@@ -426,7 +426,6 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 		Set(m.fieldMap("Name"), item.Name).
 		Set(m.fieldMap("Url"), item.Url).
 		Set(m.fieldMap("Abbreviation"), item.Abbreviation).
-		Set(m.fieldMap("Config"), item.Config).
 		Set(m.fieldMap("SortOrder"), item.SortOrder).
 		Set(m.fieldMap("Active"), item.Active).
 		Set(m.fieldMap("AddressLine1"), item.AddressLine1).
@@ -438,6 +437,7 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 		Set(m.fieldMap("WebSite"), item.WebSite).
 		Set(m.fieldMap("Phone"), item.Phone).
 		Set(m.fieldMap("Email"), item.Email).
+		Set(m.fieldMap("CurrencyUrl"), item.CurrencyUrl).
 		Set(m.fieldMap("UpdatedAt"), "NOW()").
 		Set(m.fieldMap("UpdatedBy"), by)
 }

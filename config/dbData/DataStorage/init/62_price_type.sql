@@ -43,14 +43,14 @@ COMMENT ON COLUMN public.price_type.updated_at IS 'Update time of price type';
 COMMENT ON COLUMN public.price_type.updated_by IS 'Updater of price type';
 
 -- auto set sort_order column
-CREATE TRIGGER price_type_order
+CREATE OR REPLACE TRIGGER price_type_order
     BEFORE INSERT
     ON public.price_type
     FOR EACH ROW
     EXECUTE FUNCTION set_order_column_universal();
 
 -- auto update updated_at
-CREATE TRIGGER price_type_updated_at
+CREATE OR REPLACE TRIGGER price_type_updated_at
     BEFORE UPDATE
     ON public.price_type
     FOR EACH ROW

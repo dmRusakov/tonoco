@@ -10,6 +10,7 @@ import (
 func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	row, err := psql.Get(ctx, m.client, m.makeGetStatement(filter))
 	if err != nil {
+		// add error code to error
 		return nil, err
 	}
 

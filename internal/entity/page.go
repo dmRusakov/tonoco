@@ -6,4 +6,5 @@ type ProductPage struct {
 	Description      string
 	Products         *map[string]ProductListItem
 	ProductUrl       string
+	CountItems       uint64
 }

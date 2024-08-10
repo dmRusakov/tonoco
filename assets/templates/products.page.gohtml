@@ -3,10 +3,29 @@
 {{define "content" }}
     <div class="contentBody">
         <h1>{{.Name}}</h1>
-        <div class="gridContainer">
-            {{range .Products}}
-                {{template "grid_product_item_in_list" .}}
-            {{end}}
+        <div class="grid">
+            <div class="gridItems">
+                {{range .Products}}
+                    {{template "grid_product_item_in_list" .}}
+                {{end}}
+            </div>
+            <div class="gridFooter">
+                <div class="countItems">
+                    Show ?? <br>Of {{.CountItems}} items.
+                </div>
+                <div class="pagination">
+                    <a href="#" class="active">1</a>
+                    <a href="#">2</a>
+                    <a href="#">3</a>
+                    <a href="#">4</a>
+                    <a href="#">5</a>
+                    <a href="#">6</a>
+                    <a href="#">7</a>
+                    <a href="#">8</a>
+                    <a href="#">9</a>
+                    <a href="#">10</a>
+                </div>
+            </div>
         </div>
     </div>
 {{end}}

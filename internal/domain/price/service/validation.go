@@ -69,7 +69,7 @@ func (s *Service) Validate(item *Item, fields *map[string]interface{}) []entity.
 					s.validateCurrencyID(value.(string), &v)
 					break
 				case "Price":
-					s.validatePrice(value.(uint64), &v)
+					s.validatePrice(value.(float64), &v)
 					break
 				}
 				results <- v
@@ -104,7 +104,7 @@ func (s *Service) validateCurrencyID(currencyID string, validations *[]entity.Er
 	}
 }
 
-func (s *Service) validatePrice(price uint64, validations *[]entity.Error) {
+func (s *Service) validatePrice(price float64, validations *[]entity.Error) {
 	if price == 0 {
 		*validations = append(*validations, NoPrice)
 	}

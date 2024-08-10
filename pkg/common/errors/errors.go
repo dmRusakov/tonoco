@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"fmt"
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 )
@@ -31,4 +32,9 @@ func Flatten(err error) error {
 }
 func Prefix(err error, prefix string) error {
 	return multierror.Prefix(err, prefix)
+}
+
+// add error code and message
+func AddCode(err error, code string) error {
+	return errors.Wrapf(err, fmt.Sprintf("[%s]", code))
 }

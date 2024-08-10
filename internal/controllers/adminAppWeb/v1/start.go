@@ -11,12 +11,12 @@ type Route struct {
 	template string
 }
 
-func (s server) Start(ctx context.Context, port string) error {
+func (s Service) Start(ctx context.Context) error {
 	// static files
 	fs := http.FileServer(http.Dir("assets"))
 	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
 
-	// Set up a custom HTTP server to handle .wasm.js files
+	// Set up a custom HTTP Service to handle .wasm.js files
 	http.HandleFunc("/assets/wasm/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/wasm")
 		http.ServeFile(w, r, r.URL.Path[1:])
@@ -25,8 +25,8 @@ func (s server) Start(ctx context.Context, port string) error {
 	// router
 	s.router(ctx)
 
-	// start server
-	err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
+	// start Service
+	err := http.ListenAndServe(fmt.Sprintf(":%s", s.cfg.WebPort), nil)
 	if err != nil {
 		return err
 	}

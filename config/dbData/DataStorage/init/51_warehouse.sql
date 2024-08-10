@@ -57,14 +57,14 @@ COMMENT ON COLUMN public.warehouse.updated_at IS 'Update time of warehouse';
 COMMENT ON COLUMN public.warehouse.updated_by IS 'Updater of warehouse';
 
 -- auto update updated_at
-CREATE TRIGGER warehouse_updated_at
+CREATE OR REPLACE TRIGGER warehouse_updated_at
     BEFORE UPDATE
     ON public.warehouse
     FOR EACH ROW
     EXECUTE FUNCTION update_update_at_column();
 
 -- auto set sort_order column
-CREATE TRIGGER warehouse_order
+CREATE OR REPLACE TRIGGER warehouse_order
     BEFORE INSERT
     ON public.warehouse
     FOR EACH ROW

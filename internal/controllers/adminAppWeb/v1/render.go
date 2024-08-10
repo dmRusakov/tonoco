@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (s server) Render(w http.ResponseWriter, pageTemplate string) {
+func (s Service) Render(w http.ResponseWriter, pageTemplate string) {
 	// make template
 	tmpl := s.makeTemplate(pageTemplate)
 
@@ -19,7 +19,7 @@ func (s server) Render(w http.ResponseWriter, pageTemplate string) {
 }
 
 // make template
-func (s server) makeTemplate(pageTemplate string) *template.Template {
+func (s Service) makeTemplate(pageTemplate string) *template.Template {
 	// page template
 	var templateSlice []string
 	templateSlice = append(templateSlice, fmt.Sprintf("%s%s", s.tmlPath, pageTemplate))

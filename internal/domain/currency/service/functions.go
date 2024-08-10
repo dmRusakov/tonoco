@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	"time"
 )
 
@@ -106,6 +107,9 @@ func (s *Service) getItemCash(cacheKey string) *Item {
 
 // set item cash
 func (s *Service) setItemCash(cacheKey string, item *Item) {
+	if item == nil {
+		return
+	}
 	s.itemCash[cacheKey] = *item
 }
 
@@ -117,11 +121,17 @@ func (s *Service) getItemsCash(cacheKey string) (*map[string]Item, *uint64, erro
 		return &items, &count, nil
 	}
 
-	return nil, nil, entity.ErrCacheNotFound
+	return nil, nil, errors.AddCode(entity.ErrCacheNotFound, "kdssaq")
 }
 
 // set items cash
 func (s *Service) setItemsCash(cacheKey string, items *map[string]Item, count *uint64) {
+	if items == nil {
+		items = new(map[string]Item)
+	}
 	s.itemsCash[cacheKey] = *items
+	if count == nil {
+		count = new(uint64)
+	}
 	s.countCash[cacheKey] = *count
 }

@@ -1,20 +1,26 @@
 package entity
 
+import "time"
+
 type Price struct {
 	Id          string `json:"id" db:"id"`
 	ProductID   string `json:"product_id" db:"product_id"`
 	PriceTypeID string `json:"price_type_id" db:"price_type_id"`
 	CurrencyID  string `json:"currency_id" db:"currency_id"`
 	WarehouseID string `json:"warehouse_id" db:"warehouse_id"`
-	StoreId     string `json:"store_id" db:"store_id"`
+	StoreID     string `json:"store_id" db:"store_id"`
 
-	Price  uint64 `json:"price" db:"price"`
-	Active bool   `json:"active" db:"active"`
+	Price     float64 `json:"price" db:"price"`
+	SortOrder uint64  `json:"sort_order" db:"sort_order"`
+	Active    bool    `json:"active" db:"active"`
 
-	CreatedAt string `json:"created_at" db:"created_at"`
-	CreatedBy string `json:"created_by" db:"created_by"`
-	UpdatedAt string `json:"updated_at" db:"updated_at"`
-	UpdatedBy string `json:"updated_by" db:"updated_by"`
+	StartDate time.Time `json:"start_date" db:"start_date"`
+	EndDate   time.Time `json:"end_date" db:"end_date"`
+
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	CreatedBy string    `json:"created_by" db:"created_by"`
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+	UpdatedBy string    `json:"updated_by" db:"updated_by"`
 }
 
 type PriceFilter struct {

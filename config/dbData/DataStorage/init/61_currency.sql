@@ -37,14 +37,14 @@ COMMENT ON COLUMN public.currency.updated_at IS 'Record updated date';
 COMMENT ON COLUMN public.currency.updated_by IS 'Record updated by';
 
 -- auto set sort_order column
-CREATE TRIGGER currency_order
+CREATE OR REPLACE TRIGGER currency_order
     BEFORE INSERT
     ON public.currency
     FOR EACH ROW
 EXECUTE FUNCTION set_order_column_universal();
 
 -- auto update updated_at
-CREATE TRIGGER currency_updated_at
+CREATE OR REPLACE TRIGGER currency_updated_at
     BEFORE UPDATE
     ON public.currency
     FOR EACH ROW

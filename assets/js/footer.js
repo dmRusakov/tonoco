@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    document.querySelectorAll(".gridContainer").forEach((gridContainer) => {
+    document.querySelectorAll(".gridItems").forEach((gridItems) => {
         let count = 0;
-        gridContainer.querySelectorAll(".itemNo").forEach((itemNo) => {
+        gridItems.querySelectorAll(".itemNo").forEach((itemNo) => {
             itemNo.textContent = "Item #" + ++count
         })
     })

@@ -4,12 +4,15 @@
     --lineBackground1: #323639FF;
     --lineBackground2: #262829FF;
     --accentBG: #eeeeee;
+    --deAccentBG: #4d4d4d;
 
     /* text */
     --textColor: #fff;
     --accentText: #000;
-    --deAccentText: #777;
+    --deAccentText: #4d4d4d;
     --deAccentText1: #999;
+
+
 
     --invertTextColor: #000;
 }

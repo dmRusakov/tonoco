@@ -5,6 +5,7 @@ import "time"
 type ProductInfo struct {
 	Id                    string    `json:"id" db:"id"`
 	Sku                   string    `json:"sku" db:"sku"`
+	Brand                 string    `json:"brand" db:"brand"`
 	Name                  string    `json:"name" db:"name"`
 	ShortDescription      string    `json:"short_description" db:"short_description"`
 	Description           string    `json:"description" db:"description"`
@@ -28,9 +29,10 @@ type ProductInfo struct {
 }
 
 type ProductInfoFilter struct {
-	Ids  *[]string `json:"ids"`
-	Urls *[]string `json:"urls"`
-	Skus *[]string `json:"skus"`
+	Ids    *[]string `json:"ids"`
+	Urls   *[]string `json:"urls"`
+	Skus   *[]string `json:"skus"`
+	Brands *[]string `json:"brands"`
 
 	Active *bool   `json:"active"`
 	Search *string `json:"search"`

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/google/uuid"
@@ -34,14 +35,16 @@ func (m *Model) fieldMap(field string) string {
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
 		m.fieldMap("Id"),
-		m.fieldMap("ProductIds"),
-		m.fieldMap("PriceTypeIds"),
-		m.fieldMap("CurrencyIds"),
-		m.fieldMap("WarehouseIds"),
-		m.fieldMap("StoreIds"),
+		m.fieldMap("ProductID"),
+		m.fieldMap("PriceTypeID"),
+		m.fieldMap("CurrencyID"),
+		m.fieldMap("WarehouseID"),
+		m.fieldMap("StoreID"),
 		m.fieldMap("Price"),
 		m.fieldMap("SortOrder"),
 		m.fieldMap("Active"),
+		m.fieldMap("StartDate"),
+		m.fieldMap("EndDate"),
 		m.fieldMap("CreatedAt"),
 		m.fieldMap("CreatedBy"),
 		m.fieldMap("UpdatedAt"),
@@ -49,42 +52,59 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 	).From(m.table + " p")
 }
 
-// make Get statement
-func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
-	// build query
+func (m *Model) makeStatementWithFilter(filter *Filter) sq.SelectBuilder {
 	statement := m.makeStatement()
 
-	// id
-	if filter.Ids != nil {
-		statement = statement.Where(m.fieldMap("Id")+" = ?", (*filter.Ids)[0])
+	// Ids
+	if filter.Ids != nil && len(*filter.Ids) > 0 {
+		statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
 	}
 
-	// productID
+	// ProductIds
 	if filter.ProductIds != nil {
-		statement = statement.Where(m.fieldMap("ProductIds")+" = ?", (*filter.ProductIds)[0])
+		statement = statement.Where(sq.Eq{m.fieldMap("ProductID"): *filter.ProductIds})
 	}
 
-	// priceTypeID
+	// PriceTypeIds
 	if filter.PriceTypeIds != nil {
-		statement = statement.Where(m.fieldMap("PriceTypeIds")+" = ?", (*filter.PriceTypeIds)[0])
+		statement = statement.Where(sq.Eq{m.fieldMap("PriceTypeID"): *filter.PriceTypeIds})
 	}
 
 	// CurrencyIds
 	if filter.CurrencyIds != nil {
-		statement = statement.Where(m.fieldMap("CurrencyIds")+" = ?", (*filter.CurrencyIds)[0])
+		statement = statement.Where(sq.Eq{m.fieldMap("CurrencyID"): *filter.CurrencyIds})
 	}
 
 	// WarehouseIds
 	if filter.WarehouseIds != nil {
-		statement = statement.Where(m.fieldMap("WarehouseIds")+" = ?", (*filter.WarehouseIds)[0])
+		statement = statement.Where(sq.Eq{m.fieldMap("WarehouseID"): *filter.WarehouseIds})
 	}
 
 	// StoreIds
 	if filter.StoreIds != nil {
-		statement = statement.Where(m.fieldMap("StoreIds")+" = ?", (*filter.StoreIds)[0])
+		statement = statement.Where(sq.Eq{m.fieldMap("StoreID"): *filter.StoreIds})
+	}
+
+	// Active
+	if filter.Active != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("Active"): *filter.Active})
+	}
+
+	// Search
+	if filter.Search != nil {
+		statement = statement.Where(
+			sq.Or{
+				sq.Expr("LOWER("+m.fieldMap("Price")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+			},
+		)
 	}
 
 	return statement
+}
+
+// make Get statement
+func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
+	return m.makeStatementWithFilter(filter)
 }
 
 // makeStatementByFilter
@@ -114,46 +134,7 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	}
 
 	// Build query
-	statement := m.makeStatement()
-
-	// Ids
-	if filter.Ids != nil && len(*filter.Ids) > 0 {
-		statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
-	}
-
-	// ProductIds
-	if filter.ProductIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("ProductIds"): *filter.ProductIds})
-	}
-
-	// CurrencyIds
-	if filter.CurrencyIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("CurrencyIds"): *filter.CurrencyIds})
-	}
-
-	// WarehouseIds
-	if filter.WarehouseIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("WarehouseIds"): *filter.WarehouseIds})
-	}
-
-	// StoreIds
-	if filter.StoreIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("StoreIds"): *filter.StoreIds}).Where("warehouse_id IS NULL").OrderBy("warehouse_id")
-	}
-
-	// Active
-	if filter.Active != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("Active"): *filter.Active})
-	}
-
-	// Search
-	if filter.Search != nil {
-		statement = statement.Where(
-			sq.Or{
-				sq.Expr("LOWER("+m.fieldMap("Price")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-			},
-		)
-	}
+	statement := m.makeStatementWithFilter(filter)
 
 	// Add OrderBy, OrderDir, Page, Limit and return
 	return statement.OrderBy(m.fieldMap(*filter.OrderBy) + " " + *filter.OrderDir).
@@ -209,20 +190,24 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 // scanOneRow
 func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
-	var id, productID, priceTypeID, currencyID, warehouseID, storeId, createdBy, updatedBy sql.NullString
+	var id, productId, priceTypeId, currencyId, warehouseId, storeId, createdBy, updatedBy sql.NullString
 	var active sql.NullBool
-	var price sql.NullInt64
-	var createdAt, updatedAt sql.NullString
+	var price sql.NullFloat64
+	var sortOrder sql.NullInt64
+	var startDate, endData, createdAt, updatedAt sql.NullTime
 
 	err := rows.Scan(
 		&id,
-		&productID,
-		&priceTypeID,
-		&currencyID,
-		&warehouseID,
+		&productId,
+		&priceTypeId,
+		&currencyId,
+		&warehouseId,
 		&storeId,
 		&price,
+		&sortOrder,
 		&active,
+		&startDate,
+		&endData,
 		&createdAt,
 		&createdBy,
 		&updatedAt,
@@ -232,6 +217,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	if err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
+		err = errors.AddCode(err, "cdczt0")
 		return nil, err
 	}
 
@@ -241,36 +227,48 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 		item.Id = id.String
 	}
 
-	if productID.Valid {
-		item.ProductID = productID.String
+	if productId.Valid {
+		item.ProductID = productId.String
 	}
 
-	if priceTypeID.Valid {
-		item.PriceTypeID = priceTypeID.String
+	if priceTypeId.Valid {
+		item.PriceTypeID = priceTypeId.String
 	}
 
-	if currencyID.Valid {
-		item.CurrencyID = currencyID.String
+	if currencyId.Valid {
+		item.CurrencyID = currencyId.String
 	}
 
-	if warehouseID.Valid {
-		item.WarehouseID = warehouseID.String
+	if warehouseId.Valid {
+		item.WarehouseID = warehouseId.String
 	}
 
 	if storeId.Valid {
-		item.StoreId = storeId.String
+		item.StoreID = storeId.String
 	}
 
 	if price.Valid {
-		item.Price = uint64(price.Int64)
+		item.Price = price.Float64
+	}
+
+	if sortOrder.Valid {
+		item.SortOrder = uint64(sortOrder.Int64)
 	}
 
 	if active.Valid {
 		item.Active = active.Bool
 	}
 
+	if startDate.Valid {
+		item.StartDate = startDate.Time
+	}
+
+	if endData.Valid {
+		item.EndDate = endData.Time
+	}
+
 	if createdAt.Valid {
-		item.CreatedAt = createdAt.String
+		item.CreatedAt = createdAt.Time
 	}
 
 	if createdBy.Valid {
@@ -278,7 +276,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	}
 
 	if updatedAt.Valid {
-		item.UpdatedAt = updatedAt.String
+		item.UpdatedAt = updatedAt.Time
 	}
 
 	if updatedBy.Valid {
@@ -310,6 +308,8 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		m.fieldMap("StoreIds"),
 		m.fieldMap("Price"),
 		m.fieldMap("Active"),
+		m.fieldMap("StartDate"),
+		m.fieldMap("EndDate"),
 		m.fieldMap("CreatedAt"),
 		m.fieldMap("CreatedBy"),
 		m.fieldMap("UpdatedAt"),
@@ -320,9 +320,11 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		item.PriceTypeID,
 		item.CurrencyID,
 		item.WarehouseID,
-		item.StoreId,
+		item.StoreID,
 		item.Price,
 		item.Active,
+		item.StartDate,
+		item.EndDate,
 		"NOW()",
 		by,
 		"NOW()",
@@ -343,9 +345,11 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 		Set(m.fieldMap("PriceTypeIds"), item.PriceTypeID).
 		Set(m.fieldMap("CurrencyIds"), item.CurrencyID).
 		Set(m.fieldMap("WarehouseIds"), item.WarehouseID).
-		Set(m.fieldMap("StoreIds"), item.StoreId).
+		Set(m.fieldMap("StoreIds"), item.StoreID).
 		Set(m.fieldMap("Price"), item.Price).
 		Set(m.fieldMap("Active"), item.Active).
+		Set(m.fieldMap("StartDate"), item.StartDate).
+		Set(m.fieldMap("EndDate"), item.EndDate).
 		Set(m.fieldMap("UpdatedAt"), "NOW()").
 		Set(m.fieldMap("UpdatedBy"), by)
 }
@@ -363,4 +367,16 @@ func (m *Model) makePatchStatement(ctx context.Context, id *string, fields *map[
 	}
 
 	return statement.Set(m.fieldMap("UpdatedAt"), "NOW()").Set(m.fieldMap("UpdatedBy"), by)
+}
+
+func convertToUUIDSlice(strSlice []string) ([]uuid.UUID, error) {
+	uuidSlice := make([]uuid.UUID, len(strSlice))
+	for i, str := range strSlice {
+		u, err := uuid.Parse(str)
+		if err != nil {
+			return nil, err
+		}
+		uuidSlice[i] = u
+	}
+	return uuidSlice, nil
 }

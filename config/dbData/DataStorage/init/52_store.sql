@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS public.store
     name           VARCHAR(255) DEFAULT NULL,
     url            VARCHAR(255) UNIQUE                     NOT NULL,
     abbreviation   VARCHAR(10)  DEFAULT NULL,
-    config         JSONB        DEFAULT '{}'::jsonb,
     sort_order     INTEGER      DEFAULT NULL,
     active         BOOLEAN      DEFAULT TRUE,
     address_line_1 VARCHAR(255) DEFAULT NULL,
@@ -17,6 +16,7 @@ CREATE TABLE IF NOT EXISTS public.store
     web_site       VARCHAR(255) DEFAULT NULL,
     phone          VARCHAR(255) DEFAULT NULL,
     email          VARCHAR(255) DEFAULT NULL,
+    currency_url   VARCHAR(10)  DEFAULT NULL,
 
     created_at     TIMESTAMP    DEFAULT NOW()              NOT NULL,
     created_by     UUID         DEFAULT NULL,
@@ -58,22 +58,22 @@ COMMENT ON COLUMN public.store.updated_at IS 'Update time of store';
 COMMENT ON COLUMN public.store.updated_by IS 'Updater of store';
 
 -- auto update updated_at
-CREATE TRIGGER store_updated_at
+CREATE OR REPLACE TRIGGER store_updated_at
     BEFORE UPDATE
     ON public.store
     FOR EACH ROW
     EXECUTE FUNCTION update_update_at_column();
 
 -- auto set sort_order column
-CREATE TRIGGER store_order
+CREATE OR REPLACE TRIGGER store_order
     BEFORE INSERT
     ON public.store
     FOR EACH ROW
     EXECUTE FUNCTION set_order_column_universal();
 
 -- default data
-INSERT INTO public.store (name, url, abbreviation, sort_order, address_line_1, city, state, zip, country, web_site, phone, email)
-VALUES ('Futuro Factory Direct', 'fll', 'FLL', 1, '2201 John P Lyons Lane', 'Hallandale', 'FL', '33009', 'USA', 'https://www.futurofuturo.com', '800-230-3565', 'general@futurofuturo.com');
+INSERT INTO public.store (name, url, abbreviation, sort_order, address_line_1, city, state, zip, country, web_site, phone, email, currency_url)
+VALUES ('Futuro Factory Direct', 'fll', 'FLL', 1, '2201 John P Lyons Lane', 'Hallandale', 'FL', '33009', 'USA', 'https://www.futurofuturo.com', '800-230-3565', 'general@futurofuturo.com', 'usd');
 
 -- get data
 SELECT * FROM public.store;

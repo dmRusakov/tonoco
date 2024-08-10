@@ -45,7 +45,7 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 			productIdsMap[item.ProductID] = true
 			currencyIdsMap[item.CurrencyID] = true
 			warehouseIdsMap[item.WarehouseID] = true
-			storeIdsMap[item.StoreId] = true
+			storeIdsMap[item.StoreID] = true
 		}
 	}
 

@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (s server) router(ctx context.Context) {
+func (s Service) router(ctx context.Context) {
 	// dashboard
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		s.Render(w, "dashboard.page.gohtml")

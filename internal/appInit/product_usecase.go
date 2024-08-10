@@ -1,6 +1,7 @@
 package appInit
 
 import (
+	"github.com/dmRusakov/tonoco/internal/config"
 	currency_model "github.com/dmRusakov/tonoco/internal/domain/currency/model"
 	currency_service "github.com/dmRusakov/tonoco/internal/domain/currency/service"
 	file_model "github.com/dmRusakov/tonoco/internal/domain/file/model"
@@ -26,7 +27,7 @@ import (
 	productPolicy "github.com/dmRusakov/tonoco/internal/useCase/product"
 )
 
-func (a *App) ProductUseCaseInit() (err error) {
+func (a *App) ProductUseCaseInit(cfg *config.Config) error {
 	// currency
 	currencyStorage := currency_model.NewStorage(a.SqlDB)
 	currencyService := currency_service.NewService(currencyStorage)
@@ -68,7 +69,10 @@ func (a *App) ProductUseCaseInit() (err error) {
 
 	// store
 	storeStorage := store_model.NewStorage(a.SqlDB)
-	storeService := store_service.NewService(storeStorage)
+	storeService, err := store_service.NewService(storeStorage, cfg)
+	if err != nil {
+		return err
+	}
 
 	a.ProductUseCase = productPolicy.NewProductUseCase(
 		a.generator,

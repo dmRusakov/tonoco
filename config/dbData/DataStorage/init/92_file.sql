@@ -35,14 +35,14 @@ COMMENT ON COLUMN public.file.updated_at IS 'Last update date of the file';
 COMMENT ON COLUMN public.file.updated_by IS 'Last updater of the file';
 
 -- auto set sort_order column
-CREATE TRIGGER file_order
+CREATE OR REPLACE TRIGGER file_order
     BEFORE INSERT
     ON public.file
     FOR EACH ROW
     EXECUTE FUNCTION set_order_column_universal();
 
 -- auto update updated_at
-CREATE TRIGGER file_updated_at
+CREATE OR REPLACE TRIGGER file_updated_at
     BEFORE UPDATE
     ON public.file
     FOR EACH ROW

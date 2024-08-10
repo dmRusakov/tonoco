@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     ad.hd.func.activePage()
     ad.hd.dom.mobileMenu.addEventListener("click", ad.hd.func.toggleMobileMenu, false)
 
-    // update Item count in cart(gridContainer)
+    // update Item count in cart(gridItems)
 
 
 }, false);

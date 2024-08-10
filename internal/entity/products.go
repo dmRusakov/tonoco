@@ -1,19 +1,21 @@
 package entity
 
 type ProductListItem struct {
-	No               int32    `json:"no"`
-	Id               string   `json:"id"`
-	Sku              string   `json:"sku"`
-	Name             string   `json:"name"`
-	ShortDescription string   `json:"short_description"`
-	Url              string   `json:"url"`
-	Price            string   `json:"price"`
-	Currency         string   `json:"currency"`
-	Quantity         int32    `json:"quantity"`
-	IsTaxable        bool     `json:"is_taxable"`
-	SeoTitle         string   `json:"seo_title"`
-	SeoDescription   string   `json:"seo_description"`
-	Categories       []string `json:"categories"`
+	No               int32             `json:"no" db:"no"`
+	Id               string            `json:"id" db:"id"`
+	Sku              string            `json:"sku" db:"sku"`
+	Brand            string            `json:"brand" db:"brand"`
+	Name             string            `json:"name" db:"name"`
+	ShortDescription string            `json:"short_description" db:"short_description"`
+	Url              string            `json:"url" db:"url"`
+	Price            string            `json:"price" db:"price"`
+	Currency         string            `json:"currency" db:"currency"`
+	Quantity         int32             `json:"quantity" db:"quantity"`
+	IsTaxable        bool              `json:"is_taxable" db:"is_taxable"`
+	SeoTitle         string            `json:"seo_title" db:"seo_title"`
+	SeoDescription   string            `json:"seo_description" db:"seo_description"`
+	Categories       []string          `json:"categories" db:"categories"`
+	Tags             map[string]string `json:"tags" db:"tags"`
 }
 
 type ProductsPageUrlParams struct {

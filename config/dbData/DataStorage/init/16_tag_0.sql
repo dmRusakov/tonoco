@@ -43,7 +43,7 @@ COMMENT ON COLUMN public.tag.updated_at IS 'Updated At';
 COMMENT ON COLUMN public.tag.updated_by IS 'Updated By';
 
 -- auto update updated_at
-CREATE TRIGGER tag_updated_at
+CREATE OR REPLACE TRIGGER tag_updated_at
     BEFORE UPDATE
     ON public.tag
     FOR EACH ROW
@@ -66,7 +66,7 @@ BEGIN
 END;
 $$;
 
-CREATE TRIGGER update_tag_sort_order_for_tag
+CREATE OR REPLACE TRIGGER update_tag_sort_order_for_tag
     BEFORE INSERT
     ON public.tag
     FOR EACH ROW

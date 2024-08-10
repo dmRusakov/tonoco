@@ -12,7 +12,7 @@ import (
 
 // URL params for products page
 
-func (s server) RenderProducts(
+func (s Service) RenderProducts(
 	ctx context.Context,
 	w http.ResponseWriter,
 	r *http.Request,
@@ -37,7 +37,7 @@ func (s server) RenderProducts(
 	wg.Wait()
 
 	// get products
-	products, err := s.productUseCase.GetProductList(ctx, params)
+	products, totalItemsCount, err := s.productUseCase.GetProductList(ctx, params)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -48,6 +48,8 @@ func (s server) RenderProducts(
 
 		Products:   products,
 		ProductUrl: "range-hood",
+
+		CountItems: *totalItemsCount,
 	}
 
 	// render page
@@ -59,7 +61,7 @@ func (s server) RenderProducts(
 }
 
 // ReadProductsUrlParam read page parameters from url
-func (s server) ReadProductsUrlParam(r *http.Request) *entity.ProductsPageUrlParams {
+func (s Service) ReadProductsUrlParam(r *http.Request) *entity.ProductsPageUrlParams {
 	params := &entity.ProductsPageUrlParams{}
 	v := reflect.ValueOf(params).Elem()
 	t := v.Type()

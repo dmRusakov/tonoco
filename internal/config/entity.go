@@ -6,6 +6,8 @@ type Config struct {
 	IsDebug bool   `env:"IS_DEBUG" env-required:"true"`
 	WebPort string `env:"WEB_PORT" env-required:"true"`
 
+	StoreUrl string `env:"STORE_URL" env-required:"true"`
+
 	CacheStorage    CacheStorage
 	DataStorage     DataStorage
 	ProductListener ServerProductListener

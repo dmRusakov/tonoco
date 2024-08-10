@@ -33,14 +33,14 @@ COMMENT ON COLUMN public.folder.active IS 'Active status of the folder';
 COMMENT ON COLUMN public.folder.sort_order IS 'Sort order of the folder';
 
 -- auto update updated_at
-CREATE TRIGGER folder_updated_at
+CREATE OR REPLACE TRIGGER folder_updated_at
     BEFORE UPDATE
     ON public.folder
     FOR EACH ROW
     EXECUTE FUNCTION update_update_at_column();
 
 -- auto set sort_order column
-CREATE TRIGGER folder_order
+CREATE OR REPLACE TRIGGER folder_order
     BEFORE INSERT
     ON public.folder
     FOR EACH ROW

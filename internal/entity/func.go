@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"github.com/dmRusakov/tonoco/pkg/common/errors"
 )
 
 func Hash(s string) string {
@@ -15,6 +16,8 @@ func HashFilter(filter interface{}) (string, error) {
 	// Convert the filter to a JSON string
 	jsonFilter, err := json.Marshal(filter)
 	if err != nil {
+		// add err code and message
+		err = errors.AddCode(err, "73hxsa")
 		return "", err
 	}
 

@@ -45,14 +45,14 @@ COMMENT ON COLUMN public.tag_select.updated_at IS 'Update time of product tag';
 COMMENT ON COLUMN public.tag_select.updated_by IS 'Updater of product tag';
 
 -- auto update updated_at
-CREATE TRIGGER tag_select_updated_at
+CREATE OR REPLACE TRIGGER tag_select_updated_at
     BEFORE UPDATE
     ON public.user
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();
 
 -- auto set sort_order column
-CREATE TRIGGER tag_select_order
+CREATE OR REPLACE TRIGGER tag_select_order
     BEFORE INSERT
     ON public.tag_select
     FOR EACH ROW

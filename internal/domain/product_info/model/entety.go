@@ -35,6 +35,7 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
 		m.fieldMap("Id"),
 		m.fieldMap("Sku"),
+		m.fieldMap("Brand"),
 		m.fieldMap("Name"),
 		m.fieldMap("ShortDescription"),
 		m.fieldMap("Description"),
@@ -137,13 +138,18 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		if (*filter.PerPage) > uint64(countSkus) {
 			*filter.PerPage = uint64(countSkus)
 		}
+	}
 
+	// Brands - filter by brand
+	if filter.Brands != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("Brand"): *filter.Brands})
 	}
 
 	// Search
 	if filter.Search != nil {
 		statement = statement.Where(
 			sq.Or{
+				sq.Expr("LOWER("+m.fieldMap("Brand")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+m.fieldMap("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+m.fieldMap("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+m.fieldMap("ShortDescription")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
@@ -186,6 +192,7 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 		statement = statement.Where(
 			sq.Or{
 				sq.Expr("LOWER("+m.fieldMap("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("Brand")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+m.fieldMap("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+m.fieldMap("ShortDescription")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+m.fieldMap("Description")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
@@ -202,7 +209,7 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 // scanOneRow
 func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
 	var item = Item{}
-	var id, sku, name, shortDescription, description, url, seoTitle, seoDescription, gtin, googleProductCategory, googleProductType, createdBy, updatedBy sql.NullString
+	var id, sku, brand, name, shortDescription, description, url, seoTitle, seoDescription, gtin, googleProductCategory, googleProductType, createdBy, updatedBy sql.NullString
 	var sortOrder sql.NullInt64
 	var isTaxable, isTrackStock sql.NullBool
 	var shippingWeight, shippingWidth, shippingHeight, shippingLength sql.NullInt64
@@ -211,6 +218,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	err := rows.Scan(
 		&id,
 		&sku,
+		&brand,
 		&name,
 		&shortDescription,
 		&description,
@@ -244,6 +252,9 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	}
 	if sku.Valid {
 		item.Sku = sku.String
+	}
+	if brand.Valid {
+		item.Brand = brand.String
 	}
 	if name.Valid {
 		item.Name = name.String
@@ -339,6 +350,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	insertItem := m.qb.Insert(m.table).Columns(
 		m.fieldMap("Id"),
 		m.fieldMap("Sku"),
+		m.fieldMap("Brand"),
 		m.fieldMap("Name"),
 		m.fieldMap("ShortDescription"),
 		m.fieldMap("Description"),
@@ -362,6 +374,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	).Values(
 		item.Id,
 		item.Sku,
+		item.Brand,
 		item.Name,
 		item.ShortDescription,
 		item.Description,
@@ -394,6 +407,7 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 
 	return m.qb.Update(m.table).
 		Set(m.fieldMap("Sku"), item.Sku).
+		Set(m.fieldMap("Brand"), item.Brand).
 		Set(m.fieldMap("Name"), item.Name).
 		Set(m.fieldMap("ShortDescription"), item.ShortDescription).
 		Set(m.fieldMap("Description"), item.Description).

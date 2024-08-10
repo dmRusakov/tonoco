@@ -33,7 +33,6 @@ func List(ctx context.Context, client Client, statement sq.SelectBuilder) (pgx.R
 func Get(ctx context.Context, client Client, statement sq.SelectBuilder) (pgx.Rows, error) {
 	// convert the SQL statement to a string
 	query, args, err := statement.ToSql()
-	fmt.Println(query, "functions:36")
 	if err != nil {
 		err = ErrCreateQuery(err)
 		tracing.Error(ctx, err)
