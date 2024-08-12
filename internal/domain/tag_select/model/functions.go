@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"fmt"
+	"github.com/dmRusakov/tonoco/internal/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"time"
 )
@@ -26,9 +27,9 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 
 	// iterate over the result set
 	items := make(map[string]Item)
-	idsMap := make(map[string]bool)
-	urlsMap := make(map[string]bool)
-	tagTypeIdsMap := make(map[string]bool)
+	ids := make([]string, 0)
+	urls := make([]string, 0)
+	tagTypeIds := make([]string, 0)
 
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
@@ -40,30 +41,18 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 
 		// update filters if needed
 		if isUpdateFilter {
-			idsMap[item.Id] = true
-			urlsMap[item.Url] = true
-			tagTypeIdsMap[item.TagTypeId] = true
+			ids = append(ids, item.Id)
+			urls = append(urls, item.Url)
+			tagTypeIds = append(tagTypeIds, item.TagTypeId)
 		}
 
 	}
 
 	// update filters if needed
 	if isUpdateFilter {
-		// convert map keys to slices
-		ids := make([]string, 0, len(idsMap))
-		for id := range idsMap {
-			ids = append(ids, id)
-		}
-
-		urls := make([]string, 0, len(urlsMap))
-		for url := range urlsMap {
-			urls = append(urls, url)
-		}
-
-		tagTypeIds := make([]string, 0, len(tagTypeIdsMap))
-		for tagTypeId := range tagTypeIdsMap {
-			tagTypeIds = append(tagTypeIds, tagTypeId)
-		}
+		// remove duplicates from urls
+		urls = entity.RemoveDuplicates(urls, true)
+		tagTypeIds = entity.RemoveDuplicates(tagTypeIds, true)
 
 		// update the filter
 		filter.Ids = &ids

@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"fmt"
+	"github.com/dmRusakov/tonoco/internal/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"time"
 )
@@ -26,8 +27,8 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 
 	// iterate over the result set
 	items := make(map[string]Item)
-	idsMap := make(map[string]bool)
-	urlsMap := make(map[string]bool)
+	ids := make([]string, 0)
+	urls := make([]string, 0)
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
 		if err != nil {
@@ -38,21 +39,15 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 
 		// update filters if needed
 		if isUpdateFilter {
-			idsMap[item.Id] = true
-			urlsMap[item.Url] = true
+			ids = append(ids, item.Id)
+			urls = append(urls, item.Url)
 		}
 	}
 
 	// update filter if needed
 	if isUpdateFilter {
-		ids := make([]string, 0, len(idsMap))
-		for id := range idsMap {
-			ids = append(ids, id)
-		}
-		urls := make([]string, 0, len(urlsMap))
-		for url := range urlsMap {
-			urls = append(urls, url)
-		}
+		// remove duplicates from urls
+		urls = entity.RemoveDuplicates(urls, true)
 
 		// update filter
 		filter.Ids = &ids

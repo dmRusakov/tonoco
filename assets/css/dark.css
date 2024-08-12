@@ -12,6 +12,12 @@
     --deAccentText: #4d4d4d;
     --deAccentText1: #999;
 
+    /*special color*/
+    --tagCategoryColor: #fff;
+    --tagCategoryBgColor: #3b4e3a;
+    --tagWithColor: #fff;
+    --tagWithBgColor: #266282;
+
 
 
     --invertTextColor: #000;

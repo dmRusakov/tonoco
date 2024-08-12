@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"fmt"
+	"github.com/dmRusakov/tonoco/internal/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"time"
 )
@@ -26,10 +27,10 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 
 	// iterate over the result set
 	items := make(map[string]Item)
-	idsMap := make(map[string]bool)
-	productIdsMap := make(map[string]bool)
-	tagTypeIdsMap := make(map[string]bool)
-	tagSelectIdsMap := make(map[string]bool)
+	ids := make([]string, 0)
+	productIds := make([]string, 0)
+	tagTypeIds := make([]string, 0)
+	tagSelectIds := make([]string, 0)
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
 		if err != nil {
@@ -39,34 +40,19 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 
 		// update filters if needed
 		if isUpdateFilter {
-			idsMap[item.Id] = true
-			productIdsMap[item.ProductId] = true
-			tagTypeIdsMap[item.TagTypeId] = true
-			tagSelectIdsMap[item.TagSelectId] = true
+			ids = append(ids, item.Id)
+			productIds = append(productIds, item.ProductId)
+			tagTypeIds = append(tagTypeIds, item.TagTypeId)
+			tagSelectIds = append(tagSelectIds, item.TagSelectId)
 		}
 	}
 
 	// update filters if needed
 	if isUpdateFilter {
-		// convert map keys to slices
-		ids := make([]string, 0, len(idsMap))
-		for id := range idsMap {
-			ids = append(ids, id)
-		}
-		productIds := make([]string, 0, len(productIdsMap))
-		for productId := range productIdsMap {
-			productIds = append(productIds, productId)
-		}
-
-		tagTypeIds := make([]string, 0, len(tagTypeIdsMap))
-		for tagTypeId := range tagTypeIdsMap {
-			tagTypeIds = append(tagTypeIds, tagTypeId)
-		}
-
-		tagSelectIds := make([]string, 0, len(tagSelectIdsMap))
-		for tagSelectId := range tagSelectIdsMap {
-			tagSelectIds = append(tagSelectIds, tagSelectId)
-		}
+		// remove duplicates form productIds
+		productIds = entity.RemoveDuplicates(productIds, true)
+		tagTypeIds = entity.RemoveDuplicates(tagTypeIds, true)
+		tagSelectIds = entity.RemoveDuplicates(tagSelectIds, true)
 
 		// update filter
 		filter.Ids = &ids

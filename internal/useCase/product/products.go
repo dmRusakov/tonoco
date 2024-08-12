@@ -42,6 +42,26 @@ func (uc *UseCase) GetProductList(
 		return nil, nil, err
 	}
 
+	// get tag_types with `list_item` type
+	tagTypeFilter := entity.TagTypeFilter{
+		OrderBy:  entity.StringPtr("SortOrder"),
+		OrderDir: entity.StringPtr("ASC"),
+		ListItem: entity.BoolPtr(true),
+		Active:   entity.BoolPtr(true),
+		IsCount:  entity.BoolPtr(false),
+	}
+
+	tagTypes, _, err := uc.tagType.List(ctx, &tagTypeFilter, true)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// tag order
+	tagOrder := make(map[string]uint32)
+	for i, tagType := range *tagTypeFilter.Ids {
+		tagOrder[tagType] = uint32(i)
+	}
+
 	// dto
 	productsDto := make(map[string]entity.ProductListItem)
 	counter := 0
@@ -60,24 +80,14 @@ func (uc *UseCase) GetProductList(
 		}
 
 		// get item tags
-		itemTags := make(map[string]string)
-
-		// get tag_types with `list_item` type
-		tagTypeFilter := entity.TagTypeFilter{
-			ListItem: entity.BoolPtr(true),
-			Active:   entity.BoolPtr(true),
-			IsCount:  entity.BoolPtr(false),
-		}
-
-		tagTypes, _, err := uc.tagType.List(ctx, &tagTypeFilter, true)
-		if err != nil {
-			return nil, nil, err
-		}
+		itemTags := make(map[uint32]entity.ProductListItemTag)
 
 		// get tags
-		tag, _, err := uc.tag.List(ctx, &(entity.TagFilter{
+		tags, _, err := uc.tag.List(ctx, &(entity.TagFilter{
 			ProductIds: &[]string{product.Id},
 			TagTypeIds: tagTypeFilter.Ids,
+			OrderBy:    entity.StringPtr("TagTypeId"),
+			OrderDir:   entity.StringPtr("ASC"),
 			Active:     entity.BoolPtr(true),
 			IsCount:    entity.BoolPtr(false),
 		}), true)
@@ -86,8 +96,11 @@ func (uc *UseCase) GetProductList(
 		}
 
 		// get tag selects
-		for _, tag := range *tag {
-			tagName := (*tagTypes)[tag.TagTypeId].Name
+		for _, tag := range *tags {
+			itemTag := entity.ProductListItemTag{
+				Name: (*tagTypes)[tag.TagTypeId].Name,
+				Url:  (*tagTypes)[tag.TagTypeId].Url,
+			}
 
 			// get tag selects if tag has tag_select_id
 			if tag.TagSelectId != "" {
@@ -102,12 +115,15 @@ func (uc *UseCase) GetProductList(
 				}
 
 				selectName := (*tagSelect)[tag.TagSelectId].Name
-				itemTags[tagName] = selectName
+				itemTag.Value = selectName
 			} else {
-				itemTags[tagName] = tag.Value
+				itemTag.Value = tag.Value
 			}
+
+			itemTags[tagOrder[tag.TagTypeId]] = itemTag
 		}
 
+		// make product list item
 		productsDto[id] = entity.ProductListItem{
 			Id:               product.Id,
 			Sku:              product.Sku,
@@ -124,6 +140,7 @@ func (uc *UseCase) GetProductList(
 			Tags:             itemTags,
 		}
 
+		// count
 		counter++
 	}
 

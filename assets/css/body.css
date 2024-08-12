@@ -105,6 +105,74 @@ h3, h4, h5, h6 {
                         display: none;
                     }
                 }
+
+                .tag-container {
+                    display: inline-grid;
+                    position: relative;
+                    height: 0;
+                    top: 20px;
+
+                    .tag {
+                        .tag-body {
+                            position: relative;
+                            display: none;
+                            padding: 3px 5px 4px 8px;
+                            font-size: .8em;
+                            margin: 5px 0 5px -10px;
+                            font-weight: 500;
+
+                            &::after {
+                                content: "";
+                                position: absolute;
+                                top: 0;
+                                right: -18px;
+                                width: 0;
+                                height: 0;
+                                border-left: 11px solid transparent;
+                                border-top: 17px solid transparent;
+                                border-bottom: 17px solid transparent;
+                                border-right: 7px solid transparent;
+                            }
+
+                            &.category, &.mounting-type {
+                                display: inline-grid;
+                                background-color: var(--tagCategoryBgColor);
+                                color: var(--tagCategoryColor);
+                                &::after {
+                                    border-left-color: var(--tagCategoryBgColor);
+                                }
+                            }
+
+                            &.width {
+                                display: inline-grid;
+                                background-color: var(--tagWithBgColor);
+                                color: var(--tagWithColor);
+                                &::after {
+                                    border-left-color: var(--tagWithBgColor);
+                                }
+                            }
+
+                            .tag-name {
+                                display: block;
+                                font-size: .7em;
+                            }
+
+                            .tag-value {
+
+                            }
+                        }
+
+                        /*if second div are category, hide it */
+                        &:nth-child(2) .category {
+                            display: none;
+                        }
+
+                        /* hide with if first div are category */
+                        &:nth-child(2) .width {
+                            display: none;
+                        }
+                    }
+                }
             }
 
             .gridItem:hover {
