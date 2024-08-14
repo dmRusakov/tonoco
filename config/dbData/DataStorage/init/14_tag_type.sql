@@ -73,19 +73,19 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- insert default data
 CREATE OR REPLACE TRIGGER set_order_column_universal
     BEFORE INSERT
     ON public.tag_type
     FOR EACH ROW
 EXECUTE FUNCTION set_order_column_universal();
 
--- insert default data
 INSERT INTO public.tag_type (id, url, name, type, prime, list_item, filter, required, suffix)
-    VALUES
-    ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381001', 'category', 'Category', 'select', true, false, true, true, ''),
+VALUES
+    ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381558', 'mounting-type', 'Mounting type', 'select', false, true, false, false, ''),
+    ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381001', 'category', 'Category', 'select', true, true, true, true, ''),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381002', 'status', 'Status', 'select', true, false, true, true, ''),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381003', 'shipping-class', 'Shipping Class', 'select', true, false, true, true, ''),
-    ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381558', 'mounting-type', 'Mounting type', 'select', false, true, false, false, ''),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381565', 'design', 'Design', 'select', false, false, false, false, ''),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381566', 'materials', 'Materials', 'select', false, false, false, false, ''),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381567', 'lighting-type', 'Lighting type', 'select', false, false, false, false, ''),
@@ -127,7 +127,7 @@ INSERT INTO public.tag_type (id, url, name, type, prime, list_item, filter, requ
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd382530', 'filter-accessories', 'Filter accessories', 'select', false, false, false, false, ''),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd383138', 'qty-per-box', 'Qty per box', 'select', false, false, false, false, ''),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd383139', 'keywords', 'Keywords', 'select', false, false, false, false, '')
-    ON CONFLICT (id) DO UPDATE
+ON CONFLICT (id) DO UPDATE
     SET url = EXCLUDED.url,
         name = EXCLUDED.name,
         type = EXCLUDED.type,
