@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/google/uuid"
@@ -244,7 +245,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	if err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
-		return nil, err
+		return nil, errors.AddCode(err, "752006")
 	}
 
 	if id.Valid {
@@ -321,17 +322,17 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 }
 
 // scanCountRow - scan count row
-func (m *Model) scanCountRow(ctx context.Context, rows sq.RowScanner) (uint64, error) {
+func (m *Model) scanCountRow(ctx context.Context, rows sq.RowScanner) (*uint64, error) {
 	var count uint64
 
 	err := rows.Scan(&count)
 	if err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
-		return 0, err
+		return nil, errors.AddCode(err, "671713")
 	}
 
-	return count, nil
+	return &count, nil
 }
 
 // makeInsertStatement

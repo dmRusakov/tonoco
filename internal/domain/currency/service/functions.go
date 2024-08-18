@@ -11,6 +11,7 @@ func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	// Generate a itemCash key based on id and url
 	cacheKey, err := entity.HashFilter(filter)
 	if err != nil {
+		err = errors.AddCode(err, "180209")
 		return nil, err
 	}
 

@@ -36,7 +36,6 @@ func Get(ctx context.Context, client Client, statement sq.SelectBuilder) (pgx.Ro
 	if err != nil {
 		err = ErrCreateQuery(err)
 		tracing.Error(ctx, err)
-
 		return nil, err
 	}
 

@@ -81,6 +81,7 @@ func (s *Service) List(ctx context.Context, filter *Filter, isUpdateFilter bool)
 	// Generate a itemCash key based on the filter
 	cacheKey, err := entity.HashFilter(filter)
 	if err != nil {
+		err = errors.AddCode(err, "73hxsa")
 		return nil, nil, err
 	}
 

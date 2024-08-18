@@ -52,11 +52,10 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 	).From(m.table + " p")
 }
 
-func (m *Model) makeStatementWithFilter(filter *Filter) sq.SelectBuilder {
-	statement := m.makeStatement()
-
+// fillInFilter
+func (m *Model) fillInFilter(statement sq.SelectBuilder, filter *Filter) sq.SelectBuilder {
 	// Ids
-	if filter.Ids != nil && len(*filter.Ids) > 0 {
+	if filter.Ids != nil {
 		statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
 	}
 
@@ -102,9 +101,9 @@ func (m *Model) makeStatementWithFilter(filter *Filter) sq.SelectBuilder {
 	return statement
 }
 
-// make Get statement
+// makeGetStatement - make get statement by filter
 func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
-	return m.makeStatementWithFilter(filter)
+	return m.fillInFilter(m.makeStatement(), filter)
 }
 
 // makeStatementByFilter
@@ -134,7 +133,7 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	}
 
 	// Build query
-	statement := m.makeStatementWithFilter(filter)
+	statement := m.makeGetStatement(filter)
 
 	// Add OrderBy, OrderDir, Page, Limit and return
 	return statement.OrderBy(m.fieldMap(*filter.OrderBy) + " " + *filter.OrderDir).
@@ -143,49 +142,7 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 // makeCountStatementByFilter - make count statement by filter for pagination
 func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
-	// Build query
-	statement := m.qb.Select("COUNT(*)").From(m.table)
-
-	// Ids
-	if filter.Ids != nil && len(*filter.Ids) > 0 {
-		statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
-	}
-
-	// ProductIds
-	if filter.ProductIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("ProductIds"): *filter.ProductIds})
-	}
-
-	// CurrencyIds
-	if filter.CurrencyIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("CurrencyIds"): *filter.CurrencyIds})
-	}
-
-	// WarehouseIds
-	if filter.WarehouseIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("WarehouseIds"): *filter.WarehouseIds})
-	}
-
-	// StoreIds
-	if filter.StoreIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("StoreIds"): *filter.StoreIds}).Where("warehouse_id IS NULL").OrderBy("warehouse_id")
-	}
-
-	// Active
-	if filter.Active != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("Active"): *filter.Active})
-	}
-
-	// Search
-	if filter.Search != nil {
-		statement = statement.Where(
-			sq.Or{
-				sq.Expr("LOWER("+m.fieldMap("Price")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-			},
-		)
-	}
-
-	return statement
+	return m.fillInFilter(m.qb.Select("COUNT(*)").From(m.table), filter)
 }
 
 // scanOneRow
@@ -217,8 +174,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	if err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
-		err = errors.AddCode(err, "cdczt0")
-		return nil, err
+		return nil, errors.AddCode(err, "802311")
 	}
 
 	var item = Item{}
@@ -367,16 +323,4 @@ func (m *Model) makePatchStatement(ctx context.Context, id *string, fields *map[
 	}
 
 	return statement.Set(m.fieldMap("UpdatedAt"), "NOW()").Set(m.fieldMap("UpdatedBy"), by)
-}
-
-func convertToUUIDSlice(strSlice []string) ([]uuid.UUID, error) {
-	uuidSlice := make([]uuid.UUID, len(strSlice))
-	for i, str := range strSlice {
-		u, err := uuid.Parse(str)
-		if err != nil {
-			return nil, err
-		}
-		uuidSlice[i] = u
-	}
-	return uuidSlice, nil
 }

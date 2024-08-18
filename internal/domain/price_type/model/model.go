@@ -3,9 +3,13 @@ package model
 import (
 	"context"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/dmRusakov/tonoco/internal/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"time"
 )
+
+type Item = entity.PriceType
+type Filter = entity.PriceTypeFilter
 
 type Storage interface {
 	Get(context.Context, *Filter) (*Item, error)

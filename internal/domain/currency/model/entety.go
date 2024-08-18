@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/google/uuid"
@@ -51,14 +52,14 @@ func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 	// build query
 	statement := m.makeStatement()
 
-	// id
+	// Ids
 	if filter.Ids != nil {
-		statement = statement.Where(m.fieldMap("Id")+" = ?", (*filter.Ids)[0])
+		statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
 	}
 
-	// url
+	// Urls
 	if filter.Urls != nil {
-		statement = statement.Where(m.fieldMap("Url")+" = ?", (*filter.Urls)[0])
+		statement = statement.Where(sq.Eq{m.fieldMap("Url"): *filter.Urls})
 	}
 
 	return statement
@@ -208,7 +209,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	if err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
-		return nil, err
+		return nil, errors.AddCode(err, "810532")
 	}
 
 	var item = Item{}
