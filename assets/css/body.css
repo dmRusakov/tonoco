@@ -89,6 +89,29 @@ h3, h4, h5, h6 {
                     p {
                         color: var(--accentText);
                     }
+
+                    .price {
+                        &.sale {
+                            .regular-price {
+                                position: relative;
+                            }
+                            .regular-price::after{
+                                content: "";
+                                width: 100%;
+                                height: 1px;
+                                background: black;
+                                position: absolute;
+                                bottom: 7px;
+                                left: 0;
+                                transform: rotate(-7deg)
+                            }
+                        }
+
+                        .sale-price {
+                            color: var(--saleColor);
+                            font-weight: bolder;
+                        }
+                    }
                 }
 
                 .sku-container {
@@ -188,9 +211,20 @@ h3, h4, h5, h6 {
                         font-weight: bold;
                     }
 
-                    .price {
-                        transition: all 1s;
-                        color: var(--deAccentText1);
+                    .price.sale {
+                        .regular-price {
+                            transition: all 1s;
+                            color: var(--deAccentText1);
+
+                            &::after {
+                                transition: all 1s;
+                                background: var(--deAccentText1);
+                            }
+                        }
+
+                        .sale-price {
+                            color: var(--saleColor);
+                        }
                     }
                 }
 

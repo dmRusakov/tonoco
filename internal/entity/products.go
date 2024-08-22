@@ -8,6 +8,7 @@ type ProductListItem struct {
 	Name             string                        `json:"name" db:"name"`
 	ShortDescription string                        `json:"short_description" db:"short_description"`
 	Url              string                        `json:"url" db:"url"`
+	SalePrice        string                        `json:"sale_price" db:"price"`
 	Price            string                        `json:"price" db:"price"`
 	Currency         string                        `json:"currency" db:"currency"`
 	Quantity         int32                         `json:"quantity" db:"quantity"`

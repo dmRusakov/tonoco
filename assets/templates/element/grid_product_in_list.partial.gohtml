@@ -19,7 +19,10 @@
         <p class="text">{{.ShortDescription}}</p>
         <div class="detail-container">
             <p class="details">Shop this</p>
-            <p class="price">{{.Currency}}{{.Price}}</p>
+            <p class="price{{if .SalePrice}} sale{{end}}">
+                <span class="sale-price">{{.Currency}}{{.SalePrice}}</span>
+                <span class="regular-price">{{.Currency}}{{.Price}}</span>
+            </p>
         </div>
         <div class="sku-container">
             <p class="sku">{{.Sku}}<span> - {{.Quantity}}</span></p>

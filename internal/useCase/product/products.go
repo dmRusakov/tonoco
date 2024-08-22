@@ -32,12 +32,24 @@ func (uc *UseCase) GetProductList(
 	}
 
 	// get price types
-	priceTypeFilter := entity.PriceTypeFilter{
+	specialPriceTypeFilter := entity.PriceTypeFilter{
+		Urls:     &[]string{"special", "sale"},
 		IsPublic: entity.BoolPtr(true),
 		IsCount:  entity.BoolPtr(false),
 	}
 
-	_, _, err = uc.priceType.List(ctx, &priceTypeFilter, true)
+	_, _, err = uc.priceType.List(ctx, &specialPriceTypeFilter, true)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	regularPriceTypeFilter := entity.PriceTypeFilter{
+		Urls:     &[]string{"regular"},
+		IsPublic: entity.BoolPtr(true),
+		IsCount:  entity.BoolPtr(false),
+	}
+
+	_, _, err = uc.priceType.List(ctx, &regularPriceTypeFilter, true)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -67,14 +79,28 @@ func (uc *UseCase) GetProductList(
 	counter := 0
 	for id, product := range *productInfos {
 		// get price
-		priceFilter := entity.PriceFilter{
+		specialPriceFilter := entity.PriceFilter{
 			ProductIds:   &[]string{product.Id},
-			PriceTypeIds: priceTypeFilter.Ids,
+			PriceTypeIds: specialPriceTypeFilter.Ids,
 			CurrencyIds:  &[]string{currency.Id},
 			Active:       entity.BoolPtr(true),
 			IsCount:      entity.BoolPtr(false),
 		}
-		price, err := uc.price.Get(ctx, &priceFilter)
+		specialPrice, _, err := uc.price.List(ctx, &specialPriceFilter, true)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		// get regularPrice
+		regularPriceFilter := entity.PriceFilter{
+			ProductIds:   &[]string{product.Id},
+			PriceTypeIds: regularPriceTypeFilter.Ids,
+			CurrencyIds:  &[]string{currency.Id},
+			Active:       entity.BoolPtr(true),
+			IsCount:      entity.BoolPtr(false),
+		}
+
+		regularPrice, _, err := uc.price.List(ctx, &regularPriceFilter, true)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -124,7 +150,7 @@ func (uc *UseCase) GetProductList(
 		}
 
 		// make product list item
-		productsDto[id] = entity.ProductListItem{
+		productItem := entity.ProductListItem{
 			Id:               product.Id,
 			Sku:              product.Sku,
 			Quantity:         1,
@@ -133,12 +159,22 @@ func (uc *UseCase) GetProductList(
 			ShortDescription: product.ShortDescription,
 			Url:              product.Url,
 			Currency:         currency.Symbol,
-			Price:            humanize.FormatFloat("#,###.##", price.Price),
-			IsTaxable:        product.IsTaxable,
 			SeoTitle:         product.SeoTitle,
 			SeoDescription:   product.SeoDescription,
 			Tags:             itemTags,
 		}
+
+		// price
+		if regularPriceFilter.Ids != nil && len(*regularPriceFilter.Ids) > 0 {
+			productItem.Price = humanize.FormatFloat("#,###.##", (*regularPrice)[(*regularPriceFilter.Ids)[0]].Price)
+		}
+
+		if specialPriceFilter.Ids != nil && len(*specialPriceFilter.Ids) > 0 {
+			productItem.SalePrice = humanize.FormatFloat("#,###.##", (*specialPrice)[(*specialPriceFilter.Ids)[0]].Price)
+		}
+
+		// add product to dto
+		productsDto[id] = productItem
 
 		// count
 		counter++
