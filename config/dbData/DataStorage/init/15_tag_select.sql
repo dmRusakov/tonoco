@@ -44,19 +44,34 @@ COMMENT ON COLUMN public.tag_select.created_by IS 'Creator of product tag';
 COMMENT ON COLUMN public.tag_select.updated_at IS 'Update time of product tag';
 COMMENT ON COLUMN public.tag_select.updated_by IS 'Updater of product tag';
 
--- auto update updated_at
-CREATE OR REPLACE TRIGGER tag_select_updated_at
-    BEFORE UPDATE
-    ON public.user
-    FOR EACH ROW
-EXECUTE FUNCTION update_update_at_column();
-
 -- auto set sort_order column
 CREATE OR REPLACE TRIGGER tag_select_order
     BEFORE INSERT
     ON public.tag_select
     FOR EACH ROW
 EXECUTE FUNCTION set_order_column_universal();
+
+-- auto update updated_at
+CREATE OR REPLACE TRIGGER tag_select_updated_at
+    BEFORE UPDATE
+    ON public.tag_select
+    FOR EACH ROW
+EXECUTE FUNCTION update_update_at_column();
+
+-- auto set created_by
+CREATE OR REPLACE TRIGGER tag_select_created_by
+    BEFORE INSERT
+    ON public.tag_select
+    FOR EACH ROW
+EXECUTE FUNCTION set_created_by_if_null();
+
+-- auto set updated_by
+CREATE OR REPLACE TRIGGER tag_select_updated_by
+    BEFORE INSERT
+    ON public.tag_select
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_by_if_null();
+
 
 -- insert data
 INSERT INTO public.tag_select (id, tag_type_id, name, url, sort_order) VALUES

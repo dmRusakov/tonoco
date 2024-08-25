@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS public.store CASCADE;
+
 -- create table
 CREATE TABLE IF NOT EXISTS public.store
 (
@@ -57,19 +59,33 @@ COMMENT ON COLUMN public.store.created_by IS 'Creator of store';
 COMMENT ON COLUMN public.store.updated_at IS 'Update time of store';
 COMMENT ON COLUMN public.store.updated_by IS 'Updater of store';
 
--- auto update updated_at
-CREATE OR REPLACE TRIGGER store_updated_at
-    BEFORE UPDATE
-    ON public.store
-    FOR EACH ROW
-    EXECUTE FUNCTION update_update_at_column();
-
 -- auto set sort_order column
 CREATE OR REPLACE TRIGGER store_order
     BEFORE INSERT
     ON public.store
     FOR EACH ROW
     EXECUTE FUNCTION set_order_column_universal();
+
+-- auto update updated_at
+CREATE OR REPLACE TRIGGER store_updated_at
+    BEFORE UPDATE
+    ON public.store
+    FOR EACH ROW
+EXECUTE FUNCTION update_update_at_column();
+
+-- auto set created_by
+CREATE OR REPLACE TRIGGER store_created_by
+    BEFORE INSERT
+    ON public.store
+    FOR EACH ROW
+EXECUTE FUNCTION set_created_by_if_null();
+
+-- auto set updated_by
+CREATE OR REPLACE TRIGGER store_updated_by
+    BEFORE INSERT
+    ON public.store
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_by_if_null();
 
 -- default data
 INSERT INTO public.store (name, url, abbreviation, sort_order, address_line_1, city, state, zip, country, web_site, phone, email, currency_url)

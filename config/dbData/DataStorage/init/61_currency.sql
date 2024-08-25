@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS public.currency CASCADE;
+
 -- create table
 CREATE TABLE IF NOT EXISTS public.currency
 (
@@ -50,7 +52,24 @@ CREATE OR REPLACE TRIGGER currency_updated_at
     FOR EACH ROW
 EXECUTE FUNCTION update_update_at_column();
 
+-- auto set created_by
+CREATE OR REPLACE TRIGGER currency_created_by
+    BEFORE INSERT
+    ON public.currency
+    FOR EACH ROW
+EXECUTE FUNCTION set_created_by_if_null();
+
+-- auto set updated_by
+CREATE OR REPLACE TRIGGER currency_updated_by
+    BEFORE INSERT
+    ON public.currency
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_by_if_null();
+
+
 -- default data
 INSERT INTO public.currency (id, name, symbol, url)
 VALUES ('c475a6f3-55ad-4641-8caa-a76bfae13fb0', 'USD', '$', 'usd'),
        ('c475a6f3-55ad-4641-8caa-a76bfae13fb1', 'Euro', '€', 'eur');
+
+SELECT * FROM public.currency;

@@ -42,13 +42,6 @@ COMMENT ON COLUMN public.tag.created_by IS 'Created By';
 COMMENT ON COLUMN public.tag.updated_at IS 'Updated At';
 COMMENT ON COLUMN public.tag.updated_by IS 'Updated By';
 
--- auto update updated_at
-CREATE OR REPLACE TRIGGER tag_updated_at
-    BEFORE UPDATE
-    ON public.tag
-    FOR EACH ROW
-EXECUTE FUNCTION update_update_at_column();
-
 -- auto update sort_order by product_id, tag_type_id and tag_select_id
 CREATE OR REPLACE FUNCTION update_tag_sort_order_for_tag()
     RETURNS TRIGGER
@@ -71,6 +64,27 @@ CREATE OR REPLACE TRIGGER update_tag_sort_order_for_tag
     ON public.tag
     FOR EACH ROW
 EXECUTE FUNCTION update_tag_sort_order_for_tag();
+
+-- auto update updated_at
+CREATE OR REPLACE TRIGGER tag_updated_at
+    BEFORE UPDATE
+    ON public.tag
+    FOR EACH ROW
+EXECUTE FUNCTION update_update_at_column();
+
+-- auto set created_by
+CREATE OR REPLACE TRIGGER tag_created_by
+    BEFORE INSERT
+    ON public.tag
+    FOR EACH ROW
+EXECUTE FUNCTION set_created_by_if_null();
+
+-- auto set updated_by
+CREATE OR REPLACE TRIGGER tag_updated_by
+    BEFORE INSERT
+    ON public.tag
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_by_if_null();
 
 -- SELECT
 --     CONCAT('(select id from public.product_info where sku = "', T.product_sku, '")') as product_id,

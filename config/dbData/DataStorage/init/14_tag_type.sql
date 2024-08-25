@@ -73,13 +73,28 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- insert default data
-CREATE OR REPLACE TRIGGER set_order_column_universal
+-- auto update updated_at
+CREATE OR REPLACE TRIGGER tag_type_updated_at
+    BEFORE UPDATE
+    ON public.tag_type
+    FOR EACH ROW
+EXECUTE FUNCTION update_update_at_column();
+
+-- auto set created_by
+CREATE OR REPLACE TRIGGER tag_type_created_by
     BEFORE INSERT
     ON public.tag_type
     FOR EACH ROW
-EXECUTE FUNCTION set_order_column_universal();
+EXECUTE FUNCTION set_created_by_if_null();
 
+-- auto set updated_by
+CREATE OR REPLACE TRIGGER tag_type_updated_by
+    BEFORE INSERT
+    ON public.tag_type
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_by_if_null();
+
+--
 INSERT INTO public.tag_type (id, url, name, type, prime, list_item, filter, required, suffix)
 VALUES
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381558', 'mounting-type', 'Mounting type', 'select', false, true, false, false, ''),
@@ -104,7 +119,7 @@ VALUES
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381581', 'order-processing-time', 'Order processing time', 'select', false, false, false, false, ''),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381582', 'shipping-speed', 'Shipping speed', 'select', false, false, false, false, ''),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381583', 'ships-via', 'Ships via', 'select', false, false, false, false, ''),
-    ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381584', 'country-of-production', 'Country of production', 'select', false, false, false, false, ''),
+    ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381584', 'country-of-tag_typeion', 'Country of tag_typeion', 'select', false, false, false, false, ''),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381585', 'width-group', 'Width group', 'select', false, false, false, false, ''),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381591', 'recommended-range-width', 'Recommended range width', 'select', false, false, false, false, ''),
     ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd381602', 'depth', 'Depth', 'select', false, false, false, false, ''),

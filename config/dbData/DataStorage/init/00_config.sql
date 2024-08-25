@@ -27,6 +27,26 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+CREATE OR REPLACE FUNCTION set_created_by_if_null()
+    RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.created_by IS NULL THEN
+        SELECT id INTO NEW.created_by FROM public.user LIMIT 1;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION set_updated_by_if_null()
+    RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.updated_by IS NULL THEN
+        SELECT id INTO NEW.updated_by FROM public.user LIMIT 1;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 
 
 -- drop table

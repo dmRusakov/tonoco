@@ -63,18 +63,32 @@ COMMENT ON COLUMN public.product_info.created_by IS 'User who created the produc
 COMMENT ON COLUMN public.product_info.updated_at IS 'Timestamp when the product was last updated';
 COMMENT ON COLUMN public.product_info.updated_by IS 'User who last updated the product';
 
--- auto update updated_at
-CREATE OR REPLACE TRIGGER product_updated_at
-    BEFORE UPDATE
-    ON public.user
-    FOR EACH ROW
-EXECUTE FUNCTION update_update_at_column();
-
 -- auto set sort_order column
 CREATE OR REPLACE TRIGGER product_order
     BEFORE INSERT ON public.product_info
     FOR EACH ROW
 EXECUTE FUNCTION set_order_column_universal();
+
+-- auto update updated_at
+CREATE OR REPLACE TRIGGER stock_quantity_updated_at
+    BEFORE UPDATE
+    ON public.product_info
+    FOR EACH ROW
+EXECUTE FUNCTION update_update_at_column();
+
+-- auto set created_by
+CREATE OR REPLACE TRIGGER product_info_created_by
+    BEFORE INSERT
+    ON public.product_info
+    FOR EACH ROW
+EXECUTE FUNCTION set_created_by_if_null();
+
+-- auto set updated_by
+CREATE OR REPLACE TRIGGER product_info_updated_by
+    BEFORE INSERT
+    ON public.product_info
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_by_if_null();
 
 -- demo data
 INSERT INTO public.product_info (id, brand, sku, name, short_description, description, sort_order, url, shipping_weight, shipping_length, shipping_width, shipping_height, seo_title, seo_description, gtin, google_product_category, google_product_type)

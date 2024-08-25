@@ -54,7 +54,21 @@ CREATE OR REPLACE TRIGGER price_type_updated_at
     BEFORE UPDATE
     ON public.price_type
     FOR EACH ROW
-    EXECUTE FUNCTION update_update_at_column();
+EXECUTE FUNCTION update_update_at_column();
+
+-- auto set created_by
+CREATE OR REPLACE TRIGGER price_type_created_by
+    BEFORE INSERT
+    ON public.price_type
+    FOR EACH ROW
+EXECUTE FUNCTION set_created_by_if_null();
+
+-- auto set updated_by
+CREATE OR REPLACE TRIGGER price_type_updated_by
+    BEFORE INSERT
+    ON public.price_type
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_by_if_null();
 
 -- demo data
 INSERT INTO public.price_type (id, name, url, sort_order, is_public)

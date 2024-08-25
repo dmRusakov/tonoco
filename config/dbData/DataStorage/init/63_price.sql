@@ -47,13 +47,6 @@ COMMENT ON COLUMN public.price.created_by IS 'Creator of price';
 COMMENT ON COLUMN public.price.updated_at IS 'Update time of price';
 COMMENT ON COLUMN public.price.updated_by IS 'Updater of price';
 
--- auto update updated_at
-CREATE OR REPLACE TRIGGER price_updated_at
-    BEFORE UPDATE
-    ON public.price
-    FOR EACH ROW
-    EXECUTE FUNCTION update_update_at_column();
-
 -- auto set sort_order column by product_id
 CREATE OR REPLACE FUNCTION set_sort_order()
     RETURNS TRIGGER AS
@@ -78,6 +71,27 @@ CREATE OR REPLACE TRIGGER set_sort_order
     ON public.price
     FOR EACH ROW
     EXECUTE FUNCTION set_sort_order();
+
+-- auto update updated_at
+CREATE OR REPLACE TRIGGER price_updated_at
+    BEFORE UPDATE
+    ON public.price
+    FOR EACH ROW
+EXECUTE FUNCTION update_update_at_column();
+
+-- auto set created_by
+CREATE OR REPLACE TRIGGER price_created_by
+    BEFORE INSERT
+    ON public.price
+    FOR EACH ROW
+EXECUTE FUNCTION set_created_by_if_null();
+
+-- auto set updated_by
+CREATE OR REPLACE TRIGGER price_updated_by
+    BEFORE INSERT
+    ON public.price
+    FOR EACH ROW
+EXECUTE FUNCTION set_updated_by_if_null();
 
 -- demo data
 INSERT INTO public.price (product_id, price_type_id, currency_id, price) VALUES
