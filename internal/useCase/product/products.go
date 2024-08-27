@@ -149,11 +149,22 @@ func (uc *UseCase) GetProductList(
 			itemTags[tagOrder[tag.TagTypeId]] = itemTag
 		}
 
+		// get stock quantity
+		stockQuantityFilter := entity.StockQuantityFilter{
+			ProductIds: &[]string{product.Id},
+			IsCount:    entity.BoolPtr(false),
+		}
+
+		quantity, err := uc.stockQuantity.Get(ctx, &stockQuantityFilter)
+		if err != nil {
+			return nil, nil, err
+		}
+
 		// make product list item
 		productItem := entity.ProductListItem{
 			Id:               product.Id,
 			Sku:              product.Sku,
-			Quantity:         1,
+			Quantity:         quantity.Quality,
 			Brand:            product.Brand,
 			Name:             product.Name,
 			ShortDescription: product.ShortDescription,

@@ -7,6 +7,7 @@ import (
 	price_service "github.com/dmRusakov/tonoco/internal/domain/price/service"
 	price_type_service "github.com/dmRusakov/tonoco/internal/domain/price_type/service"
 	product_info_service "github.com/dmRusakov/tonoco/internal/domain/product_info/service"
+	stock_quantity_service "github.com/dmRusakov/tonoco/internal/domain/stock_quantity/service"
 	store_service "github.com/dmRusakov/tonoco/internal/domain/store/service"
 	tag_service "github.com/dmRusakov/tonoco/internal/domain/tag/service"
 	tag_select_service "github.com/dmRusakov/tonoco/internal/domain/tag_select/service"
@@ -28,17 +29,18 @@ type UseCase struct {
 	identity IdentityGenerator
 	clock    Clock
 
-	currency    *currency_service.Service
-	file        *file_service.Service
-	folder      *folder_service.Service
-	price       *price_service.Service
-	priceType   *price_type_service.Service
-	productInfo *product_info_service.Service
-	tag         *tag_service.Service
-	tagType     *tag_type_service.Service
-	tagSelect   *tag_select_service.Service
-	store       *store_service.Service
-	warehouse   *warehouse_service.Service
+	currency      *currency_service.Service
+	file          *file_service.Service
+	folder        *folder_service.Service
+	price         *price_service.Service
+	priceType     *price_type_service.Service
+	productInfo   *product_info_service.Service
+	tag           *tag_service.Service
+	tagType       *tag_type_service.Service
+	tagSelect     *tag_select_service.Service
+	stockQuantity *stock_quantity_service.Service
+	store         *store_service.Service
+	warehouse     *warehouse_service.Service
 }
 
 func NewProductUseCase(
@@ -54,6 +56,7 @@ func NewProductUseCase(
 	tagService *tag_service.Service,
 	tagTypeService *tag_type_service.Service,
 	tagSelect *tag_select_service.Service,
+	stockQuantity *stock_quantity_service.Service,
 	storeService *store_service.Service,
 	warehouseService *warehouse_service.Service,
 ) *UseCase {
@@ -61,16 +64,17 @@ func NewProductUseCase(
 		identity: identity,
 		clock:    clock,
 
-		currency:    currencyService,
-		file:        fileService,
-		folder:      folderService,
-		price:       priceService,
-		priceType:   priceTypeService,
-		productInfo: productInfoService,
-		tag:         tagService,
-		tagType:     tagTypeService,
-		tagSelect:   tagSelect,
-		store:       storeService,
-		warehouse:   warehouseService,
+		currency:      currencyService,
+		file:          fileService,
+		folder:        folderService,
+		price:         priceService,
+		priceType:     priceTypeService,
+		productInfo:   productInfoService,
+		tag:           tagService,
+		tagType:       tagTypeService,
+		tagSelect:     tagSelect,
+		stockQuantity: stockQuantity,
+		store:         storeService,
+		warehouse:     warehouseService,
 	}
 }

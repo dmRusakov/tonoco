@@ -14,6 +14,8 @@ import (
 	price_type_service "github.com/dmRusakov/tonoco/internal/domain/price_type/service"
 	product_info_model "github.com/dmRusakov/tonoco/internal/domain/product_info/model"
 	product_info_service "github.com/dmRusakov/tonoco/internal/domain/product_info/service"
+	stock_quantity_model "github.com/dmRusakov/tonoco/internal/domain/stock_quantity/model"
+	stock_quantity_service "github.com/dmRusakov/tonoco/internal/domain/stock_quantity/service"
 	store_model "github.com/dmRusakov/tonoco/internal/domain/store/model"
 	store_service "github.com/dmRusakov/tonoco/internal/domain/store/service"
 	specification_model "github.com/dmRusakov/tonoco/internal/domain/tag/model"
@@ -74,6 +76,10 @@ func (a *App) ProductUseCaseInit(cfg *config.Config) error {
 		return err
 	}
 
+	// stoke quantity
+	stockQuantityStorage := stock_quantity_model.NewStorage(a.SqlDB)
+	stockQuantityService := stock_quantity_service.NewService(stockQuantityStorage)
+
 	a.ProductUseCase = productPolicy.NewProductUseCase(
 		a.generator,
 		a.clock,
@@ -87,6 +93,7 @@ func (a *App) ProductUseCaseInit(cfg *config.Config) error {
 		specificationService,
 		specificationTypeService,
 		specificationValueService,
+		stockQuantityService,
 		storeService,
 		warehouseService,
 	)
