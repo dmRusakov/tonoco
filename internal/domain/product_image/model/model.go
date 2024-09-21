@@ -9,14 +9,14 @@ import (
 	"time"
 )
 
-type Item = entity.Store
-type Filter = entity.StoreFilter
+type ProductImage = entity.ProductImage
+type ProductImageFilter = entity.ProductImageFilter
 
 type Storage interface {
-	Get(context.Context, *Filter) (*Item, error)
-	List(context.Context, *Filter, bool) (*map[uuid.UUID]Item, *uint64, error)
-	Create(context.Context, *Item) (*uuid.UUID, error)
-	Update(context.Context, *Item) error
+	Get(context.Context, *ProductImageFilter) (*ProductImage, error)
+	List(context.Context, *ProductImageFilter, bool) (*map[uuid.UUID]ProductImage, *uint64, error)
+	Create(context.Context, *ProductImage) (*uuid.UUID, error)
+	Update(context.Context, *ProductImage) error
 	Patch(context.Context, *uuid.UUID, *map[string]interface{}) error
 	UpdatedAt(context.Context, *uuid.UUID) (*time.Time, error)
 	MaxSortOrder(context.Context) (*uint64, error)
@@ -24,7 +24,6 @@ type Storage interface {
 	Delete(context.Context, *uuid.UUID) error
 }
 
-// Model is a struct that contains the SQL statement builder and the PostgreSQL client.
 type Model struct {
 	table       string
 	qb          sq.StatementBuilderType
@@ -32,12 +31,11 @@ type Model struct {
 	dbFieldCash map[string]string
 }
 
-// NewStorage is a constructor function that returns a new instance of the Model.
 func NewStorage(client psql.Client) *Model {
 	return &Model{
 		qb:          sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		client:      client,
-		table:       "store",
+		table:       "product_image",
 		dbFieldCash: map[string]string{},
 	}
 }

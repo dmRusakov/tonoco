@@ -5,6 +5,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
+	"github.com/google/uuid"
 	"time"
 )
 
@@ -13,14 +14,14 @@ type Filter = entity.TagFilter
 
 type Storage interface {
 	Get(context.Context, *Filter) (*Item, error)
-	List(context.Context, *Filter, bool) (*map[string]Item, *uint64, error)
-	Create(context.Context, *Item) (*string, error)
+	List(context.Context, *Filter, bool) (*map[uuid.UUID]Item, *uint64, error)
+	Create(context.Context, *Item) (*uuid.UUID, error)
 	Update(context.Context, *Item) error
-	Patch(context.Context, *string, *map[string]interface{}) error
-	UpdatedAt(context.Context, *string) (*time.Time, error)
+	Patch(context.Context, *uuid.UUID, *map[string]interface{}) error
+	UpdatedAt(context.Context, *uuid.UUID) (*time.Time, error)
 	MaxSortOrder(context.Context) (*uint64, error)
 	TableIndexCount(context.Context) (*uint64, error)
-	Delete(context.Context, *string) error
+	Delete(context.Context, *uuid.UUID) error
 }
 
 // Model is a struct that contains the SQL statement builder and the PostgreSQL client.

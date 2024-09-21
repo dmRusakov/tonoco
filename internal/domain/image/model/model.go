@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-type Item = entity.Store
-type Filter = entity.StoreFilter
+type Item = entity.Image
+type Filter = entity.ImageFilter
 
 type Storage interface {
 	Get(context.Context, *Filter) (*Item, error)
@@ -37,7 +37,7 @@ func NewStorage(client psql.Client) *Model {
 	return &Model{
 		qb:          sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		client:      client,
-		table:       "store",
+		table:       "image",
 		dbFieldCash: map[string]string{},
 	}
 }
