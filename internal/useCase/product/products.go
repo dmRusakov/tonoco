@@ -4,12 +4,13 @@ import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dustin/go-humanize"
+	"github.com/google/uuid"
 )
 
 func (uc *UseCase) GetProductList(
 	ctx context.Context,
 	parameters *entity.ProductsPageUrlParams,
-) (*map[string]entity.ProductListItem, *uint64, error) {
+) (*map[uuid.UUID]entity.ProductListItem, *uint64, error) {
 	// get productInfos
 	productInfoFilter := entity.ProductInfoFilter{
 		Page:    parameters.Page,
@@ -69,20 +70,20 @@ func (uc *UseCase) GetProductList(
 	}
 
 	// tag order
-	tagOrder := make(map[string]uint32)
+	tagOrder := make(map[uuid.UUID]uint32)
 	for i, tagType := range *tagTypeFilter.Ids {
 		tagOrder[tagType] = uint32(i)
 	}
 
 	// dto
-	productsDto := make(map[string]entity.ProductListItem)
+	productsDto := make(map[uuid.UUID]entity.ProductListItem)
 	counter := 0
 	for id, product := range *productInfos {
 		// get price
 		specialPriceFilter := entity.PriceFilter{
-			ProductIds:   &[]string{product.Id},
+			ProductIds:   &[]uuid.UUID{product.ID},
 			PriceTypeIds: specialPriceTypeFilter.Ids,
-			CurrencyIds:  &[]string{currency.Id},
+			CurrencyIds:  &[]uuid.UUID{currency.ID},
 			Active:       entity.BoolPtr(true),
 			IsCount:      entity.BoolPtr(false),
 		}
@@ -93,9 +94,9 @@ func (uc *UseCase) GetProductList(
 
 		// get regularPrice
 		regularPriceFilter := entity.PriceFilter{
-			ProductIds:   &[]string{product.Id},
+			ProductIds:   &[]uuid.UUID{product.ID},
 			PriceTypeIds: regularPriceTypeFilter.Ids,
-			CurrencyIds:  &[]string{currency.Id},
+			CurrencyIds:  &[]uuid.UUID{currency.ID},
 			Active:       entity.BoolPtr(true),
 			IsCount:      entity.BoolPtr(false),
 		}
@@ -110,7 +111,7 @@ func (uc *UseCase) GetProductList(
 
 		// get tags
 		tags, _, err := uc.tag.List(ctx, &(entity.TagFilter{
-			ProductIds: &[]string{product.Id},
+			ProductIds: &[]uuid.UUID{product.ID},
 			TagTypeIds: tagTypeFilter.Ids,
 			OrderBy:    entity.StringPtr("TagTypeId"),
 			OrderDir:   entity.StringPtr("ASC"),
@@ -129,9 +130,9 @@ func (uc *UseCase) GetProductList(
 			}
 
 			// get tag selects if tag has tag_select_id
-			if tag.TagSelectId != "" {
+			if tag.TagSelectId != uuid.Nil {
 				tagSelect, _, err := uc.tagSelect.List(ctx, &(entity.TagSelectFilter{
-					Ids:        &[]string{tag.TagSelectId},
+					Ids:        &[]uuid.UUID{tag.TagSelectId},
 					TagTypeIds: tagTypeFilter.Ids,
 					Active:     entity.BoolPtr(true),
 					IsCount:    entity.BoolPtr(false),
@@ -151,7 +152,7 @@ func (uc *UseCase) GetProductList(
 
 		// get stock quantity
 		stockQuantityFilter := entity.StockQuantityFilter{
-			ProductIds: &[]string{product.Id},
+			ProductIds: &[]uuid.UUID{product.ID},
 			IsCount:    entity.BoolPtr(false),
 		}
 
@@ -160,9 +161,11 @@ func (uc *UseCase) GetProductList(
 			return nil, nil, err
 		}
 
+		// image ids
+
 		// make product list item
 		productItem := entity.ProductListItem{
-			Id:               product.Id,
+			ID:               product.ID,
 			Sku:              product.Sku,
 			Quantity:         quantity.Quality,
 			Brand:            product.Brand,

@@ -8,10 +8,14 @@ import (
 	file_service "github.com/dmRusakov/tonoco/internal/domain/file/service"
 	folder_model "github.com/dmRusakov/tonoco/internal/domain/folder/model"
 	folder_service "github.com/dmRusakov/tonoco/internal/domain/folder/service"
+	image_model "github.com/dmRusakov/tonoco/internal/domain/image/model"
+	image_service "github.com/dmRusakov/tonoco/internal/domain/image/service"
 	price_model "github.com/dmRusakov/tonoco/internal/domain/price/model"
 	price_service "github.com/dmRusakov/tonoco/internal/domain/price/service"
 	price_type_model "github.com/dmRusakov/tonoco/internal/domain/price_type/model"
 	price_type_service "github.com/dmRusakov/tonoco/internal/domain/price_type/service"
+	product_image_model "github.com/dmRusakov/tonoco/internal/domain/product_image/model"
+	product_image_service "github.com/dmRusakov/tonoco/internal/domain/product_image/service"
 	product_info_model "github.com/dmRusakov/tonoco/internal/domain/product_info/model"
 	product_info_service "github.com/dmRusakov/tonoco/internal/domain/product_info/service"
 	stock_quantity_model "github.com/dmRusakov/tonoco/internal/domain/stock_quantity/model"
@@ -26,6 +30,7 @@ import (
 	specification_type_service "github.com/dmRusakov/tonoco/internal/domain/tag_type/service"
 	warehouse_model "github.com/dmRusakov/tonoco/internal/domain/warehouse/model"
 	warehouse_service "github.com/dmRusakov/tonoco/internal/domain/warehouse/service"
+
 	productPolicy "github.com/dmRusakov/tonoco/internal/useCase/product"
 )
 
@@ -80,6 +85,14 @@ func (a *App) ProductUseCaseInit(cfg *config.Config) error {
 	stockQuantityStorage := stock_quantity_model.NewStorage(a.SqlDB)
 	stockQuantityService := stock_quantity_service.NewService(stockQuantityStorage)
 
+	// image
+	imageStorage := image_model.NewStorage(a.SqlDB)
+	imageService := image_service.NewService(imageStorage)
+
+	// product_image
+	productImageStorage := product_image_model.NewStorage(a.SqlDB)
+	productImageService := product_image_service.NewService(productImageStorage)
+
 	a.ProductUseCase = productPolicy.NewProductUseCase(
 		a.generator,
 		a.clock,
@@ -96,6 +109,8 @@ func (a *App) ProductUseCaseInit(cfg *config.Config) error {
 		stockQuantityService,
 		storeService,
 		warehouseService,
+		imageService,
+		productImageService,
 	)
 
 	return nil

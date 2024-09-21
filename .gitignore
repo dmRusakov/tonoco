@@ -25,4 +25,4 @@ config/dbData/MqBroker/data
 log
 
 /pkg/mod
-/assets/images/original/
+/assets/images/original

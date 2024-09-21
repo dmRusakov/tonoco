@@ -2,14 +2,14 @@ package service
 
 import (
 	"context"
-	"github.com/dmRusakov/tonoco/internal/domain/price_type/model"
+	"github.com/dmRusakov/tonoco/internal/domain/product_image/model"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/google/uuid"
 	"time"
 )
 
-type Item = entity.PriceType
-type Filter = entity.PriceTypeFilter
+type Item = entity.ProductImage
+type Filter = entity.ProductImageFilter
 
 type Repository interface {
 	Get(context.Context, *Filter) (*Item, error)
@@ -22,6 +22,7 @@ type Repository interface {
 	MaxSortOrder(context.Context) (*uint64, error)
 	Delete(context.Context, *uuid.UUID) error
 }
+
 type Service struct {
 	repository model.Storage
 	itemCash   map[string]Item

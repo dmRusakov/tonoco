@@ -1,10 +1,12 @@
 package entity
 
+import "github.com/google/uuid"
+
 type ProductPage struct {
 	Name             string
 	ShortDescription string
 	Description      string
-	Products         *map[string]ProductListItem
+	Products         *map[uuid.UUID]ProductListItem
 	ProductUrl       string
 	CountItems       uint64
 }

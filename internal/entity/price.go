@@ -1,14 +1,17 @@
 package entity
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type Price struct {
-	Id          string `json:"id" db:"id"`
-	ProductID   string `json:"product_id" db:"product_id"`
-	PriceTypeID string `json:"price_type_id" db:"price_type_id"`
-	CurrencyID  string `json:"currency_id" db:"currency_id"`
-	WarehouseID string `json:"warehouse_id" db:"warehouse_id"`
-	StoreID     string `json:"store_id" db:"store_id"`
+	ID          uuid.UUID `json:"id" db:"id"`
+	ProductID   uuid.UUID `json:"product_id" db:"product_id"`
+	PriceTypeID uuid.UUID `json:"price_type_id" db:"price_type_id"`
+	CurrencyID  uuid.UUID `json:"currency_id" db:"currency_id"`
+	WarehouseID uuid.UUID `json:"warehouse_id" db:"warehouse_id"`
+	StoreID     uuid.UUID `json:"store_id" db:"store_id"`
 
 	Price     float64 `json:"price" db:"price"`
 	SortOrder uint64  `json:"sort_order" db:"sort_order"`
@@ -17,19 +20,19 @@ type Price struct {
 	StartDate time.Time `json:"start_date" db:"start_date"`
 	EndDate   time.Time `json:"end_date" db:"end_date"`
 
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	CreatedBy string    `json:"created_by" db:"created_by"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
-	UpdatedBy string    `json:"updated_by" db:"updated_by"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	CreatedBy uuid.UUID `db:"created_by" json:"created_by"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
+	UpdatedBy uuid.UUID `db:"updated_by" json:"updated_by"`
 }
 
 type PriceFilter struct {
-	Ids          *[]string `json:"id"`
-	ProductIds   *[]string `json:"product_id"`
-	PriceTypeIds *[]string `json:"price_type_id"`
-	CurrencyIds  *[]string `json:"currency_id"`
-	WarehouseIds *[]string `json:"warehouse_id"`
-	StoreIds     *[]string `json:"store_id"`
+	Ids          *[]uuid.UUID `json:"id"`
+	ProductIds   *[]uuid.UUID `json:"product_id"`
+	PriceTypeIds *[]uuid.UUID `json:"price_type_id"`
+	CurrencyIds  *[]uuid.UUID `json:"currency_id"`
+	WarehouseIds *[]uuid.UUID `json:"warehouse_id"`
+	StoreIds     *[]uuid.UUID `json:"store_id"`
 
 	Active *bool   `json:"active"`
 	Search *string `json:"search"`
