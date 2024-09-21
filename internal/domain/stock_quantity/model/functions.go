@@ -3,8 +3,10 @@ package model
 import (
 	"context"
 	"fmt"
+	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
+	"github.com/google/uuid"
 	"time"
 )
 
@@ -18,7 +20,7 @@ func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	return m.scanOneRow(ctx, row)
 }
 
-func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (*map[string]Item, *uint64, error) {
+func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (*map[uuid.UUID]Item, *uint64, error) {
 	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter))
 	if err != nil {
 		return nil, nil, errors.AddCode(err, "231402")
@@ -26,41 +28,31 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 	defer rows.Close()
 
 	// iterate over the result set
-	items := make(map[string]Item)
-	idsMap := make(map[string]bool)
-	productIdsMap := make(map[string]bool)
-	warehouseIdsMap := make(map[string]bool)
+	items := make(map[uuid.UUID]Item)
+	ids := make([]uuid.UUID, 0)
+	productIds := make([]uuid.UUID, 0)
+	warehouseIds := make([]uuid.UUID, 0)
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
 		if err != nil {
 			return nil, nil, errors.AddCode(err, "943729")
 		}
 
-		items[item.Id] = *item
+		items[item.ID] = *item
 
 		// update filters if needed
 		if isUpdateFilter {
-			idsMap[item.Id] = true
-			productIdsMap[item.ProductId] = true
-			warehouseIdsMap[item.WarehouseId] = true
+			ids = append(ids, item.ID)
+			productIds = append(productIds, item.ProductId)
+			warehouseIds = append(warehouseIds, item.WarehouseId)
 		}
 	}
 
 	// update filters if needed
 	if isUpdateFilter {
-		ids := make([]string, 0, len(idsMap))
-		for id := range idsMap {
-			ids = append(ids, id)
-		}
-		productIds := make([]string, 0, len(productIdsMap))
-		for productId := range productIdsMap {
-			productIds = append(productIds, productId)
-		}
-
-		warehouseIds := make([]string, 0, len(warehouseIdsMap))
-		for warehouseId := range warehouseIdsMap {
-			warehouseIds = append(warehouseIds, warehouseId)
-		}
+		// remove duplicates form productIds
+		productIds = entity.RemoveDuplicates(productIds, true)
+		warehouseIds = entity.RemoveDuplicates(warehouseIds, true)
 
 		// update filter
 		filter.Ids = &ids
@@ -71,7 +63,7 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 	return &items, nil, nil
 }
 
-func (m *Model) Create(ctx context.Context, item *Item) (*string, error) {
+func (m *Model) Create(ctx context.Context, item *Item) (*uuid.UUID, error) {
 	statement, id := m.makeInsertStatement(ctx, item)
 	err := psql.Create(ctx, m.client, statement)
 	if err != nil {
@@ -85,7 +77,7 @@ func (m *Model) Update(ctx context.Context, item *Item) error {
 	err := psql.Update(
 		ctx,
 		m.client,
-		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), item.Id),
+		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.fieldMap("ID")), item.ID),
 	)
 
 	if err != nil {
@@ -95,7 +87,7 @@ func (m *Model) Update(ctx context.Context, item *Item) error {
 	return nil
 }
 
-func (m *Model) Patch(ctx context.Context, id *string, fields *map[string]interface{}) error {
+func (m *Model) Patch(ctx context.Context, id *uuid.UUID, fields *map[string]interface{}) error {
 	err := psql.Update(
 		ctx,
 		m.client,
@@ -109,11 +101,11 @@ func (m *Model) Patch(ctx context.Context, id *string, fields *map[string]interf
 	return nil
 }
 
-func (m *Model) Delete(ctx context.Context, id *string) error {
+func (m *Model) Delete(ctx context.Context, id *uuid.UUID) error {
 	err := psql.Delete(
 		ctx,
 		m.client,
-		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), id),
+		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.fieldMap("ID")), id),
 	)
 
 	if err != nil {
@@ -123,7 +115,7 @@ func (m *Model) Delete(ctx context.Context, id *string) error {
 	return nil
 }
 
-func (m *Model) UpdatedAt(ctx context.Context, id *string) (*time.Time, error) {
+func (m *Model) UpdatedAt(ctx context.Context, id *uuid.UUID) (*time.Time, error) {
 	at, err := psql.UpdatedAt(
 		ctx,
 		m.client,

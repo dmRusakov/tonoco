@@ -34,7 +34,7 @@ func (m *Model) fieldMap(field string) string {
 // makeStatement
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
-		m.fieldMap("Id"),
+		m.fieldMap("ID"),
 		m.fieldMap("ProductId"),
 		m.fieldMap("TagTypeId"),
 		m.fieldMap("TagSelectId"),
@@ -55,7 +55,7 @@ func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 
 	// id
 	if filter.Ids != nil {
-		statement = statement.Where(m.fieldMap("Id")+" = ?", (*filter.Ids)[0])
+		statement = statement.Where(m.fieldMap("ID")+" = ?", (*filter.Ids)[0])
 	}
 
 	return statement
@@ -95,7 +95,7 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		countIds := len(*filter.Ids)
 
 		if countIds > 0 {
-			statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
+			statement = statement.Where(sq.Eq{m.fieldMap("ID"): *filter.Ids})
 		}
 
 		*filter.Page = 1
@@ -148,7 +148,7 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 		countIds := len(*filter.Ids)
 
 		if countIds > 0 {
-			statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
+			statement = statement.Where(sq.Eq{m.fieldMap("ID"): *filter.Ids})
 		}
 	}
 
@@ -186,22 +186,22 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 // scanOneRow
 func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
-	var Id, ProductId, TagTypeId, TagSelectId, Value, CreatedBy, UpdatedBy sql.NullString
-	var Active sql.NullBool
-	var SortOrder sql.NullInt64
-	var CreatedAt, UpdatedAt sql.NullTime
+	var id, productId, tagTypeId, tagSelectId, value, createdBy, updatedBy sql.NullString
+	var active sql.NullBool
+	var sortOrder sql.NullInt64
+	var createdAt, updatedAt sql.NullTime
 	err := rows.Scan(
-		&Id,
-		&ProductId,
-		&TagTypeId,
-		&TagSelectId,
-		&Value,
-		&Active,
-		&SortOrder,
-		&CreatedAt,
-		&CreatedBy,
-		&UpdatedAt,
-		&UpdatedBy,
+		&id,
+		&productId,
+		&tagTypeId,
+		&tagSelectId,
+		&value,
+		&active,
+		&sortOrder,
+		&createdAt,
+		&createdBy,
+		&updatedAt,
+		&updatedBy,
 	)
 
 	if err != nil {
@@ -212,80 +212,80 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 
 	var item = Item{}
 
-	// Id if null, set it to empty string
-	if Id.Valid {
-		item.Id = Id.String
+	// id if null, set it to empty string
+	if id.Valid {
+		item.ID = uuid.MustParse(id.String)
 	}
 
-	// ProductId if null, set it to empty string
-	if ProductId.Valid {
-		item.ProductId = ProductId.String
+	// productId if null, set it to empty string
+	if productId.Valid {
+		item.ProductId = uuid.MustParse(productId.String)
 	}
 
-	// TagTypeId if null, set it to empty string
-	if TagTypeId.Valid {
-		item.TagTypeId = TagTypeId.String
+	// tagTypeId if null, set it to empty string
+	if tagTypeId.Valid {
+		item.TagTypeId = uuid.MustParse(tagTypeId.String)
 	}
 
-	// TagSelectId if null, set it to empty string
-	if TagSelectId.Valid {
-		item.TagSelectId = TagSelectId.String
+	// tagSelectId if null, set it to empty string
+	if tagSelectId.Valid {
+		item.TagSelectId = uuid.MustParse(tagSelectId.String)
 	}
 
-	// Value if null, set it to empty string
-	if Value.Valid {
-		item.Value = Value.String
+	// value if null, set it to empty string
+	if value.Valid {
+		item.Value = value.String
 	}
 
-	// Active if null, set it to false
-	if Active.Valid {
-		item.Active = Active.Bool
+	// active if null, set it to false
+	if active.Valid {
+		item.Active = active.Bool
 	}
 
-	// SortOrder if null, set it to 0
-	if SortOrder.Valid {
-		item.SortOrder = uint64(SortOrder.Int64)
+	// sortOrder if null, set it to 0
+	if sortOrder.Valid {
+		item.SortOrder = uint64(sortOrder.Int64)
 	}
 
-	// CreatedAt if null, set it to time.Time{}
-	if CreatedAt.Valid {
-		item.CreatedAt = CreatedAt.Time
+	// createdAt if null, set it to time.Time{}
+	if createdAt.Valid {
+		item.CreatedAt = createdAt.Time
 	}
 
-	// CreatedBy if null, set it to empty string
-	if CreatedBy.Valid {
-		item.CreatedBy = CreatedBy.String
+	// createdBy if null, set it to empty string
+	if createdBy.Valid {
+		item.CreatedBy = uuid.MustParse(createdBy.String)
 	}
 
-	// UpdatedAt if null, set it to time.Time{}
-	if UpdatedAt.Valid {
-		item.UpdatedAt = UpdatedAt.Time
+	// updatedAt if null, set it to time.Time{}
+	if updatedAt.Valid {
+		item.UpdatedAt = updatedAt.Time
 	}
 
-	// UpdatedBy if null, set it to empty string
-	if UpdatedBy.Valid {
-		item.UpdatedBy = UpdatedBy.String
+	// updatedBy if null, set it to empty string
+	if updatedBy.Valid {
+		item.UpdatedBy = uuid.MustParse(updatedBy.String)
 	}
 
 	return &item, nil
 }
 
 // makeInsertStatement
-func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.InsertBuilder, *string) {
+func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.InsertBuilder, *uuid.UUID) {
 
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
-	// if Id is not set, generate a new UUID
-	if item.Id == "" {
-		item.Id = uuid.New().String()
+	// if ID is not set, generate a new UUID
+	if item.ID == uuid.Nil {
+		item.ID = uuid.New()
 	}
 
-	// set Id to context
-	ctx = context.WithValue(ctx, "itemId", item.Id)
+	// set ID to context
+	ctx = context.WithValue(ctx, "itemId", item.ID)
 
 	insertItem := m.qb.Insert(m.table).Columns(
-		m.fieldMap("Id"),
+		m.fieldMap("ID"),
 		m.fieldMap("ProductId"),
 		m.fieldMap("TagTypeId"),
 		m.fieldMap("TagSelectId"),
@@ -297,7 +297,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		m.fieldMap("UpdatedAt"),
 		m.fieldMap("UpdatedBy"),
 	).Values(
-		item.Id,
+		item.ID,
 		item.ProductId,
 		item.TagTypeId,
 		item.TagSelectId,
@@ -310,7 +310,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		by,
 	)
 
-	return &insertItem, &item.Id
+	return &insertItem, &item.ID
 }
 
 // makeUpdateStatement
@@ -330,7 +330,7 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 }
 
 // makePatchStatement
-func (m *Model) makePatchStatement(ctx context.Context, id *string, fields *map[string]interface{}) sq.UpdateBuilder {
+func (m *Model) makePatchStatement(ctx context.Context, id *uuid.UUID, fields *map[string]interface{}) sq.UpdateBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 

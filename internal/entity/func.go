@@ -4,6 +4,8 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"github.com/dmRusakov/tonoco/pkg/common/errors"
+	"github.com/google/uuid"
 )
 
 func Hash(s string) string {
@@ -42,6 +44,15 @@ func BoolPtr(b bool) *bool {
 
 func StringPtr(s string) *string {
 	return &s
+}
+
+func StringToUUID(s string) (u uuid.UUID, err error) {
+	u, err = uuid.Parse(s)
+	if err != nil {
+		return u, errors.AddCode(err, "837732")
+	}
+
+	return u, nil
 }
 
 // Remove duplicates from a slice of any

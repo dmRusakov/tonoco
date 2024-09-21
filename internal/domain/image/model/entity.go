@@ -35,16 +35,17 @@ func (m *Model) fieldMap(field string) string {
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
 		m.fieldMap("ID"),
-		m.fieldMap("ProductID"),
-		m.fieldMap("PriceTypeID"),
-		m.fieldMap("CurrencyID"),
-		m.fieldMap("WarehouseID"),
-		m.fieldMap("StoreID"),
-		m.fieldMap("Price"),
+		m.fieldMap("Title"),
+		m.fieldMap("AltText"),
+		m.fieldMap("OriginPath"),
+		m.fieldMap("FullPath"),
+		m.fieldMap("LargePath"),
+		m.fieldMap("MediumPath"),
+		m.fieldMap("GridPath"),
+		m.fieldMap("ThumbnailPath"),
 		m.fieldMap("SortOrder"),
-		m.fieldMap("Active"),
-		m.fieldMap("StartDate"),
-		m.fieldMap("EndDate"),
+		m.fieldMap("IsWebp"),
+		m.fieldMap("ImageType"),
 		m.fieldMap("CreatedAt"),
 		m.fieldMap("CreatedBy"),
 		m.fieldMap("UpdatedAt"),
@@ -59,41 +60,17 @@ func (m *Model) fillInFilter(statement sq.SelectBuilder, filter *Filter) sq.Sele
 		statement = statement.Where(sq.Eq{m.fieldMap("ID"): *filter.Ids})
 	}
 
-	// ProductIds
-	if filter.ProductIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("ProductID"): *filter.ProductIds})
-	}
-
-	// PriceTypeIds
-	if filter.PriceTypeIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("PriceTypeID"): *filter.PriceTypeIds})
-	}
-
-	// CurrencyIds
-	if filter.CurrencyIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("CurrencyID"): *filter.CurrencyIds})
-	}
-
-	// WarehouseIds
-	if filter.WarehouseIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("WarehouseID"): *filter.WarehouseIds})
-	}
-
-	// StoreIds
-	if filter.StoreIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("StoreID"): *filter.StoreIds})
-	}
-
-	// Active
-	if filter.Active != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("Active"): *filter.Active})
+	// IsWebp
+	if filter.IsWebp != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("IsWebp"): *filter.IsWebp})
 	}
 
 	// Search
 	if filter.Search != nil {
 		statement = statement.Where(
 			sq.Or{
-				sq.Expr("LOWER("+m.fieldMap("Price")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("Title")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.fieldMap("AltText")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 			},
 		)
 	}
@@ -147,24 +124,24 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 // scanOneRow
 func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
-	var id, productId, priceTypeId, currencyId, warehouseId, storeId, createdBy, updatedBy sql.NullString
-	var active sql.NullBool
-	var price sql.NullFloat64
+	var id, title, altText, originPath, fullPath, largePath, mediumPath, gridPath, thumbnailPath, imageType, createdBy, updatedBy sql.NullString
+	var isWebp sql.NullBool
 	var sortOrder sql.NullInt64
-	var startDate, endData, createdAt, updatedAt sql.NullTime
+	var createdAt, updatedAt sql.NullTime
 
 	err := rows.Scan(
 		&id,
-		&productId,
-		&priceTypeId,
-		&currencyId,
-		&warehouseId,
-		&storeId,
-		&price,
+		&title,
+		&altText,
+		&originPath,
+		&fullPath,
+		&largePath,
+		&mediumPath,
+		&gridPath,
+		&thumbnailPath,
 		&sortOrder,
-		&active,
-		&startDate,
-		&endData,
+		&isWebp,
+		&imageType,
 		&createdAt,
 		&createdBy,
 		&updatedAt,
@@ -174,7 +151,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	if err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
-		return nil, errors.AddCode(err, "802311")
+		return nil, errors.AddCode(err, "853456")
 	}
 
 	var item = Item{}
@@ -183,48 +160,48 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 		item.ID = uuid.MustParse(id.String)
 	}
 
-	if productId.Valid {
-		item.ProductID = uuid.MustParse(productId.String)
+	if title.Valid {
+		item.Title = title.String
 	}
 
-	if priceTypeId.Valid {
-		item.PriceTypeID = uuid.MustParse(priceTypeId.String)
+	if altText.Valid {
+		item.AltText = altText.String
 	}
 
-	if currencyId.Valid {
-		item.CurrencyID = uuid.MustParse(currencyId.String)
+	if originPath.Valid {
+		item.OriginPath = originPath.String
 	}
 
-	if warehouseId.Valid {
-		item.WarehouseID = uuid.MustParse(warehouseId.String)
+	if fullPath.Valid {
+		item.FullPath = fullPath.String
 	}
 
-	if storeId.Valid {
-		item.StoreID = uuid.MustParse(storeId.String)
+	if largePath.Valid {
+		item.LargePath = largePath.String
 	}
 
-	if price.Valid {
-		item.Price = price.Float64
+	if mediumPath.Valid {
+		item.MediumPath = mediumPath.String
+	}
+
+	if gridPath.Valid {
+		item.GridPath = gridPath.String
+	}
+
+	if thumbnailPath.Valid {
+		item.ThumbnailPath = thumbnailPath.String
 	}
 
 	if sortOrder.Valid {
 		item.SortOrder = uint64(sortOrder.Int64)
 	}
 
-	if active.Valid {
-		item.Active = active.Bool
+	if isWebp.Valid {
+		item.IsWebp = isWebp.Bool
 	}
 
-	if startDate.Valid {
-		item.StartDate = startDate.Time
-	}
-
-	if endData.Valid {
-		item.EndDate = endData.Time
-	}
-
-	if createdAt.Valid {
-		item.CreatedAt = createdAt.Time
+	if imageType.Valid {
+		item.ImageType = imageType.String
 	}
 
 	if createdBy.Valid {
@@ -257,30 +234,35 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 
 	insertItem := m.qb.Insert(m.table).Columns(
 		m.fieldMap("ID"),
-		m.fieldMap("ProductIds"),
-		m.fieldMap("PriceTypeIds"),
-		m.fieldMap("CurrencyIds"),
-		m.fieldMap("WarehouseIds"),
-		m.fieldMap("StoreIds"),
-		m.fieldMap("Price"),
-		m.fieldMap("Active"),
-		m.fieldMap("StartDate"),
-		m.fieldMap("EndDate"),
+		m.fieldMap("Title"),
+		m.fieldMap("AltText"),
+		m.fieldMap("OriginPath"),
+		m.fieldMap("FullPath"),
+		m.fieldMap("LargePath"),
+		m.fieldMap("MediumPath"),
+		m.fieldMap("GridPath"),
+		m.fieldMap("ThumbnailPath"),
+		m.fieldMap("SortOrder"),
+		m.fieldMap("IsWebp"),
+		m.fieldMap("ImageType"),
+		m.fieldMap("ProductID"),
 		m.fieldMap("CreatedAt"),
 		m.fieldMap("CreatedBy"),
 		m.fieldMap("UpdatedAt"),
 		m.fieldMap("UpdatedBy"),
 	).Values(
 		item.ID,
-		item.ProductID,
-		item.PriceTypeID,
-		item.CurrencyID,
-		item.WarehouseID,
-		item.StoreID,
-		item.Price,
-		item.Active,
-		item.StartDate,
-		item.EndDate,
+		item.Title,
+		item.AltText,
+		item.OriginPath,
+		item.FullPath,
+		item.LargePath,
+		item.MediumPath,
+		item.GridPath,
+		item.ThumbnailPath,
+		item.SortOrder,
+		item.IsWebp,
+		item.ImageType,
 		"NOW()",
 		by,
 		"NOW()",
@@ -297,15 +279,17 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 	by := ctx.Value("user_id").(string)
 
 	return m.qb.Update(m.table).
-		Set(m.fieldMap("ProductIds"), item.ProductID).
-		Set(m.fieldMap("PriceTypeIds"), item.PriceTypeID).
-		Set(m.fieldMap("CurrencyIds"), item.CurrencyID).
-		Set(m.fieldMap("WarehouseIds"), item.WarehouseID).
-		Set(m.fieldMap("StoreIds"), item.StoreID).
-		Set(m.fieldMap("Price"), item.Price).
-		Set(m.fieldMap("Active"), item.Active).
-		Set(m.fieldMap("StartDate"), item.StartDate).
-		Set(m.fieldMap("EndDate"), item.EndDate).
+		Set(m.fieldMap("Title"), item.Title).
+		Set(m.fieldMap("AltText"), item.AltText).
+		Set(m.fieldMap("OriginPath"), item.OriginPath).
+		Set(m.fieldMap("FullPath"), item.FullPath).
+		Set(m.fieldMap("LargePath"), item.LargePath).
+		Set(m.fieldMap("MediumPath"), item.MediumPath).
+		Set(m.fieldMap("GridPath"), item.GridPath).
+		Set(m.fieldMap("ThumbnailPath"), item.ThumbnailPath).
+		Set(m.fieldMap("SortOrder"), item.SortOrder).
+		Set(m.fieldMap("IsWebp"), item.IsWebp).
+		Set(m.fieldMap("ImageType"), item.ImageType).
 		Set(m.fieldMap("UpdatedAt"), "NOW()").
 		Set(m.fieldMap("UpdatedBy"), by)
 }

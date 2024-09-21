@@ -1,23 +1,26 @@
 package entity
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type StockQuantity struct {
-	Id          string `json:"id" db:"id"`
-	ProductId   string `json:"product_id" db:"product_id"`
-	Quality     int32  `json:"quality" db:"quantity"`
-	WarehouseId string `json:"warehouse_id" db:"warehouse_id"`
+	ID          uuid.UUID `json:"id" db:"id"`
+	ProductId   uuid.UUID `json:"product_id" db:"product_id"`
+	Quality     int32     `json:"quality" db:"quantity"`
+	WarehouseId uuid.UUID `json:"warehouse_id" db:"warehouse_id"`
 
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	CreatedBy string    `json:"created_by" db:"created_by"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
-	UpdatedBy string    `json:"updated_by" db:"updated_by"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	CreatedBy uuid.UUID `db:"created_by" json:"created_by"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
+	UpdatedBy uuid.UUID `db:"updated_by" json:"updated_by"`
 }
 
 type StockQuantityFilter struct {
-	Ids          *[]string `json:"ids"`
-	ProductIds   *[]string `json:"product_ids"`
-	WarehouseIds *[]string `json:"warehouse_id"`
+	Ids          *[]uuid.UUID `json:"ids"`
+	ProductIds   *[]uuid.UUID `json:"product_ids"`
+	WarehouseIds *[]uuid.UUID `json:"warehouse_id"`
 
 	OrderBy  *string `json:"order_by"`
 	OrderDir *string `json:"order_dir"`

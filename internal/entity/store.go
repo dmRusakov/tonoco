@@ -1,9 +1,12 @@
 package entity
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type Store struct {
-	Id           string    `json:"id" db:"id"`
+	ID           uuid.UUID `json:"id" db:"id"`
 	Name         string    `json:"name" db:"name"`
 	Url          string    `json:"url" db:"url"`
 	Abbreviation string    `json:"abbreviation" db:"abbreviation"`
@@ -19,16 +22,16 @@ type Store struct {
 	Phone        string    `json:"phone" db:"phone"`
 	Email        string    `json:"email" db:"email"`
 	CurrencyUrl  string    `json:"currency_url" db:"currency_url"`
-	CreatedAt    time.Time `json:"created_at" db:"created_at"`
-	CreatedBy    string    `json:"created_by" db:"created_by"`
-	UpdatedAt    time.Time `json:"updated_at" db:"updated_at"`
-	UpdatedBy    string    `json:"updated_by" db:"updated_by"`
+	CreatedAt    time.Time `db:"created_at" json:"created_at"`
+	CreatedBy    uuid.UUID `db:"created_by" json:"created_by"`
+	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
+	UpdatedBy    uuid.UUID `db:"updated_by" json:"updated_by"`
 }
 
 type StoreFilter struct {
-	Ids           *[]string `json:"ids"`
-	Urls          *[]string `json:"urls"`
-	Abbreviations *[]string `json:"abbreviations"`
+	Ids           *[]uuid.UUID `json:"ids"`
+	Urls          *[]string    `json:"urls"`
+	Abbreviations *[]string    `json:"abbreviations"`
 
 	Active *bool   `json:"active"`
 	Search *string `json:"search"`

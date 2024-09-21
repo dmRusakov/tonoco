@@ -4,13 +4,14 @@ import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
+	"github.com/google/uuid"
 	"time"
 )
 
 // clear cashes
 func (s *Service) clearCashes() {
 	s.itemCash = make(map[string]Item)
-	s.itemsCash = make(map[string]map[string]Item)
+	s.itemsCash = make(map[string]map[uuid.UUID]Item)
 	s.countCash = make(map[string]uint64)
 }
 
@@ -31,19 +32,19 @@ func (s *Service) setItemCash(cacheKey string, item *Item) {
 }
 
 // get items cash
-func (s *Service) getItemsCash(cacheKey string) (*map[string]Item, *uint64, error) {
+func (s *Service) getItemsCash(cacheKey string) (*map[uuid.UUID]Item, *uint64, error) {
 	items := s.itemsCash[cacheKey]
 	count := s.countCash[cacheKey]
 	if items != nil && count != 0 {
 		return &items, &count, nil
 	}
-	return nil, nil, errors.AddCode(entity.ErrCacheNotFound, "hdj3ss")
+	return nil, nil, errors.AddCode(entity.ErrCacheNotFound, "320496")
 }
 
 // set items cash
-func (s *Service) setItemsCash(cacheKey string, items *map[string]Item, count *uint64) {
+func (s *Service) setItemsCash(cacheKey string, items *map[uuid.UUID]Item, count *uint64) {
 	if items == nil {
-		items = new(map[string]Item)
+		items = new(map[uuid.UUID]Item)
 	}
 	s.itemsCash[cacheKey] = *items
 	if count == nil {
@@ -76,7 +77,7 @@ func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	return item, nil
 }
 
-func (s *Service) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (*map[string]Item, *uint64, error) {
+func (s *Service) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (*map[uuid.UUID]Item, *uint64, error) {
 	// Generate a itemCash key based on the filter
 	cacheKey, err := entity.HashFilter(filter)
 	if err != nil {
@@ -102,7 +103,7 @@ func (s *Service) List(ctx context.Context, filter *Filter, isUpdateFilter bool)
 	return items, count, nil
 }
 
-func (s *Service) Create(ctx context.Context, item *Item) (*string, error) {
+func (s *Service) Create(ctx context.Context, item *Item) (*uuid.UUID, error) {
 	s.clearCashes()
 	return s.repository.Create(ctx, item)
 }
@@ -112,12 +113,12 @@ func (s *Service) Update(ctx context.Context, item *Item) error {
 	return s.repository.Update(ctx, item)
 }
 
-func (s *Service) Patch(ctx context.Context, id *string, fields *map[string]interface{}) error {
+func (s *Service) Patch(ctx context.Context, id *uuid.UUID, fields *map[string]interface{}) error {
 	s.clearCashes()
 	return s.repository.Patch(ctx, id, fields)
 }
 
-func (s *Service) UpdatedAt(ctx context.Context, id *string) (*time.Time, error) {
+func (s *Service) UpdatedAt(ctx context.Context, id *uuid.UUID) (*time.Time, error) {
 	return s.repository.UpdatedAt(ctx, id)
 }
 
@@ -129,7 +130,7 @@ func (s *Service) MaxSortOrder(ctx context.Context) (*uint64, error) {
 	return s.repository.MaxSortOrder(ctx)
 }
 
-func (s *Service) Delete(ctx context.Context, id *string) error {
+func (s *Service) Delete(ctx context.Context, id *uuid.UUID) error {
 	s.clearCashes()
 	return s.repository.Delete(ctx, id)
 }

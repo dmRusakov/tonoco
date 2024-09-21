@@ -12,32 +12,26 @@ import (
 	"reflect"
 )
 
-// fieldMap
 func (m *Model) fieldMap(field string) string {
-	// check if field is in the cash
 	if dbField, ok := m.dbFieldCash[field]; ok {
 		return dbField
 	}
 
-	// get field from struct
-	typeOf := reflect.TypeOf(Item{})
+	typeOf := reflect.TypeOf(ProductImage{})
 	byName, _ := typeOf.FieldByName(field)
 	dbField := byName.Tag.Get("db")
 
-	// set field to cash
 	m.dbFieldCash[field] = dbField
-
-	// done
 	return dbField
 }
 
-// makeStatement
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
 		m.fieldMap("ID"),
 		m.fieldMap("ProductId"),
-		m.fieldMap("Quality"),
-		m.fieldMap("WarehouseId"),
+		m.fieldMap("ImageId"),
+		m.fieldMap("Type"),
+		m.fieldMap("SortOrder"),
 		m.fieldMap("CreatedAt"),
 		m.fieldMap("CreatedBy"),
 		m.fieldMap("UpdatedAt"),
@@ -45,44 +39,47 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 	).From(m.table + " p")
 }
 
-// fillInFilter
-func (m *Model) fillInFilter(statement sq.SelectBuilder, filter *Filter) sq.SelectBuilder {
-	// Ids
+func (m *Model) fillInFilter(statement sq.SelectBuilder, filter *ProductImageFilter) sq.SelectBuilder {
 	if filter.Ids != nil {
 		statement = statement.Where(sq.Eq{m.fieldMap("ID"): *filter.Ids})
 	}
 
-	// ProductIds
 	if filter.ProductIds != nil {
 		statement = statement.Where(sq.Eq{m.fieldMap("ProductId"): *filter.ProductIds})
 	}
 
-	// WarehouseId
-	if filter.WarehouseIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("WarehouseId"): *filter.WarehouseIds})
+	if filter.ImageIds != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("ImageId"): *filter.ImageIds})
+	}
+
+	if filter.Type != nil {
+		statement = statement.Where(sq.Eq{m.fieldMap("Type"): *filter.Type})
+	}
+
+	if filter.Search != nil {
+		statement = statement.Where(
+			sq.Or{
+				sq.Expr("LOWER("+m.fieldMap("Type")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+			},
+		)
 	}
 
 	return statement
 }
 
-// makeGetStatement - make get statement by filter
-func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
+func (m *Model) makeGetStatement(filter *ProductImageFilter) sq.SelectBuilder {
 	return m.fillInFilter(m.makeStatement(), filter)
 }
 
-// makeStatementByFilter
-func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
-	// OrderBy
+func (m *Model) makeStatementByFilter(filter *ProductImageFilter) sq.SelectBuilder {
 	if filter.OrderBy == nil {
 		filter.OrderBy = entity.StringPtr("SortOrder")
 	}
 
-	// OrderDir
 	if filter.OrderDir == nil {
 		filter.OrderDir = entity.StringPtr("ASC")
 	}
 
-	// PerPage
 	if filter.PerPage == nil {
 		if filter.Page == nil {
 			filter.PerPage = entity.Uint64Ptr(999999999999999999)
@@ -91,35 +88,31 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		}
 	}
 
-	// Page
 	if filter.Page == nil {
 		filter.Page = entity.Uint64Ptr(1)
 	}
 
-	// Build query
 	statement := m.makeGetStatement(filter)
 
-	// Add OrderBy, OrderDir, Page, Limit and return
 	return statement.OrderBy(m.fieldMap(*filter.OrderBy) + " " + *filter.OrderDir).
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 }
 
-// makeCountStatementByFilter - make count statement by filter for pagination
-func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
+func (m *Model) makeCountStatementByFilter(filter *ProductImageFilter) sq.SelectBuilder {
 	return m.fillInFilter(m.qb.Select("COUNT(*)").From(m.table), filter)
 }
 
-// scanOneRow
-func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
-	var id, productId, warehouseId, createdBy, updatedBy sql.NullString
-	var quality sql.NullInt32
+func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*ProductImage, error) {
+	var id, productId, imageId, typeField, createdBy, updatedBy sql.NullString
+	var sortOrder sql.NullInt64
 	var createdAt, updatedAt sql.NullTime
 
 	err := rows.Scan(
 		&id,
 		&productId,
-		&quality,
-		&warehouseId,
+		&imageId,
+		&typeField,
+		&sortOrder,
 		&createdAt,
 		&createdBy,
 		&updatedAt,
@@ -129,10 +122,10 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	if err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
-		return nil, errors.AddCode(err, "802311")
+		return nil, errors.AddCode(err, "853456")
 	}
 
-	var item = Item{}
+	var item = ProductImage{}
 
 	if id.Valid {
 		item.ID = uuid.MustParse(id.String)
@@ -142,12 +135,16 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 		item.ProductId = uuid.MustParse(productId.String)
 	}
 
-	if quality.Valid {
-		item.Quality = quality.Int32
+	if imageId.Valid {
+		item.ImageId = uuid.MustParse(imageId.String)
 	}
 
-	if warehouseId.Valid {
-		item.WarehouseId = uuid.MustParse(warehouseId.String)
+	if typeField.Valid {
+		item.Type = typeField.String
+	}
+
+	if sortOrder.Valid {
+		item.SortOrder = uint64(sortOrder.Int64)
 	}
 
 	if createdAt.Valid {
@@ -169,25 +166,21 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	return &item, nil
 }
 
-// makeInsertStatement
-func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.InsertBuilder, *uuid.UUID) {
-	// get user_id from context
+func (m *Model) makeInsertStatement(ctx context.Context, item *ProductImage) (*sq.InsertBuilder, *uuid.UUID) {
 	by := ctx.Value("user_id").(string)
 
-	// if ID is not set, generate a new UUID
 	if item.ID == uuid.Nil {
 		item.ID = uuid.New()
 	}
 
-	// set ID to context
 	ctx = context.WithValue(ctx, "itemId", item.ID)
 
-	// insert statement
 	insertItem := m.qb.Insert(m.table).Columns(
 		m.fieldMap("ID"),
 		m.fieldMap("ProductId"),
-		m.fieldMap("Quality"),
-		m.fieldMap("WarehouseId"),
+		m.fieldMap("ImageId"),
+		m.fieldMap("Type"),
+		m.fieldMap("SortOrder"),
 		m.fieldMap("CreatedAt"),
 		m.fieldMap("CreatedBy"),
 		m.fieldMap("UpdatedAt"),
@@ -195,34 +188,31 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	).Values(
 		item.ID,
 		item.ProductId,
-		item.Quality,
-		item.WarehouseId,
+		item.ImageId,
+		item.Type,
+		item.SortOrder,
 		"NOW()",
 		by,
 		"NOW()",
 		by,
 	)
 
-	// get itemId from context
-	return &insertItem, &item.ID
+	return &insertItem, ctx.Value("itemId").(*uuid.UUID)
 }
 
-// makeUpdateStatement
-func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBuilder {
-	// get user_id from context
+func (m *Model) makeUpdateStatement(ctx context.Context, item *ProductImage) sq.UpdateBuilder {
 	by := ctx.Value("user_id").(string)
 
 	return m.qb.Update(m.table).
 		Set(m.fieldMap("ProductId"), item.ProductId).
-		Set(m.fieldMap("Quality"), item.Quality).
-		Set(m.fieldMap("WarehouseId"), item.WarehouseId).
+		Set(m.fieldMap("ImageId"), item.ImageId).
+		Set(m.fieldMap("Type"), item.Type).
+		Set(m.fieldMap("SortOrder"), item.SortOrder).
 		Set(m.fieldMap("UpdatedAt"), "NOW()").
 		Set(m.fieldMap("UpdatedBy"), by)
 }
 
-// makePatchStatement
 func (m *Model) makePatchStatement(ctx context.Context, id *uuid.UUID, fields *map[string]interface{}) sq.UpdateBuilder {
-	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
 	statement := m.qb.Update(m.table).Where("id = ?", id)

@@ -1,26 +1,29 @@
 package entity
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type Tag struct {
-	Id          string    `json:"id" db:"id"`
-	ProductId   string    `json:"product_id" db:"product_id"`
-	TagTypeId   string    `json:"tag_type_id" db:"tag_type_id"`
-	TagSelectId string    `json:"tag_select_id" db:"tag_select_id"`
+	ID          uuid.UUID `json:"id" db:"id"`
+	ProductId   uuid.UUID `json:"product_id" db:"product_id"`
+	TagTypeId   uuid.UUID `json:"tag_type_id" db:"tag_type_id"`
+	TagSelectId uuid.UUID `json:"tag_select_id" db:"tag_select_id"`
 	Value       string    `json:"value" db:"value"`
 	Active      bool      `json:"active" db:"active"`
 	SortOrder   uint64    `json:"sort_order" db:"sort_order"`
-	CreatedAt   time.Time `json:"created_at" db:"created_at"`
-	CreatedBy   string    `json:"created_by" db:"created_by"`
-	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
-	UpdatedBy   string    `json:"updated_by" db:"updated_by"`
+	CreatedAt   time.Time `db:"created_at" json:"created_at"`
+	CreatedBy   uuid.UUID `db:"created_by" json:"created_by"`
+	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
+	UpdatedBy   uuid.UUID `db:"updated_by" json:"updated_by"`
 }
 
 type TagFilter struct {
-	Ids          *[]string `json:"ids"`
-	ProductIds   *[]string `json:"product_ids"`
-	TagTypeIds   *[]string `json:"tag_type_ids"`
-	TagSelectIds *[]string `json:"tag_select_ids"`
+	Ids          *[]uuid.UUID `json:"ids"`
+	ProductIds   *[]uuid.UUID `json:"product_ids"`
+	TagTypeIds   *[]uuid.UUID `json:"tag_type_ids"`
+	TagSelectIds *[]uuid.UUID `json:"tag_select_ids"`
 
 	Active *bool   `json:"active"`
 	Search *string `json:"search"`

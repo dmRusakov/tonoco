@@ -1,23 +1,26 @@
 package entity
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type Folder struct {
-	Id        string    `json:"id"`
+	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
 	Url       string    `json:"url"`
 	ParentID  string    `json:"parent_id"`
 	SortOrder uint64    `json:"sort_order"`
 	Active    bool      `json:"active"`
-	CreatedAt time.Time `json:"created_at"`
-	CreatedBy string    `json:"created_by"`
-	UpdatedAt time.Time `json:"updated_at"`
-	UpdatedBy string    `json:"updated_by"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	CreatedBy uuid.UUID `db:"created_by" json:"created_by"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
+	UpdatedBy uuid.UUID `db:"updated_by" json:"updated_by"`
 }
 
 type FolderFilter struct {
-	Ids  *[]string `json:"ids"`
-	Urls *[]string `json:"urls"`
+	Ids  *[]uuid.UUID `json:"ids"`
+	Urls *[]string    `json:"urls"`
 
 	Active *bool   `json:"active"`
 	Search *string `json:"search"`

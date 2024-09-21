@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
+	"github.com/google/uuid"
 	"time"
 )
 
@@ -18,7 +19,7 @@ func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	return m.scanOneRow(ctx, row)
 }
 
-func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (*map[string]Item, *uint64, error) {
+func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (*map[uuid.UUID]Item, *uint64, error) {
 	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter))
 	if err != nil {
 		return nil, nil, errors.AddCode(err, "397222")
@@ -26,9 +27,9 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 	defer rows.Close()
 
 	// iterate over the result set
-	items := make(map[string]Item)
-	idsMap := make(map[string]bool)
-	urlsMap := make(map[string]bool)
+	items := make(map[uuid.UUID]Item)
+	ids := make([]uuid.UUID, 0)
+	urls := make([]string, 0)
 	abbreviationsMap := make(map[string]bool)
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
@@ -36,26 +37,19 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 			return nil, nil, errors.AddCode(err, "919569")
 		}
 
-		items[item.Id] = *item
+		items[item.ID] = *item
 
 		// update filters if needed
 		if isUpdateFilter {
-			idsMap[item.Id] = true
-			urlsMap[item.Url] = true
+			ids = append(ids, item.ID)
+			urls = append(urls, item.Url)
 			abbreviationsMap[item.Abbreviation] = true
 		}
 	}
 
 	// update filters if needed
 	if isUpdateFilter {
-		ids := make([]string, 0, len(idsMap))
-		for id := range idsMap {
-			ids = append(ids, id)
-		}
-		urls := make([]string, 0, len(urlsMap))
-		for url := range urlsMap {
-			urls = append(urls, url)
-		}
+
 		abbreviations := make([]string, 0, len(abbreviationsMap))
 		for abbreviation := range abbreviationsMap {
 			abbreviations = append(abbreviations, abbreviation)
@@ -70,7 +64,7 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 	return &items, nil, nil
 }
 
-func (m *Model) Create(ctx context.Context, item *Item) (*string, error) {
+func (m *Model) Create(ctx context.Context, item *Item) (*uuid.UUID, error) {
 	statement, id := m.makeInsertStatement(ctx, item)
 	err := psql.Create(ctx, m.client, statement)
 	if err != nil {
@@ -84,7 +78,7 @@ func (m *Model) Update(ctx context.Context, item *Item) error {
 	err := psql.Update(
 		ctx,
 		m.client,
-		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), item.Id),
+		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.fieldMap("ID")), item.ID),
 	)
 
 	if err != nil {
@@ -94,7 +88,7 @@ func (m *Model) Update(ctx context.Context, item *Item) error {
 	return nil
 }
 
-func (m *Model) Patch(ctx context.Context, id *string, fields *map[string]interface{}) error {
+func (m *Model) Patch(ctx context.Context, id *uuid.UUID, fields *map[string]interface{}) error {
 	err := psql.Update(
 		ctx,
 		m.client,
@@ -108,11 +102,11 @@ func (m *Model) Patch(ctx context.Context, id *string, fields *map[string]interf
 	return nil
 }
 
-func (m *Model) Delete(ctx context.Context, id *string) error {
+func (m *Model) Delete(ctx context.Context, id *uuid.UUID) error {
 	err := psql.Delete(
 		ctx,
 		m.client,
-		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), id),
+		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.fieldMap("ID")), id),
 	)
 
 	if err != nil {
@@ -122,7 +116,7 @@ func (m *Model) Delete(ctx context.Context, id *string) error {
 	return nil
 }
 
-func (m *Model) UpdatedAt(ctx context.Context, id *string) (*time.Time, error) {
+func (m *Model) UpdatedAt(ctx context.Context, id *uuid.UUID) (*time.Time, error) {
 	at, err := psql.UpdatedAt(
 		ctx,
 		m.client,

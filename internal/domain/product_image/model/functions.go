@@ -3,80 +3,61 @@ package model
 import (
 	"context"
 	"fmt"
-	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/google/uuid"
 	"time"
 )
 
-func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
+func (m *Model) Get(ctx context.Context, filter *ProductImageFilter) (*ProductImage, error) {
 	row, err := psql.Get(ctx, m.client, m.makeGetStatement(filter))
 	if err != nil {
-		return nil, errors.AddCode(err, "398921")
+		return nil, errors.AddCode(err, "467009")
 	}
 
-	// return the Item
 	return m.scanOneRow(ctx, row)
 }
 
-func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (*map[uuid.UUID]Item, *uint64, error) {
+func (m *Model) List(ctx context.Context, filter *ProductImageFilter, isUpdateFilter bool) (*map[uuid.UUID]ProductImage, *uint64, error) {
 	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter))
 	if err != nil {
-		return nil, nil, errors.AddCode(err, "272746")
+		return nil, nil, errors.AddCode(err, "953590")
 	}
 	defer rows.Close()
 
-	// iterate over the result set
-	items := make(map[uuid.UUID]Item)
+	items := make(map[uuid.UUID]ProductImage)
 	ids := make([]uuid.UUID, 0)
-	urls := make([]string, 0)
-	tagTypeIds := make([]uuid.UUID, 0)
-
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
 		if err != nil {
-			return nil, nil, errors.AddCode(err, "626225")
+			return nil, nil, errors.AddCode(err, "389234")
 		}
 
 		items[item.ID] = *item
 
-		// update filters if needed
 		if isUpdateFilter {
 			ids = append(ids, item.ID)
-			urls = append(urls, item.Url)
-			tagTypeIds = append(tagTypeIds, item.TagTypeId)
 		}
-
 	}
 
-	// update filters if needed
 	if isUpdateFilter {
-		// remove duplicates from urls
-		urls = entity.RemoveDuplicates(urls, true)
-		tagTypeIds = entity.RemoveDuplicates(tagTypeIds, true)
-
-		// update the filter
 		filter.Ids = &ids
-		filter.Urls = &urls
-		filter.TagTypeIds = &tagTypeIds
 	}
 
-	// done
 	return &items, nil, nil
 }
 
-func (m *Model) Create(ctx context.Context, item *Item) (*uuid.UUID, error) {
+func (m *Model) Create(ctx context.Context, item *ProductImage) (*uuid.UUID, error) {
 	statement, id := m.makeInsertStatement(ctx, item)
 	err := psql.Create(ctx, m.client, statement)
 	if err != nil {
-		return nil, errors.AddCode(err, "572732")
+		return nil, errors.AddCode(err, "235131")
 	}
 
 	return id, nil
 }
 
-func (m *Model) Update(ctx context.Context, item *Item) error {
+func (m *Model) Update(ctx context.Context, item *ProductImage) error {
 	err := psql.Update(
 		ctx,
 		m.client,
@@ -84,7 +65,7 @@ func (m *Model) Update(ctx context.Context, item *Item) error {
 	)
 
 	if err != nil {
-		return errors.AddCode(err, "330776")
+		return errors.AddCode(err, "115681")
 	}
 
 	return nil
@@ -98,7 +79,7 @@ func (m *Model) Patch(ctx context.Context, id *uuid.UUID, fields *map[string]int
 	)
 
 	if err != nil {
-		return errors.AddCode(err, "988373")
+		return errors.AddCode(err, "976385")
 	}
 
 	return nil
@@ -112,7 +93,7 @@ func (m *Model) Delete(ctx context.Context, id *uuid.UUID) error {
 	)
 
 	if err != nil {
-		return errors.AddCode(err, "213091")
+		return errors.AddCode(err, "129688")
 	}
 
 	return nil
@@ -126,7 +107,7 @@ func (m *Model) UpdatedAt(ctx context.Context, id *uuid.UUID) (*time.Time, error
 	)
 
 	if err != nil {
-		return nil, errors.AddCode(err, "576564")
+		return nil, errors.AddCode(err, "713559")
 	}
 
 	return at, nil
@@ -140,7 +121,7 @@ func (m *Model) TableIndexCount(ctx context.Context) (*uint64, error) {
 	)
 
 	if err != nil {
-		return nil, errors.AddCode(err, "146268")
+		return nil, errors.AddCode(err, "891898")
 	}
 
 	return count, nil
@@ -155,7 +136,7 @@ func (m *Model) MaxSortOrder(ctx context.Context) (*uint64, error) {
 	)
 
 	if err != nil {
-		return nil, errors.AddCode(err, "677754")
+		return nil, errors.AddCode(err, "605995")
 	}
 
 	return order, nil

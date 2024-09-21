@@ -1,9 +1,12 @@
 package entity
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type TagType struct {
-	Id               string    `json:"id" db:"id"`
+	ID               uuid.UUID `json:"id" db:"id"`
 	Name             string    `json:"name" db:"name"`
 	Url              string    `json:"url" db:"url"`
 	ShortDescription string    `json:"short_description" db:"short_description"`
@@ -17,14 +20,14 @@ type TagType struct {
 	Type             string    `json:"type" db:"type"`
 	Prefix           string    `json:"prefix" db:"prefix"`
 	Suffix           string    `json:"suffix" db:"suffix"`
-	CreatedAt        time.Time `json:"created_at" db:"created_at"`
-	CreatedBy        string    `json:"created_by" db:"created_by"`
-	UpdatedAt        time.Time `json:"updated_at" db:"updated_at"`
-	UpdatedBy        string    `json:"updated_by" db:"updated_by"`
+	CreatedAt        time.Time `db:"created_at" json:"created_at"`
+	CreatedBy        uuid.UUID `db:"created_by" json:"created_by"`
+	UpdatedAt        time.Time `db:"updated_at" json:"updated_at"`
+	UpdatedBy        uuid.UUID `db:"updated_by" json:"updated_by"`
 }
 
 type TagTypeFilter struct {
-	Ids  *[]string
+	Ids  *[]uuid.UUID
 	Urls *[]string
 
 	Required *bool
