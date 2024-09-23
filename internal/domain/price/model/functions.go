@@ -40,11 +40,11 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 			return nil, nil, errors.AddCode(err, "295128")
 		}
 
-		items[item.ID] = *item
+		items[item.Id] = *item
 
 		// update filters if needed
 		if isUpdateFilter {
-			ids = append(ids, item.ID)
+			ids = append(ids, item.Id)
 			productIDs = append(productIDs, item.ProductID)
 			currencyIDs = append(currencyIDs, item.CurrencyID)
 			warehouseIDs = append(warehouseIDs, item.WarehouseID)
@@ -85,7 +85,7 @@ func (m *Model) Update(ctx context.Context, item *Item) error {
 	err := psql.Update(
 		ctx,
 		m.client,
-		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.fieldMap("ID")), item.ID),
+		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), item.Id),
 	)
 
 	if err != nil {
@@ -113,7 +113,7 @@ func (m *Model) Delete(ctx context.Context, id *uuid.UUID) error {
 	err := psql.Delete(
 		ctx,
 		m.client,
-		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.fieldMap("ID")), id),
+		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), id),
 	)
 
 	if err != nil {

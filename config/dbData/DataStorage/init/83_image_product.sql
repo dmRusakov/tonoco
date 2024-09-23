@@ -68,7 +68,7 @@ select * from public.product_image;
 --         SELECT
 --             product_sku.meta_value AS sku,
 --             pm.meta_value          AS image_id,
---             'thumbnail' as type,
+--             'main' as type,
 --             0 as sort_order
 --         FROM wp_posts product
 --                  JOIN wp_postmeta pm ON product.ID = pm.post_id

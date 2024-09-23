@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"fmt"
+	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/google/uuid"
@@ -27,21 +28,31 @@ func (m *Model) List(ctx context.Context, filter *ProductImageFilter, isUpdateFi
 
 	items := make(map[uuid.UUID]ProductImage)
 	ids := make([]uuid.UUID, 0)
+	productIDs := make([]uuid.UUID, 0)
+	imageIDs := make([]uuid.UUID, 0)
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
 		if err != nil {
 			return nil, nil, errors.AddCode(err, "389234")
 		}
 
-		items[item.ID] = *item
+		items[item.Id] = *item
 
 		if isUpdateFilter {
-			ids = append(ids, item.ID)
+			ids = append(ids, item.Id)
+			productIDs = append(productIDs, item.ProductId)
+			imageIDs = append(imageIDs, item.ImageId)
 		}
 	}
 
 	if isUpdateFilter {
+		// remove duplicates
+		productIDs = entity.RemoveDuplicates(productIDs, true)
+		imageIDs = entity.RemoveDuplicates(imageIDs, true)
+
 		filter.Ids = &ids
+		filter.ProductIds = &productIDs
+		filter.ImageIds = &imageIDs
 	}
 
 	return &items, nil, nil
@@ -61,7 +72,7 @@ func (m *Model) Update(ctx context.Context, item *ProductImage) error {
 	err := psql.Update(
 		ctx,
 		m.client,
-		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.fieldMap("ID")), item.ID),
+		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), item.Id),
 	)
 
 	if err != nil {
@@ -89,7 +100,7 @@ func (m *Model) Delete(ctx context.Context, id *uuid.UUID) error {
 	err := psql.Delete(
 		ctx,
 		m.client,
-		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.fieldMap("ID")), id),
+		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), id),
 	)
 
 	if err != nil {

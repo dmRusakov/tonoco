@@ -34,7 +34,7 @@ func (m *Model) fieldMap(field string) string {
 // makeStatement
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
-		m.fieldMap("ID"),
+		m.fieldMap("Id"),
 		m.fieldMap("Name"),
 		m.fieldMap("Url"),
 		m.fieldMap("ParentID"),
@@ -54,7 +54,7 @@ func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 
 	// id
 	if filter.Ids != nil {
-		statement = statement.Where(m.fieldMap("ID")+" = ?", (*filter.Ids)[0])
+		statement = statement.Where(m.fieldMap("Id")+" = ?", (*filter.Ids)[0])
 	}
 
 	// url
@@ -99,7 +99,7 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		countIds := len(*filter.Ids)
 
 		if countIds > 0 {
-			statement = statement.Where(sq.Eq{m.fieldMap("ID"): *filter.Ids})
+			statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
 		}
 
 		*filter.Page = 1
@@ -152,7 +152,7 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 		countIds := len(*filter.Ids)
 
 		if countIds > 0 {
-			statement = statement.Where(sq.Eq{m.fieldMap("ID"): *filter.Ids})
+			statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
 		}
 	}
 
@@ -211,7 +211,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	var item = Item{}
 
 	if id.Valid {
-		item.ID = uuid.MustParse(id.String)
+		item.Id = uuid.MustParse(id.String)
 	}
 
 	if name.Valid {
@@ -254,16 +254,16 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
-	// if ID is not set, generate a new UUID
-	if item.ID == uuid.Nil {
-		item.ID = uuid.New()
+	// if Id is not set, generate a new UUID
+	if item.Id == uuid.Nil {
+		item.Id = uuid.New()
 	}
 
-	// set ID to context
-	ctx = context.WithValue(ctx, "itemId", item.ID)
+	// set Id to context
+	ctx = context.WithValue(ctx, "itemId", item.Id)
 
 	insertItem := m.qb.Insert(m.table).Columns(
-		m.fieldMap("ID"),
+		m.fieldMap("Id"),
 		m.fieldMap("Name"),
 		m.fieldMap("Url"),
 		m.fieldMap("ParentID"),
@@ -274,7 +274,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		m.fieldMap("UpdatedAt"),
 		m.fieldMap("UpdatedBy"),
 	).Values(
-		item.ID,
+		item.Id,
 		item.Name,
 		item.Url,
 		item.ParentID,
@@ -287,7 +287,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	)
 
 	// get itemId from context
-	return &insertItem, &item.ID
+	return &insertItem, &item.Id
 }
 
 // makeUpdateStatement

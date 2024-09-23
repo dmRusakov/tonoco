@@ -34,7 +34,7 @@ func (m *Model) fieldMap(field string) string {
 // makeStatement
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
-		m.fieldMap("ID"),
+		m.fieldMap("Id"),
 		m.fieldMap("ProductID"),
 		m.fieldMap("PriceTypeID"),
 		m.fieldMap("CurrencyID"),
@@ -56,7 +56,7 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 func (m *Model) fillInFilter(statement sq.SelectBuilder, filter *Filter) sq.SelectBuilder {
 	// Ids
 	if filter.Ids != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("ID"): *filter.Ids})
+		statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
 	}
 
 	// ProductIds
@@ -180,7 +180,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	var item = Item{}
 
 	if id.Valid {
-		item.ID = uuid.MustParse(id.String)
+		item.Id = uuid.MustParse(id.String)
 	}
 
 	if productId.Valid {
@@ -247,16 +247,16 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
-	// if ID is not set, generate a new UUID
-	if item.ID == uuid.Nil {
-		item.ID = uuid.New()
+	// if Id is not set, generate a new UUID
+	if item.Id == uuid.Nil {
+		item.Id = uuid.New()
 	}
 
-	// set ID to context
-	ctx = context.WithValue(ctx, "itemId", item.ID)
+	// set Id to context
+	ctx = context.WithValue(ctx, "itemId", item.Id)
 
 	insertItem := m.qb.Insert(m.table).Columns(
-		m.fieldMap("ID"),
+		m.fieldMap("Id"),
 		m.fieldMap("ProductIds"),
 		m.fieldMap("PriceTypeIds"),
 		m.fieldMap("CurrencyIds"),
@@ -271,7 +271,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		m.fieldMap("UpdatedAt"),
 		m.fieldMap("UpdatedBy"),
 	).Values(
-		item.ID,
+		item.Id,
 		item.ProductID,
 		item.PriceTypeID,
 		item.CurrencyID,
@@ -288,7 +288,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	)
 
 	// get itemId from context
-	return &insertItem, &item.ID
+	return &insertItem, &item.Id
 }
 
 // makeUpdateStatement

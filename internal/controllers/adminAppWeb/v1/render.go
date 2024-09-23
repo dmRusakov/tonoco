@@ -2,11 +2,12 @@ package admin_app_web_v1
 
 import (
 	"fmt"
+	"github.com/dmRusakov/tonoco/internal/entity"
 	"html/template"
 	"net/http"
 )
 
-func (s Service) Render(w http.ResponseWriter, pageTemplate string) {
+func (s Service) Render(w http.ResponseWriter, pageTemplate string, appData entity.AppData) {
 	// make template
 	tmpl := s.makeTemplate(pageTemplate)
 
@@ -33,6 +34,7 @@ func (s Service) makeTemplate(pageTemplate string) *template.Template {
 		"element/footer.partial",
 		"element/footer_file_imports.partial",
 		"element/grid_product_in_list.partial",
+		"element/footer_logs.partial",
 	}
 	for _, x := range partials {
 		templateSlice = append(templateSlice, fmt.Sprintf("%s%s.gohtml", s.tmlPath, x))

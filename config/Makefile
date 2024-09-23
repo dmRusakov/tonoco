@@ -52,22 +52,22 @@ minJSFiles:
 			$(eval FILENAME := $(file)) \
 			$(eval FILENAME := $(shell echo $(FILENAME) | sed 's/.*\///')) \
 			$(eval FILENAME := $(shell echo $(FILENAME) | sed 's/\.js//')) \
-			$(eval ID := "$(FILENAME)-js") \
+			$(eval Id := "$(FILENAME)-js") \
 			FILENAME=$(FILENAME)  make updateCJsVersion; \
 		fi; \
 	)
 
 updateCJsVersion:
 	# delete all min.js files
-	$(eval ID := "$(FILENAME)-js")
-	@echo $(ID)
-	$(eval VERSION := $(shell grep '<script.*id=$(ID)' "./../assets/templates/element/head_file_imports.partial.gohtml" | sed -n 's/.*version="\([^"]*\)".*/\1/p'))
+	$(eval Id := "$(FILENAME)-js")
+	@echo $(Id)
+	$(eval VERSION := $(shell grep '<script.*id=$(Id)' "./../assets/templates/element/head_file_imports.partial.gohtml" | sed -n 's/.*version="\([^"]*\)".*/\1/p'))
 	$(if $(VERSION),,$(eval VERSION := 1.0))
 	$(eval VERSION := $(shell echo "$(VERSION) + 0.001" | bc))
 	@echo $(VERSION)
-	sed -i 's/\(script id=$(ID).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/head_file_imports.partial.gohtml
-	sed -i 's/\(script id=$(ID).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/prod_head_file_imports.partial.gohtml
-	sed -i 's/\(script id=$(ID).*src="\)[^"]*"/\1'"\/assets\/js\/"$(FILENAME)".min.js?v="$(VERSION)'"/' ./../assets/templates/element/prod_head_file_imports.partial.gohtml
+	sed -i 's/\(script id=$(Id).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/head_file_imports.partial.gohtml
+	sed -i 's/\(script id=$(Id).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/prod_head_file_imports.partial.gohtml
+	sed -i 's/\(script id=$(Id).*src="\)[^"]*"/\1'"\/assets\/js\/"$(FILENAME)".min.js?v="$(VERSION)'"/' ./../assets/templates/element/prod_head_file_imports.partial.gohtml
 
 minCssFiles:
  	# minify all css files in the assets/css folder
@@ -81,7 +81,7 @@ minCssFiles:
 				$(eval FILENAME := $(file)) \
 				$(eval FILENAME := $(shell echo $(FILENAME) | sed 's/.*\///')) \
 				$(eval FILENAME := $(shell echo $(FILENAME) | sed 's/\.css//')) \
-				$(eval ID := "$(FILENAME)-css") \
+				$(eval Id := "$(FILENAME)-css") \
 				FILENAME=$(FILENAME)  make updateCssVersion; \
 			fi; \
 		fi; \
@@ -90,19 +90,19 @@ minCssFiles:
 	rm -f ./../assets/css/*.min.min.css
 
 updateCssVersion:
-	$(eval ID := "$(FILENAME)-css")
-	@echo $(ID)
-	$(eval VERSION := $(shell grep '<link.*id=$(ID)' "./../assets/templates/element/head_file_imports.partial.gohtml" | sed -n 's/.*version="\([^"]*\)".*/\1/p'))
+	$(eval Id := "$(FILENAME)-css")
+	@echo $(Id)
+	$(eval VERSION := $(shell grep '<link.*id=$(Id)' "./../assets/templates/element/head_file_imports.partial.gohtml" | sed -n 's/.*version="\([^"]*\)".*/\1/p'))
 	$(if $(VERSION),,$(eval VERSION := 1.0))
 	$(eval VERSION := $(shell echo "$(VERSION) + 0.001" | bc))
 	@echo $(VERSION)
-	sed -i 's/\(link id=$(ID).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/head_file_imports.partial.gohtml
-	sed -i 's/\(link id=$(ID).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/prod_head_file_imports.partial.gohtml
-	sed -i 's/\(link id=$(ID).*href="\)[^"]*"/\1'"\/assets\/css\/"$(FILENAME)".min.css?v="$(VERSION)'"/' ./../assets/templates/element/prod_head_file_imports.partial.gohtml
-	$(eval VERSION := $(shell grep '<link.*id=$(ID)' "./../assets/templates/element/footer_file_imports.partial.gohtml" | sed -n 's/.*version="\([^"]*\)".*/\1/p'))
+	sed -i 's/\(link id=$(Id).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/head_file_imports.partial.gohtml
+	sed -i 's/\(link id=$(Id).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/prod_head_file_imports.partial.gohtml
+	sed -i 's/\(link id=$(Id).*href="\)[^"]*"/\1'"\/assets\/css\/"$(FILENAME)".min.css?v="$(VERSION)'"/' ./../assets/templates/element/prod_head_file_imports.partial.gohtml
+	$(eval VERSION := $(shell grep '<link.*id=$(Id)' "./../assets/templates/element/footer_file_imports.partial.gohtml" | sed -n 's/.*version="\([^"]*\)".*/\1/p'))
 	$(if $(VERSION),,$(eval VERSION := 1.0))
 	$(eval VERSION := $(shell echo "$(VERSION) + 0.001" | bc))
 	@echo $(VERSION)
-	sed -i 's/\(link id=$(ID).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/footer_file_imports.partial.gohtml
-	sed -i 's/\(link id=$(ID).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/prod_footer_file_imports.partial.gohtml
-	sed -i 's/\(link id=$(ID).*href="\)[^"]*"/\1'"\/assets\/css\/"$(FILENAME)".min.css?v="$(VERSION)'"/' ./../assets/templates/element/prod_footer_file_imports.partial.gohtml
+	sed -i 's/\(link id=$(Id).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/footer_file_imports.partial.gohtml
+	sed -i 's/\(link id=$(Id).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/prod_footer_file_imports.partial.gohtml
+	sed -i 's/\(link id=$(Id).*href="\)[^"]*"/\1'"\/assets\/css\/"$(FILENAME)".min.css?v="$(VERSION)'"/' ./../assets/templates/element/prod_footer_file_imports.partial.gohtml

@@ -34,7 +34,7 @@ func (m *Model) fieldMap(field string) string {
 // makeStatement
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
-		m.fieldMap("ID"),
+		m.fieldMap("Id"),
 		m.fieldMap("Sku"),
 		m.fieldMap("Brand"),
 		m.fieldMap("Name"),
@@ -67,7 +67,7 @@ func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 
 	// id
 	if filter.Ids != nil {
-		statement = statement.Where(m.fieldMap("ID")+" = ?", (*filter.Ids)[0])
+		statement = statement.Where(m.fieldMap("Id")+" = ?", (*filter.Ids)[0])
 	}
 
 	// url
@@ -109,7 +109,7 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 	// Ids
 	if filter.Ids != nil && len(*filter.Ids) > 0 {
-		statement = statement.Where(sq.Eq{m.fieldMap("ID"): *filter.Ids})
+		statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
 
 		*filter.Page = 1
 		if (*filter.PerPage) > uint64(len(*filter.Ids)) {
@@ -175,7 +175,7 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 	// Ids
 	if filter.Ids != nil && len(*filter.Ids) > 0 {
-		statement = statement.Where(sq.Eq{m.fieldMap("ID"): *filter.Ids})
+		statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
 	}
 
 	// Urls
@@ -249,7 +249,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	}
 
 	if id.Valid {
-		item.ID = uuid.MustParse(id.String)
+		item.Id = uuid.MustParse(id.String)
 	}
 	if sku.Valid {
 		item.Sku = sku.String
@@ -340,16 +340,16 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
-	// if ID is not set, generate a new UUID
-	if item.ID == uuid.Nil {
-		item.ID = uuid.New()
+	// if Id is not set, generate a new UUID
+	if item.Id == uuid.Nil {
+		item.Id = uuid.New()
 	}
 
-	// set ID to context
-	ctx = context.WithValue(ctx, "itemId", item.ID)
+	// set Id to context
+	ctx = context.WithValue(ctx, "itemId", item.Id)
 
 	insertItem := m.qb.Insert(m.table).Columns(
-		m.fieldMap("ID"),
+		m.fieldMap("Id"),
 		m.fieldMap("Sku"),
 		m.fieldMap("Brand"),
 		m.fieldMap("Name"),
@@ -373,7 +373,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		m.fieldMap("UpdatedAt"),
 		m.fieldMap("UpdatedBy"),
 	).Values(
-		item.ID,
+		item.Id,
 		item.Sku,
 		item.Brand,
 		item.Name,
@@ -398,7 +398,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		by,
 	)
 
-	return &insertItem, &item.ID
+	return &insertItem, &item.Id
 }
 
 // makeUpdateStatement
@@ -427,7 +427,7 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 		Set(m.fieldMap("GoogleProductType"), item.GoogleProductType).
 		Set(m.fieldMap("UpdatedAt"), "NOW()").
 		Set(m.fieldMap("UpdatedBy"), by).
-		Where(m.fieldMap("ID")+" = ?", item.ID)
+		Where(m.fieldMap("Id")+" = ?", item.Id)
 }
 
 // makePatchStatement

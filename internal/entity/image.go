@@ -6,7 +6,7 @@ import (
 )
 
 type Image struct {
-	ID            uuid.UUID `db:"id" json:"id"`
+	Id            uuid.UUID `db:"id" json:"id"`
 	Title         string    `db:"title" json:"title"`
 	AltText       string    `db:"alt_text" json:"alt_text"`
 	OriginPath    string    `db:"origin_path" json:"origin_path"`

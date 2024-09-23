@@ -6,7 +6,7 @@ import (
 )
 
 type Error struct {
-	ID         uuid.UUID `json:"id"`
+	Id         uuid.UUID `json:"id"`
 	Type       string    `json:"type"`
 	Message    string    `json:"message"`
 	DevMessage string    `json:"dev_message"`
@@ -29,4 +29,10 @@ type ErrorFilter struct {
 	OrderDir *string `json:"order_dir"`
 	Page     *uint64 `json:"page"`
 	PerPage  *uint64 `json:"per_page"`
+}
+
+type ConsoleMessage struct {
+	Log   []string
+	Warn  []string
+	Error []string
 }

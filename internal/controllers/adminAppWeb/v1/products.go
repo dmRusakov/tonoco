@@ -16,6 +16,7 @@ func (s Service) RenderProducts(
 	ctx context.Context,
 	w http.ResponseWriter,
 	r *http.Request,
+	appData entity.AppData,
 ) {
 
 	var wg sync.WaitGroup
@@ -37,19 +38,24 @@ func (s Service) RenderProducts(
 	wg.Wait()
 
 	// get products
-	products, totalItemsCount, err := s.productUseCase.GetProductList(ctx, params)
+	appData.ConsoleMessage = entity.ConsoleMessage{}
+
+	// get products
+	products, totalItemsCount, err := s.productUseCase.GetProductList(ctx, params, &appData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// page info
 	productPage := entity.ProductPage{
 		Name: "Range Hoods",
 
 		Products:   products,
 		ProductUrl: "range-hood",
 
-		CountItems: *totalItemsCount,
+		CountItems:     *totalItemsCount,
+		ConsoleMessage: appData.ConsoleMessage,
 	}
 
 	// render page

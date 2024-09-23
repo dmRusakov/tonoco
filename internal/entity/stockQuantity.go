@@ -6,7 +6,7 @@ import (
 )
 
 type StockQuantity struct {
-	ID          uuid.UUID `json:"id" db:"id"`
+	Id          uuid.UUID `json:"id" db:"id"`
 	ProductId   uuid.UUID `json:"product_id" db:"product_id"`
 	Quality     int32     `json:"quality" db:"quantity"`
 	WarehouseId uuid.UUID `json:"warehouse_id" db:"warehouse_id"`

@@ -1,7 +1,7 @@
 package config
 
 type Config struct {
-	ID      string `env:"ID" env-required:"true"`
+	Id      string `env:"Id" env-required:"true"`
 	IsProd  bool   `env:"IS_PROD" env-required:"true"`
 	IsDebug bool   `env:"IS_DEBUG" env-required:"true"`
 	WebPort string `env:"WEB_PORT" env-required:"true"`

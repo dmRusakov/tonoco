@@ -6,7 +6,7 @@ import (
 )
 
 type File struct {
-	ID        uuid.UUID `json:"id"`
+	Id        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
 	Url       string    `json:"url"`
 	SortOrder uint64    `json:"sort_order"`

@@ -6,7 +6,7 @@ import (
 )
 
 type ProductInfo struct {
-	ID                    uuid.UUID `json:"id" db:"id"`
+	Id                    uuid.UUID `json:"id" db:"id"`
 	Sku                   string    `json:"sku" db:"sku"`
 	Brand                 string    `json:"brand" db:"brand"`
 	Name                  string    `json:"name" db:"name"`

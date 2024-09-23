@@ -6,7 +6,7 @@ import (
 )
 
 type Price struct {
-	ID          uuid.UUID `json:"id" db:"id"`
+	Id          uuid.UUID `json:"id" db:"id"`
 	ProductID   uuid.UUID `json:"product_id" db:"product_id"`
 	PriceTypeID uuid.UUID `json:"price_type_id" db:"price_type_id"`
 	CurrencyID  uuid.UUID `json:"currency_id" db:"currency_id"`

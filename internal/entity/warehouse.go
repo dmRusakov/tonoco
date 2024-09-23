@@ -6,7 +6,7 @@ import (
 )
 
 type Warehouse struct {
-	ID           uuid.UUID `json:"id" db:"id"`
+	Id           uuid.UUID `json:"id" db:"id"`
 	Name         string    `json:"name" db:"name"`
 	Url          string    `json:"url" db:"url"`
 	Abbreviation string    `json:"abbreviation" db:"abbreviation"`

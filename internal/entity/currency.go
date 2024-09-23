@@ -6,7 +6,7 @@ import (
 )
 
 type Currency struct {
-	ID        uuid.UUID `json:"id" db:"id"`
+	Id        uuid.UUID `json:"id" db:"id"`
 	Name      string    `json:"name" db:"name"`
 	Symbol    string    `json:"symbol" db:"symbol"`
 	Url       string    `json:"url" db:"url"`

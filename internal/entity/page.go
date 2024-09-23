@@ -9,4 +9,5 @@ type ProductPage struct {
 	Products         *map[uuid.UUID]ProductListItem
 	ProductUrl       string
 	CountItems       uint64
+	ConsoleMessage   ConsoleMessage `json:"console_message" db:"console_message"`
 }

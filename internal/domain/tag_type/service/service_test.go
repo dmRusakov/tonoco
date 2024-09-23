@@ -49,7 +49,7 @@ func testItemValidations(t *testing.T) {
 		{
 			name: "Good Item",
 			item: service.Item{
-				ID:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381001",
+				Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381001",
 				Name:             "Category",
 				Url:              "category",
 				ShortDescription: "",
@@ -311,10 +311,10 @@ func get(t *testing.T) {
 		get  *service.Item
 	}{
 		{
-			name: "GetModel by ID",
+			name: "GetModel by Id",
 			id:   "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381001",
 			get: &service.Item{
-				ID:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381001",
+				Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381001",
 				Name:             "Category",
 				Url:              "category",
 				ShortDescription: "",
@@ -331,10 +331,10 @@ func get(t *testing.T) {
 				UpdatedBy:        "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1",
 			},
 		}, {
-			name: "GetModel by ID",
+			name: "GetModel by Id",
 			id:   "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381002",
 			get: &service.Item{
-				ID:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381002",
+				Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381002",
 				Name:             "Status",
 				Url:              "status",
 				ShortDescription: "",
@@ -361,7 +361,7 @@ func get(t *testing.T) {
 			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
-			assert.Equal(t, tc.get.ID, result.ID)
+			assert.Equal(t, tc.get.Id, result.Id)
 			assert.Equal(t, tc.get.Name, result.Name)
 			assert.Equal(t, tc.get.Url, result.Url)
 			assert.Equal(t, tc.get.ShortDescription, result.ShortDescription)
@@ -393,7 +393,7 @@ func getByUrl(t *testing.T) {
 			name: "GetModel by URL",
 			url:  "shipping-class",
 			get: &service.Item{
-				ID:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381003",
+				Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381003",
 				Name:             "Shipping Class",
 				Url:              "shipping-class",
 				ShortDescription: "",
@@ -420,7 +420,7 @@ func getByUrl(t *testing.T) {
 			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
-			assert.Equal(t, tc.get.ID, result.ID)
+			assert.Equal(t, tc.get.Id, result.Id)
 			assert.Equal(t, tc.get.Name, result.Name)
 			assert.Equal(t, tc.get.Url, result.Url)
 			assert.Equal(t, tc.get.ShortDescription, result.ShortDescription)
@@ -448,16 +448,16 @@ func createWithId(t *testing.T) {
 		item *service.Item
 	}{
 		{
-			name: "Create with ID",
+			name: "Create with Id",
 			item: newTestItems[0],
 		}, {
-			name: "Create with ID",
+			name: "Create with Id",
 			item: newTestItems[1],
 		}, {
-			name: "Create with ID",
+			name: "Create with Id",
 			item: newTestItems[2],
 		}, {
-			name: "Create with ID",
+			name: "Create with Id",
 			item: newTestItems[3],
 		},
 	}
@@ -469,12 +469,12 @@ func createWithId(t *testing.T) {
 			id, err := storage.Create(initContext(), tc.item)
 			assert.NoError(t, err)
 
-			// get the product status by the ID
+			// get the product status by the Id
 			result, err := storage.Get(initContext(), id, nil)
 			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
-			assert.Equal(t, tc.item.ID, result.ID)
+			assert.Equal(t, tc.item.Id, result.Id)
 			assert.Equal(t, tc.item.Name, result.Name)
 			assert.Equal(t, tc.item.Url, result.Url)
 			assert.Equal(t, tc.item.ShortDescription, result.ShortDescription)
@@ -500,10 +500,10 @@ func createWithoutId(t *testing.T) {
 		item *service.Item
 	}{
 		{
-			name: "Create without ID",
+			name: "Create without Id",
 			item: newTestItems[4],
 		}, {
-			name: "Create without ID",
+			name: "Create without Id",
 			item: newTestItems[5],
 		},
 	}
@@ -515,15 +515,15 @@ func createWithoutId(t *testing.T) {
 			id, err := storage.Create(initContext(), tc.item)
 			assert.NoError(t, err)
 
-			// get the product status by the ID
+			// get the product status by the Id
 			result, err := storage.Get(initContext(), id, nil)
 			assert.NoError(t, err)
 
-			// update ID
-			tc.item.ID = result.ID
+			// update Id
+			tc.item.Id = result.Id
 
 			// Assert that the result is equal to the expected
-			assert.Equal(t, tc.item.ID, result.ID)
+			assert.Equal(t, tc.item.Id, result.Id)
 			assert.Equal(t, tc.item.Name, result.Name)
 			assert.Equal(t, tc.item.Url, result.Url)
 			assert.Equal(t, tc.item.ShortDescription, result.ShortDescription)
@@ -567,12 +567,12 @@ func update(t *testing.T) {
 			err := storage.Update(initContext(), tc.sent)
 			assert.NoError(t, err)
 
-			// get the product status by the ID
-			result, err := storage.Get(initContext(), &tc.get.ID, nil)
+			// get the product status by the Id
+			result, err := storage.Get(initContext(), &tc.get.Id, nil)
 			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
-			assert.Equal(t, tc.get.ID, result.ID)
+			assert.Equal(t, tc.get.Id, result.Id)
 			assert.Equal(t, tc.get.Name, result.Name)
 			assert.Equal(t, tc.get.Url, result.Url)
 			assert.Equal(t, tc.get.ShortDescription, result.ShortDescription)
@@ -616,15 +616,15 @@ func patch(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Call Patch method
-			err := storage.Patch(initContext(), &testItemNew.ID, &tc.fields)
+			err := storage.Patch(initContext(), &testItemNew.Id, &tc.fields)
 			assert.NoError(t, err)
 
-			// get item by ID
-			result, err := storage.Get(initContext(), &testItemNew.ID, nil)
+			// get item by Id
+			result, err := storage.Get(initContext(), &testItemNew.Id, nil)
 			assert.NoError(t, err)
 
 			// Assert that the result is equal to the expected
-			assert.Equal(t, testItemNew.ID, result.ID)
+			assert.Equal(t, testItemNew.Id, result.Id)
 			assert.Equal(t, testItemNew.Name, result.Name)
 			assert.Equal(t, testItemNew.Url, result.Url)
 			assert.Equal(t, testItemNew.ShortDescription, result.ShortDescription)
@@ -651,7 +651,7 @@ func updatedAt(t *testing.T) {
 	}{
 		{
 			name: "Updated at 01",
-			id:   newTestItems[4].ID,
+			id:   newTestItems[4].Id,
 			sent: newTestItems[4],
 		},
 	}
@@ -700,22 +700,22 @@ func del(t *testing.T) {
 	}{
 		{
 			name: "Delete 01",
-			id:   newTestItems[0].ID,
+			id:   newTestItems[0].Id,
 		}, {
 			name: "Delete 02",
-			id:   newTestItems[1].ID,
+			id:   newTestItems[1].Id,
 		}, {
 			name: "Delete 03",
-			id:   newTestItems[2].ID,
+			id:   newTestItems[2].Id,
 		}, {
 			name: "Delete 04",
-			id:   newTestItems[3].ID,
+			id:   newTestItems[3].Id,
 		}, {
 			name: "Delete 05",
-			id:   newTestItems[4].ID,
+			id:   newTestItems[4].Id,
 		}, {
 			name: "Delete 06",
-			id:   newTestItems[5].ID,
+			id:   newTestItems[5].Id,
 		},
 	}
 
@@ -754,7 +754,7 @@ func initContext() context.Context {
 
 var newTestItems = []*service.Item{
 	{
-		ID:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381004",
+		Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381004",
 		Name:             "Test item 1",
 		Url:              "test-item-1",
 		ShortDescription: "",
@@ -765,7 +765,7 @@ var newTestItems = []*service.Item{
 		ListItem:         false,
 		Filter:           false,
 	}, {
-		ID:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381005",
+		Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381005",
 		Name:             "Test item 2",
 		Url:              "test-item-2",
 		ShortDescription: "",
@@ -776,7 +776,7 @@ var newTestItems = []*service.Item{
 		ListItem:         false,
 		Filter:           false,
 	}, {
-		ID:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381006",
+		Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381006",
 		Name:             "Test item 3",
 		Url:              "test-item-3",
 		ShortDescription: "",
@@ -787,7 +787,7 @@ var newTestItems = []*service.Item{
 		ListItem:         false,
 		Filter:           false,
 	}, {
-		ID:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381007",
+		Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd381007",
 		Name:             "Test item 4",
 		Url:              "test-item-4",
 		ShortDescription: "",

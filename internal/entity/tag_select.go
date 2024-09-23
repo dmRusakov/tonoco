@@ -6,7 +6,7 @@ import (
 )
 
 type TagSelect struct {
-	ID               uuid.UUID `json:"id" db:"id"`
+	Id               uuid.UUID `json:"id" db:"id"`
 	TagTypeId        uuid.UUID `json:"tag_type_id" db:"tag_type_id"`
 	Name             string    `json:"name" db:"name"`
 	Url              string    `json:"url" db:"url"`

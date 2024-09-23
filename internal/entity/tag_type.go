@@ -6,7 +6,7 @@ import (
 )
 
 type TagType struct {
-	ID               uuid.UUID `json:"id" db:"id"`
+	Id               uuid.UUID `json:"id" db:"id"`
 	Name             string    `json:"name" db:"name"`
 	Url              string    `json:"url" db:"url"`
 	ShortDescription string    `json:"short_description" db:"short_description"`

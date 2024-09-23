@@ -6,7 +6,7 @@ import (
 )
 
 type PriceType struct {
-	ID        uuid.UUID `json:"id" db:"id"`
+	Id        uuid.UUID `json:"id" db:"id"`
 	Name      string    `json:"name" db:"name"`
 	Url       string    `json:"url" db:"url"`
 	SortOrder uint64    `json:"sort_order" db:"sort_order"`

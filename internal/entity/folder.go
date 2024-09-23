@@ -6,7 +6,7 @@ import (
 )
 
 type Folder struct {
-	ID        uuid.UUID `json:"id"`
+	Id        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
 	Url       string    `json:"url"`
 	ParentID  string    `json:"parent_id"`

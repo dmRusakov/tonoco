@@ -21,7 +21,7 @@ WebAssembly.instantiateStreaming(fetch(folderPath + appFileName + "?v=" + appFil
 });
 
 async function run() {
-    console.clear();
+    // console.clear();
     await go.run(inst);
     inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
 }

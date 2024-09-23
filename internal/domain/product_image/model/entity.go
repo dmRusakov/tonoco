@@ -27,7 +27,7 @@ func (m *Model) fieldMap(field string) string {
 
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
-		m.fieldMap("ID"),
+		m.fieldMap("Id"),
 		m.fieldMap("ProductId"),
 		m.fieldMap("ImageId"),
 		m.fieldMap("Type"),
@@ -41,7 +41,7 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 
 func (m *Model) fillInFilter(statement sq.SelectBuilder, filter *ProductImageFilter) sq.SelectBuilder {
 	if filter.Ids != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("ID"): *filter.Ids})
+		statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
 	}
 
 	if filter.ProductIds != nil {
@@ -128,7 +128,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*ProductIma
 	var item = ProductImage{}
 
 	if id.Valid {
-		item.ID = uuid.MustParse(id.String)
+		item.Id = uuid.MustParse(id.String)
 	}
 
 	if productId.Valid {
@@ -169,14 +169,14 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*ProductIma
 func (m *Model) makeInsertStatement(ctx context.Context, item *ProductImage) (*sq.InsertBuilder, *uuid.UUID) {
 	by := ctx.Value("user_id").(string)
 
-	if item.ID == uuid.Nil {
-		item.ID = uuid.New()
+	if item.Id == uuid.Nil {
+		item.Id = uuid.New()
 	}
 
-	ctx = context.WithValue(ctx, "itemId", item.ID)
+	ctx = context.WithValue(ctx, "itemId", item.Id)
 
 	insertItem := m.qb.Insert(m.table).Columns(
-		m.fieldMap("ID"),
+		m.fieldMap("Id"),
 		m.fieldMap("ProductId"),
 		m.fieldMap("ImageId"),
 		m.fieldMap("Type"),
@@ -186,7 +186,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *ProductImage) (*s
 		m.fieldMap("UpdatedAt"),
 		m.fieldMap("UpdatedBy"),
 	).Values(
-		item.ID,
+		item.Id,
 		item.ProductId,
 		item.ImageId,
 		item.Type,

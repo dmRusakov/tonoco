@@ -1,0 +1,18 @@
+{{/*add message to console */}}
+{{define "footer_logs" }}
+    {{range .ConsoleMessage.Log}}
+        <script type="text/javascript">
+            console.log("{{.}}");
+        </script>
+    {{end}}
+    {{range .ConsoleMessage.Warn}}
+        <script type="text/javascript">
+            console.warn("{{.}}");
+        </script>
+    {{end}}
+    {{range .ConsoleMessage.Error}}
+        <script type="text/javascript">
+            console.error("{{.}}");
+        </script>
+    {{end}}
+{{end}}

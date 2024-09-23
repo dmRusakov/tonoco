@@ -3,7 +3,7 @@ package entity
 import "github.com/google/uuid"
 
 type ProductListItem struct {
-	ID               uuid.UUID                     `json:"id" db:"id"`
+	Id               uuid.UUID                     `json:"id" db:"id"`
 	No               int32                         `json:"no" db:"no"`
 	Sku              string                        `json:"sku" db:"sku"`
 	Brand            string                        `json:"brand" db:"brand"`
@@ -22,7 +22,7 @@ type ProductListItem struct {
 }
 
 type ProductsPageUrlParams struct {
-	ID       *string
+	Id       *string
 	Category *string
 	Currency *string
 	Page     *uint64
