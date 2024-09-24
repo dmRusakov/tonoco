@@ -29,6 +29,13 @@ type ErrorFilter struct {
 	OrderDir *string `json:"order_dir"`
 	Page     *uint64 `json:"page"`
 	PerPage  *uint64 `json:"per_page"`
+
+	Count *uint64 `json:"count"`
+
+	IsIdsOnly          *bool `json:"is_ids_only"`
+	IsCount            *bool `json:"is_count"`
+	IsUpdateFilter     *bool `json:"is_update_filter"`
+	IsRemoveDuplicates *bool `json:"is_remove_duplicates"`
 }
 
 type ConsoleMessage struct {

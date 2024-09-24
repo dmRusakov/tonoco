@@ -9,14 +9,14 @@ import (
 	"time"
 )
 
-type ProductImage = entity.ProductImage
-type ProductImageFilter = entity.ProductImageFilter
+type Item = entity.ProductImage
+type Filter = entity.ProductImageFilter
 
 type Storage interface {
-	Get(context.Context, *ProductImageFilter) (*ProductImage, error)
-	List(context.Context, *ProductImageFilter, bool) (*map[uuid.UUID]ProductImage, *uint64, error)
-	Create(context.Context, *ProductImage) (*uuid.UUID, error)
-	Update(context.Context, *ProductImage) error
+	Get(context.Context, *Filter) (*Item, error)
+	List(context.Context, *Filter) (*map[uuid.UUID]Item, error)
+	Create(context.Context, *Item) (*uuid.UUID, error)
+	Update(context.Context, *Item) error
 	Patch(context.Context, *uuid.UUID, *map[string]interface{}) error
 	UpdatedAt(context.Context, *uuid.UUID) (*time.Time, error)
 	MaxSortOrder(context.Context) (*uint64, error)

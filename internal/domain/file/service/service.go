@@ -12,16 +12,17 @@ type Item = entity.File
 type Filter = entity.FileFilter
 
 type Repository interface {
-	Get(context.Context, *Filter) (*Item, error)
-	List(context.Context, *Filter, bool) (*map[uuid.UUID]Item, *uint64, error)
-	Create(context.Context, *Item) (*uuid.UUID, error)
-	Update(context.Context, *Item) error
-	Patch(context.Context, *uuid.UUID, *map[string]interface{}) error
-	UpdatedAt(context.Context, *uuid.UUID) (*time.Time, error)
-	TableIndexCount(context.Context) (*uint64, error)
-	MaxSortOrder(context.Context) (*uint64, error)
-	Delete(context.Context, *uuid.UUID) error
+	Get(ctx context.Context, filter *Filter) (*Item, error)
+	List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error)
+	Create(ctx context.Context, item *Item) (*uuid.UUID, error)
+	Update(ctx context.Context, item *Item) error
+	Patch(ctx context.Context, id *uuid.UUID, fields *map[string]interface{}) error
+	UpdatedAt(ctx context.Context, id *uuid.UUID) (*time.Time, error)
+	TableIndexCount(ctx context.Context) (*uint64, error)
+	MaxSortOrder(ctx context.Context) (*uint64, error)
+	Delete(ctx context.Context, id *uuid.UUID) error
 }
+
 type Service struct {
 	repository model.Storage
 	itemCash   map[string]Item
@@ -29,11 +30,47 @@ type Service struct {
 	countCash  map[string]uint64
 }
 
-func NewService(repository model.Storage) *Service {
+func NewService(repository *model.Model) *Service {
 	return &Service{
 		repository: repository,
 		itemCash:   make(map[string]Item),
 		itemsCash:  make(map[string]map[uuid.UUID]Item),
 		countCash:  make(map[string]uint64),
 	}
+}
+
+func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {
+	return s.repository.Get(ctx, filter)
+}
+
+func (s *Service) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {
+	return s.repository.List(ctx, filter)
+}
+
+func (s *Service) Create(ctx context.Context, item *Item) (*uuid.UUID, error) {
+	return s.repository.Create(ctx, item)
+}
+
+func (s *Service) Update(ctx context.Context, item *Item) error {
+	return s.repository.Update(ctx, item)
+}
+
+func (s *Service) Patch(ctx context.Context, id *uuid.UUID, fields *map[string]interface{}) error {
+	return s.repository.Patch(ctx, id, fields)
+}
+
+func (s *Service) UpdatedAt(ctx context.Context, id *uuid.UUID) (*time.Time, error) {
+	return s.repository.UpdatedAt(ctx, id)
+}
+
+func (s *Service) TableIndexCount(ctx context.Context) (*uint64, error) {
+	return s.repository.TableIndexCount(ctx)
+}
+
+func (s *Service) MaxSortOrder(ctx context.Context) (*uint64, error) {
+	return s.repository.MaxSortOrder(ctx)
+}
+
+func (s *Service) Delete(ctx context.Context, id *uuid.UUID) error {
+	return s.repository.Delete(ctx, id)
 }

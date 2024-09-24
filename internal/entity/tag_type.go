@@ -44,5 +44,10 @@ type TagTypeFilter struct {
 	Page     *uint64
 	PerPage  *uint64
 
-	IsCount *bool `json:"is_count"`
+	Count *uint64 `json:"count"`
+
+	IsIdsOnly          *bool `json:"is_ids_only"`
+	IsCount            *bool `json:"is_count"`
+	IsUpdateFilter     *bool `json:"is_update_filter"`
+	IsRemoveDuplicates *bool `json:"is_remove_duplicates"`
 }

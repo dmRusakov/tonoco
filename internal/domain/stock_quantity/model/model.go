@@ -14,7 +14,7 @@ type Filter = entity.StockQuantityFilter
 
 type Storage interface {
 	Get(context.Context, *Filter) (*Item, error)
-	List(context.Context, *Filter, bool) (*map[uuid.UUID]Item, *uint64, error)
+	List(context.Context, *Filter) (*map[uuid.UUID]Item, error)
 	Create(context.Context, *Item) (*uuid.UUID, error)
 	Update(context.Context, *Item) error
 	Patch(context.Context, *uuid.UUID, *map[string]interface{}) error
@@ -22,6 +22,15 @@ type Storage interface {
 	MaxSortOrder(context.Context) (*uint64, error)
 	TableIndexCount(context.Context) (*uint64, error)
 	Delete(context.Context, *uuid.UUID) error
+
+	makeStatement() sq.SelectBuilder
+	makeGetStatement(*Filter) sq.SelectBuilder
+	makeStatementByFilter(*Filter) sq.SelectBuilder
+	makeCountStatementByFilter(*Filter) sq.SelectBuilder
+	scanOneRow(context.Context, sq.RowScanner) (*Item, error)
+	makeInsertStatement(context.Context, *Item) (*sq.InsertBuilder, *uuid.UUID)
+	makeUpdateStatement(context.Context, *Item) sq.UpdateBuilder
+	makePatchStatement(context.Context, *uuid.UUID, *map[string]interface{}) sq.UpdateBuilder
 }
 
 // Model is a struct that contains the SQL statement builder and the PostgreSQL client.

@@ -17,7 +17,7 @@ func (m *Model) fieldMap(field string) string {
 		return dbField
 	}
 
-	typeOf := reflect.TypeOf(ProductImage{})
+	typeOf := reflect.TypeOf(Item{})
 	byName, _ := typeOf.FieldByName(field)
 	dbField := byName.Tag.Get("db")
 
@@ -39,7 +39,7 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 	).From(m.table + " p")
 }
 
-func (m *Model) fillInFilter(statement sq.SelectBuilder, filter *ProductImageFilter) sq.SelectBuilder {
+func (m *Model) fillInFilter(statement sq.SelectBuilder, filter *Filter) sq.SelectBuilder {
 	if filter.Ids != nil {
 		statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
 	}
@@ -67,11 +67,11 @@ func (m *Model) fillInFilter(statement sq.SelectBuilder, filter *ProductImageFil
 	return statement
 }
 
-func (m *Model) makeGetStatement(filter *ProductImageFilter) sq.SelectBuilder {
+func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 	return m.fillInFilter(m.makeStatement(), filter)
 }
 
-func (m *Model) makeStatementByFilter(filter *ProductImageFilter) sq.SelectBuilder {
+func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	if filter.OrderBy == nil {
 		filter.OrderBy = entity.StringPtr("SortOrder")
 	}
@@ -98,11 +98,11 @@ func (m *Model) makeStatementByFilter(filter *ProductImageFilter) sq.SelectBuild
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 }
 
-func (m *Model) makeCountStatementByFilter(filter *ProductImageFilter) sq.SelectBuilder {
+func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 	return m.fillInFilter(m.qb.Select("COUNT(*)").From(m.table), filter)
 }
 
-func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*ProductImage, error) {
+func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
 	var id, productId, imageId, typeField, createdBy, updatedBy sql.NullString
 	var sortOrder sql.NullInt64
 	var createdAt, updatedAt sql.NullTime
@@ -125,7 +125,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*ProductIma
 		return nil, errors.AddCode(err, "853456")
 	}
 
-	var item = ProductImage{}
+	var item = Item{}
 
 	if id.Valid {
 		item.Id = uuid.MustParse(id.String)
@@ -166,7 +166,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*ProductIma
 	return &item, nil
 }
 
-func (m *Model) makeInsertStatement(ctx context.Context, item *ProductImage) (*sq.InsertBuilder, *uuid.UUID) {
+func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.InsertBuilder, *uuid.UUID) {
 	by := ctx.Value("user_id").(string)
 
 	if item.Id == uuid.Nil {
@@ -200,7 +200,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *ProductImage) (*s
 	return &insertItem, ctx.Value("itemId").(*uuid.UUID)
 }
 
-func (m *Model) makeUpdateStatement(ctx context.Context, item *ProductImage) sq.UpdateBuilder {
+func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBuilder {
 	by := ctx.Value("user_id").(string)
 
 	return m.qb.Update(m.table).

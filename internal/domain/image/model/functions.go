@@ -19,10 +19,10 @@ func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	return m.scanOneRow(ctx, row)
 }
 
-func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (*map[uuid.UUID]Item, *uint64, error) {
+func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {
 	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter))
 	if err != nil {
-		return nil, nil, errors.AddCode(err, "222895")
+		return nil, errors.AddCode(err, "222895")
 	}
 	defer rows.Close()
 
@@ -32,23 +32,23 @@ func (m *Model) List(ctx context.Context, filter *Filter, isUpdateFilter bool) (
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
 		if err != nil {
-			return nil, nil, errors.AddCode(err, "555690")
+			return nil, errors.AddCode(err, "555690")
 		}
 
 		items[item.Id] = *item
 
 		// update filters if needed
-		if isUpdateFilter {
+		if filter.IsUpdateFilter != nil && *filter.IsUpdateFilter {
 			ids = append(ids, item.Id)
 		}
 	}
 
 	// update filters if needed
-	if isUpdateFilter {
+	if filter.IsUpdateFilter != nil && *filter.IsUpdateFilter {
 		filter.Ids = &ids
 	}
 
-	return &items, nil, nil
+	return &items, nil
 }
 
 func (m *Model) Create(ctx context.Context, item *Item) (*uuid.UUID, error) {

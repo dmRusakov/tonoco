@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func (m *Model) Get(ctx context.Context, filter *ProductImageFilter) (*ProductImage, error) {
+func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	row, err := psql.Get(ctx, m.client, m.makeGetStatement(filter))
 	if err != nil {
 		return nil, errors.AddCode(err, "467009")
@@ -19,33 +19,33 @@ func (m *Model) Get(ctx context.Context, filter *ProductImageFilter) (*ProductIm
 	return m.scanOneRow(ctx, row)
 }
 
-func (m *Model) List(ctx context.Context, filter *ProductImageFilter, isUpdateFilter bool) (*map[uuid.UUID]ProductImage, *uint64, error) {
+func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {
 	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter))
 	if err != nil {
-		return nil, nil, errors.AddCode(err, "953590")
+		return nil, errors.AddCode(err, "953590")
 	}
 	defer rows.Close()
 
-	items := make(map[uuid.UUID]ProductImage)
+	items := make(map[uuid.UUID]Item)
 	ids := make([]uuid.UUID, 0)
 	productIDs := make([]uuid.UUID, 0)
 	imageIDs := make([]uuid.UUID, 0)
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
 		if err != nil {
-			return nil, nil, errors.AddCode(err, "389234")
+			return nil, errors.AddCode(err, "389234")
 		}
 
 		items[item.Id] = *item
 
-		if isUpdateFilter {
+		if filter.IsUpdateFilter != nil && *filter.IsUpdateFilter {
 			ids = append(ids, item.Id)
 			productIDs = append(productIDs, item.ProductId)
 			imageIDs = append(imageIDs, item.ImageId)
 		}
 	}
 
-	if isUpdateFilter {
+	if filter.IsUpdateFilter != nil && *filter.IsUpdateFilter {
 		// remove duplicates
 		productIDs = entity.RemoveDuplicates(productIDs, true)
 		imageIDs = entity.RemoveDuplicates(imageIDs, true)
@@ -55,10 +55,10 @@ func (m *Model) List(ctx context.Context, filter *ProductImageFilter, isUpdateFi
 		filter.ImageIds = &imageIDs
 	}
 
-	return &items, nil, nil
+	return &items, nil
 }
 
-func (m *Model) Create(ctx context.Context, item *ProductImage) (*uuid.UUID, error) {
+func (m *Model) Create(ctx context.Context, item *Item) (*uuid.UUID, error) {
 	statement, id := m.makeInsertStatement(ctx, item)
 	err := psql.Create(ctx, m.client, statement)
 	if err != nil {
@@ -68,7 +68,7 @@ func (m *Model) Create(ctx context.Context, item *ProductImage) (*uuid.UUID, err
 	return id, nil
 }
 
-func (m *Model) Update(ctx context.Context, item *ProductImage) error {
+func (m *Model) Update(ctx context.Context, item *Item) error {
 	err := psql.Update(
 		ctx,
 		m.client,

@@ -13,7 +13,7 @@ type Filter = entity.ImageFilter
 
 type Repository interface {
 	Get(context.Context, *Filter) (*Item, error)
-	List(context.Context, *Filter, bool) (*map[uuid.UUID]Item, *uint64, error)
+	List(context.Context, *Filter) (*map[uuid.UUID]Item, error)
 	Create(context.Context, *Item) (*uuid.UUID, error)
 	Update(context.Context, *Item) error
 	Patch(context.Context, *uuid.UUID, *map[string]interface{}) error
