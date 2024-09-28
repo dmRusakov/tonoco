@@ -138,6 +138,7 @@ func (uc *UseCase) GetProductList(
 	counter := 0
 	for id, product := range *productsInfo {
 		var group sync.WaitGroup
+		var mu sync.Mutex
 
 		// make product list item
 		productItem := entity.ProductListItem{
@@ -167,7 +168,9 @@ func (uc *UseCase) GetProductList(
 			}
 			specialPrice, err := uc.price.List(ctx, specialPriceFilter)
 			if err != nil {
+				mu.Lock()
 				errs = append(errs, err)
+				mu.Unlock()
 				return
 			}
 			if specialPriceFilter.Ids != nil && len(*specialPriceFilter.Ids) > 0 {
@@ -190,7 +193,9 @@ func (uc *UseCase) GetProductList(
 			}
 			regularPrice, err := uc.price.List(ctx, regularPriceFilter)
 			if err != nil {
+				mu.Lock()
 				errs = append(errs, err)
+				mu.Unlock()
 				return
 			}
 			if regularPriceFilter.Ids != nil && len(*regularPriceFilter.Ids) > 0 {
@@ -213,7 +218,9 @@ func (uc *UseCase) GetProductList(
 				IsCount:    entity.BoolPtr(false),
 			}))
 			if err != nil {
+				mu.Lock()
 				errs = append(errs, err)
+				mu.Unlock()
 				return
 			}
 
@@ -255,14 +262,14 @@ func (uc *UseCase) GetProductList(
 				IsCount:    entity.BoolPtr(false),
 			})
 			if err != nil {
+				mu.Lock()
 				errs = append(errs, err)
+				mu.Unlock()
 				return
 			}
 
 			productItem.Quantity = quantity.Quality
 		}()
-
-		group.Wait()
 
 		// got product images IDs (main, hover)
 		productImagesFilter := entity.ProductImageFilter{
@@ -282,7 +289,7 @@ func (uc *UseCase) GetProductList(
 		}
 		images, err := uc.imageService.List(ctx, &imageFilter)
 
-		//
+		group.Wait()
 
 		appData.ConsoleMessage.Log = append(appData.ConsoleMessage.Log, fmt.Sprintf("products:177 %v", productImages))
 		appData.ConsoleMessage.Log = append(appData.ConsoleMessage.Log, fmt.Sprintf("products:178 %v", productImagesFilter.ImageIds))
