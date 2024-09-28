@@ -16,6 +16,7 @@ func (uc *UseCase) GetProductList(
 ) (*map[uuid.UUID]entity.ProductListItem, error) {
 
 	var wg sync.WaitGroup
+	var mu sync.Mutex
 	var errs []error
 
 	// get productsInfo
@@ -116,7 +117,9 @@ func (uc *UseCase) GetProductList(
 
 		tagTypes, err = uc.tagType.List(ctx, tagTypeFilter)
 		if err != nil {
+			mu.Lock()
 			errs = append(errs, err)
+			mu.Unlock()
 			return
 		}
 
@@ -137,8 +140,9 @@ func (uc *UseCase) GetProductList(
 	productsDto := make(map[uuid.UUID]entity.ProductListItem)
 	counter := 0
 	for id, product := range *productsInfo {
-		var group sync.WaitGroup
-		var mu sync.Mutex
+		var subWg sync.WaitGroup
+		var subMu sync.Mutex
+		var subErrs []error
 
 		// make product list item
 		productItem := entity.ProductListItem{
@@ -154,9 +158,9 @@ func (uc *UseCase) GetProductList(
 		}
 
 		// get special price
-		group.Add(1)
+		subWg.Add(1)
 		go func() {
-			defer group.Done()
+			defer subWg.Done()
 			var err error
 			specialPriceFilter := &entity.PriceFilter{
 				ProductIds:     &[]uuid.UUID{product.Id},
@@ -168,9 +172,9 @@ func (uc *UseCase) GetProductList(
 			}
 			specialPrice, err := uc.price.List(ctx, specialPriceFilter)
 			if err != nil {
-				mu.Lock()
-				errs = append(errs, err)
-				mu.Unlock()
+				subMu.Lock()
+				subErrs = append(subErrs, err)
+				subMu.Unlock()
 				return
 			}
 			if specialPriceFilter.Ids != nil && len(*specialPriceFilter.Ids) > 0 {
@@ -179,9 +183,9 @@ func (uc *UseCase) GetProductList(
 		}()
 
 		// get regularPrice
-		group.Add(1)
+		subWg.Add(1)
 		go func() {
-			defer group.Done()
+			defer subWg.Done()
 			var err error
 			regularPriceFilter := &entity.PriceFilter{
 				ProductIds:     &[]uuid.UUID{product.Id},
@@ -193,9 +197,9 @@ func (uc *UseCase) GetProductList(
 			}
 			regularPrice, err := uc.price.List(ctx, regularPriceFilter)
 			if err != nil {
-				mu.Lock()
-				errs = append(errs, err)
-				mu.Unlock()
+				subMu.Lock()
+				subErrs = append(subErrs, err)
+				subMu.Unlock()
 				return
 			}
 			if regularPriceFilter.Ids != nil && len(*regularPriceFilter.Ids) > 0 {
@@ -205,9 +209,9 @@ func (uc *UseCase) GetProductList(
 
 		// get item tags
 		itemTags := make(map[uint32]entity.ProductListItemTag)
-		group.Add(1)
+		subWg.Add(1)
 		go func() {
-			defer group.Done()
+			defer subWg.Done()
 			// get tags
 			tags, err := uc.tag.List(ctx, &(entity.TagFilter{
 				ProductIds: &[]uuid.UUID{product.Id},
@@ -218,9 +222,9 @@ func (uc *UseCase) GetProductList(
 				IsCount:    entity.BoolPtr(false),
 			}))
 			if err != nil {
-				mu.Lock()
-				errs = append(errs, err)
-				mu.Unlock()
+				subMu.Lock()
+				subErrs = append(subErrs, err)
+				subMu.Unlock()
 				return
 			}
 
@@ -254,17 +258,17 @@ func (uc *UseCase) GetProductList(
 		}()
 
 		// get stock quantity
-		group.Add(1)
+		subWg.Add(1)
 		go func() {
-			defer group.Done()
+			defer subWg.Done()
 			quantity, err := uc.stockQuantity.Get(ctx, &entity.StockQuantityFilter{
 				ProductIds: &[]uuid.UUID{product.Id},
 				IsCount:    entity.BoolPtr(false),
 			})
 			if err != nil {
-				mu.Lock()
-				errs = append(errs, err)
-				mu.Unlock()
+				subMu.Lock()
+				subErrs = append(subErrs, err)
+				subMu.Unlock()
 				return
 			}
 
@@ -289,7 +293,7 @@ func (uc *UseCase) GetProductList(
 		}
 		images, err := uc.imageService.List(ctx, &imageFilter)
 
-		group.Wait()
+		subWg.Wait()
 
 		appData.ConsoleMessage.Log = append(appData.ConsoleMessage.Log, fmt.Sprintf("products:177 %v", productImages))
 		appData.ConsoleMessage.Log = append(appData.ConsoleMessage.Log, fmt.Sprintf("products:178 %v", productImagesFilter.ImageIds))
