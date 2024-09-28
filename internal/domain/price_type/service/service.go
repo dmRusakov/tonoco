@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/domain/price_type/model"
 	"github.com/dmRusakov/tonoco/internal/entity"
-	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	"github.com/google/uuid"
 	"time"
 )
@@ -26,17 +25,11 @@ type Repository interface {
 
 type Service struct {
 	repository model.Storage
-	itemCash   map[string]Item
-	itemsCash  map[string]map[uuid.UUID]Item
-	countCash  map[string]uint64
 }
 
 func NewService(repository *model.Model) *Service {
 	return &Service{
 		repository: repository,
-		itemCash:   make(map[string]Item),
-		itemsCash:  make(map[string]map[uuid.UUID]Item),
-		countCash:  make(map[string]uint64),
 	}
 }
 
@@ -74,15 +67,4 @@ func (s *Service) MaxSortOrder(ctx context.Context) (*uint64, error) {
 
 func (s *Service) Delete(ctx context.Context, id *uuid.UUID) error {
 	return s.repository.Delete(ctx, id)
-}
-
-// get items cash
-func (s *Service) getItemsCash(cacheKey string) (*map[uuid.UUID]Item, error) {
-	items := s.itemsCash[cacheKey]
-	count := s.countCash[cacheKey]
-	if items != nil && count != 0 {
-		return &items, nil
-	}
-
-	return nil, errors.AddCode(entity.ErrCacheNotFound, "lwsdh3")
 }

@@ -2,31 +2,9 @@ package service
 
 import (
 	"context"
-	"github.com/dmRusakov/tonoco/internal/entity"
-	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	"github.com/google/uuid"
 	"time"
 )
-
-func (s *Service) getItemsCash(cacheKey string) (*map[uuid.UUID]Item, error) {
-	items := s.itemsCash[cacheKey]
-	count := s.countCash[cacheKey]
-	if items != nil && count != 0 {
-		return &items, nil
-	}
-	return nil, errors.AddCode(entity.ErrCacheNotFound, "hdj3ss")
-}
-
-func (s *Service) setItemsCash(cacheKey string, items *map[uuid.UUID]Item, count *uint64) {
-	if items == nil {
-		items = new(map[uuid.UUID]Item)
-	}
-	s.itemsCash[cacheKey] = *items
-	if count == nil {
-		count = new(uint64)
-	}
-	s.countCash[cacheKey] = *count
-}
 
 func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	return s.repository.Get(ctx, filter)

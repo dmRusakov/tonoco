@@ -21,12 +21,13 @@ type ProductListItem struct {
 	Tags             map[uint32]ProductListItemTag `json:"tags" db:"tags"`
 }
 
-type ProductsPageUrlParams struct {
+type ProductsPageParams struct {
 	Id       *string
 	Category *string
 	Currency *string
 	Page     *uint64
 	PerPage  *uint64
+	Count    *uint64
 }
 
 type ProductListItemTag struct {

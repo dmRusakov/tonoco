@@ -25,17 +25,11 @@ type Repository interface {
 
 type Service struct {
 	repository model.Storage
-	itemCash   map[string]Item
-	itemsCash  map[string]map[uuid.UUID]Item
-	countCash  map[string]uint64
 }
 
 func NewService(repository *model.Model) *Service {
 	return &Service{
 		repository: repository,
-		itemCash:   make(map[string]Item),
-		itemsCash:  make(map[string]map[uuid.UUID]Item),
-		countCash:  make(map[string]uint64),
 	}
 }
 

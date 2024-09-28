@@ -12,7 +12,7 @@ import (
 	"reflect"
 )
 
-func (m *Model) fieldMap(field string) string {
+func (m *Model) mapFieldToDBColumn(field string) string {
 	if dbField, ok := m.dbFieldCash[field]; ok {
 		return dbField
 	}
@@ -27,39 +27,39 @@ func (m *Model) fieldMap(field string) string {
 
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
-		m.fieldMap("Id"),
-		m.fieldMap("ProductId"),
-		m.fieldMap("ImageId"),
-		m.fieldMap("Type"),
-		m.fieldMap("SortOrder"),
-		m.fieldMap("CreatedAt"),
-		m.fieldMap("CreatedBy"),
-		m.fieldMap("UpdatedAt"),
-		m.fieldMap("UpdatedBy"),
+		m.mapFieldToDBColumn("Id"),
+		m.mapFieldToDBColumn("ProductId"),
+		m.mapFieldToDBColumn("ImageId"),
+		m.mapFieldToDBColumn("Type"),
+		m.mapFieldToDBColumn("SortOrder"),
+		m.mapFieldToDBColumn("CreatedAt"),
+		m.mapFieldToDBColumn("CreatedBy"),
+		m.mapFieldToDBColumn("UpdatedAt"),
+		m.mapFieldToDBColumn("UpdatedBy"),
 	).From(m.table + " p")
 }
 
 func (m *Model) fillInFilter(statement sq.SelectBuilder, filter *Filter) sq.SelectBuilder {
 	if filter.Ids != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Id"): *filter.Ids})
 	}
 
 	if filter.ProductIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("ProductId"): *filter.ProductIds})
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("ProductId"): *filter.ProductIds})
 	}
 
 	if filter.ImageIds != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("ImageId"): *filter.ImageIds})
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("ImageId"): *filter.ImageIds})
 	}
 
 	if filter.Type != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("Type"): *filter.Type})
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Type"): *filter.Type})
 	}
 
 	if filter.Search != nil {
 		statement = statement.Where(
 			sq.Or{
-				sq.Expr("LOWER("+m.fieldMap("Type")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("Type")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 			},
 		)
 	}
@@ -94,7 +94,7 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 	statement := m.makeGetStatement(filter)
 
-	return statement.OrderBy(m.fieldMap(*filter.OrderBy) + " " + *filter.OrderDir).
+	return statement.OrderBy(m.mapFieldToDBColumn(*filter.OrderBy) + " " + *filter.OrderDir).
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 }
 
@@ -166,6 +166,19 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	return &item, nil
 }
 
+func (m *Model) scanCountRow(ctx context.Context, rows sq.RowScanner) (*uint64, error) {
+	var count uint64
+
+	err := rows.Scan(&count)
+	if err != nil {
+		err = psql.ErrScan(psql.ParsePgError(err))
+		tracing.Error(ctx, err)
+		return nil, err
+	}
+
+	return &count, nil
+}
+
 func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.InsertBuilder, *uuid.UUID) {
 	by := ctx.Value("user_id").(string)
 
@@ -176,15 +189,15 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	ctx = context.WithValue(ctx, "itemId", item.Id)
 
 	insertItem := m.qb.Insert(m.table).Columns(
-		m.fieldMap("Id"),
-		m.fieldMap("ProductId"),
-		m.fieldMap("ImageId"),
-		m.fieldMap("Type"),
-		m.fieldMap("SortOrder"),
-		m.fieldMap("CreatedAt"),
-		m.fieldMap("CreatedBy"),
-		m.fieldMap("UpdatedAt"),
-		m.fieldMap("UpdatedBy"),
+		m.mapFieldToDBColumn("Id"),
+		m.mapFieldToDBColumn("ProductId"),
+		m.mapFieldToDBColumn("ImageId"),
+		m.mapFieldToDBColumn("Type"),
+		m.mapFieldToDBColumn("SortOrder"),
+		m.mapFieldToDBColumn("CreatedAt"),
+		m.mapFieldToDBColumn("CreatedBy"),
+		m.mapFieldToDBColumn("UpdatedAt"),
+		m.mapFieldToDBColumn("UpdatedBy"),
 	).Values(
 		item.Id,
 		item.ProductId,
@@ -204,12 +217,12 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 	by := ctx.Value("user_id").(string)
 
 	return m.qb.Update(m.table).
-		Set(m.fieldMap("ProductId"), item.ProductId).
-		Set(m.fieldMap("ImageId"), item.ImageId).
-		Set(m.fieldMap("Type"), item.Type).
-		Set(m.fieldMap("SortOrder"), item.SortOrder).
-		Set(m.fieldMap("UpdatedAt"), "NOW()").
-		Set(m.fieldMap("UpdatedBy"), by)
+		Set(m.mapFieldToDBColumn("ProductId"), item.ProductId).
+		Set(m.mapFieldToDBColumn("ImageId"), item.ImageId).
+		Set(m.mapFieldToDBColumn("Type"), item.Type).
+		Set(m.mapFieldToDBColumn("SortOrder"), item.SortOrder).
+		Set(m.mapFieldToDBColumn("UpdatedAt"), "NOW()").
+		Set(m.mapFieldToDBColumn("UpdatedBy"), by)
 }
 
 func (m *Model) makePatchStatement(ctx context.Context, id *uuid.UUID, fields *map[string]interface{}) sq.UpdateBuilder {
@@ -218,9 +231,9 @@ func (m *Model) makePatchStatement(ctx context.Context, id *uuid.UUID, fields *m
 	statement := m.qb.Update(m.table).Where("id = ?", id)
 
 	for field, value := range *fields {
-		field = m.fieldMap(field)
+		field = m.mapFieldToDBColumn(field)
 		statement = statement.Set(field, value)
 	}
 
-	return statement.Set(m.fieldMap("UpdatedAt"), "NOW()").Set(m.fieldMap("UpdatedBy"), by)
+	return statement.Set(m.mapFieldToDBColumn("UpdatedAt"), "NOW()").Set(m.mapFieldToDBColumn("UpdatedBy"), by)
 }

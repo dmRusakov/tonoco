@@ -12,8 +12,7 @@ import (
 	"reflect"
 )
 
-// fieldMap
-func (m *Model) fieldMap(field string) string {
+func (m *Model) mapFieldToDBColumn(field string) string {
 	// check if field is in the cash
 	if dbField, ok := m.dbFieldCash[field]; ok {
 		return dbField
@@ -31,41 +30,38 @@ func (m *Model) fieldMap(field string) string {
 	return dbField
 }
 
-// makeStatement
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
-		m.fieldMap("Id"),
-		m.fieldMap("Name"),
-		m.fieldMap("Url"),
-		m.fieldMap("SortOrder"),
-		m.fieldMap("IsPublic"),
-		m.fieldMap("Active"),
-		m.fieldMap("CreatedAt"),
-		m.fieldMap("CreatedBy"),
-		m.fieldMap("UpdatedAt"),
-		m.fieldMap("UpdatedBy"),
+		m.mapFieldToDBColumn("Id"),
+		m.mapFieldToDBColumn("Name"),
+		m.mapFieldToDBColumn("Url"),
+		m.mapFieldToDBColumn("SortOrder"),
+		m.mapFieldToDBColumn("IsPublic"),
+		m.mapFieldToDBColumn("Active"),
+		m.mapFieldToDBColumn("CreatedAt"),
+		m.mapFieldToDBColumn("CreatedBy"),
+		m.mapFieldToDBColumn("UpdatedAt"),
+		m.mapFieldToDBColumn("UpdatedBy"),
 	).From(m.table + " p")
 }
 
-// make Get statement
 func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 	// build query
 	statement := m.makeStatement()
 
 	// id
 	if filter.Ids != nil {
-		statement = statement.Where(m.fieldMap("Id")+" = ?", (*filter.Ids)[0])
+		statement = statement.Where(m.mapFieldToDBColumn("Id")+" = ?", (*filter.Ids)[0])
 	}
 
 	// url
 	if filter.Urls != nil {
-		statement = statement.Where(m.fieldMap("Url")+" = ?", (*filter.Urls)[0])
+		statement = statement.Where(m.mapFieldToDBColumn("Url")+" = ?", (*filter.Urls)[0])
 	}
 
 	return statement
 }
 
-// makeStatementByFilter
 func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	// OrderBy
 	if filter.OrderBy == nil {
@@ -99,7 +95,7 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		countIds := len(*filter.Ids)
 
 		if countIds > 0 {
-			statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
+			statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Id"): *filter.Ids})
 		}
 
 		*filter.Page = 1
@@ -113,7 +109,7 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		countUrls := len(*filter.Urls)
 
 		if countUrls > 0 {
-			statement = statement.Where(sq.Eq{m.fieldMap("Url"): *filter.Urls})
+			statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Url"): *filter.Urls})
 		}
 
 		*filter.Page = 1
@@ -124,30 +120,29 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 	// IsPublic
 	if filter.IsPublic != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("IsPublic"): *filter.IsPublic})
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("IsPublic"): *filter.IsPublic})
 	}
 
 	// Active
 	if filter.Active != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("Active"): *filter.Active})
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Active"): *filter.Active})
 	}
 
 	// Search
 	if filter.Search != nil {
 		statement = statement.Where(
 			sq.Or{
-				sq.Expr("LOWER("+m.fieldMap("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.fieldMap("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 			},
 		)
 	}
 
 	// Add OrderBy, OrderDir, Page, Limit and return
-	return statement.OrderBy(m.fieldMap(*filter.OrderBy) + " " + *filter.OrderDir).
+	return statement.OrderBy(m.mapFieldToDBColumn(*filter.OrderBy) + " " + *filter.OrderDir).
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 }
 
-// makeCountStatementByFilter - make count statement by filter for pagination
 func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 	statement := m.qb.Select("COUNT(*)").From(m.table + " p")
 
@@ -156,7 +151,7 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 		countIds := len(*filter.Ids)
 
 		if countIds > 0 {
-			statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
+			statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Id"): *filter.Ids})
 		}
 	}
 
@@ -165,26 +160,26 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 		countUrls := len(*filter.Urls)
 
 		if countUrls > 0 {
-			statement = statement.Where(sq.Eq{m.fieldMap("Url"): *filter.Urls})
+			statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Url"): *filter.Urls})
 		}
 	}
 
 	// IsPublic
 	if filter.IsPublic != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("IsPublic"): *filter.IsPublic})
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("IsPublic"): *filter.IsPublic})
 	}
 
 	// Active
 	if filter.Active != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("Active"): *filter.Active})
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Active"): *filter.Active})
 	}
 
 	// Search
 	if filter.Search != nil {
 		statement = statement.Where(
 			sq.Or{
-				sq.Expr("LOWER("+m.fieldMap("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.fieldMap("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 			},
 		)
 	}
@@ -192,7 +187,6 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 	return statement
 }
 
-// scanOneRow
 func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
 	var id, name, url, createdBy, updatedBy sql.NullString
 	var sortOrder sql.NullInt64
@@ -263,7 +257,19 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	return &item, nil
 }
 
-// makeInsertStatement
+func (m *Model) scanCountRow(ctx context.Context, rows sq.RowScanner) (*uint64, error) {
+	var count uint64
+
+	err := rows.Scan(&count)
+	if err != nil {
+		err = psql.ErrScan(psql.ParsePgError(err))
+		tracing.Error(ctx, err)
+		return nil, err
+	}
+
+	return &count, nil
+}
+
 func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.InsertBuilder, *uuid.UUID) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
@@ -277,16 +283,16 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	ctx = context.WithValue(ctx, "itemId", item.Id)
 
 	insertItem := m.qb.Insert(m.table).Columns(
-		m.fieldMap("Id"),
-		m.fieldMap("Name"),
-		m.fieldMap("Url"),
-		m.fieldMap("SortOrder"),
-		m.fieldMap("IsPublic"),
-		m.fieldMap("Active"),
-		m.fieldMap("CreatedAt"),
-		m.fieldMap("CreatedBy"),
-		m.fieldMap("UpdatedAt"),
-		m.fieldMap("UpdatedBy"),
+		m.mapFieldToDBColumn("Id"),
+		m.mapFieldToDBColumn("Name"),
+		m.mapFieldToDBColumn("Url"),
+		m.mapFieldToDBColumn("SortOrder"),
+		m.mapFieldToDBColumn("IsPublic"),
+		m.mapFieldToDBColumn("Active"),
+		m.mapFieldToDBColumn("CreatedAt"),
+		m.mapFieldToDBColumn("CreatedBy"),
+		m.mapFieldToDBColumn("UpdatedAt"),
+		m.mapFieldToDBColumn("UpdatedBy"),
 	).Values(
 		item.Id,
 		item.Name,
@@ -304,21 +310,19 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	return &insertItem, &item.Id
 }
 
-// makeUpdateStatement
 func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
 	return m.qb.Update(m.table).
-		Set(m.fieldMap("Name"), item.Name).
-		Set(m.fieldMap("Url"), item.Url).
-		Set(m.fieldMap("SortOrder"), item.SortOrder).
-		Set(m.fieldMap("Active"), item.Active).
-		Set(m.fieldMap("UpdatedAt"), "NOW()").
-		Set(m.fieldMap("UpdatedBy"), by)
+		Set(m.mapFieldToDBColumn("Name"), item.Name).
+		Set(m.mapFieldToDBColumn("Url"), item.Url).
+		Set(m.mapFieldToDBColumn("SortOrder"), item.SortOrder).
+		Set(m.mapFieldToDBColumn("Active"), item.Active).
+		Set(m.mapFieldToDBColumn("UpdatedAt"), "NOW()").
+		Set(m.mapFieldToDBColumn("UpdatedBy"), by)
 }
 
-// makePatchStatement
 func (m *Model) makePatchStatement(ctx context.Context, id *uuid.UUID, fields *map[string]interface{}) sq.UpdateBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
@@ -326,9 +330,8 @@ func (m *Model) makePatchStatement(ctx context.Context, id *uuid.UUID, fields *m
 	statement := m.qb.Update(m.table).Where("id = ?", id)
 
 	for field, value := range *fields {
-		field = m.fieldMap(field)
-		statement = statement.Set(field, value)
+		statement = statement.Set(m.mapFieldToDBColumn(field), value)
 	}
 
-	return statement.Set(m.fieldMap("UpdatedAt"), "NOW()").Set(m.fieldMap("UpdatedBy"), by)
+	return statement.Set(m.mapFieldToDBColumn("UpdatedAt"), "NOW()").Set(m.mapFieldToDBColumn("UpdatedBy"), by)
 }

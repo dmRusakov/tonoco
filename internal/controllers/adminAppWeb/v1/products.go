@@ -21,7 +21,7 @@ func (s Service) RenderProducts(
 
 	var wg sync.WaitGroup
 	var tmpl *template.Template
-	var params *entity.ProductsPageUrlParams
+	var params *entity.ProductsPageParams
 
 	wg.Add(2)
 
@@ -41,7 +41,7 @@ func (s Service) RenderProducts(
 	appData.ConsoleMessage = entity.ConsoleMessage{}
 
 	// get products
-	products, totalItemsCount, err := s.productUseCase.GetProductList(ctx, params, &appData)
+	products, err := s.productUseCase.GetProductList(ctx, params, &appData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -54,7 +54,7 @@ func (s Service) RenderProducts(
 		Products:   products,
 		ProductUrl: "range-hood",
 
-		CountItems:     *totalItemsCount,
+		CountItems:     params.Count,
 		ConsoleMessage: appData.ConsoleMessage,
 	}
 
@@ -67,8 +67,8 @@ func (s Service) RenderProducts(
 }
 
 // ReadProductsUrlParam read page parameters from url
-func (s Service) ReadProductsUrlParam(r *http.Request) *entity.ProductsPageUrlParams {
-	params := &entity.ProductsPageUrlParams{}
+func (s Service) ReadProductsUrlParam(r *http.Request) *entity.ProductsPageParams {
+	params := &entity.ProductsPageParams{}
 	v := reflect.ValueOf(params).Elem()
 	t := v.Type()
 

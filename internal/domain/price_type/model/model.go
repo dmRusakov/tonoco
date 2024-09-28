@@ -77,17 +77,18 @@ func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, 
 	for rows.Next() {
 		item, err := m.scanOneRow(ctx, rows)
 		if err != nil {
-			return nil, errors.AddCode(err, "600839")
+			return nil, err
 		}
 
-		items[item.Id] = *item
+		if filter.IsIdsOnly == nil || !*filter.IsIdsOnly {
+			items[item.Id] = *item
+		}
 
 		// update filters if needed
 		if filter.IsUpdateFilter != nil && *filter.IsUpdateFilter {
 			ids = append(ids, item.Id)
 			urls = append(urls, item.Url)
 		}
-
 	}
 
 	// update filters if needed
@@ -114,7 +115,7 @@ func (m *Model) Update(ctx context.Context, item *Item) error {
 	err := psql.Update(
 		ctx,
 		m.client,
-		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), item.Id),
+		m.makeUpdateStatement(ctx, item).Where(fmt.Sprintf("%s = ?", m.mapFieldToDBColumn("Id")), item.Id),
 	)
 
 	if err != nil {
@@ -142,7 +143,7 @@ func (m *Model) Delete(ctx context.Context, id *uuid.UUID) error {
 	err := psql.Delete(
 		ctx,
 		m.client,
-		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.fieldMap("Id")), id),
+		m.qb.Delete(m.table).Where(fmt.Sprintf("%s = ?", m.mapFieldToDBColumn("Id")), id),
 	)
 
 	if err != nil {
@@ -156,7 +157,7 @@ func (m *Model) UpdatedAt(ctx context.Context, id *uuid.UUID) (*time.Time, error
 	at, err := psql.UpdatedAt(
 		ctx,
 		m.client,
-		m.qb.Select(m.fieldMap("UpdatedAt")).From(m.table).Where("id = ?", id),
+		m.qb.Select(m.mapFieldToDBColumn("UpdatedAt")).From(m.table).Where("id = ?", id),
 	)
 
 	if err != nil {

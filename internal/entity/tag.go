@@ -35,8 +35,8 @@ type TagFilter struct {
 
 	Count *uint64 `json:"count"`
 
-	IsIdsOnly          *bool `json:"is_ids_only"`
-	IsCount            *bool `json:"is_count"`
-	IsUpdateFilter     *bool `json:"is_update_filter"`
-	IsRemoveDuplicates *bool `json:"is_remove_duplicates"`
+	IsIdsOnly      *bool `json:"is_ids_only"`
+	IsCount        *bool `json:"is_count"`
+	IsUpdateFilter *bool `json:"is_update_filter"`
+	IsKeepIdsOrder *bool `json:"is_keep_ids_order"`
 }

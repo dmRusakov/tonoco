@@ -12,8 +12,7 @@ import (
 	"reflect"
 )
 
-// fieldMap
-func (m *Model) fieldMap(field string) string {
+func (m *Model) mapFieldToDBColumn(field string) string {
 	// check if field is in the cash
 	if dbField, ok := m.dbFieldCash[field]; ok {
 		return dbField
@@ -31,54 +30,51 @@ func (m *Model) fieldMap(field string) string {
 	return dbField
 }
 
-// makeStatement
 func (m *Model) makeStatement() sq.SelectBuilder {
 	return m.qb.Select(
-		m.fieldMap("Id"),
-		m.fieldMap("Sku"),
-		m.fieldMap("Brand"),
-		m.fieldMap("Name"),
-		m.fieldMap("ShortDescription"),
-		m.fieldMap("Description"),
-		m.fieldMap("SortOrder"),
-		m.fieldMap("Url"),
-		m.fieldMap("IsTaxable"),
-		m.fieldMap("IsTrackStock"),
-		m.fieldMap("ShippingWeight"),
-		m.fieldMap("ShippingWidth"),
-		m.fieldMap("ShippingHeight"),
-		m.fieldMap("ShippingLength"),
-		m.fieldMap("SeoTitle"),
-		m.fieldMap("SeoDescription"),
-		m.fieldMap("GTIN"),
-		m.fieldMap("GoogleProductCategory"),
-		m.fieldMap("GoogleProductType"),
-		m.fieldMap("CreatedAt"),
-		m.fieldMap("CreatedBy"),
-		m.fieldMap("UpdatedAt"),
-		m.fieldMap("UpdatedBy"),
+		m.mapFieldToDBColumn("Id"),
+		m.mapFieldToDBColumn("Sku"),
+		m.mapFieldToDBColumn("Brand"),
+		m.mapFieldToDBColumn("Name"),
+		m.mapFieldToDBColumn("ShortDescription"),
+		m.mapFieldToDBColumn("Description"),
+		m.mapFieldToDBColumn("SortOrder"),
+		m.mapFieldToDBColumn("Url"),
+		m.mapFieldToDBColumn("IsTaxable"),
+		m.mapFieldToDBColumn("IsTrackStock"),
+		m.mapFieldToDBColumn("ShippingWeight"),
+		m.mapFieldToDBColumn("ShippingWidth"),
+		m.mapFieldToDBColumn("ShippingHeight"),
+		m.mapFieldToDBColumn("ShippingLength"),
+		m.mapFieldToDBColumn("SeoTitle"),
+		m.mapFieldToDBColumn("SeoDescription"),
+		m.mapFieldToDBColumn("GTIN"),
+		m.mapFieldToDBColumn("GoogleProductCategory"),
+		m.mapFieldToDBColumn("GoogleProductType"),
+		m.mapFieldToDBColumn("CreatedAt"),
+		m.mapFieldToDBColumn("CreatedBy"),
+		m.mapFieldToDBColumn("UpdatedAt"),
+		m.mapFieldToDBColumn("UpdatedBy"),
 	).From(m.table + " p")
 }
 
-// make Get statement
 func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 	// build query
 	statement := m.makeStatement()
 
 	// id
 	if filter.Ids != nil {
-		statement = statement.Where(m.fieldMap("Id")+" = ?", (*filter.Ids)[0])
+		statement = statement.Where(m.mapFieldToDBColumn("Id")+" = ?", (*filter.Ids)[0])
 	}
 
 	// url
 	if filter.Urls != nil {
-		statement = statement.Where(m.fieldMap("Url")+" = ?", (*filter.Urls)[0])
+		statement = statement.Where(m.mapFieldToDBColumn("Url")+" = ?", (*filter.Urls)[0])
 	}
 
 	return statement
 }
 
-// makeStatementByFilter
 func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	// OrderBy
 	if filter.OrderBy == nil {
@@ -109,7 +105,7 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 	// Ids
 	if filter.Ids != nil && len(*filter.Ids) > 0 {
-		statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Id"): *filter.Ids})
 
 		*filter.Page = 1
 		if (*filter.PerPage) > uint64(len(*filter.Ids)) {
@@ -119,7 +115,7 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 	// Urls
 	if filter.Urls != nil && len(*filter.Urls) > 0 {
-		statement = statement.Where(sq.Eq{m.fieldMap("Url"): *filter.Urls})
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Url"): *filter.Urls})
 
 		*filter.Page = 1
 		if (*filter.PerPage) > uint64(len(*filter.Urls)) {
@@ -132,7 +128,7 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		countSkus := len(*filter.Skus)
 
 		if countSkus > 0 {
-			statement = statement.Where(sq.Eq{m.fieldMap("Sku"): *filter.Skus})
+			statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Sku"): *filter.Skus})
 		}
 
 		*filter.Page = 1
@@ -143,62 +139,61 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 	// Brands - filter by brand
 	if filter.Brands != nil {
-		statement = statement.Where(sq.Eq{m.fieldMap("Brand"): *filter.Brands})
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Brand"): *filter.Brands})
 	}
 
 	// Search
 	if filter.Search != nil {
 		statement = statement.Where(
 			sq.Or{
-				sq.Expr("LOWER("+m.fieldMap("Brand")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.fieldMap("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.fieldMap("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.fieldMap("ShortDescription")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.fieldMap("Description")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.fieldMap("SeoTitle")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.fieldMap("SeoDescription")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("Brand")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("ShortDescription")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("Description")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("SeoTitle")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("SeoDescription")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 			},
 		)
 	}
 
-	statement = statement.OrderBy(m.fieldMap(*filter.OrderBy) + " " + *filter.OrderDir).
+	statement = statement.OrderBy(m.mapFieldToDBColumn(*filter.OrderBy) + " " + *filter.OrderDir).
 		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
 
 	// Add OrderBy, OrderDir, Page, Limit and return
 	return statement
 }
 
-// makeCountStatementByFilter - make count statement by filter for pagination
 func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 	// Build query
 	statement := m.qb.Select("COUNT(*) as count").From(m.table + " p")
 
 	// Ids
 	if filter.Ids != nil && len(*filter.Ids) > 0 {
-		statement = statement.Where(sq.Eq{m.fieldMap("Id"): *filter.Ids})
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Id"): *filter.Ids})
 	}
 
 	// Urls
 	if filter.Urls != nil && len(*filter.Urls) > 0 {
-		statement = statement.Where(sq.Eq{m.fieldMap("Url"): *filter.Urls})
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Url"): *filter.Urls})
 	}
 
 	// Skus
 	if filter.Skus != nil && len(*filter.Skus) > 0 {
-		statement = statement.Where(sq.Eq{m.fieldMap("Sku"): *filter.Skus})
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Sku"): *filter.Skus})
 	}
 
 	// Search
 	if filter.Search != nil {
 		statement = statement.Where(
 			sq.Or{
-				sq.Expr("LOWER("+m.fieldMap("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.fieldMap("Brand")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.fieldMap("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.fieldMap("ShortDescription")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.fieldMap("Description")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.fieldMap("SeoTitle")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.fieldMap("SeoDescription")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("Brand")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("ShortDescription")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("Description")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("SeoTitle")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("SeoDescription")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 			},
 		)
 	}
@@ -207,7 +202,6 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 	return statement
 }
 
-// scanOneRow
 func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
 	var item = Item{}
 	var id, sku, brand, name, shortDescription, description, url, seoTitle, seoDescription, gtin, googleProductCategory, googleProductType, createdBy, updatedBy sql.NullString
@@ -321,7 +315,6 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	return &item, nil
 }
 
-// scanCountRow - scan count row
 func (m *Model) scanCountRow(ctx context.Context, rows sq.RowScanner) (*uint64, error) {
 	var count uint64
 
@@ -329,13 +322,12 @@ func (m *Model) scanCountRow(ctx context.Context, rows sq.RowScanner) (*uint64, 
 	if err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
-		return nil, errors.AddCode(err, "671713")
+		return nil, errors.AddCode(err, "187456")
 	}
 
 	return &count, nil
 }
 
-// makeInsertStatement
 func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.InsertBuilder, *uuid.UUID) {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
@@ -349,29 +341,29 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	ctx = context.WithValue(ctx, "itemId", item.Id)
 
 	insertItem := m.qb.Insert(m.table).Columns(
-		m.fieldMap("Id"),
-		m.fieldMap("Sku"),
-		m.fieldMap("Brand"),
-		m.fieldMap("Name"),
-		m.fieldMap("ShortDescription"),
-		m.fieldMap("Description"),
-		m.fieldMap("SortOrder"),
-		m.fieldMap("Url"),
-		m.fieldMap("IsTaxable"),
-		m.fieldMap("IsTrackStock"),
-		m.fieldMap("ShippingWeight"),
-		m.fieldMap("ShippingWidth"),
-		m.fieldMap("ShippingHeight"),
-		m.fieldMap("ShippingLength"),
-		m.fieldMap("SeoTitle"),
-		m.fieldMap("SeoDescription"),
-		m.fieldMap("GTIN"),
-		m.fieldMap("GoogleProductCategory"),
-		m.fieldMap("GoogleProductType"),
-		m.fieldMap("CreatedAt"),
-		m.fieldMap("CreatedBy"),
-		m.fieldMap("UpdatedAt"),
-		m.fieldMap("UpdatedBy"),
+		m.mapFieldToDBColumn("Id"),
+		m.mapFieldToDBColumn("Sku"),
+		m.mapFieldToDBColumn("Brand"),
+		m.mapFieldToDBColumn("Name"),
+		m.mapFieldToDBColumn("ShortDescription"),
+		m.mapFieldToDBColumn("Description"),
+		m.mapFieldToDBColumn("SortOrder"),
+		m.mapFieldToDBColumn("Url"),
+		m.mapFieldToDBColumn("IsTaxable"),
+		m.mapFieldToDBColumn("IsTrackStock"),
+		m.mapFieldToDBColumn("ShippingWeight"),
+		m.mapFieldToDBColumn("ShippingWidth"),
+		m.mapFieldToDBColumn("ShippingHeight"),
+		m.mapFieldToDBColumn("ShippingLength"),
+		m.mapFieldToDBColumn("SeoTitle"),
+		m.mapFieldToDBColumn("SeoDescription"),
+		m.mapFieldToDBColumn("GTIN"),
+		m.mapFieldToDBColumn("GoogleProductCategory"),
+		m.mapFieldToDBColumn("GoogleProductType"),
+		m.mapFieldToDBColumn("CreatedAt"),
+		m.mapFieldToDBColumn("CreatedBy"),
+		m.mapFieldToDBColumn("UpdatedAt"),
+		m.mapFieldToDBColumn("UpdatedBy"),
 	).Values(
 		item.Id,
 		item.Sku,
@@ -401,36 +393,35 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 	return &insertItem, &item.Id
 }
 
-// makeUpdateStatement
 func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
 
 	return m.qb.Update(m.table).
-		Set(m.fieldMap("Sku"), item.Sku).
-		Set(m.fieldMap("Brand"), item.Brand).
-		Set(m.fieldMap("Name"), item.Name).
-		Set(m.fieldMap("ShortDescription"), item.ShortDescription).
-		Set(m.fieldMap("Description"), item.Description).
-		Set(m.fieldMap("SortOrder"), item.SortOrder).
-		Set(m.fieldMap("Url"), item.Url).
-		Set(m.fieldMap("IsTaxable"), item.IsTaxable).
-		Set(m.fieldMap("IsTrackStock"), item.IsTrackStock).
-		Set(m.fieldMap("ShippingWeight"), item.ShippingWeight).
-		Set(m.fieldMap("ShippingWidth"), item.ShippingWidth).
-		Set(m.fieldMap("ShippingHeight"), item.ShippingHeight).
-		Set(m.fieldMap("ShippingLength"), item.ShippingLength).
-		Set(m.fieldMap("SeoTitle"), item.SeoTitle).
-		Set(m.fieldMap("SeoDescription"), item.SeoDescription).
-		Set(m.fieldMap("GTIN"), item.GTIN).
-		Set(m.fieldMap("GoogleProductCategory"), item.GoogleProductCategory).
-		Set(m.fieldMap("GoogleProductType"), item.GoogleProductType).
-		Set(m.fieldMap("UpdatedAt"), "NOW()").
-		Set(m.fieldMap("UpdatedBy"), by).
-		Where(m.fieldMap("Id")+" = ?", item.Id)
+		SetMap(map[string]interface{}{
+			m.mapFieldToDBColumn("Sku"):                   item.Sku,
+			m.mapFieldToDBColumn("Brand"):                 item.Brand,
+			m.mapFieldToDBColumn("Name"):                  item.Name,
+			m.mapFieldToDBColumn("ShortDescription"):      item.ShortDescription,
+			m.mapFieldToDBColumn("Description"):           item.Description,
+			m.mapFieldToDBColumn("SortOrder"):             item.SortOrder,
+			m.mapFieldToDBColumn("Url"):                   item.Url,
+			m.mapFieldToDBColumn("IsTaxable"):             item.IsTaxable,
+			m.mapFieldToDBColumn("IsTrackStock"):          item.IsTrackStock,
+			m.mapFieldToDBColumn("ShippingWeight"):        item.ShippingWeight,
+			m.mapFieldToDBColumn("ShippingWidth"):         item.ShippingWidth,
+			m.mapFieldToDBColumn("ShippingHeight"):        item.ShippingHeight,
+			m.mapFieldToDBColumn("ShippingLength"):        item.ShippingLength,
+			m.mapFieldToDBColumn("SeoTitle"):              item.SeoTitle,
+			m.mapFieldToDBColumn("SeoDescription"):        item.SeoDescription,
+			m.mapFieldToDBColumn("GTIN"):                  item.GTIN,
+			m.mapFieldToDBColumn("GoogleProductCategory"): item.GoogleProductCategory,
+			m.mapFieldToDBColumn("GoogleProductType"):     item.GoogleProductType,
+			m.mapFieldToDBColumn("UpdatedAt"):             "NOW()",
+			m.mapFieldToDBColumn("UpdatedBy"):             by,
+		}).Where(m.mapFieldToDBColumn("Id")+" = ?", item.Id)
 }
 
-// makePatchStatement
 func (m *Model) makePatchStatement(ctx context.Context, id *uuid.UUID, fields *map[string]interface{}) sq.UpdateBuilder {
 	// get user_id from context
 	by := ctx.Value("user_id").(string)
@@ -438,9 +429,8 @@ func (m *Model) makePatchStatement(ctx context.Context, id *uuid.UUID, fields *m
 	statement := m.qb.Update(m.table).Where("id = ?", id)
 
 	for field, value := range *fields {
-		field = m.fieldMap(field)
-		statement = statement.Set(field, value)
+		statement = statement.Set(m.mapFieldToDBColumn(field), value)
 	}
 
-	return statement.Set(m.fieldMap("UpdatedAt"), "NOW()").Set(m.fieldMap("UpdatedBy"), by)
+	return statement.Set(m.mapFieldToDBColumn("UpdatedAt"), "NOW()").Set(m.mapFieldToDBColumn("UpdatedBy"), by)
 }
