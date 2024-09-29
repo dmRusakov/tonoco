@@ -1,6 +1,6 @@
 module github.com/dmRusakov/tonoco
 
-go 1.21.5
+go 1.23.1
 
 require (
 	github.com/Masterminds/squirrel v1.5.4

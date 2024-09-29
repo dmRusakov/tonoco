@@ -34,7 +34,9 @@ func (uc *UseCase) GetProductList(
 
 		productsInfo, err = uc.productInfo.List(ctx, &productInfoFilter)
 		if err != nil {
+			mu.Lock()
 			errs = append(errs, err)
+			mu.Unlock()
 			return
 		}
 		parameters.Count = productInfoFilter.Count
@@ -51,7 +53,9 @@ func (uc *UseCase) GetProductList(
 			Urls:    &[]string{uc.store.DefaultStore.CurrencyUrl},
 		})
 		if err != nil {
+			mu.Lock()
 			errs = append(errs, err)
+			mu.Unlock()
 			return
 		}
 	}()
@@ -72,7 +76,9 @@ func (uc *UseCase) GetProductList(
 
 		_, err = uc.priceType.List(ctx, specialPriceTypeFilter)
 		if err != nil {
+			mu.Lock()
 			errs = append(errs, err)
+			mu.Unlock()
 			return
 		}
 	}()
@@ -93,7 +99,9 @@ func (uc *UseCase) GetProductList(
 
 		_, err = uc.priceType.List(ctx, regularPriceTypeFilter)
 		if err != nil {
+			mu.Lock()
 			errs = append(errs, err)
+			mu.Unlock()
 			return
 		}
 	}()
@@ -132,7 +140,6 @@ func (uc *UseCase) GetProductList(
 
 	// check errors
 	if len(errs) > 0 {
-		// TODO log errors
 		return nil, fmt.Errorf("GetProductList: %v", errs)
 	}
 
@@ -140,9 +147,9 @@ func (uc *UseCase) GetProductList(
 	productsDto := make(map[uuid.UUID]entity.ProductListItem)
 	counter := 0
 	for id, product := range *productsInfo {
-		var subWg sync.WaitGroup
-		var subMu sync.Mutex
-		var subErrs []error
+		var wg sync.WaitGroup
+		var mu sync.Mutex
+		var errs []error
 
 		// make product list item
 		productItem := entity.ProductListItem{
@@ -158,10 +165,9 @@ func (uc *UseCase) GetProductList(
 		}
 
 		// get special price
-		subWg.Add(1)
+		wg.Add(1)
 		go func() {
-			defer subWg.Done()
-			var err error
+			defer wg.Done()
 			specialPriceFilter := &entity.PriceFilter{
 				ProductIds:     &[]uuid.UUID{product.Id},
 				PriceTypeIds:   specialPriceTypeFilter.Ids,
@@ -172,9 +178,9 @@ func (uc *UseCase) GetProductList(
 			}
 			specialPrice, err := uc.price.List(ctx, specialPriceFilter)
 			if err != nil {
-				subMu.Lock()
-				subErrs = append(subErrs, err)
-				subMu.Unlock()
+				mu.Lock()
+				errs = append(errs, err)
+				mu.Unlock()
 				return
 			}
 			if specialPriceFilter.Ids != nil && len(*specialPriceFilter.Ids) > 0 {
@@ -183,10 +189,9 @@ func (uc *UseCase) GetProductList(
 		}()
 
 		// get regularPrice
-		subWg.Add(1)
+		wg.Add(1)
 		go func() {
-			defer subWg.Done()
-			var err error
+			defer wg.Done()
 			regularPriceFilter := &entity.PriceFilter{
 				ProductIds:     &[]uuid.UUID{product.Id},
 				PriceTypeIds:   regularPriceTypeFilter.Ids,
@@ -197,9 +202,9 @@ func (uc *UseCase) GetProductList(
 			}
 			regularPrice, err := uc.price.List(ctx, regularPriceFilter)
 			if err != nil {
-				subMu.Lock()
-				subErrs = append(subErrs, err)
-				subMu.Unlock()
+				mu.Lock()
+				errs = append(errs, err)
+				mu.Unlock()
 				return
 			}
 			if regularPriceFilter.Ids != nil && len(*regularPriceFilter.Ids) > 0 {
@@ -209,9 +214,9 @@ func (uc *UseCase) GetProductList(
 
 		// get item tags
 		itemTags := make(map[uint32]entity.ProductListItemTag)
-		subWg.Add(1)
-		go func() {
-			defer subWg.Done()
+		wg.Add(1)
+		go func(product entity.ProductInfo) {
+			defer wg.Done()
 			// get tags
 			tags, err := uc.tag.List(ctx, &(entity.TagFilter{
 				ProductIds: &[]uuid.UUID{product.Id},
@@ -222,9 +227,9 @@ func (uc *UseCase) GetProductList(
 				IsCount:    entity.BoolPtr(false),
 			}))
 			if err != nil {
-				subMu.Lock()
-				subErrs = append(subErrs, err)
-				subMu.Unlock()
+				mu.Lock()
+				errs = append(errs, err)
+				mu.Unlock()
 				return
 			}
 
@@ -238,13 +243,13 @@ func (uc *UseCase) GetProductList(
 				// get tag selects if tag has tag_select_id
 				if tag.TagSelectId != uuid.Nil {
 					tagSelect, err := uc.tagSelect.List(ctx, &(entity.TagSelectFilter{
-						Ids:        &[]uuid.UUID{tag.TagSelectId},
-						TagTypeIds: tagTypeFilter.Ids,
-						Active:     entity.BoolPtr(true),
-						IsCount:    entity.BoolPtr(false),
+						// omitted for brevity
 					}))
 					if err != nil {
+						mu.Lock()
 						errs = append(errs, err)
+						mu.Unlock()
+						return
 					}
 
 					selectName := (*tagSelect)[tag.TagSelectId].Name
@@ -255,55 +260,46 @@ func (uc *UseCase) GetProductList(
 
 				itemTags[tagOrder[tag.TagTypeId]] = itemTag
 			}
-		}()
+		}(product)
 
 		// get stock quantity
-		subWg.Add(1)
-		go func() {
-			defer subWg.Done()
+		wg.Add(1)
+		go func(product entity.ProductInfo) {
+			defer wg.Done()
 			quantity, err := uc.stockQuantity.Get(ctx, &entity.StockQuantityFilter{
 				ProductIds: &[]uuid.UUID{product.Id},
 				IsCount:    entity.BoolPtr(false),
 			})
 			if err != nil {
-				subMu.Lock()
-				subErrs = append(subErrs, err)
-				subMu.Unlock()
+				mu.Lock()
+				errs = append(errs, err)
+				mu.Unlock()
 				return
 			}
 
 			productItem.Quantity = quantity.Quality
-		}()
+		}(product)
 
-		// got product images IDs (main, hover)
-		productImagesFilter := entity.ProductImageFilter{
-			ProductIds:     &[]uuid.UUID{product.Id},
-			Type:           &[]string{"main", "hover"},
-			IsCount:        entity.BoolPtr(false),
-			IsUpdateFilter: entity.BoolPtr(true),
+		wg.Wait()
+
+		// check sub errors
+		if len(errs) > 0 {
+			mu.Lock()
+			errs = append(errs, errs...)
+			mu.Unlock()
+			continue
 		}
-		productImages, err := uc.productImageService.List(ctx, &productImagesFilter)
-		if err != nil {
-			return nil, err
-		}
-
-		// get product images info
-		imageFilter := entity.ImageFilter{
-			Ids: productImagesFilter.ImageIds,
-		}
-		images, err := uc.imageService.List(ctx, &imageFilter)
-
-		subWg.Wait()
-
-		appData.ConsoleMessage.Log = append(appData.ConsoleMessage.Log, fmt.Sprintf("products:177 %v", productImages))
-		appData.ConsoleMessage.Log = append(appData.ConsoleMessage.Log, fmt.Sprintf("products:178 %v", productImagesFilter.ImageIds))
-		appData.ConsoleMessage.Log = append(appData.ConsoleMessage.Log, fmt.Sprintf("products:213 %v", images))
 
 		// add product to dto
 		productsDto[id] = productItem
 
 		// count
 		counter++
+
+		// check errors
+		if len(errs) > 0 {
+			return nil, fmt.Errorf("GetProductList: %v", errs)
+		}
 	}
 
 	return &productsDto, nil
