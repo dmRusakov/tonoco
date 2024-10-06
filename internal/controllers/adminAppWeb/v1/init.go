@@ -12,8 +12,8 @@ func NewWebServer(
 	productUseCase *productUseCase.UseCase,
 	appCacheService *appCacheService.Service,
 	userCacheService *userCacheService.Service,
-) (*Service, error) {
-	return &Service{
+) (*Controller, error) {
+	return &Controller{
 		cfg:              cfg,
 		tmlPath:          "./assets/templates/",
 		productUseCase:   productUseCase,

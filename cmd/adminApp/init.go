@@ -50,8 +50,22 @@ func init() {
 	}
 	logging.L(ctx).Info("Product DB initialized")
 
+	// services
+	err = app.ServicesInit(cfg)
+	if err != nil {
+		logging.WithError(ctx, err).Fatal("app.ServicesInit")
+	}
+	logging.L(ctx).Info("Services initialized")
+
+	// currency use case
+	err = app.CurrencyUseCaseInit()
+	if err != nil {
+		logging.WithError(ctx, err).Fatal("app.CurrencyUseCaseInit")
+	}
+	logging.L(ctx).Info("Currency UseCase initialized")
+
 	// product use case
-	err = app.ProductUseCaseInit(cfg)
+	err = app.ProductUseCaseInit()
 	if err != nil {
 		logging.WithError(ctx, err).Fatal("app.ProductUseCaseInit")
 	}

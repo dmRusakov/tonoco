@@ -7,9 +7,9 @@ import (
 	"net/http"
 )
 
-func (s Service) Render(w http.ResponseWriter, pageTemplate string, appData entity.AppData) {
+func (c Controller) Render(w http.ResponseWriter, pageTemplate string, appData entity.AppData) {
 	// make template
-	tmpl := s.makeTemplate(pageTemplate)
+	tmpl := c.makeTemplate(pageTemplate)
 
 	// render page
 	if err := tmpl.Execute(w, nil); err != nil {
@@ -20,10 +20,10 @@ func (s Service) Render(w http.ResponseWriter, pageTemplate string, appData enti
 }
 
 // make template
-func (s Service) makeTemplate(pageTemplate string) *template.Template {
+func (c Controller) makeTemplate(pageTemplate string) *template.Template {
 	// page template
 	var templateSlice []string
-	templateSlice = append(templateSlice, fmt.Sprintf("%s%s", s.tmlPath, pageTemplate))
+	templateSlice = append(templateSlice, fmt.Sprintf("%s%s", c.tmlPath, pageTemplate))
 
 	// static templates
 	partials := []string{
@@ -37,7 +37,7 @@ func (s Service) makeTemplate(pageTemplate string) *template.Template {
 		"element/footer_logs.partial",
 	}
 	for _, x := range partials {
-		templateSlice = append(templateSlice, fmt.Sprintf("%s%s.gohtml", s.tmlPath, x))
+		templateSlice = append(templateSlice, fmt.Sprintf("%s%s.gohtml", c.tmlPath, x))
 	}
 
 	// parse templates

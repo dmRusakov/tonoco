@@ -10,9 +10,9 @@ import (
 	"net/http"
 )
 
-var _ Server = &Service{}
+var _ Server = &Controller{}
 
-type Service struct {
+type Controller struct {
 	cfg              *config.Config
 	tmlPath          string
 	productUseCase   *productUseCase.UseCase

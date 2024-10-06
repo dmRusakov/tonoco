@@ -1,6 +1,8 @@
 package entity
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type ProductListItem struct {
 	Id               uuid.UUID                     `json:"id" db:"id"`
@@ -21,13 +23,21 @@ type ProductListItem struct {
 	Tags             map[uint32]ProductListItemTag `json:"tags" db:"tags"`
 }
 
-type ProductsPageParams struct {
-	Id       *string
+type ProductsPageUrlParams struct {
 	Category *string
 	Currency *string
 	Page     *uint64
 	PerPage  *uint64
 	Count    *uint64
+}
+
+type ProductsPageParams struct {
+	Currency            Currency
+	RegularPriceTypeIds []uuid.UUID
+	SpecialPriceTypeIds []uuid.UUID
+	Page                *uint64
+	PerPage             *uint64
+	Count               *uint64
 }
 
 type ProductListItemTag struct {

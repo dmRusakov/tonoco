@@ -5,6 +5,7 @@ import (
 	productServire "github.com/dmRusakov/tonoco-grpc/gen/go/proto/service/v1"
 	"github.com/dmRusakov/tonoco/internal/config"
 	webController "github.com/dmRusakov/tonoco/internal/controllers/adminAppWeb/v1"
+	currencyUsecase "github.com/dmRusakov/tonoco/internal/useCase/currency"
 	productUsecase "github.com/dmRusakov/tonoco/internal/useCase/product"
 	"github.com/dmRusakov/tonoco/pkg/appCacheService"
 	"github.com/dmRusakov/tonoco/pkg/common/core/clock"
@@ -33,8 +34,12 @@ type App struct {
 	AppCacheService  *appCacheService.Service
 	UserCacheService *userCacheService.Service
 
+	// services
+	Services *Services
+
 	// usaCase
-	ProductUseCase *productUsecase.UseCase
+	CurrencyUseCase *currencyUsecase.UseCase
+	ProductUseCase  *productUsecase.UseCase
 
 	// api controllers
 	ProductController *productServire.ProductServiceServer

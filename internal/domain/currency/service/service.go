@@ -24,13 +24,27 @@ type Repository interface {
 }
 
 type Service struct {
-	repository model.Storage
+	repository      model.Storage
+	DefaultCurrency *Item
 }
 
-func NewService(repository *model.Model) *Service {
-	return &Service{
+func NewService(repository *model.Model, store *entity.Store) *Service {
+	service := &Service{
 		repository: repository,
 	}
+	if store != nil {
+		defaultCurrency, err := service.Get(context.Background(), &entity.CurrencyFilter{
+			IsCount: entity.BoolPtr(true),
+			Urls:    &[]string{store.CurrencyUrl},
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		service.DefaultCurrency = defaultCurrency
+	}
+
+	return service
 }
 
 func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {

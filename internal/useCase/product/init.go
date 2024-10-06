@@ -15,22 +15,9 @@ import (
 	tag_select_service "github.com/dmRusakov/tonoco/internal/domain/tag_select/service"
 	tag_type_service "github.com/dmRusakov/tonoco/internal/domain/tag_type/service"
 	warehouse_service "github.com/dmRusakov/tonoco/internal/domain/warehouse/service"
-	"github.com/dmRusakov/tonoco/pkg/common/core/clock"
-	"time"
 )
 
-type IdentityGenerator interface {
-	GenerateUUIDv4String() string
-}
-
-type Clock interface {
-	Now() time.Time
-}
-
 type UseCase struct {
-	identity IdentityGenerator
-	clock    Clock
-
 	currency            *currency_service.Service
 	file                *file_service.Service
 	folder              *folder_service.Service
@@ -47,10 +34,7 @@ type UseCase struct {
 	productImageService *product_image_service.Service
 }
 
-func NewProductUseCase(
-	identity IdentityGenerator,
-	clock clock.Clock,
-
+func NewUseCase(
 	currencyService *currency_service.Service,
 	fileService *file_service.Service,
 	folderService *folder_service.Service,
@@ -67,9 +51,6 @@ func NewProductUseCase(
 	productImageService *product_image_service.Service,
 ) *UseCase {
 	return &UseCase{
-		identity: identity,
-		clock:    clock,
-
 		currency:            currencyService,
 		file:                fileService,
 		folder:              folderService,

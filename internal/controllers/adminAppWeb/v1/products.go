@@ -12,7 +12,7 @@ import (
 
 // URL params for products page
 
-func (s Service) RenderProducts(
+func (c Controller) RenderProducts(
 	ctx context.Context,
 	w http.ResponseWriter,
 	r *http.Request,
@@ -21,18 +21,18 @@ func (s Service) RenderProducts(
 
 	var wg sync.WaitGroup
 	var tmpl *template.Template
-	var params *entity.ProductsPageParams
+	var params *entity.ProductsPageUrlParams
 
 	wg.Add(2)
 
 	go func() {
 		defer wg.Done()
-		tmpl = s.makeTemplate("products.page.gohtml")
+		tmpl = c.makeTemplate("products.page.gohtml")
 	}()
 
 	go func() {
 		defer wg.Done()
-		params = s.ReadProductsUrlParam(r)
+		params = c.ReadProductParam(r)
 	}()
 
 	wg.Wait()
@@ -41,7 +41,7 @@ func (s Service) RenderProducts(
 	appData.ConsoleMessage = entity.ConsoleMessage{}
 
 	// get products
-	products, err := s.productUseCase.GetProductList(ctx, params, &appData)
+	products, err := c.productUseCase.GetProductList(ctx, params, &appData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -66,10 +66,11 @@ func (s Service) RenderProducts(
 	return
 }
 
-// ReadProductsUrlParam read page parameters from url
-func (s Service) ReadProductsUrlParam(r *http.Request) *entity.ProductsPageParams {
-	params := &entity.ProductsPageParams{}
-	v := reflect.ValueOf(params).Elem()
+// ReadProductParam read page parameters from url
+func (c Controller) ReadProductParam(r *http.Request) *entity.ProductsPageUrlParams {
+	// read url urlParams
+	urlParams := &entity.ProductsPageUrlParams{}
+	v := reflect.ValueOf(urlParams).Elem()
 	t := v.Type()
 
 	for i := 0; i < v.NumField(); i++ {
@@ -87,19 +88,19 @@ func (s Service) ReadProductsUrlParam(r *http.Request) *entity.ProductsPageParam
 	}
 
 	// default Currency
-	if params.Currency == nil {
-		params.Currency = entity.StringPtr("usd")
+	if urlParams.Currency == nil {
+		urlParams.Currency = entity.StringPtr("usd")
 	}
 
 	// default Page
-	if params.Page == nil {
-		params.Page = entity.Uint64Ptr(1)
+	if urlParams.Page == nil {
+		urlParams.Page = entity.Uint64Ptr(1)
 	}
 
 	// default PerPage
-	if params.PerPage == nil {
-		params.PerPage = entity.Uint64Ptr(18)
+	if urlParams.PerPage == nil {
+		urlParams.PerPage = entity.Uint64Ptr(18)
 	}
 
-	return params
+	return urlParams
 }
