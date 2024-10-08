@@ -13,7 +13,7 @@ func (u *UseCase) GetProductList(
 	ctx context.Context,
 	parameters *entity.ProductsPageUrlParams,
 	appData *entity.AppData,
-) (*map[uuid.UUID]entity.ProductListItem, error) {
+) (*map[uuid.UUID]*entity.ProductListItem, error) {
 
 	var wg sync.WaitGroup
 	var mu sync.Mutex
@@ -22,7 +22,7 @@ func (u *UseCase) GetProductList(
 	// get productsInfo
 	var productsInfo *map[uuid.UUID]entity.ProductInfo
 	wg.Add(1)
-	go func() {
+	go func(parameters *entity.ProductsPageUrlParams) {
 		defer wg.Done()
 		var err error
 		productInfoFilter := entity.ProductInfoFilter{
@@ -32,64 +32,18 @@ func (u *UseCase) GetProductList(
 			IsUpdateFilter: entity.BoolPtr(true),
 		}
 
-		productsInfo, err = u.productInfo.List(ctx, &productInfoFilter)
+		result, err := u.productInfo.List(ctx, &productInfoFilter)
 		if err != nil {
 			mu.Lock()
 			errs = append(errs, err)
 			mu.Unlock()
 			return
 		}
+		mu.Lock()
+		productsInfo = result
+		mu.Unlock()
 		parameters.Count = productInfoFilter.Count
-	}()
-
-	// get special prices type IDs
-	var specialPriceTypeFilterIds []uuid.UUID
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		var err error
-		specialPriceTypeFilter := &entity.PriceTypeFilter{
-			Urls:           &[]string{"special", "sale"},
-			IsPublic:       entity.BoolPtr(true),
-			IsIdsOnly:      entity.BoolPtr(true),
-			IsCount:        entity.BoolPtr(false),
-			IsUpdateFilter: entity.BoolPtr(true),
-		}
-
-		_, err = u.priceType.List(ctx, specialPriceTypeFilter)
-		if err != nil {
-			mu.Lock()
-			errs = append(errs, err)
-			mu.Unlock()
-			return
-		}
-
-		specialPriceTypeFilterIds = *specialPriceTypeFilter.Ids
-	}()
-
-	// get regular prices type IDs
-	var regularPriceTypeFilterIds []uuid.UUID
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		var err error
-		regularPriceTypeFilter := &entity.PriceTypeFilter{
-			Urls:           &[]string{"regular"},
-			IsPublic:       entity.BoolPtr(true),
-			IsIdsOnly:      entity.BoolPtr(true),
-			IsCount:        entity.BoolPtr(false),
-			IsUpdateFilter: entity.BoolPtr(true),
-		}
-
-		_, err = u.priceType.List(ctx, regularPriceTypeFilter)
-		if err != nil {
-			mu.Lock()
-			errs = append(errs, err)
-			mu.Unlock()
-			return
-		}
-		regularPriceTypeFilterIds = *regularPriceTypeFilter.Ids
-	}()
+	}(parameters)
 
 	// get tag_types with `list_item` type
 	var tagTypes *map[uuid.UUID]entity.TagType
@@ -156,7 +110,7 @@ func (u *UseCase) GetProductList(
 	}
 
 	// dto
-	productsDto := make(map[uuid.UUID]entity.ProductListItem)
+	productsDto := make(map[uuid.UUID]*entity.ProductListItem)
 	counter := 0
 	for id, product := range *productsInfo {
 		var subWg sync.WaitGroup
@@ -164,7 +118,8 @@ func (u *UseCase) GetProductList(
 		var subErrs []error
 
 		// make product list item
-		productItem := entity.ProductListItem{
+		var productItem *entity.ProductListItem
+		productItem = &entity.ProductListItem{
 			Id:               product.Id,
 			Sku:              product.Sku,
 			Brand:            product.Brand,
@@ -181,10 +136,11 @@ func (u *UseCase) GetProductList(
 		go func(
 			productId uuid.UUID,
 			currencyId uuid.UUID,
-			specialPriceTypeFilterIds []uuid.UUID,
 		) {
 			defer subWg.Done()
-			specialPriceFilter := &entity.PriceFilter{
+			specialPriceTypeFilterIds := u.priceType.GetSpecialPriceTypeIds()
+
+			specialPriceFilter := entity.PriceFilter{
 				ProductIds:     &[]uuid.UUID{productId},
 				PriceTypeIds:   &specialPriceTypeFilterIds,
 				CurrencyIds:    &[]uuid.UUID{currencyId},
@@ -192,7 +148,8 @@ func (u *UseCase) GetProductList(
 				IsCount:        entity.BoolPtr(false),
 				IsUpdateFilter: entity.BoolPtr(true),
 			}
-			specialPrice, err := u.price.List(ctx, specialPriceFilter)
+
+			specialPrice, err := u.price.List(ctx, &specialPriceFilter)
 			if err != nil {
 				subMu.Lock()
 				subErrs = append(subErrs, err)
@@ -204,26 +161,27 @@ func (u *UseCase) GetProductList(
 				productItem.SalePrice = humanize.FormatFloat("#,###.##", (*specialPrice)[(*specialPriceFilter.Ids)[0]].Price)
 				subMu.Unlock()
 			}
-		}(product.Id, currency.Id, specialPriceTypeFilterIds)
+		}(product.Id, currency.Id)
 
 		// get regularPrice
 		subWg.Add(1)
 		go func(
 			productId uuid.UUID,
 			currencyId uuid.UUID,
-			regularPriceTypeFilterIds []uuid.UUID,
 		) {
 			defer subWg.Done()
 
-			regularPriceFilter := &entity.PriceFilter{
+			regularPriceTypeIds := u.priceType.GetRegularPriceTypeIds()
+			regularPriceFilter := entity.PriceFilter{
 				ProductIds:     &[]uuid.UUID{productId},
-				PriceTypeIds:   &regularPriceTypeFilterIds,
+				PriceTypeIds:   &regularPriceTypeIds,
 				CurrencyIds:    &[]uuid.UUID{currencyId},
 				Active:         entity.BoolPtr(true),
 				IsCount:        entity.BoolPtr(false),
 				IsUpdateFilter: entity.BoolPtr(true),
 			}
-			regularPrice, err := u.price.List(ctx, regularPriceFilter)
+
+			regularPrice, err := u.price.List(ctx, &regularPriceFilter)
 			if err != nil {
 				subMu.Lock()
 				subErrs = append(subErrs, err)
@@ -235,7 +193,7 @@ func (u *UseCase) GetProductList(
 				productItem.Price = humanize.FormatFloat("#,###.##", (*regularPrice)[(*regularPriceFilter.Ids)[0]].Price)
 				subMu.Unlock()
 			}
-		}(product.Id, currency.Id, regularPriceTypeFilterIds)
+		}(product.Id, currency.Id)
 
 		//get item tags
 		itemTags := make(map[uint32]entity.ProductListItemTag)
