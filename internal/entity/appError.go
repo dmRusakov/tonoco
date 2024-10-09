@@ -5,6 +5,6 @@ import (
 )
 
 var (
-	ErrCacheNotFound = errors.New("cache not found")
-	ErrFilterIsNil   = errors.New("filter is nil")
+	ErrNotFound    = errors.New("not found")
+	ErrFilterIsNil = errors.New("filter is nil")
 )

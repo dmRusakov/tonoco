@@ -2,25 +2,15 @@ package service
 
 import (
 	"context"
-	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/google/uuid"
 	"time"
 )
 
 func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {
-	// check if filter is nil
-	if filter == nil {
-		return nil, entity.ErrFilterIsNil
-	}
 	return s.repository.Get(ctx, filter)
 }
 
 func (s *Service) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {
-	// check if filter is nil
-	if filter == nil {
-		return nil, entity.ErrFilterIsNil
-	}
-
 	return s.repository.List(ctx, filter)
 }
 

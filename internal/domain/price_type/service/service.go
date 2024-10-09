@@ -13,8 +13,8 @@ type Filter = entity.PriceTypeFilter
 
 type Repository interface {
 	Get(ctx context.Context, filter *Filter) (*Item, error)
-	GetRegularPriceTypeIds() []uuid.UUID
-	GetSpecialPriceTypeIds() []uuid.UUID
+	GetDefault(name string) (*Item, error)
+	GetDefaultIds(name string) ([]uuid.UUID, error)
 	List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error)
 	Create(ctx context.Context, item *Item) (*uuid.UUID, error)
 	Update(ctx context.Context, item *Item) error
@@ -26,20 +26,49 @@ type Repository interface {
 }
 
 type Service struct {
-	repository          model.Storage
-	regularPriceTypeIds []uuid.UUID
-	specialPriceTypeIds []uuid.UUID
+	repository  model.Storage
+	defaultItem map[string]*Item
+	defaultIds  map[string]*[]uuid.UUID
 }
 
 func NewService(repository *model.Model) *Service {
 	return &Service{
-		repository: repository,
+		repository:  repository,
+		defaultItem: map[string]*Item{},
+		defaultIds:  map[string]*[]uuid.UUID{},
 	}
 }
 
-func (s *Service) GetRegularPriceTypeIds() []uuid.UUID {
-	if s.regularPriceTypeIds == nil {
-		regularPriceTypeFilter := &entity.PriceTypeFilter{
+func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {
+	return s.repository.Get(ctx, filter)
+}
+
+func (s *Service) GetDefault(name string) (*Item, error) {
+	if s.defaultItem[name] != nil {
+		return s.defaultItem[name], nil
+	}
+
+	item, err := s.Get(context.Background(), &Filter{
+		Urls:     &[]string{name},
+		IsPublic: entity.BoolPtr(true),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	s.defaultItem[name] = item
+
+	return s.defaultItem[name], nil
+}
+
+func (s *Service) GetDefaultIds(name string) (*[]uuid.UUID, error) {
+	if s.defaultIds[name] != nil {
+		return s.defaultIds[name], nil
+	}
+
+	switch name {
+	case "regular":
+		regularPriceTypeFilter := &Filter{
 			Urls:           &[]string{"regular"},
 			IsPublic:       entity.BoolPtr(true),
 			IsIdsOnly:      entity.BoolPtr(true),
@@ -49,22 +78,16 @@ func (s *Service) GetRegularPriceTypeIds() []uuid.UUID {
 
 		_, err := s.List(context.Background(), regularPriceTypeFilter)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		if regularPriceTypeFilter.Ids != nil {
-			s.regularPriceTypeIds = *regularPriceTypeFilter.Ids
+			s.defaultIds[name] = regularPriceTypeFilter.Ids
 		} else {
-			s.regularPriceTypeIds = []uuid.UUID{}
+			s.defaultIds[name] = nil
 		}
-	}
-
-	return s.regularPriceTypeIds
-}
-
-func (s *Service) GetSpecialPriceTypeIds() []uuid.UUID {
-	if s.specialPriceTypeIds == nil {
-		specialPriceTypeFilter := &entity.PriceTypeFilter{
+	case "special":
+		filter := &Filter{
 			Urls:           &[]string{"special", "sale"},
 			IsPublic:       entity.BoolPtr(true),
 			IsIdsOnly:      entity.BoolPtr(true),
@@ -72,35 +95,24 @@ func (s *Service) GetSpecialPriceTypeIds() []uuid.UUID {
 			IsUpdateFilter: entity.BoolPtr(true),
 		}
 
-		_, err := s.List(context.Background(), specialPriceTypeFilter)
+		_, err := s.List(context.Background(), filter)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
-		if specialPriceTypeFilter.Ids != nil {
-			s.specialPriceTypeIds = *specialPriceTypeFilter.Ids
+		if filter.Ids != nil {
+			s.defaultIds[name] = filter.Ids
 		} else {
-			s.specialPriceTypeIds = []uuid.UUID{}
+			s.defaultIds[name] = nil
 		}
+	default:
+		return nil, entity.ErrNotFound
 	}
 
-	return s.specialPriceTypeIds
-}
-
-func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {
-	// check if filter is nil
-	if filter == nil {
-		return nil, entity.ErrFilterIsNil
-	}
-	return s.repository.Get(ctx, filter)
+	return s.defaultIds[name], nil
 }
 
 func (s *Service) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {
-	// check if filter is nil
-	if filter == nil {
-		return nil, entity.ErrFilterIsNil
-	}
-
 	return s.repository.List(ctx, filter)
 }
 
