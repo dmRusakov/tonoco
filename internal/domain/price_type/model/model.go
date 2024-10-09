@@ -8,6 +8,7 @@ import (
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/google/uuid"
+	"sync"
 	"time"
 )
 
@@ -41,6 +42,7 @@ type Model struct {
 	qb          sq.StatementBuilderType
 	client      psql.Client
 	dbFieldCash map[string]string
+	mu          sync.Mutex
 }
 
 // NewStorage is a constructor function that returns a new instance of the Model.
@@ -64,7 +66,8 @@ func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
 }
 
 func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {
-	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter))
+	statement := m.makeStatementByFilter(filter)
+	rows, err := psql.List(ctx, m.client, statement)
 	if err != nil {
 		return nil, errors.AddCode(err, "777083")
 	}

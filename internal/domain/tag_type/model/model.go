@@ -8,6 +8,7 @@ import (
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/google/uuid"
+	"sync"
 	"time"
 )
 
@@ -41,6 +42,7 @@ type Model struct {
 	qb          sq.StatementBuilderType
 	client      psql.Client
 	dbFieldCash map[string]string
+	mu          sync.Mutex
 }
 
 // NewStorage is a constructor function that returns a new instance of the Model.

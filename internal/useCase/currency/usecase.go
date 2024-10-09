@@ -19,5 +19,5 @@ func (u *UseCase) Get(ctx context.Context, id *uuid.UUID, url *string) (*entity.
 }
 
 func (u *UseCase) GetDefault() (*entity.Currency, error) {
-	return u.currency.DefaultCurrency, nil
+	return u.currency.GetDefault(), nil
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/google/uuid"
 	"reflect"
+	"sync"
 	"time"
 )
 
@@ -44,6 +45,7 @@ type Model struct {
 	qb           sq.StatementBuilderType
 	client       psql.Client
 	dbFieldCache map[string]string
+	mu           sync.Mutex
 }
 
 // NewStorage is a constructor function that returns a new instance of the Model.
@@ -200,6 +202,9 @@ func (m *Model) MaxSortOrder(ctx context.Context) (*uint64, error) {
 }
 
 func (m *Model) mapFieldToDBColumn(field string) string {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	// check if field is in the cash
 	if dbField, ok := m.dbFieldCache[field]; ok {
 		return dbField

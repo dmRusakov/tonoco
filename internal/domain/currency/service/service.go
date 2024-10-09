@@ -13,6 +13,7 @@ type Filter = entity.CurrencyFilter
 
 type Repository interface {
 	Get(ctx context.Context, filter *Filter) (*Item, error)
+	GetDefault() *Item
 	List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error)
 	Create(ctx context.Context, item *Item) (*uuid.UUID, error)
 	Update(ctx context.Context, item *Item) error
@@ -25,7 +26,7 @@ type Repository interface {
 
 type Service struct {
 	repository      model.Storage
-	DefaultCurrency *Item
+	defaultCurrency *Item
 }
 
 func NewService(repository *model.Model, store *entity.Store) *Service {
@@ -41,7 +42,7 @@ func NewService(repository *model.Model, store *entity.Store) *Service {
 			panic(err)
 		}
 
-		service.DefaultCurrency = defaultCurrency
+		service.defaultCurrency = defaultCurrency
 	}
 
 	return service
@@ -53,6 +54,10 @@ func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {
 		return nil, entity.ErrFilterIsNil
 	}
 	return s.repository.Get(ctx, filter)
+}
+
+func (s *Service) GetDefault() *Item {
+	return s.defaultCurrency
 }
 
 func (s *Service) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {

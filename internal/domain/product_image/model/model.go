@@ -8,6 +8,7 @@ import (
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/google/uuid"
+	"sync"
 	"time"
 )
 
@@ -31,6 +32,7 @@ type Model struct {
 	qb          sq.StatementBuilderType
 	client      psql.Client
 	dbFieldCash map[string]string
+	mu          sync.Mutex
 }
 
 func NewStorage(client psql.Client) *Model {

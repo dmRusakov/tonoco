@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
@@ -13,6 +14,9 @@ import (
 )
 
 func (m *Model) mapFieldToDBColumn(field string) string {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	// check if field is in the cash
 	if dbField, ok := m.dbFieldCash[field]; ok {
 		return dbField
@@ -20,7 +24,11 @@ func (m *Model) mapFieldToDBColumn(field string) string {
 
 	// get field from struct
 	typeOf := reflect.TypeOf(Item{})
-	byName, _ := typeOf.FieldByName(field)
+	byName, found := typeOf.FieldByName(field)
+	if !found {
+		fmt.Println(field, "entety:26") // TODO
+		return ""
+	}
 	dbField := byName.Tag.Get("db")
 
 	// set field to cash
