@@ -13,12 +13,38 @@
                 {{end}}
             {{end}}
         </div>
-        <img src="/assets/images/elements/no-image.svg" title="{{.SeoTitle}}" alt="{{.SeoDescription}}">
+        {{if and .MainImage .HoverImage}}
+            <div class="image-container with-hover">
+                <img class="main" src="/assets/images/original/{{.MainImage.OriginPath}}" title="{{.MainImage.Title}}" alt="{{.MainImage.AltText}}">
+                <img class="hover" style="display: none;" src="/assets/images/original/{{.HoverImage.OriginPath}}" title="{{.HoverImage.Title}}" alt="{{.HoverImage.AltText}}">
+            </div>
+        {{else if .MainImage}}
+            <div class="image-container">
+                <img class="main" src="/assets/images/original/{{.MainImage.OriginPath}}" title="{{.MainImage.Title}}" alt="{{.MainImage.AltText}}">
+            </div>
+        {{else if .HoverImage}}
+            <div class="image-container">
+                <img class="main" src="/assets/images/original/{{.HoverImage.OriginPath}}" title="{{.HoverImage.Title}}" alt="{{.HoverImage.AltText}}">
+            </div>
+        {{else}}
+            <div class="image-container">
+                <img src="/assets/images/elements/no-image.svg" title="{{.SeoTitle}}" alt="{{.SeoDescription}}">
+            </div>
+        {{end}}
         <h2>{{.Brand}}</h2>
         <h3>{{.Name}}</h3>
         <p class="text">{{.ShortDescription}}</p>
         <div class="detail-container">
-            <p class="details">Shop this</p>
+            {{if eq .Status "discontinued"}}
+                <p class="details">Discontinued</p>
+            {{else if eq .Status "pre_order"}}
+                <p class="details">Pre-order now</p>
+            {{else if .SalePrice }}
+                <p class="placeholder"></p><p class="details">Get sale price now</p>
+            {{else}}
+                <p class="placeholder"></p><p class="details">Shop this</p>
+            {{end}}
+
             {{if or .SalePrice .Price}}
                 <p class="price{{if .SalePrice}} sale{{end}}">
                     {{if .SalePrice}}<span class="sale-price">{{.Currency}}{{.SalePrice}}</span>{{end}}

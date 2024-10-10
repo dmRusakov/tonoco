@@ -18,20 +18,20 @@ import (
 )
 
 type UseCase struct {
-	currency            *currency_service.Service
-	file                *file_service.Service
-	folder              *folder_service.Service
-	price               *price_service.Service
-	priceType           *price_type_service.Service
-	productInfo         *product_info_service.Service
-	tag                 *tag_service.Service
-	tagType             *tag_type_service.Service
-	tagSelect           *tag_select_service.Service
-	stockQuantity       *stock_quantity_service.Service
-	store               *store_service.Service
-	warehouse           *warehouse_service.Service
-	imageService        *image_service.Service
-	productImageService *product_image_service.Service
+	currency      *currency_service.Service
+	file          *file_service.Service
+	folder        *folder_service.Service
+	price         *price_service.Service
+	priceType     *price_type_service.Service
+	productInfo   *product_info_service.Service
+	tag           *tag_service.Service
+	tagType       *tag_type_service.Service
+	tagSelect     *tag_select_service.Service
+	stockQuantity *stock_quantity_service.Service
+	store         *store_service.Service
+	warehouse     *warehouse_service.Service
+	image         *image_service.Service
+	productImage  *product_image_service.Service
 }
 
 func NewUseCase(
@@ -51,19 +51,19 @@ func NewUseCase(
 	productImageService *product_image_service.Service,
 ) *UseCase {
 	return &UseCase{
-		currency:            currencyService,
-		file:                fileService,
-		folder:              folderService,
-		price:               priceService,
-		priceType:           priceTypeService,
-		productInfo:         productInfoService,
-		tag:                 tagService,
-		tagType:             tagTypeService,
-		tagSelect:           tagSelect,
-		stockQuantity:       stockQuantity,
-		store:               storeService,
-		warehouse:           warehouseService,
-		imageService:        imageService,
-		productImageService: productImageService,
+		currency:      currencyService,
+		file:          fileService,
+		folder:        folderService,
+		price:         priceService,
+		priceType:     priceTypeService,
+		productInfo:   productInfoService,
+		tag:           tagService,
+		tagType:       tagTypeService,
+		tagSelect:     tagSelect,
+		stockQuantity: stockQuantity,
+		store:         storeService,
+		warehouse:     warehouseService,
+		image:         imageService,
+		productImage:  productImageService,
 	}
 }

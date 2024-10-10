@@ -262,10 +262,65 @@ func (u *UseCase) GetProductList(
 
 			mu.Lock()
 			item.Quantity = quantity.Quality
+			if item.Quantity > 0 {
+				item.Status = "in_stock"
+			} else if item.Quantity < -50 {
+				item.Status = "discontinued"
+			} else {
+				item.Status = "pre_order"
+			}
 			mu.Unlock()
 		}()
 
-		// product image ids
+		// product main image
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			imageInfo, _ := u.productImage.Get(ctx, &entity.ProductImageFilter{
+				ProductIds: &[]uuid.UUID{product.Id},
+				IsCount:    entity.BoolPtr(false),
+				Type:       &[]string{"main"},
+			})
+
+			if imageInfo == nil {
+				return
+			}
+
+			image, _ := u.image.Get(ctx, &entity.ImageFilter{
+				Ids: &[]uuid.UUID{imageInfo.ImageId},
+			})
+
+			if image != nil {
+				mu.Lock()
+				item.MainImage = image
+				mu.Unlock()
+			}
+		}()
+
+		// hover image
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			imageInfo, _ := u.productImage.Get(ctx, &entity.ProductImageFilter{
+				ProductIds: &[]uuid.UUID{product.Id},
+				IsCount:    entity.BoolPtr(false),
+				Type:       &[]string{"hover"},
+			})
+
+			if imageInfo == nil {
+				return
+			}
+
+			image, _ := u.image.Get(ctx, &entity.ImageFilter{
+				Ids: &[]uuid.UUID{imageInfo.ImageId},
+			})
+
+			if image != nil {
+				mu.Lock()
+				item.HoverImage = image
+				mu.Unlock()
+			}
+		}()
 
 		wg.Wait()
 

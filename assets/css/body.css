@@ -31,12 +31,24 @@ h3, h4, h5, h6 {
     font-weight: bolder;
 }
 
+@keyframes showBlock {
+    from {
+        display: none;
+        opacity: 0;
+    }
+    to {
+        display: block;
+        opacity: 1;
+    }
+}
+
 .contentBody {
     padding: 0 20px;
     margin-bottom: 40px;
 
     .grid {
         /* Product Item in the gist by grid  */
+
         .gridItems {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
@@ -80,6 +92,16 @@ h3, h4, h5, h6 {
                     text-align: justify;
                 }
 
+                .image-container {
+                    margin: -31px -10px 0;
+
+                    &.with-hover {
+                        .hover {
+                            display: none;
+                        }
+                    }
+                }
+
                 .detail-container {
                     display: flex;
                     justify-content: space-between;
@@ -90,12 +112,21 @@ h3, h4, h5, h6 {
                         color: var(--accentText);
                     }
 
+                    .placeholder {
+                        display: block;
+                    }
+
+                    .details {
+                        display: none;
+                    }
+
                     .price {
                         &.sale {
                             .regular-price {
                                 position: relative;
                             }
-                            .regular-price::after{
+
+                            .regular-price::after {
                                 content: "";
                                 width: 100%;
                                 height: 1px;
@@ -161,6 +192,7 @@ h3, h4, h5, h6 {
                                 display: inline-grid;
                                 background-color: var(--tagCategoryBgColor);
                                 color: var(--tagCategoryColor);
+
                                 &::after {
                                     border-left-color: var(--tagCategoryBgColor);
                                 }
@@ -170,6 +202,7 @@ h3, h4, h5, h6 {
                                 display: inline-grid;
                                 background-color: var(--tagWithBgColor);
                                 color: var(--tagWithColor);
+
                                 &::after {
                                     border-left-color: var(--tagWithBgColor);
                                 }
@@ -186,11 +219,13 @@ h3, h4, h5, h6 {
                         }
 
                         /*if second div are category, hide it */
+
                         &:nth-child(2) .category {
                             display: none;
                         }
 
                         /* hide with if first div are category */
+
                         &:nth-child(2) .width {
                             display: none;
                         }
@@ -204,11 +239,30 @@ h3, h4, h5, h6 {
                     font-weight: 600;
                 }
 
+                .image-container {
+                    &.with-hover {
+                        .main {
+                            display: none;
+                        }
+
+                        .hover {
+                            display: block !important;
+                            margin-bottom: 3.5px;
+                        }
+                    }
+                }
+
                 .detail-container {
+                    .placeholder {
+                        display: none;
+                        transition: all 2s;
+                    }
+
                     .details {
-                        transition: all 1s;
-                        text-decoration: underline;
-                        font-weight: bold;
+                        display: block;
+                        animation: showBlock 2s forwards;
+                        transition: all 2s;
+                        font-weight: bolder;
                     }
 
                     .price.sale {
@@ -224,6 +278,8 @@ h3, h4, h5, h6 {
 
                         .sale-price {
                             color: var(--saleColor);
+                            transition: all 2s;
+                            font-weight: bold;
                         }
                     }
                 }
