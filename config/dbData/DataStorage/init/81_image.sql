@@ -4,25 +4,29 @@ DROP TABLE IF EXISTS public.image CASCADE;
 -- create table
 CREATE TABLE IF NOT EXISTS public.image
 (
-    id             UUID UNIQUE   DEFAULT uuid_generate_v4(),
-    title          VARCHAR(255)  DEFAULT NULL,
-    alt_text       VARCHAR(4000) DEFAULT NULL,
+    id                  UUID UNIQUE   DEFAULT uuid_generate_v4(),
 
-    origin_path    VARCHAR(255)  DEFAULT NULL,
-    full_path      VARCHAR(255)  DEFAULT NULL,
-    large_path     VARCHAR(255)  DEFAULT NULL,
-    medium_path    VARCHAR(255)  DEFAULT NULL,
-    grid_path      VARCHAR(255)  DEFAULT NULL,
-    thumbnail_path VARCHAR(255)  DEFAULT NULL,
+    filename            VARCHAR(255)  DEFAULT NULL,
+    extension           VARCHAR(10)   DEFAULT NULL,
 
-    sort_order     INTEGER       DEFAULT NULL,
-    is_webp        BOOLEAN       DEFAULT FALSE,
-    image_type     VARCHAR(255)  DEFAULT NULL,
+    is_compressed       BOOLEAN       DEFAULT FALSE,
+    is_webp             BOOLEAN       DEFAULT FALSE,
 
-    created_at     TIMESTAMP     DEFAULT NOW() NOT NULL,
-    created_by     UUID          DEFAULT NULL,
-    updated_at     TIMESTAMP     DEFAULT NOW() NOT NULL,
-    updated_by     UUID          DEFAULT NULL,
+    folder_id           UUID          DEFAULT NULL,
+    sort_order          INTEGER       DEFAULT NULL,
+
+    title               VARCHAR(255)  DEFAULT NULL,
+    alt_text            VARCHAR(510)  DEFAULT NULL,
+    copyright           VARCHAR(100)  DEFAULT NULL,
+    creator             VARCHAR(100)  DEFAULT NULL,
+    rating              FLOAT         DEFAULT NULL,
+
+    origin_path         VARCHAR(255)  DEFAULT NULL,
+
+    created_at          TIMESTAMP     DEFAULT NOW() NOT NULL,
+    created_by          UUID          DEFAULT NULL,
+    updated_at          TIMESTAMP     DEFAULT NOW() NOT NULL,
+    updated_by          UUID          DEFAULT NULL,
 
     CONSTRAINT image_pkey PRIMARY KEY (id)
 );
@@ -30,17 +34,29 @@ CREATE TABLE IF NOT EXISTS public.image
 -- ownership and index
 ALTER TABLE public.image OWNER TO postgres;
 CREATE INDEX image_id ON public.image USING btree (id);
-CREATE INDEX image_type ON public.image USING btree (image_type);
+CREATE INDEX image_is_compressed ON public.image USING btree (is_compressed);
+CREATE INDEX image_folder_id ON public.image USING btree (folder_id);
 
 -- comment on table
 COMMENT ON TABLE public.image IS 'Reference table for price type';
+
 COMMENT ON COLUMN public.image.id IS 'Unique identifier for price type';
+COMMENT ON COLUMN public.image.filename IS 'Filename of image';
+COMMENT ON COLUMN public.image.extension IS 'Extension of image';
+
+COMMENT ON COLUMN public.image.is_compressed IS 'Compressed status of image';
+COMMENT ON COLUMN public.image.is_webp IS 'Webp status of image';
+
+COMMENT ON COLUMN public.image.folder_id IS 'Folder of image';
+COMMENT ON COLUMN public.image.sort_order IS 'Sort order of image';
+
+COMMENT ON COLUMN public.image.title IS 'Title of image';
+COMMENT ON COLUMN public.image.alt_text IS 'Alt text of image';
+COMMENT ON COLUMN public.image.copyright IS 'Copyright of image';
+COMMENT ON COLUMN public.image.creator IS 'Creator of image';
+COMMENT ON COLUMN public.image.rating IS 'Rating of image';
+
 COMMENT ON COLUMN public.image.origin_path IS 'Origin path of image';
-COMMENT ON COLUMN public.image.full_path IS 'Full path of image 2000x2000';
-COMMENT ON COLUMN public.image.large_path IS 'Large path of image 1500x1500';
-COMMENT ON COLUMN public.image.medium_path IS 'Medium path of image 800x800';
-COMMENT ON COLUMN public.image.grid_path IS 'Medium path of image 400x400';
-COMMENT ON COLUMN public.image.thumbnail_path IS 'Thumbnail path of image 200x200';
 
 COMMENT ON COLUMN public.image.created_at IS 'Creation time of price type';
 COMMENT ON COLUMN public.image.created_by IS 'Creator of price type';
@@ -74,7 +90,6 @@ select * from public.image;
 --     img.ID as sort_order,
 --     replace(replace(img.guid, 'https://futurofuturo.com/wp-content/uploads/', ''), 'http://futurofuturo.com/wp-content/uploads/', '') AS origin_path,
 --     img.post_title AS title,
---     img.post_content AS alt_text,
---     replace(img.post_mime_type, 'image/', '') AS image_type
+--     img.post_content AS alt_text
 -- FROM wp_posts img
 -- WHERE img.post_mime_type LIKE 'image/%';

@@ -8174,3 +8174,8 @@ INSERT INTO product_image(product_id, image_id, type, sort_order) VALUES ((selec
 INSERT INTO product_image(product_id, image_id, type, sort_order) VALUES ((select id from public.product_info where sku = 'WL48STREAMLINE-WHT'), (select id from public.image where sort_order = '23848'), 'gallery', 13);
 INSERT INTO product_image(product_id, image_id, type, sort_order) VALUES ((select id from public.product_info where sku = 'WL48STREAMLINE-WHT'), (select id from public.image where sort_order = '23849'), 'gallery', 14);
 INSERT INTO product_image(product_id, image_id, type, sort_order) VALUES ((select id from public.product_info where sku = 'WL48STREAMLINE-WHT'), (select id from public.image where sort_order = '1847'), 'gallery', 15);
+
+
+
+
+

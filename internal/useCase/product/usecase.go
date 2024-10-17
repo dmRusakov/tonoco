@@ -295,6 +295,17 @@ func (u *UseCase) GetProductList(
 				item.MainImage = image
 				mu.Unlock()
 			}
+
+			// // compress image
+			// err := u.image.Compression(ctx, &entity.ImageCompression{
+			// 	Ids:         &[]uuid.UUID{imageInfo.ImageId},
+			// 	Compression: entity.UintPtr(80),
+			// })
+			// if err != nil {
+			// 	mu.Lock()
+			// 	errs = append(errs, err)
+			// 	mu.Unlock()
+			// }
 		}()
 
 		// hover image

@@ -4,7 +4,9 @@ go 1.23.1
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
+	github.com/chai2010/webp v1.1.1
 	github.com/dmRusakov/tonoco-grpc/gen/go/proto v0.0.0-20240122015721-b74903ac9bda
+	github.com/dustin/go-humanize v1.0.1
 	github.com/go-playground/validator/v10 v10.16.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/google/uuid v1.5.0
@@ -15,6 +17,7 @@ require (
 	github.com/jackc/pgx/v5 v5.5.1
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/lib/pq v1.10.9
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/pkg/errors v0.9.1
 	github.com/shopspring/decimal v1.3.1
 	github.com/stretchr/testify v1.8.4
@@ -26,6 +29,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.21.0
 	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.17.0
+	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 	golang.org/x/sync v0.5.0
 )
 
@@ -35,7 +39,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect

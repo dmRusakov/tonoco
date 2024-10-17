@@ -33,6 +33,13 @@ func PtrString(s *string) string {
 	}
 	return ""
 }
+func IntPtr(i int) *int {
+	return &i
+}
+
+func UintPtr(i uint) *uint {
+	return &i
+}
 
 func Uint64Ptr(i uint64) *uint64 {
 	return &i

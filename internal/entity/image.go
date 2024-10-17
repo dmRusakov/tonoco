@@ -6,22 +6,23 @@ import (
 )
 
 type Image struct {
-	Id            uuid.UUID `db:"id" json:"id"`
-	Title         string    `db:"title" json:"title"`
-	AltText       string    `db:"alt_text" json:"alt_text"`
-	OriginPath    string    `db:"origin_path" json:"origin_path"`
-	FullPath      string    `db:"full_path" json:"full_path"`
-	LargePath     string    `db:"large_path" json:"large_path"`
-	MediumPath    string    `db:"medium_path" json:"medium_path"`
-	GridPath      string    `db:"grid_path" json:"grid_path"`
-	ThumbnailPath string    `db:"thumbnail_path" json:"thumbnail_path"`
-	SortOrder     uint64    `db:"sort_order" json:"sort_order"`
-	IsWebp        bool      `db:"is_webp" json:"is_webp"`
-	ImageType     string    `db:"image_type" json:"image_type"`
-	CreatedAt     time.Time `db:"created_at" json:"created_at"`
-	CreatedBy     uuid.UUID `db:"created_by" json:"created_by"`
-	UpdatedAt     time.Time `db:"updated_at" json:"updated_at"`
-	UpdatedBy     uuid.UUID `db:"updated_by" json:"updated_by"`
+	Id           uuid.UUID `db:"id"`
+	FileName     string    `db:"filename"`
+	Extension    string    `db:"extension"`
+	IsCompressed bool      `db:"is_compressed"`
+	IsWebp       bool      `db:"is_webp"`
+	FolderId     uuid.UUID `db:"folder_id"`
+	SortOrder    uint64    `db:"sort_order"`
+	Title        string    `db:"title"`
+	AltText      string    `db:"alt_text"`
+	CopyRight    string    `db:"copyright"`
+	Creator      string    `db:"creator"`
+	Rating       float32   `db:"rating"`
+	OriginPath   string    `db:"origin_path"`
+	CreatedAt    time.Time `db:"created_at"`
+	CreatedBy    uuid.UUID `db:"created_by"`
+	UpdatedAt    time.Time `db:"updated_at"`
+	UpdatedBy    uuid.UUID `db:"updated_by"`
 }
 
 type ImageFilter struct {
@@ -41,4 +42,12 @@ type ImageFilter struct {
 	IsCount        *bool `json:"is_count"`
 	IsUpdateFilter *bool `json:"is_update_filter"`
 	IsKeepIdsOrder *bool `json:"is_keep_ids_order"`
+}
+
+type ImageCompression struct {
+	Ids         *[]uuid.UUID `json:"id"`
+	FileName    *string      `json:"file_name"`
+	Title       *string      `json:"title"`
+	AltText     *string      `json:"alt_text"`
+	Compression *uint        `json:"compression"`
 }
