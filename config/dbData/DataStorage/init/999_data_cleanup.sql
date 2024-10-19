@@ -3,7 +3,7 @@ update public.image set origin_path = substring(origin_path from '^[^?]+') where
 update public.image set extension = substring(origin_path from '[^.]+$') where 1=1;
 update public.image set filename =  substring(origin_path from '[^/]+(?=\.[^.]+$)') where 1=1;
 delete from public.image where extension not in ('jpg', 'png', 'gif', 'webp', 'svg');
-update public.image set copyright = 'FuturoFuturo.com' where 1=1;
+update public.image set copyright = '©FuturoFuturo.com' where 1=1;
 update public.image set creator = 'FuturoFuturo.com' where 1=1;
 update public.image set rating = 5 where 1=1;
 select * from public.image;

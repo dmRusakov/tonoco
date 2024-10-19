@@ -49,5 +49,8 @@ type ImageCompression struct {
 	FileName    *string      `json:"file_name"`
 	Title       *string      `json:"title"`
 	AltText     *string      `json:"alt_text"`
+	CopyRight   *string      `json:"copy_right"`
+	Creator     *string      `json:"creator"`
+	Rating      *float32     `json:"rating"`
 	Compression *uint        `json:"compression"`
 }

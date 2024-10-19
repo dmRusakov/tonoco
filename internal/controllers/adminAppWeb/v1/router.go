@@ -8,6 +8,7 @@ import (
 )
 
 func (c Controller) router(ctx context.Context, cfg *config.Config) {
+
 	appData := entity.AppData{
 		IsProd:  cfg.IsProd,
 		IsDebug: cfg.IsDebug,

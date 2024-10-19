@@ -18,6 +18,8 @@ func (c Controller) RenderProducts(
 	r *http.Request,
 	appData entity.AppData,
 ) {
+	// add user to context TODO make it right
+	ctx = context.WithValue(ctx, "user_id", "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
 
 	var wg sync.WaitGroup
 	var tmpl *template.Template
@@ -103,4 +105,13 @@ func (c Controller) ReadProductParam(r *http.Request) *entity.ProductsPageUrlPar
 	}
 
 	return urlParams
+}
+
+func (c Controller) addUserToContext(
+	ctx context.Context,
+	r *http.Request,
+) (context.Context, error) {
+	context.WithValue(ctx, "user_id", "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
+
+	return ctx, nil
 }
