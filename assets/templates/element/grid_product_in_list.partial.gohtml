@@ -13,18 +13,32 @@
                 {{end}}
             {{end}}
         </div>
-        {{if and .MainImage .HoverImage}}
+        {{if and .MainImage .MainImage.IsCompressed .HoverImage .HoverImage.IsCompressed}}
             <div class="image-container with-hover">
-                <img class="main" src="/assets/images/original/{{.MainImage.OriginPath}}" title="{{.MainImage.Title}}" alt="{{.MainImage.AltText}}">
-                <img class="hover" style="display: none;" src="/assets/images/original/{{.HoverImage.OriginPath}}" title="{{.HoverImage.Title}}" alt="{{.HoverImage.AltText}}">
+                <picture>
+                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_grid.webp" type="image/webp">
+                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_grid.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
+                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_medium.webp" type="image/webp">
+                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_medium.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
+                    <img class="main" src="/assets/images/web/{{.MainImage.FileName}}_grid.webp" title="{{.MainImage.Title}}" alt="{{.MainImage.AltText}}" copyright="{{.MainImage.CopyRight}}" author="{{.MainImage.Creator}}">
+                </picture>
+                <picture>
+                    <source srcset="/assets/images/web/{{.HoverImage.FileName}}_grid.webp" type="image/webp">
+                    <source srcset="/assets/images/web/{{.HoverImage.FileName}}_grid.{{.HoverImage.Extension}}" type="image/{{.HoverImage.Extension}}">
+                    <source srcset="/assets/images/web/{{.HoverImage.FileName}}_medium.webp" type="image/webp">
+                    <source srcset="/assets/images/web/{{.HoverImage.FileName}}_medium.{{.HoverImage.Extension}}" type="image/{{.HoverImage.Extension}}">
+                    <img class="hover" style="display: none;" src="/assets/images/web/{{.HoverImage.FileName}}_grid.webp" title="{{.HoverImage.Title}}" alt="{{.HoverImage.AltText}}" copyright="{{.HoverImage.CopyRight}}" author="{{.HoverImage.Creator}}">
+                </picture>
             </div>
-        {{else if .MainImage}}
+        {{else if and .MainImage .MainImage.IsCompressed}}
             <div class="image-container">
-                <img class="main" src="/assets/images/original/{{.MainImage.OriginPath}}" title="{{.MainImage.Title}}" alt="{{.MainImage.AltText}}">
-            </div>
-        {{else if .HoverImage}}
-            <div class="image-container">
-                <img class="main" src="/assets/images/original/{{.HoverImage.OriginPath}}" title="{{.HoverImage.Title}}" alt="{{.HoverImage.AltText}}">
+                <picture>
+                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_grid.webp" type="image/webp">
+                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_grid.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
+                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_medium.webp" type="image/webp">
+                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_medium.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
+                    <img class="main" src="/assets/images/web/{{.MainImage.FileName}}_grid.webp" title="{{.MainImage.Title}}" alt="{{.MainImage.AltText}}" copyright="{{.MainImage.CopyRight}}" author="{{.MainImage.Creator}}">
+                </picture>
             </div>
         {{else}}
             <div class="image-container">

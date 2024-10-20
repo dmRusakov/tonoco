@@ -303,6 +303,7 @@ func (s *Service) Compression(ctx context.Context, param *entity.ImageCompressio
 
 		// update image
 		img.IsCompressed = true
+		img.IsWebp = true
 
 		// update image in the repository
 		err = s.Update(ctx, img)

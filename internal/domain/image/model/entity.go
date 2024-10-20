@@ -152,46 +152,68 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 
 	if id.Valid {
 		item.Id = uuid.MustParse(id.String)
+	} else {
+		return nil, errors.AddCode(entity.ErrNotFound, "929897")
 	}
 
 	if fileName.Valid {
 		item.FileName = fileName.String
+	} else {
+		item.FileName = ""
 	}
 
 	if extension.Valid {
 		item.Extension = extension.String
+	} else {
+		item.Extension = ""
 	}
 
 	if isCompressed.Valid {
 		item.IsCompressed = isCompressed.Bool
+	} else {
+		item.IsCompressed = false
 	}
 
 	if isWebp.Valid {
 		item.IsWebp = isWebp.Bool
+	} else {
+		item.IsWebp = false
 	}
 
 	if folderId.Valid {
 		item.FolderId = uuid.MustParse(folderId.String)
+	} else {
+		item.FolderId = uuid.Nil
 	}
 
 	if sortOrder.Valid {
 		item.SortOrder = uint64(sortOrder.Int64)
+	} else {
+		item.SortOrder = 0
 	}
 
 	if title.Valid {
 		item.Title = title.String
+	} else {
+		item.Title = ""
 	}
 
 	if altText.Valid {
 		item.AltText = altText.String
+	} else {
+		item.AltText = ""
 	}
 
 	if copyRight.Valid {
 		item.CopyRight = copyRight.String
+	} else {
+		item.CopyRight = ""
 	}
 
 	if creator.Valid {
 		item.Creator = creator.String
+	} else {
+		item.Creator = ""
 	}
 
 	if rating.Valid {

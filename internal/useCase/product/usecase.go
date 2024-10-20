@@ -286,15 +286,17 @@ func (u *UseCase) GetProductList(
 				return
 			}
 
-			image, _ := u.image.Get(ctx, &entity.ImageFilter{
+			image, err := u.image.Get(ctx, &entity.ImageFilter{
 				Ids: &[]uuid.UUID{imageInfo.ImageId},
 			})
 
-			if image != nil {
-				mu.Lock()
-				item.MainImage = image
-				mu.Unlock()
+			if err != nil {
+				return
 			}
+
+			mu.Lock()
+			item.MainImage = image
+			mu.Unlock()
 
 			// compress image if not compressed
 			if !image.IsCompressed {
@@ -328,10 +330,25 @@ func (u *UseCase) GetProductList(
 				Ids: &[]uuid.UUID{imageInfo.ImageId},
 			})
 
-			if image != nil {
-				mu.Lock()
-				item.HoverImage = image
-				mu.Unlock()
+			if image == nil {
+				return
+			}
+
+			mu.Lock()
+			item.HoverImage = image
+			mu.Unlock()
+
+			// compress image if not compressed
+			if !image.IsCompressed && image.Id != uuid.Nil {
+				err := u.image.Compression(ctx, &entity.ImageCompression{
+					Ids:         &[]uuid.UUID{image.Id},
+					Compression: entity.UintPtr(80),
+				})
+				if err != nil {
+					mu.Lock()
+					errs = append(errs, err)
+					mu.Unlock()
+				}
 			}
 		}()
 
