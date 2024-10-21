@@ -3,7 +3,6 @@ package model
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
@@ -142,7 +141,6 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	)
 
 	if err != nil {
-		fmt.Println(err, "entity:144")
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
 		return nil, errors.AddCode(err, "616229")
@@ -152,68 +150,46 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 
 	if id.Valid {
 		item.Id = uuid.MustParse(id.String)
-	} else {
-		return nil, errors.AddCode(entity.ErrNotFound, "929897")
 	}
 
 	if fileName.Valid {
 		item.FileName = fileName.String
-	} else {
-		item.FileName = ""
 	}
 
 	if extension.Valid {
 		item.Extension = extension.String
-	} else {
-		item.Extension = ""
 	}
 
 	if isCompressed.Valid {
 		item.IsCompressed = isCompressed.Bool
-	} else {
-		item.IsCompressed = false
 	}
 
 	if isWebp.Valid {
 		item.IsWebp = isWebp.Bool
-	} else {
-		item.IsWebp = false
 	}
 
 	if folderId.Valid {
 		item.FolderId = uuid.MustParse(folderId.String)
-	} else {
-		item.FolderId = uuid.Nil
 	}
 
 	if sortOrder.Valid {
 		item.SortOrder = uint64(sortOrder.Int64)
-	} else {
-		item.SortOrder = 0
 	}
 
 	if title.Valid {
 		item.Title = title.String
-	} else {
-		item.Title = ""
 	}
 
 	if altText.Valid {
 		item.AltText = altText.String
-	} else {
-		item.AltText = ""
 	}
 
 	if copyRight.Valid {
 		item.CopyRight = copyRight.String
-	} else {
-		item.CopyRight = ""
 	}
 
 	if creator.Valid {
 		item.Creator = creator.String
-	} else {
-		item.Creator = ""
 	}
 
 	if rating.Valid {

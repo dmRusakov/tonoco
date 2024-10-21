@@ -56,6 +56,7 @@ func (c Controller) RenderProducts(
 		Products:   products,
 		ProductUrl: "range-hood",
 
+		Page:           params.Page,
 		CountItems:     params.Count,
 		ConsoleMessage: appData.ConsoleMessage,
 	}

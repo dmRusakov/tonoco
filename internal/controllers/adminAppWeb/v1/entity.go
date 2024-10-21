@@ -13,7 +13,11 @@ import (
 var _ Server = &Controller{}
 
 type Controller struct {
-	cfg              *config.Config
+	cfg  *config.Config
+	rout []struct {
+		path    string
+		handler func(http.ResponseWriter, *http.Request)
+	}
 	tmlPath          string
 	productUseCase   *productUseCase.UseCase
 	appCacheService  *appCacheService.Service
