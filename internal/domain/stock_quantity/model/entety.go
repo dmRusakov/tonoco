@@ -108,12 +108,12 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 	return m.fillInFilter(m.qb.Select("COUNT(*)").From(m.table), filter)
 }
 
-func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
+func (m *Model) scanOneRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 	var id, productId, warehouseId, createdBy, updatedBy sql.NullString
 	var quality sql.NullInt32
 	var createdAt, updatedAt sql.NullTime
 
-	err := rows.Scan(
+	err := row.Scan(
 		&id,
 		&productId,
 		&quality,

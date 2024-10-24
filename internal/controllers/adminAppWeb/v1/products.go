@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/pkg/common/pagination"
 	"html/template"
 	"net/http"
 	"reflect"
@@ -58,12 +59,15 @@ func (c Controller) RenderProducts(
 		Items: products,
 		Url:   "range-hood",
 
-		Page:           int(*params.Page),
-		PerPage:        int(*params.PerPage),
-		TotalItems:     int(*params.Count),
-		TotalPages:     int(((*params.Count) + (*params.PerPage) - 1) / *params.PerPage),
+		Page:       uint32(*params.Page),
+		PerPage:    uint32(*params.PerPage),
+		TotalItems: uint32(*params.Count),
+		TotalPages: uint32(((*params.Count) + (*params.PerPage) - 1) / *params.PerPage),
+
 		ConsoleMessage: appData.ConsoleMessage,
 	}
+
+	productPage.Pagination = pagination.GetPagination(productPage.Page, productPage.TotalPages, 5)
 
 	// render page
 	if err := tmpl.Execute(w, productPage); err != nil {
