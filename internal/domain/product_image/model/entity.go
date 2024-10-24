@@ -13,15 +13,23 @@ import (
 )
 
 func (m *Model) mapFieldToDBColumn(field string) string {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	// check if field is in the cash
 	if dbField, ok := m.dbFieldCash[field]; ok {
 		return dbField
 	}
 
+	// get field from struct
 	typeOf := reflect.TypeOf(Item{})
 	byName, _ := typeOf.FieldByName(field)
 	dbField := byName.Tag.Get("db")
 
+	// set field to cash
 	m.dbFieldCash[field] = dbField
+
+	// done
 	return dbField
 }
 

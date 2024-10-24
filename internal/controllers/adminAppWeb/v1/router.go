@@ -22,7 +22,7 @@ func (c Controller) router(ctx context.Context, cfg *config.Config) {
 		{"/orders/", func(w http.ResponseWriter, r *http.Request) { c.Render(w, "orders.page.gohtml", appData) }},
 		{"/order/", func(w http.ResponseWriter, r *http.Request) { c.Render(w, "order.page.gohtml", appData) }},
 		{"/products/", func(w http.ResponseWriter, r *http.Request) { c.RenderProducts(r.Context(), w, r, appData) }},
-		{"/range-hood/", func(w http.ResponseWriter, r *http.Request) { c.RenderProducts(r.Context(), w, r, appData) }},
+		{"/range-hood", func(w http.ResponseWriter, r *http.Request) { c.RenderProducts(r.Context(), w, r, appData) }},
 		{"/product/", func(w http.ResponseWriter, r *http.Request) { c.Render(w, "product.page.gohtml", appData) }},
 		{"/categories/", func(w http.ResponseWriter, r *http.Request) { c.Render(w, "categories.page.gohtml", appData) }},
 		{"/category/", func(w http.ResponseWriter, r *http.Request) { c.Render(w, "category.page.gohtml", appData) }},

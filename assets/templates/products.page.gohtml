@@ -5,27 +5,32 @@
         <h1>{{.Name}}</h1>
         <div class="grid">
             <div class="gridItems">
-                {{range .Products}}
+                {{range .Items}}
                     {{template "grid_product_item_in_list" .}}
                 {{end}}
             </div>
             <div class="gridFooter">
                 <div class="countItems">
-                    Show ?? <br>Of {{.CountItems}} items.
+                    Show {{.PerPage}} <br>Of {{.TotalItems}} items.
+                <div class="pagination">
+{{/*                    {{if gt .Page 2}}*/}}
+{{/*                        <a href="{{url .Page 1}}">First</a>*/}}
+{{/*                        <a href="{{url .Page (sub .Page 1)}}">Previous</a>*/}}
+{{/*                    {{end}}*/}}
+{{/*                    {{if gr (lt .Page .TotalPages)}}*/}}
+{{/*                        <a href="{{url .Page (add .Page 1)}}">Next</a>*/}}
+{{/*                        <a href="{{url .Page .TotalPages}}">Last</a>*/}}
+{{/*                    {{end}}*/}}
+
+
+
+
+
+                    {{.Page}}
+                    {{.PerPage}}
+                    {{.TotalItems}}
+                    {{.TotalPages}}
                 </div>
-                {{.Page}}
-{{/*                <div class="pagination">*/}}
-{{/*                    <a href="#" class="">1</a>*/}}
-{{/*                    <a href="/products?page=2">2</a>*/}}
-{{/*                    <a href="#">3</a>*/}}
-{{/*                    <a href="#">4</a>*/}}
-{{/*                    <a href="#">5</a>*/}}
-{{/*                    <a href="#">6</a>*/}}
-{{/*                    <a href="#">7</a>*/}}
-{{/*                    <a href="#">8</a>*/}}
-{{/*                    <a href="#">9</a>*/}}
-{{/*                    <a href="#">10</a>*/}}
-{{/*                </div>*/}}
             </div>
         </div>
     </div>

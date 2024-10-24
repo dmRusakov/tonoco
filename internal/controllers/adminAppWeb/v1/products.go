@@ -2,10 +2,12 @@ package admin_app_web_v1
 
 import (
 	"context"
+	"fmt"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	"html/template"
 	"net/http"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -53,11 +55,13 @@ func (c Controller) RenderProducts(
 	productPage := entity.ProductPage{
 		Name: "Range Hoods",
 
-		Products:   products,
-		ProductUrl: "range-hood",
+		Items: products,
+		Url:   "range-hood",
 
-		Page:           params.Page,
-		CountItems:     params.Count,
+		Page:           int(*params.Page),
+		PerPage:        int(*params.PerPage),
+		TotalItems:     int(*params.Count),
+		TotalPages:     int(((*params.Count) + (*params.PerPage) - 1) / *params.PerPage),
 		ConsoleMessage: appData.ConsoleMessage,
 	}
 
@@ -81,11 +85,19 @@ func (c Controller) ReadProductParam(r *http.Request) *entity.ProductsPageUrlPar
 		value := r.URL.Query().Get(strings.ToLower(fieldName))
 		if value != "" {
 			field := v.Field(i)
-			if field.Kind() == reflect.Ptr && !field.IsNil() {
+			if field.Kind() == reflect.Ptr {
+				if field.IsNil() {
+					field.Set(reflect.New(field.Type().Elem()))
+				}
 				field = field.Elem()
 			}
-			if field.Kind() == reflect.String {
+			switch field.Kind() {
+			case reflect.String:
 				field.SetString(value)
+			case reflect.Uint64:
+				if parsedValue, err := strconv.ParseUint(value, 10, 64); err == nil {
+					field.SetUint(parsedValue)
+				}
 			}
 		}
 	}
@@ -105,6 +117,8 @@ func (c Controller) ReadProductParam(r *http.Request) *entity.ProductsPageUrlPar
 		urlParams.PerPage = entity.Uint64Ptr(18)
 	}
 
+	fmt.Println(*urlParams.Page, "products:111")
+
 	return urlParams
 }
 
@@ -112,7 +126,6 @@ func (c Controller) addUserToContext(
 	ctx context.Context,
 	r *http.Request,
 ) (context.Context, error) {
-	context.WithValue(ctx, "user_id", "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
-
+	ctx = context.WithValue(ctx, "user_id", "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
 	return ctx, nil
 }
