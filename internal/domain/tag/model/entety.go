@@ -8,6 +8,7 @@ import (
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
+	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	"github.com/google/uuid"
 	"reflect"
 )
@@ -75,15 +76,15 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	// PerPage
 	if filter.PerPage == nil {
 		if filter.Page == nil {
-			filter.PerPage = entity.Uint64Ptr(999999999999999999)
+			filter.PerPage = pointer.Uint64Ptr(999999999999999999)
 		} else {
-			filter.PerPage = entity.Uint64Ptr(10)
+			filter.PerPage = pointer.Uint64Ptr(10)
 		}
 	}
 
 	// Page
 	if filter.Page == nil {
-		filter.Page = entity.Uint64Ptr(1)
+		filter.Page = pointer.Uint64Ptr(1)
 	}
 
 	// Build query

@@ -54,6 +54,6 @@ type TagTypeFilter struct {
 
 type DefaultTagTypes struct {
 	TagTypes    *map[uuid.UUID]TagType
-	TagOrder    *map[uuid.UUID]uint32
+	TagOrder    *map[uuid.UUID]uint64
 	TagTypesIds *[]uuid.UUID
 }

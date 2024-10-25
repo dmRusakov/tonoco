@@ -178,7 +178,7 @@ func (u *UseCase) GetProductList(
 		}()
 
 		/* get item tags */
-		itemTags := make(map[uint32]entity.ProductListItemTag)
+		itemTags := make(map[uint64]entity.ProductListItemTag)
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

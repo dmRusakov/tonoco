@@ -9,18 +9,18 @@ package pagination
 //
 // Returns:
 // - A slice of uint32 containing the page numbers to be displayed in the pagination.
-func GetPagination(page, totalPages, count uint32) []uint32 {
-	var pagination []uint32
+func GetPagination(page, totalPages, count uint64) []uint64 {
+	var pagination []uint64
 
 	if totalPages <= count {
 		// If the total number of pages is less than or equal to the count, display all pages.
-		for i := uint32(1); i <= totalPages; i++ {
+		for i := uint64(1); i <= totalPages; i++ {
 			pagination = append(pagination, i)
 		}
 	} else {
 		if page <= count/2 {
 			// If the current page is in the first half of the pagination range, display the first 'count' pages.
-			for i := uint32(1); i <= count; i++ {
+			for i := uint64(1); i <= count; i++ {
 				pagination = append(pagination, i)
 			}
 		} else if page >= totalPages-count/2 {
@@ -38,7 +38,7 @@ func GetPagination(page, totalPages, count uint32) []uint32 {
 
 	// Add the first page if not in the slice
 	if pagination[0] != 1 {
-		pagination = append([]uint32{1}, pagination...)
+		pagination = append([]uint64{1}, pagination...)
 	}
 
 	// Add the last page if not in the slice

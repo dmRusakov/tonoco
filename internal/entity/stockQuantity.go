@@ -8,7 +8,7 @@ import (
 type StockQuantity struct {
 	Id          uuid.UUID `json:"id" db:"id"`
 	ProductId   uuid.UUID `json:"product_id" db:"product_id"`
-	Quality     int32     `json:"quality" db:"quantity"`
+	Quality     int64     `json:"quality" db:"quantity"`
 	WarehouseId uuid.UUID `json:"warehouse_id" db:"warehouse_id"`
 
 	CreatedAt time.Time `db:"created_at" json:"created_at"`

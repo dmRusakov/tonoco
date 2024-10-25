@@ -71,7 +71,7 @@ func (s *Service) GetDefaultIds(name string) (*entity.DefaultTagTypes, error) {
 	case "list":
 		item := &entity.DefaultTagTypes{
 			TagTypes:    &map[uuid.UUID]entity.TagType{},
-			TagOrder:    &map[uuid.UUID]uint32{},
+			TagOrder:    &map[uuid.UUID]uint64{},
 			TagTypesIds: &[]uuid.UUID{},
 		}
 
@@ -92,7 +92,7 @@ func (s *Service) GetDefaultIds(name string) (*entity.DefaultTagTypes, error) {
 
 		// tag order
 		for i, tagType := range *tagTypeFilter.Ids {
-			(*item.TagOrder)[tagType] = uint32(i)
+			(*item.TagOrder)[tagType] = uint64(i)
 		}
 
 		// get tag types ids

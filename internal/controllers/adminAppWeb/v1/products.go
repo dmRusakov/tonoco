@@ -2,9 +2,9 @@ package admin_app_web_v1
 
 import (
 	"context"
-	"fmt"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/pkg/common/pagination"
+	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	"html/template"
 	"net/http"
 	"reflect"
@@ -37,7 +37,7 @@ func (c Controller) RenderProducts(
 
 	go func() {
 		defer wg.Done()
-		params = c.ReadProductParam(r)
+		params, _ = c.ReadProductParam(r)
 	}()
 
 	wg.Wait()
@@ -59,10 +59,10 @@ func (c Controller) RenderProducts(
 		Items: products,
 		Url:   "range-hood",
 
-		Page:       uint32(*params.Page),
-		PerPage:    uint32(*params.PerPage),
-		TotalItems: uint32(*params.Count),
-		TotalPages: uint32(((*params.Count) + (*params.PerPage) - 1) / *params.PerPage),
+		Page:       uint64(*params.Page),
+		PerPage:    uint64(*params.PerPage),
+		TotalItems: uint64(*params.Count),
+		TotalPages: uint64(((*params.Count) + (*params.PerPage) - 1) / *params.PerPage),
 
 		ConsoleMessage: appData.ConsoleMessage,
 	}
@@ -78,7 +78,7 @@ func (c Controller) RenderProducts(
 }
 
 // ReadProductParam read page parameters from url
-func (c Controller) ReadProductParam(r *http.Request) *entity.ProductsPageUrlParams {
+func (c Controller) ReadProductParam(r *http.Request) (*entity.ProductsPageUrlParams, string) {
 	// read url urlParams
 	urlParams := &entity.ProductsPageUrlParams{}
 	v := reflect.ValueOf(urlParams).Elem()
@@ -106,24 +106,33 @@ func (c Controller) ReadProductParam(r *http.Request) *entity.ProductsPageUrlPar
 		}
 	}
 
+	// get ase url without excitation
+	url := strings.Split(r.URL.String(), "?")[0]
+
+	urlExcitation := "&"
+
 	// default Currency
 	if urlParams.Currency == nil {
 		urlParams.Currency = entity.StringPtr("usd")
+	} else {
+		urlExcitation = urlExcitation + "currency=" + *urlParams.Currency + "&"
 	}
 
 	// default Page
 	if urlParams.Page == nil {
-		urlParams.Page = entity.Uint64Ptr(1)
+		urlParams.Page = pointer.Uint64Ptr(1)
+	} else {
+		urlExcitation = urlExcitation + "page=" + strconv.FormatUint(uint64(*urlParams.Page), 10) + "&"
 	}
 
 	// default PerPage
 	if urlParams.PerPage == nil {
-		urlParams.PerPage = entity.Uint64Ptr(18)
+		urlParams.PerPage = pointer.Uint64Ptr(18)
+	} else {
+		urlExcitation = urlExcitation + "perPage=" + strconv.FormatUint(uint64(*urlParams.Page), 10) + "&"
 	}
 
-	fmt.Println(*urlParams.Page, "products:111")
-
-	return urlParams
+	return urlParams, url + urlExcitation
 }
 
 func (c Controller) addUserToContext(

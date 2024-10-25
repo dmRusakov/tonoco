@@ -8,10 +8,10 @@ type ProductPage struct {
 	Description      string
 	Items            *map[uuid.UUID]*ProductListItem
 	Url              string
-	Page             uint32
-	PerPage          uint32
-	TotalPages       uint32
-	TotalItems       uint32
-	Pagination       []uint32
+	Page             uint64
+	PerPage          uint64
+	TotalPages       uint64
+	TotalItems       uint64
+	Pagination       []uint64
 	ConsoleMessage   ConsoleMessage
 }

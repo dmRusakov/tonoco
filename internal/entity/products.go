@@ -15,13 +15,13 @@ type ProductListItem struct {
 	SalePrice        string                        `json:"sale_price" db:"price"`
 	Price            string                        `json:"price" db:"price"`
 	Currency         string                        `json:"currency" db:"currency"`
-	Quantity         int32                         `json:"quantity" db:"quantity"`
+	Quantity         int64                         `json:"quantity" db:"quantity"`
 	Status           string                        `json:"status" db:"status"`
 	IsTaxable        bool                          `json:"is_taxable" db:"is_taxable"`
 	SeoTitle         string                        `json:"seo_title" db:"seo_title"`
 	SeoDescription   string                        `json:"seo_description" db:"seo_description"`
 	Categories       []string                      `json:"categories" db:"categories"`
-	Tags             map[uint32]ProductListItemTag `json:"tags" db:"tags"`
+	Tags             map[uint64]ProductListItemTag `json:"tags" db:"tags"`
 	MainImage        *Image                        `json:"main_image" db:"main_image"`
 	HoverImage       *Image                        `json:"hover_image" db:"hover_image"`
 }
