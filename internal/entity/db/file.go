@@ -1,15 +1,14 @@
-package entity
+package db
 
 import (
 	"github.com/google/uuid"
 	"time"
 )
 
-type Folder struct {
+type File struct {
 	Id        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
 	Url       string    `json:"url"`
-	ParentID  string    `json:"parent_id"`
 	SortOrder uint64    `json:"sort_order"`
 	Active    bool      `json:"active"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
@@ -18,7 +17,7 @@ type Folder struct {
 	UpdatedBy uuid.UUID `db:"updated_by" json:"updated_by"`
 }
 
-type FolderFilter struct {
+type FileFilter struct {
 	Ids  *[]uuid.UUID `json:"ids"`
 	Urls *[]string    `json:"urls"`
 

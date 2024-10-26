@@ -4,17 +4,18 @@ import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/domain/tag_type/model"
 	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	"github.com/google/uuid"
 	"time"
 )
 
-type Item = entity.TagType
-type Filter = entity.TagTypeFilter
+type Item = db.TagType
+type Filter = db.TagTypeFilter
 
 type Repository interface {
 	Get(ctx context.Context, filter *Filter) (*Item, error)
-	GetDefaultIds(name string) (*entity.DefaultTagTypes, error)
+	GetDefaultIds(name string) (*db.DefaultTagTypes, error)
 	List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error)
 	Create(ctx context.Context, item *Item) (*uuid.UUID, error)
 	Update(ctx context.Context, item *Item) error
@@ -28,14 +29,14 @@ type Repository interface {
 type Service struct {
 	repository  model.Storage
 	defaultItem map[string]*Item
-	defaultIds  map[string]*entity.DefaultTagTypes
+	defaultIds  map[string]*db.DefaultTagTypes
 }
 
 func NewService(repository *model.Model) *Service {
 	return &Service{
 		repository:  repository,
 		defaultItem: make(map[string]*Item),
-		defaultIds:  make(map[string]*entity.DefaultTagTypes),
+		defaultIds:  make(map[string]*db.DefaultTagTypes),
 	}
 }
 
@@ -63,21 +64,21 @@ func (s *Service) GetDefault(name string) (*Item, error) {
 	return s.defaultItem[name], nil
 }
 
-func (s *Service) GetDefaultIds(name string) (*entity.DefaultTagTypes, error) {
+func (s *Service) GetDefaultIds(name string) (*db.DefaultTagTypes, error) {
 	if s.defaultIds[name] != nil {
 		return s.defaultIds[name], nil
 	}
 
 	switch name {
 	case "list":
-		item := &entity.DefaultTagTypes{
-			TagTypes:    &map[uuid.UUID]entity.TagType{},
+		item := &db.DefaultTagTypes{
+			TagTypes:    &map[uuid.UUID]db.TagType{},
 			TagOrder:    &map[uuid.UUID]uint64{},
 			TagTypesIds: &[]uuid.UUID{},
 		}
 
 		var err error
-		tagTypeFilter := &entity.TagTypeFilter{
+		tagTypeFilter := &db.TagTypeFilter{
 			OrderBy:        pointer.StringPtr("SortOrder"),
 			OrderDir:       pointer.StringPtr("ASC"),
 			ListItem:       pointer.BoolPtr(true),

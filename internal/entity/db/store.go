@@ -1,11 +1,11 @@
-package entity
+package db
 
 import (
 	"github.com/google/uuid"
 	"time"
 )
 
-type Warehouse struct {
+type Store struct {
 	Id           uuid.UUID `json:"id" db:"id"`
 	Name         string    `json:"name" db:"name"`
 	Url          string    `json:"url" db:"url"`
@@ -16,24 +16,24 @@ type Warehouse struct {
 	AddressLine2 string    `json:"address_line2" db:"address_line_2"`
 	City         string    `json:"city" db:"city"`
 	State        string    `json:"state" db:"state"`
-	ZipCode      string    `json:"zip_code" db:"zip_code"`
+	ZipCode      string    `json:"zip" db:"zip"`
 	Country      string    `json:"country" db:"country"`
 	WebSite      string    `json:"web_site" db:"web_site"`
 	Phone        string    `json:"phone" db:"phone"`
 	Email        string    `json:"email" db:"email"`
+	CurrencyUrl  string    `json:"currency_url" db:"currency_url"`
 	CreatedAt    time.Time `db:"created_at" json:"created_at"`
 	CreatedBy    uuid.UUID `db:"created_by" json:"created_by"`
 	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
 	UpdatedBy    uuid.UUID `db:"updated_by" json:"updated_by"`
 }
 
-type WarehouseFilter struct {
+type StoreFilter struct {
 	Ids           *[]uuid.UUID `json:"ids"`
 	Urls          *[]string    `json:"urls"`
 	Abbreviations *[]string    `json:"abbreviations"`
 
 	Active *bool   `json:"active"`
-	Prime  *bool   `json:"prime"`
 	Search *string `json:"search"`
 
 	OrderBy  *string `json:"order_by"`

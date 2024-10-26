@@ -14,11 +14,9 @@
                     Show {{.PerPage}} <br>Of {{.TotalItems}} items.
                 </div>
                 <div class="pagination">
-
-
-                    {{.Pagination}}
-
-
+                    {{range .Pagination}}
+                        <a href="{{.Url}}" {{if eq .Page .CurrentPage}}class="active"{{end}}>{{.Page}}</a>
+                    {{end}}
                 </div>
             </div>
         </div>

@@ -1,11 +1,11 @@
 package validation
 
 import (
-	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/internal/entity/db"
 )
 
-func NewValidation(msg string, adminMsg string, code string, field string) entity.Error {
-	return entity.Error{
+func NewValidation(msg string, adminMsg string, code string, field string) db.Error {
+	return db.Error{
 		Message:    msg,
 		DevMessage: adminMsg,
 		Code:       code,

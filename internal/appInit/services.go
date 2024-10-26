@@ -30,7 +30,7 @@ import (
 	tag_type_service "github.com/dmRusakov/tonoco/internal/domain/tag_type/service"
 	warehouse_model "github.com/dmRusakov/tonoco/internal/domain/warehouse/model"
 	warehouse_service "github.com/dmRusakov/tonoco/internal/domain/warehouse/service"
-	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"sync"
 )
 
@@ -192,7 +192,7 @@ func (a *App) ServicesInit(cfg *config.Config) error {
 
 		// currency
 		wg.Add(1)
-		go func(defaultStore *entity.Store) {
+		go func(defaultStore *db.Store) {
 			defer wg.Done()
 			currencyStorage := currency_model.NewStorage(a.SqlDB)
 			mu.Lock()

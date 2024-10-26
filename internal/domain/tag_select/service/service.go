@@ -3,13 +3,13 @@ package service
 import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/domain/tag_select/model"
-	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/google/uuid"
 	"time"
 )
 
-type Item = entity.TagSelect
-type Filter = entity.TagSelectFilter
+type Item = db.TagSelect
+type Filter = db.TagSelectFilter
 
 type Repository interface {
 	Get(ctx context.Context, filter *Filter) (*Item, error)

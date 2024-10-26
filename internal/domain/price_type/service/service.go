@@ -4,13 +4,14 @@ import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/domain/price_type/model"
 	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	"github.com/google/uuid"
 	"time"
 )
 
-type Item = entity.PriceType
-type Filter = entity.PriceTypeFilter
+type Item = db.PriceType
+type Filter = db.PriceTypeFilter
 
 type Repository interface {
 	Get(ctx context.Context, filter *Filter) (*Item, error)

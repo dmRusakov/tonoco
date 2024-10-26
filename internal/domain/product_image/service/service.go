@@ -3,13 +3,13 @@ package service
 import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/domain/product_image/model"
-	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/google/uuid"
 	"time"
 )
 
-type Item = entity.ProductImage
-type Filter = entity.ProductImageFilter
+type Item = db.ProductImage
+type Filter = db.ProductImageFilter
 
 type Repository interface {
 	Get(context.Context, *Filter) (*Item, error)

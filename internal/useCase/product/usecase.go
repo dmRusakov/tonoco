@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/internal/entity/db"
+	"github.com/dmRusakov/tonoco/internal/entity/pages"
 	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	"github.com/dustin/go-humanize"
 	"github.com/google/uuid"
@@ -12,21 +14,21 @@ import (
 
 func (u *UseCase) GetProductList(
 	ctx context.Context,
-	parameters *entity.ProductsPageUrlParams,
+	parameters *pages.ProductsPageUrlParams,
 	appData *entity.AppData,
-) (*map[uuid.UUID]*entity.ProductListItem, error) {
+) (*map[uuid.UUID]*pages.ProductListItem, error) {
 
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	var errs []error
 
 	// get productsInfo
-	var productsInfo *map[uuid.UUID]entity.ProductInfo
+	var productsInfo *map[uuid.UUID]db.ProductInfo
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		var err error
-		productInfoFilter := entity.ProductInfoFilter{
+		productInfoFilter := db.ProductInfoFilter{
 			Page:           parameters.Page,
 			PerPage:        parameters.PerPage,
 			IsCount:        pointer.BoolPtr(true),
@@ -47,7 +49,7 @@ func (u *UseCase) GetProductList(
 	}()
 
 	// currency
-	var currency *entity.Currency
+	var currency *db.Currency
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -60,7 +62,7 @@ func (u *UseCase) GetProductList(
 			return
 		} else {
 			// get currency by url
-			currency, err = u.currency.Get(ctx, &entity.CurrencyFilter{
+			currency, err = u.currency.Get(ctx, &db.CurrencyFilter{
 				Urls: &[]string{*parameters.Currency},
 			})
 			if err != nil {
@@ -80,11 +82,11 @@ func (u *UseCase) GetProductList(
 	}
 
 	// dto
-	productsDto := make(map[uuid.UUID]*entity.ProductListItem)
+	productsDto := make(map[uuid.UUID]*pages.ProductListItem)
 	counter := 0
 	for id, product := range *productsInfo {
 		/* make product list item */
-		item := &entity.ProductListItem{
+		item := &pages.ProductListItem{
 			Id:               product.Id,
 			Sku:              product.Sku,
 			Brand:            product.Brand,
@@ -111,7 +113,7 @@ func (u *UseCase) GetProductList(
 			}
 
 			// make special price filter
-			filter := entity.PriceFilter{
+			filter := db.PriceFilter{
 				ProductIds:     &[]uuid.UUID{product.Id},
 				PriceTypeIds:   typeIds,
 				CurrencyIds:    &[]uuid.UUID{currency.Id},
@@ -152,7 +154,7 @@ func (u *UseCase) GetProductList(
 			}
 
 			// make regular price filter
-			filter := entity.PriceFilter{
+			filter := db.PriceFilter{
 				ProductIds:     &[]uuid.UUID{product.Id},
 				PriceTypeIds:   typeIds,
 				CurrencyIds:    &[]uuid.UUID{currency.Id},
@@ -179,7 +181,7 @@ func (u *UseCase) GetProductList(
 		}()
 
 		/* get item tags */
-		itemTags := make(map[uint64]entity.ProductListItemTag)
+		itemTags := make(map[uint64]pages.ProductListItemTag)
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -194,7 +196,7 @@ func (u *UseCase) GetProductList(
 			}
 
 			// get tags
-			tags, err := u.tag.List(ctx, &(entity.TagFilter{
+			tags, err := u.tag.List(ctx, &(db.TagFilter{
 				ProductIds: &[]uuid.UUID{product.Id},
 				TagTypeIds: defaultTagTypes.TagTypesIds,
 				OrderBy:    pointer.StringPtr("TagTypeId"),
@@ -212,14 +214,14 @@ func (u *UseCase) GetProductList(
 
 			// get tag selects
 			for _, tag := range *tags {
-				itemTag := entity.ProductListItemTag{
+				itemTag := pages.ProductListItemTag{
 					Name: (*defaultTagTypes.TagTypes)[tag.TagTypeId].Name,
 					Url:  (*defaultTagTypes.TagTypes)[tag.TagTypeId].Url,
 				}
 
 				// get tag selects if tag has tag_select_id
 				if tag.TagSelectId != uuid.Nil {
-					tagSelect, err := u.tagSelect.List(ctx, &(entity.TagSelectFilter{
+					tagSelect, err := u.tagSelect.List(ctx, &(db.TagSelectFilter{
 						// omitted for brevity
 					}))
 					if err != nil {
@@ -250,7 +252,7 @@ func (u *UseCase) GetProductList(
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			quantity, err := u.stockQuantity.Get(ctx, &entity.StockQuantityFilter{
+			quantity, err := u.stockQuantity.Get(ctx, &db.StockQuantityFilter{
 				ProductIds: &[]uuid.UUID{product.Id},
 				IsCount:    pointer.BoolPtr(false),
 			})
@@ -277,7 +279,7 @@ func (u *UseCase) GetProductList(
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			imageInfo, _ := u.productImage.Get(ctx, &entity.ProductImageFilter{
+			imageInfo, _ := u.productImage.Get(ctx, &db.ProductImageFilter{
 				ProductIds: &[]uuid.UUID{product.Id},
 				IsCount:    pointer.BoolPtr(false),
 				Type:       &[]string{"main"},
@@ -287,7 +289,7 @@ func (u *UseCase) GetProductList(
 				return
 			}
 
-			image, err := u.image.Get(ctx, &entity.ImageFilter{
+			image, err := u.image.Get(ctx, &db.ImageFilter{
 				Ids: &[]uuid.UUID{imageInfo.ImageId},
 			})
 
@@ -301,7 +303,7 @@ func (u *UseCase) GetProductList(
 
 			// compress image if not compressed
 			if !image.IsCompressed {
-				err := u.image.Compression(ctx, &entity.ImageCompression{
+				err := u.image.Compression(ctx, &db.ImageCompression{
 					Ids:         &[]uuid.UUID{imageInfo.ImageId},
 					Compression: pointer.UintPtr(80),
 				})
@@ -317,7 +319,7 @@ func (u *UseCase) GetProductList(
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			imageInfo, _ := u.productImage.Get(ctx, &entity.ProductImageFilter{
+			imageInfo, _ := u.productImage.Get(ctx, &db.ProductImageFilter{
 				ProductIds: &[]uuid.UUID{product.Id},
 				IsCount:    pointer.BoolPtr(false),
 				Type:       &[]string{"hover"},
@@ -327,7 +329,7 @@ func (u *UseCase) GetProductList(
 				return
 			}
 
-			image, _ := u.image.Get(ctx, &entity.ImageFilter{
+			image, _ := u.image.Get(ctx, &db.ImageFilter{
 				Ids: &[]uuid.UUID{imageInfo.ImageId},
 			})
 
@@ -341,7 +343,7 @@ func (u *UseCase) GetProductList(
 
 			// compress image if not compressed
 			if !image.IsCompressed && image.Id != uuid.Nil {
-				err := u.image.Compression(ctx, &entity.ImageCompression{
+				err := u.image.Compression(ctx, &db.ImageCompression{
 					Ids:         &[]uuid.UUID{image.Id},
 					Compression: pointer.UintPtr(80),
 				})

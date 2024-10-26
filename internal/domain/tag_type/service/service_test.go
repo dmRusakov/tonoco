@@ -8,7 +8,7 @@ import (
 	"github.com/dmRusakov/tonoco/internal/config"
 	"github.com/dmRusakov/tonoco/internal/domain/tag_type/model"
 	"github.com/dmRusakov/tonoco/internal/domain/tag_type/service"
-	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/internal/entity/db"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -44,7 +44,7 @@ func testItemValidations(t *testing.T) {
 		item     service.Item
 		fields   map[string]interface{}
 		countErr int
-		err      []entity.Error
+		err      []db.Error
 	}{
 		{
 			name: "Good Item",
@@ -89,7 +89,7 @@ func testItemValidations(t *testing.T) {
 			},
 			fields:   nil,
 			countErr: 1,
-			err:      []entity.Error{service.NoName},
+			err:      []db.Error{service.NoName},
 		}, {
 			name: "Item without url",
 			item: service.Item{
@@ -110,7 +110,7 @@ func testItemValidations(t *testing.T) {
 			},
 			fields:   nil,
 			countErr: 1,
-			err:      []entity.Error{service.NoUrl},
+			err:      []db.Error{service.NoUrl},
 		}, {
 			name: "Item without type",
 			item: service.Item{
@@ -131,7 +131,7 @@ func testItemValidations(t *testing.T) {
 			},
 			fields:   nil,
 			countErr: 1,
-			err:      []entity.Error{service.NoType},
+			err:      []db.Error{service.NoType},
 		}, {
 			name: "Item with wrong type",
 			item: service.Item{
@@ -153,7 +153,7 @@ func testItemValidations(t *testing.T) {
 			},
 			fields:   nil,
 			countErr: 1,
-			err:      []entity.Error{service.InvalidType},
+			err:      []db.Error{service.InvalidType},
 		},
 	}
 
@@ -177,7 +177,7 @@ func testValidateFields(t *testing.T) {
 		name     string
 		fields   map[string]interface{}
 		countErr int
-		err      []entity.Error
+		err      []db.Error
 	}{
 		{
 			name: "Good Fields",
@@ -194,7 +194,7 @@ func testValidateFields(t *testing.T) {
 				"Url":  "jh",
 			},
 			countErr: 1,
-			err:      []entity.Error{service.NoName},
+			err:      []db.Error{service.NoName},
 		}, {
 			name: "Fields with empty url",
 			fields: map[string]interface{}{
@@ -202,7 +202,7 @@ func testValidateFields(t *testing.T) {
 				"Url":  "",
 			},
 			countErr: 1,
-			err:      []entity.Error{service.NoUrl},
+			err:      []db.Error{service.NoUrl},
 		},
 	}
 

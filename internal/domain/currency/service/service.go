@@ -3,14 +3,14 @@ package service
 import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/domain/currency/model"
-	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	"github.com/google/uuid"
 	"time"
 )
 
-type Item = entity.Currency
-type Filter = entity.CurrencyFilter
+type Item = db.Currency
+type Filter = db.CurrencyFilter
 
 type Repository interface {
 	Get(ctx context.Context, filter *Filter) (*Item, error)
@@ -30,12 +30,12 @@ type Service struct {
 	defaultCurrency *Item
 }
 
-func NewService(repository *model.Model, store *entity.Store) *Service {
+func NewService(repository *model.Model, store *db.Store) *Service {
 	service := &Service{
 		repository: repository,
 	}
 	if store != nil {
-		defaultCurrency, err := service.Get(context.Background(), &entity.CurrencyFilter{
+		defaultCurrency, err := service.Get(context.Background(), &db.CurrencyFilter{
 			IsCount: pointer.BoolPtr(true),
 			Urls:    &[]string{store.CurrencyUrl},
 		})

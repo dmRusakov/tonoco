@@ -4,13 +4,13 @@ import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/config"
 	"github.com/dmRusakov/tonoco/internal/domain/store/model"
-	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/google/uuid"
 	"time"
 )
 
-type Item = entity.Store
-type Filter = entity.StoreFilter
+type Item = db.Store
+type Filter = db.StoreFilter
 
 type Repository interface {
 	InitStore(context.Context, string) (*Item, error)

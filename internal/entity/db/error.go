@@ -1,4 +1,4 @@
-package entity
+package db
 
 import (
 	"github.com/google/uuid"
@@ -36,10 +36,4 @@ type ErrorFilter struct {
 	IsCount        *bool `json:"is_count"`
 	IsUpdateFilter *bool `json:"is_update_filter"`
 	IsKeepIdsOrder *bool `json:"is_keep_ids_order"`
-}
-
-type ConsoleMessage struct {
-	Log   []string
-	Warn  []string
-	Error []string
 }

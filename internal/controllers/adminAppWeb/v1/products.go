@@ -3,6 +3,7 @@ package admin_app_web_v1
 import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/internal/entity/pages"
 	"github.com/dmRusakov/tonoco/pkg/common/pagination"
 	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	standart "github.com/dmRusakov/tonoco/pkg/utils/standart"
@@ -27,7 +28,7 @@ func (c Controller) RenderProducts(
 
 	var wg sync.WaitGroup
 	var tmpl *template.Template
-	var url *entity.ProductsPageUrl
+	var url *pages.ProductsPageUrl
 
 	wg.Add(2)
 
@@ -44,7 +45,7 @@ func (c Controller) RenderProducts(
 	wg.Wait()
 
 	// get products
-	appData.ConsoleMessage = entity.ConsoleMessage{}
+	appData.ConsoleMessage = pages.ConsoleMessage{}
 
 	// get products
 	products, err := c.productUseCase.GetProductList(ctx, &url.Params, &appData)
@@ -54,7 +55,7 @@ func (c Controller) RenderProducts(
 	}
 
 	// page info
-	productPage := entity.ProductPage{
+	productPage := pages.ProductPage{
 		Name: "Range Hoods",
 
 		Items: products,
@@ -69,11 +70,15 @@ func (c Controller) RenderProducts(
 	}
 
 	paginationPages := pagination.GetPagination(productPage.Page, productPage.TotalPages, 5)
-	productPage.Pagination = make(map[uint64]string)
+	productPage.Pagination = make(map[uint64]pages.PaginationItem)
 	for _, page := range paginationPages {
 		newUrl := *url
 		newUrl.Params.Page = &page
-		productPage.Pagination[page] = c.MakeProductPageUrl(newUrl)
+		productPage.Pagination[page] = pages.PaginationItem{
+			Page:        page,
+			Url:         c.MakeProductPageUrl(newUrl),
+			CurrentPage: *url.Params.Page,
+		}
 	}
 
 	// render page
@@ -85,9 +90,9 @@ func (c Controller) RenderProducts(
 }
 
 // readProductUrlParam read page parameters from url
-func (c Controller) readProductUrlParam(r *http.Request) *entity.ProductsPageUrl {
+func (c Controller) readProductUrlParam(r *http.Request) *pages.ProductsPageUrl {
 	// read url urlParams
-	url := entity.ProductsPageUrl{}
+	url := pages.ProductsPageUrl{}
 	v := reflect.ValueOf(&url.Params).Elem()
 	t := v.Type()
 
@@ -134,7 +139,7 @@ func (c Controller) readProductUrlParam(r *http.Request) *entity.ProductsPageUrl
 	return &url
 }
 
-func (c Controller) MakeProductPageUrl(urlParams entity.ProductsPageUrl) string {
+func (c Controller) MakeProductPageUrl(urlParams pages.ProductsPageUrl) string {
 	url := urlParams.Url + "?"
 
 	addParam := func(key, value string) {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/google/uuid"
@@ -12,8 +12,8 @@ import (
 	"time"
 )
 
-type Item = entity.Image
-type Filter = entity.ImageFilter
+type Item = db.Image
+type Filter = db.ImageFilter
 
 type Storage interface {
 	Get(context.Context, *Filter) (*Item, error)

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/chai2010/webp"
 	"github.com/dmRusakov/tonoco/internal/domain/image/model"
-	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	"github.com/google/uuid"
 	"github.com/nfnt/resize"
@@ -22,8 +22,8 @@ import (
 	"golang.org/x/image/math/fixed"
 )
 
-type Item = entity.Image
-type Filter = entity.ImageFilter
+type Item = db.Image
+type Filter = db.ImageFilter
 
 type Repository interface {
 	Get(context.Context, *Filter) (*Item, error)
@@ -60,7 +60,7 @@ func NewService(repository *model.Model) *Service {
 	}
 }
 
-func (s *Service) Compression(ctx context.Context, param *entity.ImageCompression) error {
+func (s *Service) Compression(ctx context.Context, param *db.ImageCompression) error {
 	// Get the image from the repository
 	img, err := s.Get(ctx, &Filter{
 		Ids: param.Ids,

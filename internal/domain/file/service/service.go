@@ -3,13 +3,13 @@ package service
 import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/domain/file/model"
-	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/google/uuid"
 	"time"
 )
 
-type Item = entity.File
-type Filter = entity.FileFilter
+type Item = db.File
+type Filter = db.FileFilter
 
 type Repository interface {
 	Get(ctx context.Context, filter *Filter) (*Item, error)

@@ -1,8 +1,23 @@
-package entity
+package pages
 
 import (
+	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/google/uuid"
 )
+
+type ProductPage struct {
+	Name             string
+	ShortDescription string
+	Description      string
+	Items            *map[uuid.UUID]*ProductListItem
+	Url              string
+	Page             uint64
+	PerPage          uint64
+	TotalPages       uint64
+	TotalItems       uint64
+	Pagination       map[uint64]PaginationItem
+	ConsoleMessage   ConsoleMessage
+}
 
 type ProductListItem struct {
 	Id               uuid.UUID                     `json:"id" db:"id"`
@@ -22,8 +37,8 @@ type ProductListItem struct {
 	SeoDescription   string                        `json:"seo_description" db:"seo_description"`
 	Categories       []string                      `json:"categories" db:"categories"`
 	Tags             map[uint64]ProductListItemTag `json:"tags" db:"tags"`
-	MainImage        *Image                        `json:"main_image" db:"main_image"`
-	HoverImage       *Image                        `json:"hover_image" db:"hover_image"`
+	MainImage        *db.Image                     `json:"main_image" db:"main_image"`
+	HoverImage       *db.Image                     `json:"hover_image" db:"hover_image"`
 }
 
 type ProductsPageUrl struct {
@@ -40,7 +55,7 @@ type ProductsPageUrlParams struct {
 }
 
 type ProductsPageParams struct {
-	Currency            Currency
+	Currency            db.Currency
 	RegularPriceTypeIds []uuid.UUID
 	SpecialPriceTypeIds []uuid.UUID
 	Page                *uint64
@@ -49,7 +64,7 @@ type ProductsPageParams struct {
 }
 
 type ProductListItemTag struct {
-	Name  string `json:"name" db:"name"`
-	Url   string `json:"url" db:"url"`
-	Value string `json:"value" db:"value"`
+	Name  string
+	Url   string
+	Value string
 }
