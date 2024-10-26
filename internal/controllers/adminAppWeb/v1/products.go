@@ -5,6 +5,7 @@ import (
 	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/pkg/common/pagination"
 	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
+	standart "github.com/dmRusakov/tonoco/pkg/utils/standart"
 	"html/template"
 	"net/http"
 	"reflect"
@@ -26,7 +27,7 @@ func (c Controller) RenderProducts(
 
 	var wg sync.WaitGroup
 	var tmpl *template.Template
-	var params *entity.ProductsPageUrlParams
+	var url *entity.ProductsPageUrl
 
 	wg.Add(2)
 
@@ -37,7 +38,7 @@ func (c Controller) RenderProducts(
 
 	go func() {
 		defer wg.Done()
-		params, _ = c.ReadProductParam(r)
+		url = c.readProductUrlParam(r)
 	}()
 
 	wg.Wait()
@@ -46,7 +47,7 @@ func (c Controller) RenderProducts(
 	appData.ConsoleMessage = entity.ConsoleMessage{}
 
 	// get products
-	products, err := c.productUseCase.GetProductList(ctx, params, &appData)
+	products, err := c.productUseCase.GetProductList(ctx, &url.Params, &appData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -57,17 +58,23 @@ func (c Controller) RenderProducts(
 		Name: "Range Hoods",
 
 		Items: products,
-		Url:   "range-hood",
+		Url:   url.Url,
 
-		Page:       uint64(*params.Page),
-		PerPage:    uint64(*params.PerPage),
-		TotalItems: uint64(*params.Count),
-		TotalPages: uint64(((*params.Count) + (*params.PerPage) - 1) / *params.PerPage),
+		Page:       *url.Params.Page,
+		PerPage:    *url.Params.PerPage,
+		TotalItems: *url.Params.Count,
+		TotalPages: ((*url.Params.Count) + (*url.Params.PerPage) - 1) / *url.Params.PerPage,
 
 		ConsoleMessage: appData.ConsoleMessage,
 	}
 
-	productPage.Pagination = pagination.GetPagination(productPage.Page, productPage.TotalPages, 5)
+	paginationPages := pagination.GetPagination(productPage.Page, productPage.TotalPages, 5)
+	productPage.Pagination = make(map[uint64]string)
+	for _, page := range paginationPages {
+		newUrl := *url
+		newUrl.Params.Page = &page
+		productPage.Pagination[page] = c.MakeProductPageUrl(newUrl)
+	}
 
 	// render page
 	if err := tmpl.Execute(w, productPage); err != nil {
@@ -77,11 +84,11 @@ func (c Controller) RenderProducts(
 	return
 }
 
-// ReadProductParam read page parameters from url
-func (c Controller) ReadProductParam(r *http.Request) (*entity.ProductsPageUrlParams, string) {
+// readProductUrlParam read page parameters from url
+func (c Controller) readProductUrlParam(r *http.Request) *entity.ProductsPageUrl {
 	// read url urlParams
-	urlParams := &entity.ProductsPageUrlParams{}
-	v := reflect.ValueOf(urlParams).Elem()
+	url := entity.ProductsPageUrl{}
+	v := reflect.ValueOf(&url.Params).Elem()
 	t := v.Type()
 
 	for i := 0; i < v.NumField(); i++ {
@@ -107,32 +114,40 @@ func (c Controller) ReadProductParam(r *http.Request) (*entity.ProductsPageUrlPa
 	}
 
 	// get ase url without excitation
-	url := strings.Split(r.URL.String(), "?")[0]
-
-	urlExcitation := "&"
+	url.Url = strings.Split(r.URL.String(), "?")[0]
 
 	// default Currency
-	if urlParams.Currency == nil {
-		urlParams.Currency = entity.StringPtr("usd")
-	} else {
-		urlExcitation = urlExcitation + "currency=" + *urlParams.Currency + "&"
+	if url.Params.Currency == nil {
+		url.Params.Currency = pointer.StringPtr("usd")
 	}
 
 	// default Page
-	if urlParams.Page == nil {
-		urlParams.Page = pointer.Uint64Ptr(1)
-	} else {
-		urlExcitation = urlExcitation + "page=" + strconv.FormatUint(uint64(*urlParams.Page), 10) + "&"
+	if url.Params.Page == nil {
+		url.Params.Page = pointer.Uint64Ptr(1)
 	}
 
 	// default PerPage
-	if urlParams.PerPage == nil {
-		urlParams.PerPage = pointer.Uint64Ptr(18)
-	} else {
-		urlExcitation = urlExcitation + "perPage=" + strconv.FormatUint(uint64(*urlParams.Page), 10) + "&"
+	if url.Params.PerPage == nil {
+		url.Params.PerPage = pointer.Uint64Ptr(18)
 	}
 
-	return urlParams, url + urlExcitation
+	return &url
+}
+
+func (c Controller) MakeProductPageUrl(urlParams entity.ProductsPageUrl) string {
+	url := urlParams.Url + "?"
+
+	addParam := func(key, value string) {
+		if value != "" {
+			url += key + "=" + value + "&"
+		}
+	}
+
+	addParam("currency", standart.GetStringValue(urlParams.Params.Currency, "usd"))
+	addParam("page", standart.GetUint64Value(urlParams.Params.Page, 1))
+	addParam("perPage", standart.GetUint64Value(urlParams.Params.PerPage, 18))
+
+	return strings.TrimRight(url, "&?")
 }
 
 func (c Controller) addUserToContext(

@@ -50,9 +50,9 @@
         <p class="text">{{.ShortDescription}}</p>
         <div class="detail-container">
             {{if eq .Status "discontinued"}}
-                <p class="details">Discontinued</p>
+                <p class="placeholder"></p><p class="details">Discontinued</p>
             {{else if eq .Status "pre_order"}}
-                <p class="details">Pre-order now</p>
+                <p class="placeholder"></p><p class="details">Pre-order now</p>
             {{else if .SalePrice }}
                 <p class="placeholder"></p><p class="details">Get sale price now</p>
             {{else}}

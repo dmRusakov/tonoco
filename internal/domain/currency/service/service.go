@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/domain/currency/model"
 	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	"github.com/google/uuid"
 	"time"
 )
@@ -35,7 +36,7 @@ func NewService(repository *model.Model, store *entity.Store) *Service {
 	}
 	if store != nil {
 		defaultCurrency, err := service.Get(context.Background(), &entity.CurrencyFilter{
-			IsCount: entity.BoolPtr(true),
+			IsCount: pointer.BoolPtr(true),
 			Urls:    &[]string{store.CurrencyUrl},
 		})
 		if err != nil {

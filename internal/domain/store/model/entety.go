@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
@@ -87,12 +86,12 @@ func (m *Model) makeGetStatement(
 func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	// OrderBy
 	if filter.OrderBy == nil {
-		filter.OrderBy = entity.StringPtr("SortOrder")
+		filter.OrderBy = pointer.StringPtr("SortOrder")
 	}
 
 	// OrderDir
 	if filter.OrderDir == nil {
-		filter.OrderDir = entity.StringPtr("ASC")
+		filter.OrderDir = pointer.StringPtr("ASC")
 	}
 
 	// PerPage

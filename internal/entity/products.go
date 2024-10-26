@@ -26,6 +26,11 @@ type ProductListItem struct {
 	HoverImage       *Image                        `json:"hover_image" db:"hover_image"`
 }
 
+type ProductsPageUrl struct {
+	Params ProductsPageUrlParams
+	Url    string
+}
+
 type ProductsPageUrlParams struct {
 	Category *string
 	Currency *string

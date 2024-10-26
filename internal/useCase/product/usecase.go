@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	"github.com/dustin/go-humanize"
 	"github.com/google/uuid"
 	"sync"
@@ -28,8 +29,8 @@ func (u *UseCase) GetProductList(
 		productInfoFilter := entity.ProductInfoFilter{
 			Page:           parameters.Page,
 			PerPage:        parameters.PerPage,
-			IsCount:        entity.BoolPtr(true),
-			IsUpdateFilter: entity.BoolPtr(true),
+			IsCount:        pointer.BoolPtr(true),
+			IsUpdateFilter: pointer.BoolPtr(true),
 		}
 
 		result, err := u.productInfo.List(ctx, &productInfoFilter)
@@ -114,9 +115,9 @@ func (u *UseCase) GetProductList(
 				ProductIds:     &[]uuid.UUID{product.Id},
 				PriceTypeIds:   typeIds,
 				CurrencyIds:    &[]uuid.UUID{currency.Id},
-				Active:         entity.BoolPtr(true),
-				IsCount:        entity.BoolPtr(false),
-				IsUpdateFilter: entity.BoolPtr(true),
+				Active:         pointer.BoolPtr(true),
+				IsCount:        pointer.BoolPtr(false),
+				IsUpdateFilter: pointer.BoolPtr(true),
 			}
 
 			//	get special price
@@ -155,9 +156,9 @@ func (u *UseCase) GetProductList(
 				ProductIds:     &[]uuid.UUID{product.Id},
 				PriceTypeIds:   typeIds,
 				CurrencyIds:    &[]uuid.UUID{currency.Id},
-				Active:         entity.BoolPtr(true),
-				IsCount:        entity.BoolPtr(false),
-				IsUpdateFilter: entity.BoolPtr(true),
+				Active:         pointer.BoolPtr(true),
+				IsCount:        pointer.BoolPtr(false),
+				IsUpdateFilter: pointer.BoolPtr(true),
 			}
 
 			// get regular price
@@ -196,10 +197,10 @@ func (u *UseCase) GetProductList(
 			tags, err := u.tag.List(ctx, &(entity.TagFilter{
 				ProductIds: &[]uuid.UUID{product.Id},
 				TagTypeIds: defaultTagTypes.TagTypesIds,
-				OrderBy:    entity.StringPtr("TagTypeId"),
-				OrderDir:   entity.StringPtr("ASC"),
-				Active:     entity.BoolPtr(true),
-				IsCount:    entity.BoolPtr(false),
+				OrderBy:    pointer.StringPtr("TagTypeId"),
+				OrderDir:   pointer.StringPtr("ASC"),
+				Active:     pointer.BoolPtr(true),
+				IsCount:    pointer.BoolPtr(false),
 			}))
 
 			if err != nil {
@@ -251,7 +252,7 @@ func (u *UseCase) GetProductList(
 			defer wg.Done()
 			quantity, err := u.stockQuantity.Get(ctx, &entity.StockQuantityFilter{
 				ProductIds: &[]uuid.UUID{product.Id},
-				IsCount:    entity.BoolPtr(false),
+				IsCount:    pointer.BoolPtr(false),
 			})
 			if err != nil {
 				mu.Lock()
@@ -278,7 +279,7 @@ func (u *UseCase) GetProductList(
 			defer wg.Done()
 			imageInfo, _ := u.productImage.Get(ctx, &entity.ProductImageFilter{
 				ProductIds: &[]uuid.UUID{product.Id},
-				IsCount:    entity.BoolPtr(false),
+				IsCount:    pointer.BoolPtr(false),
 				Type:       &[]string{"main"},
 			})
 
@@ -302,7 +303,7 @@ func (u *UseCase) GetProductList(
 			if !image.IsCompressed {
 				err := u.image.Compression(ctx, &entity.ImageCompression{
 					Ids:         &[]uuid.UUID{imageInfo.ImageId},
-					Compression: entity.UintPtr(80),
+					Compression: pointer.UintPtr(80),
 				})
 				if err != nil {
 					mu.Lock()
@@ -318,7 +319,7 @@ func (u *UseCase) GetProductList(
 			defer wg.Done()
 			imageInfo, _ := u.productImage.Get(ctx, &entity.ProductImageFilter{
 				ProductIds: &[]uuid.UUID{product.Id},
-				IsCount:    entity.BoolPtr(false),
+				IsCount:    pointer.BoolPtr(false),
 				Type:       &[]string{"hover"},
 			})
 
@@ -342,7 +343,7 @@ func (u *UseCase) GetProductList(
 			if !image.IsCompressed && image.Id != uuid.Nil {
 				err := u.image.Compression(ctx, &entity.ImageCompression{
 					Ids:         &[]uuid.UUID{image.Id},
-					Compression: entity.UintPtr(80),
+					Compression: pointer.UintPtr(80),
 				})
 				if err != nil {
 					mu.Lock()

@@ -7,6 +7,7 @@ import (
 	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
+	"github.com/dmRusakov/tonoco/pkg/utils/slice"
 	"github.com/google/uuid"
 	"sync"
 	"time"
@@ -100,8 +101,8 @@ func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, 
 	// update filters if needed
 	if filter.IsUpdateFilter != nil && *filter.IsUpdateFilter {
 		// remove duplicates from urls
-		urls = entity.RemoveDuplicates(urls, filter.IsKeepIdsOrder != nil && *filter.IsKeepIdsOrder)
-		tagTypeIds = entity.RemoveDuplicates(tagTypeIds, filter.IsKeepIdsOrder != nil && *filter.IsKeepIdsOrder)
+		urls = slice.RemoveDuplicates(urls, filter.IsKeepIdsOrder != nil && *filter.IsKeepIdsOrder)
+		tagTypeIds = slice.RemoveDuplicates(tagTypeIds, filter.IsKeepIdsOrder != nil && *filter.IsKeepIdsOrder)
 
 		// update the filter
 		filter.Ids = &ids

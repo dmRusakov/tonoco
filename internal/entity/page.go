@@ -12,6 +12,6 @@ type ProductPage struct {
 	PerPage          uint64
 	TotalPages       uint64
 	TotalItems       uint64
-	Pagination       []uint64
+	Pagination       map[uint64]string
 	ConsoleMessage   ConsoleMessage
 }

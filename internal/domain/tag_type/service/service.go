@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/domain/tag_type/model"
 	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	"github.com/google/uuid"
 	"time"
 )
@@ -77,12 +78,12 @@ func (s *Service) GetDefaultIds(name string) (*entity.DefaultTagTypes, error) {
 
 		var err error
 		tagTypeFilter := &entity.TagTypeFilter{
-			OrderBy:        entity.StringPtr("SortOrder"),
-			OrderDir:       entity.StringPtr("ASC"),
-			ListItem:       entity.BoolPtr(true),
-			Active:         entity.BoolPtr(true),
-			IsCount:        entity.BoolPtr(false),
-			IsUpdateFilter: entity.BoolPtr(true),
+			OrderBy:        pointer.StringPtr("SortOrder"),
+			OrderDir:       pointer.StringPtr("ASC"),
+			ListItem:       pointer.BoolPtr(true),
+			Active:         pointer.BoolPtr(true),
+			IsCount:        pointer.BoolPtr(false),
+			IsUpdateFilter: pointer.BoolPtr(true),
 		}
 
 		item.TagTypes, err = s.List(context.Background(), tagTypeFilter)

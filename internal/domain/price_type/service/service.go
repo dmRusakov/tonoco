@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/domain/price_type/model"
 	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	"github.com/google/uuid"
 	"time"
 )
@@ -50,7 +51,7 @@ func (s *Service) GetDefault(name string) (*Item, error) {
 
 	item, err := s.Get(context.Background(), &Filter{
 		Urls:     &[]string{name},
-		IsPublic: entity.BoolPtr(true),
+		IsPublic: pointer.BoolPtr(true),
 	})
 	if err != nil {
 		return nil, err
@@ -70,10 +71,10 @@ func (s *Service) GetDefaultIds(name string) (*[]uuid.UUID, error) {
 	case "regular":
 		regularPriceTypeFilter := &Filter{
 			Urls:           &[]string{"regular"},
-			IsPublic:       entity.BoolPtr(true),
-			IsIdsOnly:      entity.BoolPtr(true),
-			IsCount:        entity.BoolPtr(false),
-			IsUpdateFilter: entity.BoolPtr(true),
+			IsPublic:       pointer.BoolPtr(true),
+			IsIdsOnly:      pointer.BoolPtr(true),
+			IsCount:        pointer.BoolPtr(false),
+			IsUpdateFilter: pointer.BoolPtr(true),
 		}
 
 		_, err := s.List(context.Background(), regularPriceTypeFilter)
@@ -89,10 +90,10 @@ func (s *Service) GetDefaultIds(name string) (*[]uuid.UUID, error) {
 	case "special":
 		filter := &Filter{
 			Urls:           &[]string{"special", "sale"},
-			IsPublic:       entity.BoolPtr(true),
-			IsIdsOnly:      entity.BoolPtr(true),
-			IsCount:        entity.BoolPtr(false),
-			IsUpdateFilter: entity.BoolPtr(true),
+			IsPublic:       pointer.BoolPtr(true),
+			IsIdsOnly:      pointer.BoolPtr(true),
+			IsCount:        pointer.BoolPtr(false),
+			IsUpdateFilter: pointer.BoolPtr(true),
 		}
 
 		_, err := s.List(context.Background(), filter)
