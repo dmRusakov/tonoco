@@ -299,8 +299,16 @@ h3, h4, h5, h6 {
             .countItems {
                 font-size: 0.8em;
                 color: var(--deAccentText);
-                margin: 5px 0;
+                margin: 7px 0;
                 text-align: left;
+
+                select {
+                    font-size: 0.8em;
+                    border: 1px solid var(--paginationBgColor);
+                    background-color: var(--paginationBgColor);
+                    color: var(--paginationColor);
+                    transition: background-color 0.3s, color 0.3s;
+                }
             }
 
             .pagination {

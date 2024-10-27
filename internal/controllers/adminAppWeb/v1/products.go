@@ -6,7 +6,7 @@ import (
 	"github.com/dmRusakov/tonoco/internal/entity/pages"
 	"github.com/dmRusakov/tonoco/pkg/common/pagination"
 	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
-	standart "github.com/dmRusakov/tonoco/pkg/utils/standart"
+	"github.com/dmRusakov/tonoco/pkg/utils/standart"
 	"html/template"
 	"net/http"
 	"reflect"
@@ -150,7 +150,7 @@ func (c Controller) MakeProductPageUrl(urlParams pages.ProductsPageUrl) string {
 
 	addParam("currency", standart.GetStringValue(urlParams.Params.Currency, "usd"))
 	addParam("page", standart.GetUint64Value(urlParams.Params.Page, 1))
-	addParam("perPage", standart.GetUint64Value(urlParams.Params.PerPage, 18))
+	addParam("perpage", standart.GetUint64Value(urlParams.Params.PerPage, 18))
 
 	return strings.TrimRight(url, "&?")
 }
