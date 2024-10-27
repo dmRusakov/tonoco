@@ -306,15 +306,15 @@ h3, h4, h5, h6 {
             .pagination {
                 text-align: right;
                 display: grid;
-                grid-template-columns: repeat(10, 30px);
+                grid-template-columns: repeat(7, 30px);
                 gap: 10px;
                 justify-content: end;
                 margin: 10px 0;
 
                 a {
                     font-size: 0.8em;
-                    color: var(--deAccentText);
-                    background-color: var(--accentText);
+                    color: var(--paginationColor);
+                    background-color: var(--paginationBgColor);
                     padding: 7px;
                     border-radius: 5px;
                     text-align: center;
@@ -322,8 +322,8 @@ h3, h4, h5, h6 {
                 }
 
                 a.active, a:hover, a:focus {
-                    background-color: var(--deAccentBG);
-                    color: var(--deAccentText);
+                    color: var(--paginationHoverColor);
+                    background-color: var(--paginationHoverBgColor);
                 }
             }
         }

@@ -4,7 +4,7 @@
     --lineBackground1: #323639FF;
     --lineBackground2: #262829FF;
     --accentBG: #eeeeee;
-    --deAccentBG: #4d4d4d;
+    --deAccentBG: #7e7e7e;
 
     /* text */
     --textColor: #fff;
@@ -18,6 +18,12 @@
     --tagWithColor: #fff;
     --tagWithBgColor: #266282;
     --saleColor: #299529;
+
+    /* pagination */
+    --paginationColor: #fff;
+    --paginationBgColor: #000;
+    --paginationHoverColor: #4d4d4d;
+    --paginationHoverBgColor: #7e7e7e;
 
 
 

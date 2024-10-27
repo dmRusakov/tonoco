@@ -15,7 +15,7 @@
                 </div>
                 <div class="pagination">
                     {{range .Pagination}}
-                        <a href="{{.Url}}" {{if eq .Page .CurrentPage}}class="active"{{end}}>{{.Page}}</a>
+                        <a href="{{.Url}}" {{if eq .Page .CurrentPage}}class="active" disabled="disabled" {{end}}>{{.Page}}</a>
                     {{end}}
                 </div>
             </div>
