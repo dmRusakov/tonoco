@@ -3,7 +3,6 @@ package product
 import (
 	"context"
 	"fmt"
-	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/dmRusakov/tonoco/internal/entity/pages"
 	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
@@ -15,7 +14,6 @@ import (
 func (u *UseCase) GetProductList(
 	ctx context.Context,
 	parameters *pages.ProductsPageUrlParams,
-	appData *entity.AppData,
 ) (*map[uuid.UUID]*pages.ProductListItem, error) {
 
 	var wg sync.WaitGroup

@@ -2,10 +2,8 @@ package admin_app_web_v1
 
 import (
 	"context"
-	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/internal/entity/pages"
 	"github.com/dmRusakov/tonoco/pkg/common/pagination"
-	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	"github.com/dmRusakov/tonoco/pkg/utils/standart"
 	"html/template"
 	"net/http"
@@ -21,7 +19,6 @@ func (c Controller) RenderProducts(
 	ctx context.Context,
 	w http.ResponseWriter,
 	r *http.Request,
-	appData entity.AppData,
 ) {
 	// add user to context TODO make it right
 	ctx = context.WithValue(ctx, "user_id", "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
@@ -45,10 +42,10 @@ func (c Controller) RenderProducts(
 	wg.Wait()
 
 	// get products
-	appData.ConsoleMessage = pages.ConsoleMessage{}
+	consoleMessage := pages.ConsoleMessage{}
 
 	// get products
-	products, err := c.productUseCase.GetProductList(ctx, &url.Params, &appData)
+	products, err := c.productUseCase.GetProductList(ctx, &url.Params)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -66,7 +63,7 @@ func (c Controller) RenderProducts(
 		TotalItems: *url.Params.Count,
 		TotalPages: ((*url.Params.Count) + (*url.Params.PerPage) - 1) / *url.Params.PerPage,
 
-		ConsoleMessage: appData.ConsoleMessage,
+		ConsoleMessage: consoleMessage,
 	}
 
 	paginationPages := pagination.GetPagination(productPage.Page, productPage.TotalPages, 5)
@@ -123,17 +120,17 @@ func (c Controller) readProductUrlParam(r *http.Request) *pages.ProductsPageUrl 
 
 	// default Currency
 	if url.Params.Currency == nil {
-		url.Params.Currency = pointer.StringPtr("usd")
+		url.Params.Currency = &c.cfg.StoreCurrency
 	}
 
 	// default Page
 	if url.Params.Page == nil {
-		url.Params.Page = pointer.Uint64Ptr(1)
+		url.Params.Page = &c.cfg.AppDefaultPage
 	}
 
 	// default PerPage
 	if url.Params.PerPage == nil {
-		url.Params.PerPage = pointer.Uint64Ptr(18)
+		url.Params.PerPage = &c.cfg.AppDefaultPerPAge
 	}
 
 	return &url
@@ -148,9 +145,9 @@ func (c Controller) MakeProductPageUrl(urlParams pages.ProductsPageUrl) string {
 		}
 	}
 
-	addParam("currency", standart.GetStringValue(urlParams.Params.Currency, "usd"))
-	addParam("page", standart.GetUint64Value(urlParams.Params.Page, 1))
-	addParam("perpage", standart.GetUint64Value(urlParams.Params.PerPage, 18))
+	addParam("currency", standart.GetStringValue(urlParams.Params.Currency, &c.cfg.StoreCurrency))
+	addParam("page", standart.GetUint64Value(urlParams.Params.Page, &c.cfg.AppDefaultPage))
+	addParam("perpage", standart.GetUint64Value(urlParams.Params.PerPage, &c.cfg.AppDefaultPerPAge))
 
 	return strings.TrimRight(url, "&?")
 }

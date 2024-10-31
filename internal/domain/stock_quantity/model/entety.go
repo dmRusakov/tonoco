@@ -127,7 +127,7 @@ func (m *Model) scanOneRow(ctx context.Context, row sq.RowScanner) (*Item, error
 	if err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)
-		return nil, errors.AddCode(err, "802312")
+		return nil, errors.AddCode(err, "")
 	}
 
 	var item = Item{}

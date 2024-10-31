@@ -3,7 +3,6 @@ package admin_app_web_v1
 import (
 	"context"
 	"fmt"
-	"github.com/dmRusakov/tonoco/internal/config"
 	"net/http"
 )
 
@@ -12,7 +11,7 @@ type Route struct {
 	template string
 }
 
-func (c Controller) Start(ctx context.Context, cfg *config.Config) error {
+func (c Controller) Start(ctx context.Context) error {
 	// static files
 	fs := http.FileServer(http.Dir("assets"))
 	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
@@ -24,10 +23,10 @@ func (c Controller) Start(ctx context.Context, cfg *config.Config) error {
 	})
 
 	// router
-	c.router(ctx, cfg)
+	c.router(ctx)
 
 	// start Controller
-	err := http.ListenAndServe(fmt.Sprintf(":%s", c.cfg.WebPort), nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%s", c.cfg.AppWebPort), nil)
 	if err != nil {
 		return err
 	}

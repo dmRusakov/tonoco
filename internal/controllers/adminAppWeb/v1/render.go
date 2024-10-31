@@ -2,12 +2,11 @@ package admin_app_web_v1
 
 import (
 	"fmt"
-	"github.com/dmRusakov/tonoco/internal/entity"
 	"html/template"
 	"net/http"
 )
 
-func (c Controller) Render(w http.ResponseWriter, pageTemplate string, appData entity.AppData) {
+func (c Controller) Render(w http.ResponseWriter, pageTemplate string) {
 	// make template
 	tmpl := c.makeTemplate(pageTemplate)
 

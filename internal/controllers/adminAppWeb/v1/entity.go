@@ -3,7 +3,6 @@ package admin_app_web_v1
 import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/config"
-	"github.com/dmRusakov/tonoco/internal/entity"
 	productUseCase "github.com/dmRusakov/tonoco/internal/useCase/product"
 	"github.com/dmRusakov/tonoco/pkg/appCacheService"
 	"github.com/dmRusakov/tonoco/pkg/userCacheService"
@@ -25,8 +24,8 @@ type Controller struct {
 }
 
 type Server interface {
-	Render(w http.ResponseWriter, t string, appData entity.AppData)
-	Start(ctx context.Context, cfg *config.Config) error
+	Render(w http.ResponseWriter, t string)
+	Start(ctx context.Context) error
 
-	RenderProducts(ctx context.Context, w http.ResponseWriter, r *http.Request, appData entity.AppData)
+	RenderProducts(ctx context.Context, w http.ResponseWriter, r *http.Request)
 }
