@@ -32,7 +32,8 @@ func (c Controller) makeTemplate(pageTemplate string) *template.Template {
 		"element/menu.partial",
 		"element/footer.partial",
 		"element/footer_file_imports.partial",
-		"element/grid_product_in_list.partial",
+		"grid/products.partial",
+		"grid/product.partial",
 		"element/footer_logs.partial",
 	}
 	for _, x := range partials {

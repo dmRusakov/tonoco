@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             case '/orders':
                 ad.hd.dom.orderTab.classList.add("active")
                 break
-            case '/products':
+            case '/grid':
                 ad.hd.dom.productTab.classList.add("active")
                 break
             case '/categories':

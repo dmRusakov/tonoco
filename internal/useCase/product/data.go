@@ -69,7 +69,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 	// Create new item
 	item := &pages.ProductGridItem{}
 	var wg sync.WaitGroup
-	var hasError bool
+	isOk := true
 
 	// Fetch product details
 	wg.Add(1)
@@ -79,7 +79,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 			Ids: &[]uuid.UUID{itemId},
 		})
 		if err != nil {
-			hasError = true
+			isOk = false
 			*errs = append(*errs, err)
 			return
 		}
@@ -100,7 +100,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 		defer wg.Done()
 		typeIds, err := u.priceType.GetDefaultIds("special")
 		if err != nil {
-			hasError = true
+			isOk = false
 			*errs = append(*errs, err)
 			return
 		}
@@ -116,7 +116,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 
 		price, err := u.price.List(ctx, &filter)
 		if err != nil {
-			hasError = true
+			isOk = false
 			*errs = append(*errs, err)
 			return
 		}
@@ -132,7 +132,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 		defer wg.Done()
 		typeIds, err := u.priceType.GetDefaultIds("regular")
 		if err != nil {
-			hasError = true
+			isOk = false
 			*errs = append(*errs, err)
 			return
 		}
@@ -148,7 +148,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 
 		price, err := u.price.List(ctx, &filter)
 		if err != nil {
-			hasError = true
+			isOk = false
 			*errs = append(*errs, err)
 			return
 		}
@@ -165,7 +165,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 		defer wg.Done()
 		defaultTagTypes, err := u.tagType.GetDefaultIds("list")
 		if err != nil {
-			hasError = true
+			isOk = false
 			*errs = append(*errs, err)
 			return
 		}
@@ -180,7 +180,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 		}))
 
 		if err != nil {
-			hasError = true
+			isOk = false
 			*errs = append(*errs, err)
 			return
 		}
@@ -196,7 +196,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 					// omitted for brevity
 				}))
 				if err != nil {
-					hasError = true
+					isOk = false
 					*errs = append(*errs, err)
 					return
 				}
@@ -225,7 +225,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 			IsCount:    pointer.BoolPtr(false),
 		})
 		if err != nil {
-			hasError = true
+			isOk = false
 			*errs = append(*errs, err)
 			return
 		}
@@ -253,6 +253,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 		})
 
 		if imageInfo == nil {
+			isOk = false
 			return
 		}
 
@@ -261,7 +262,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 		})
 
 		if err != nil {
-			hasError = true
+			isOk = false
 			return
 		}
 
@@ -273,7 +274,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 				Compression: pointer.UintPtr(80),
 			})
 			if err != nil {
-				hasError = true
+				isOk = false
 				*errs = append(*errs, err)
 			}
 		}
@@ -290,7 +291,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 		})
 
 		if imageInfo == nil {
-			hasError = true
+			isOk = false
 			return
 		}
 
@@ -299,7 +300,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 		})
 
 		if image == nil {
-			hasError = true
+			isOk = false
 			return
 		}
 
@@ -311,7 +312,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 				Compression: pointer.UintPtr(80),
 			})
 			if err != nil {
-				hasError = true
+				isOk = false
 				*errs = append(*errs, err)
 			}
 		}
@@ -320,7 +321,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 	wg.Wait()
 
 	// Save to cache
-	if !hasError {
+	if isOk {
 		go u.setGridItemCache(itemId, item)
 	}
 

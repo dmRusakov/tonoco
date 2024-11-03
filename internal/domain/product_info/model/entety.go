@@ -217,42 +217,28 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 }
 
 func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
-	var item = Item{}
-	var id, sku, brand, name, shortDescription, description, url, seoTitle, seoDescription, gtin, googleProductCategory, googleProductType, createdBy, updatedBy sql.NullString
-	var sortOrder sql.NullInt64
-	var isTaxable, isTrackStock sql.NullBool
-	var shippingWeight, shippingWidth, shippingHeight, shippingLength sql.NullInt64
-	var createdAt, updatedAt sql.NullTime
-
-	err := row.Scan(
-		&id,
-		&sku,
-		&brand,
-		&name,
-		&shortDescription,
-		&description,
-		&sortOrder,
-		&url,
-		&isTaxable,
-		&isTrackStock,
-		&shippingWeight,
-		&shippingWidth,
-		&shippingHeight,
-		&shippingLength,
-		&seoTitle,
-		&seoDescription,
-		&gtin,
-		&googleProductCategory,
-		&googleProductType,
-		&createdAt,
-		&createdBy,
-		&updatedAt,
-		&updatedBy,
+	var (
+		item                                                                                                                                                     = Item{}
+		id, sku, brand, name, shortDescription, description, url, seoTitle, seoDescription, gtin, googleProductCategory, googleProductType, createdBy, updatedBy sql.NullString
+		sortOrder                                                                                                                                                sql.NullInt64
+		isTaxable, isTrackStock                                                                                                                                  sql.NullBool
+		shippingWeight, shippingWidth, shippingHeight, shippingLength                                                                                            sql.NullInt64
+		createdAt, updatedAt                                                                                                                                     sql.NullTime
 	)
 
+	// check row
+	if row == nil {
+		err := errors.New("row is nil")
+		return nil, errors.AddCode(err, "350644")
+	}
+
+	err := row.Scan(
+		&id, &sku, &brand, &name, &shortDescription, &description, &sortOrder, &url, &isTaxable, &isTrackStock,
+		&shippingWeight, &shippingWidth, &shippingHeight, &shippingLength, &seoTitle, &seoDescription, &gtin,
+		&googleProductCategory, &googleProductType, &createdAt, &createdBy, &updatedAt, &updatedBy,
+	)
 	if err != nil {
-		err = psql.ErrScan(psql.ParsePgError(err))
-		tracing.Error(ctx, err)
+		tracing.Error(ctx, psql.ErrScan(psql.ParsePgError(err)))
 		return nil, errors.AddCode(err, "752006")
 	}
 
