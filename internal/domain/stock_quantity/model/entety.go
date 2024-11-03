@@ -74,26 +74,26 @@ func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	// OrderBy
 	if filter.OrderBy == nil {
-		filter.OrderBy = pointer.StringPtr("SortOrder")
+		filter.OrderBy = pointer.StringToPtr("SortOrder")
 	}
 
 	// OrderDir
 	if filter.OrderDir == nil {
-		filter.OrderDir = pointer.StringPtr("ASC")
+		filter.OrderDir = pointer.StringToPtr("ASC")
 	}
 
 	// PerPage
 	if filter.PerPage == nil {
 		if filter.Page == nil {
-			filter.PerPage = pointer.Uint64Ptr(999999999999999999)
+			filter.PerPage = pointer.UintTo64Ptr(999999999999999999)
 		} else {
-			filter.PerPage = pointer.Uint64Ptr(10)
+			filter.PerPage = pointer.UintTo64Ptr(10)
 		}
 	}
 
 	// Page
 	if filter.Page == nil {
-		filter.Page = pointer.Uint64Ptr(1)
+		filter.Page = pointer.UintTo64Ptr(1)
 	}
 
 	// Build query
@@ -108,7 +108,7 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 	return m.fillInFilter(m.qb.Select("COUNT(*)").From(m.table), filter)
 }
 
-func (m *Model) scanOneRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
+func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 	var id, productId, warehouseId, createdBy, updatedBy sql.NullString
 	var quality sql.NullInt64
 	var createdAt, updatedAt sql.NullTime
@@ -167,10 +167,10 @@ func (m *Model) scanOneRow(ctx context.Context, row sq.RowScanner) (*Item, error
 	return &item, nil
 }
 
-func (m *Model) scanCountRow(ctx context.Context, rows sq.RowScanner) (*uint64, error) {
+func (m *Model) scanCountRow(ctx context.Context, row sq.RowScanner) (*uint64, error) {
 	var count uint64
 
-	err := rows.Scan(&count)
+	err := row.Scan(&count)
 	if err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)

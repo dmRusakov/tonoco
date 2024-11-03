@@ -70,26 +70,26 @@ func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	// OrderBy
 	if filter.OrderBy == nil {
-		filter.OrderBy = pointer.StringPtr("SortOrder")
+		filter.OrderBy = pointer.StringToPtr("SortOrder")
 	}
 
 	// OrderDir
 	if filter.OrderDir == nil {
-		filter.OrderDir = pointer.StringPtr("ASC")
+		filter.OrderDir = pointer.StringToPtr("ASC")
 	}
 
 	// PerPage
 	if filter.PerPage == nil {
 		if filter.Page == nil {
-			filter.PerPage = pointer.Uint64Ptr(999999999999999999)
+			filter.PerPage = pointer.UintTo64Ptr(999999999999999999)
 		} else {
-			filter.PerPage = pointer.Uint64Ptr(10)
+			filter.PerPage = pointer.UintTo64Ptr(10)
 		}
 	}
 
 	// Page
 	if filter.Page == nil {
-		filter.Page = pointer.Uint64Ptr(1)
+		filter.Page = pointer.UintTo64Ptr(1)
 	}
 
 	// Build query
@@ -227,14 +227,14 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 	return statement
 }
 
-func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
+func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 	var tagSelect = &Item{}
 	var id, tagTypeId, name, url, shortDescription, description, createdBy, updatedBy sql.NullString
 	var active sql.NullBool
 	var sortOrder sql.NullInt64
 	var createdAt, updatedAt sql.NullTime
 
-	err := rows.Scan(
+	err := row.Scan(
 		&id,
 		&tagTypeId,
 		&name,

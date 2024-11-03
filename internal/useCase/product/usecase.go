@@ -20,30 +20,24 @@ func (u *UseCase) GetProductList(
 	var mu sync.Mutex
 	var errs []error
 
-	// get productsInfo
-	var productsInfo *map[uuid.UUID]db.ProductInfo
+	// get product ids
+	var productIds *[]uuid.UUID
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		var err error
-		productInfoFilter := db.ProductInfoFilter{
-			Page:           parameters.Page,
-			PerPage:        parameters.PerPage,
-			IsCount:        pointer.BoolPtr(true),
-			IsUpdateFilter: pointer.BoolPtr(true),
+		productIdsFilter := db.ProductInfoFilter{
+			Page:    parameters.Page,
+			PerPage: parameters.PerPage,
+			IsCount: pointer.BoolPtr(true),
 		}
-
-		result, err := u.productInfo.List(ctx, &productInfoFilter)
+		productIds, err = u.productInfo.Ids(ctx, &productIdsFilter)
 		if err != nil {
-			mu.Lock()
 			errs = append(errs, err)
-			mu.Unlock()
 			return
 		}
-		mu.Lock()
-		productsInfo = result
-		mu.Unlock()
-		parameters.Count = productInfoFilter.Count
+
+		parameters.Count = productIdsFilter.Count
 	}()
 
 	// currency
@@ -64,9 +58,7 @@ func (u *UseCase) GetProductList(
 				Urls: &[]string{*parameters.Currency},
 			})
 			if err != nil {
-				mu.Lock()
 				errs = append(errs, err)
-				mu.Unlock()
 				return
 			}
 		}
@@ -82,20 +74,44 @@ func (u *UseCase) GetProductList(
 	// dto
 	productsDto := make(map[uuid.UUID]*pages.ProductListItem)
 	counter := 0
-	for id, product := range *productsInfo {
-		/* make product list item */
-		item := &pages.ProductListItem{
-			Id:               product.Id,
-			Sku:              product.Sku,
-			Brand:            product.Brand,
-			Name:             product.Name,
-			ShortDescription: product.ShortDescription,
-			Url:              product.Url,
-			Currency:         currency.Symbol,
-			SeoTitle:         product.SeoTitle,
-			SeoDescription:   product.SeoDescription,
-		}
+	for _, productId := range *productIds {
+		item := &pages.ProductListItem{}
 
+		/* product info */
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			product, err := u.productInfo.Get(ctx, &db.ProductInfoFilter{
+				Ids: &[]uuid.UUID{productId},
+			})
+			if err != nil {
+				errs = append(errs, err)
+				return
+			}
+
+			item.Id = product.Id
+			item.Sku = product.Sku
+			item.Brand = product.Brand
+			item.Name = product.Name
+			item.ShortDescription = product.ShortDescription
+			item.Url = product.Url
+			item.SeoTitle = product.SeoTitle
+			item.SeoDescription = product.SeoDescription
+		}()
+
+		// /* make product list item */
+		// item := &pages.ProductListItem{
+		// 	Id:               product.Id,
+		// 	Sku:              product.Sku,
+		// 	Brand:            product.Brand,
+		// 	Name:             product.Name,
+		// 	ShortDescription: product.ShortDescription,
+		// 	Url:              product.Url,
+		// 	Currency:         currency.Symbol,
+		// 	SeoTitle:         product.SeoTitle,
+		// 	SeoDescription:   product.SeoDescription,
+		// }
+		//
 		/* get special price */
 		wg.Add(1)
 		go func() {
@@ -112,7 +128,7 @@ func (u *UseCase) GetProductList(
 
 			// make special price filter
 			filter := db.PriceFilter{
-				ProductIds:     &[]uuid.UUID{product.Id},
+				ProductIds:     &[]uuid.UUID{productId},
 				PriceTypeIds:   typeIds,
 				CurrencyIds:    &[]uuid.UUID{currency.Id},
 				Active:         pointer.BoolPtr(true),
@@ -153,7 +169,7 @@ func (u *UseCase) GetProductList(
 
 			// make regular price filter
 			filter := db.PriceFilter{
-				ProductIds:     &[]uuid.UUID{product.Id},
+				ProductIds:     &[]uuid.UUID{productId},
 				PriceTypeIds:   typeIds,
 				CurrencyIds:    &[]uuid.UUID{currency.Id},
 				Active:         pointer.BoolPtr(true),
@@ -195,10 +211,10 @@ func (u *UseCase) GetProductList(
 
 			// get tags
 			tags, err := u.tag.List(ctx, &(db.TagFilter{
-				ProductIds: &[]uuid.UUID{product.Id},
+				ProductIds: &[]uuid.UUID{productId},
 				TagTypeIds: defaultTagTypes.TagTypesIds,
-				OrderBy:    pointer.StringPtr("TagTypeId"),
-				OrderDir:   pointer.StringPtr("ASC"),
+				OrderBy:    pointer.StringToPtr("TagTypeId"),
+				OrderDir:   pointer.StringToPtr("ASC"),
 				Active:     pointer.BoolPtr(true),
 				IsCount:    pointer.BoolPtr(false),
 			}))
@@ -251,7 +267,7 @@ func (u *UseCase) GetProductList(
 		go func() {
 			defer wg.Done()
 			quantity, err := u.stockQuantity.Get(ctx, &db.StockQuantityFilter{
-				ProductIds: &[]uuid.UUID{product.Id},
+				ProductIds: &[]uuid.UUID{productId},
 				IsCount:    pointer.BoolPtr(false),
 			})
 			if err != nil {
@@ -278,7 +294,7 @@ func (u *UseCase) GetProductList(
 		go func() {
 			defer wg.Done()
 			imageInfo, _ := u.productImage.Get(ctx, &db.ProductImageFilter{
-				ProductIds: &[]uuid.UUID{product.Id},
+				ProductIds: &[]uuid.UUID{productId},
 				IsCount:    pointer.BoolPtr(false),
 				Type:       &[]string{"main"},
 			})
@@ -318,7 +334,7 @@ func (u *UseCase) GetProductList(
 		go func() {
 			defer wg.Done()
 			imageInfo, _ := u.productImage.Get(ctx, &db.ProductImageFilter{
-				ProductIds: &[]uuid.UUID{product.Id},
+				ProductIds: &[]uuid.UUID{productId},
 				IsCount:    pointer.BoolPtr(false),
 				Type:       &[]string{"hover"},
 			})
@@ -356,7 +372,7 @@ func (u *UseCase) GetProductList(
 		wg.Wait()
 
 		// add product to dto
-		productsDto[id] = item
+		productsDto[productId] = item
 
 		// count
 		counter++

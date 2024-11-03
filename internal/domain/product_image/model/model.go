@@ -51,7 +51,7 @@ func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
 		return nil, errors.AddCode(err, "467009")
 	}
 
-	return m.scanOneRow(ctx, row)
+	return m.scanRow(ctx, row)
 }
 
 func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {
@@ -66,7 +66,7 @@ func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, 
 	productIDs := make([]uuid.UUID, 0)
 	imageIDs := make([]uuid.UUID, 0)
 	for rows.Next() {
-		item, err := m.scanOneRow(ctx, rows)
+		item, err := m.scanRow(ctx, rows)
 		if err != nil {
 			return nil, err
 		}

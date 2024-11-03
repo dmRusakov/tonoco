@@ -61,6 +61,12 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 	).From(m.table + " p")
 }
 
+func (m *Model) makeIdsStatement() sq.SelectBuilder {
+	return m.qb.Select(
+		m.mapFieldToDBColumn("Id"),
+	).From(m.table + " p")
+}
+
 func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 	// build query
 	statement := m.makeStatement()
@@ -78,33 +84,38 @@ func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 	return statement
 }
 
-func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
+func (m *Model) makeStatementByFilter(filter *Filter, isGetData bool) sq.SelectBuilder {
 	// OrderBy
 	if filter.OrderBy == nil {
-		filter.OrderBy = pointer.StringPtr("SortOrder")
+		filter.OrderBy = pointer.StringToPtr("SortOrder")
 	}
 
 	// OrderDir
 	if filter.OrderDir == nil {
-		filter.OrderDir = pointer.StringPtr("ASC")
+		filter.OrderDir = pointer.StringToPtr("ASC")
 	}
 
 	// PerPage
 	if filter.PerPage == nil {
 		if filter.Page == nil {
-			filter.PerPage = pointer.Uint64Ptr(999999999999999999)
+			filter.PerPage = pointer.UintTo64Ptr(999999999999999999)
 		} else {
-			filter.PerPage = pointer.Uint64Ptr(10)
+			filter.PerPage = pointer.UintTo64Ptr(10)
 		}
 	}
 
 	// Page
 	if filter.Page == nil {
-		filter.Page = pointer.Uint64Ptr(1)
+		filter.Page = pointer.UintTo64Ptr(1)
 	}
 
 	// Build query
-	statement := m.makeStatement()
+	var statement sq.SelectBuilder
+	if isGetData {
+		statement = m.makeStatement()
+	} else {
+		statement = m.makeIdsStatement()
+	}
 
 	// Ids
 	if filter.Ids != nil && len(*filter.Ids) > 0 {
@@ -205,7 +216,7 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 	return statement
 }
 
-func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
+func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 	var item = Item{}
 	var id, sku, brand, name, shortDescription, description, url, seoTitle, seoDescription, gtin, googleProductCategory, googleProductType, createdBy, updatedBy sql.NullString
 	var sortOrder sql.NullInt64
@@ -213,7 +224,7 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	var shippingWeight, shippingWidth, shippingHeight, shippingLength sql.NullInt64
 	var createdAt, updatedAt sql.NullTime
 
-	err := rows.Scan(
+	err := row.Scan(
 		&id,
 		&sku,
 		&brand,
@@ -318,10 +329,23 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	return &item, nil
 }
 
-func (m *Model) scanCountRow(ctx context.Context, rows sq.RowScanner) (*uint64, error) {
+func (m *Model) scanIdRow(ctx context.Context, row sq.RowScanner) (*uuid.UUID, error) {
+	var id sql.NullString
+
+	err := row.Scan(&id)
+	if err != nil {
+		err = psql.ErrScan(psql.ParsePgError(err))
+		tracing.Error(ctx, err)
+		return nil, errors.AddCode(err, "494158")
+	}
+
+	return pointer.StringToUUID(id.String), nil
+}
+
+func (m *Model) scanCountRow(ctx context.Context, row sq.RowScanner) (*uint64, error) {
 	var count uint64
 
-	err := rows.Scan(&count)
+	err := row.Scan(&count)
 	if err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)

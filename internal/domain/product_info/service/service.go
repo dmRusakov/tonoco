@@ -14,6 +14,7 @@ type Filter = db.ProductInfoFilter
 type Repository interface {
 	Get(ctx context.Context, filter *Filter) (*Item, error)
 	List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error)
+	Ids(ctx context.Context, filter *Filter) (*[]uuid.UUID, error)
 	Create(ctx context.Context, item *Item) (*uuid.UUID, error)
 	Update(ctx context.Context, item *Item) error
 	Patch(ctx context.Context, id *uuid.UUID, fields *map[string]interface{}) error
@@ -39,6 +40,10 @@ func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {
 
 func (s *Service) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {
 	return s.repository.List(ctx, filter)
+}
+
+func (s *Service) Ids(ctx context.Context, filter *Filter) (*[]uuid.UUID, error) {
+	return s.repository.Ids(ctx, filter)
 }
 
 func (s *Service) Create(ctx context.Context, item *Item) (*uuid.UUID, error) {

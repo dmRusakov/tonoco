@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/entity/pages"
 	"github.com/dmRusakov/tonoco/pkg/common/pagination"
+	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	"github.com/dmRusakov/tonoco/pkg/utils/standart"
 	"html/template"
 	"net/http"
@@ -58,13 +59,15 @@ func (c Controller) RenderProducts(
 		Items: products,
 		Url:   url.Url,
 
-		Page:       *url.Params.Page,
-		PerPage:    *url.Params.PerPage,
-		TotalItems: *url.Params.Count,
-		TotalPages: ((*url.Params.Count) + (*url.Params.PerPage) - 1) / *url.Params.PerPage,
+		Page:       pointer.PtrToUint64(url.Params.Page),
+		PerPage:    pointer.PtrToUint64(url.Params.PerPage),
+		TotalItems: pointer.PtrToUint64(url.Params.Count),
 
 		ConsoleMessage: consoleMessage,
 	}
+
+	// total pages
+	productPage.TotalPages = ((productPage.TotalItems) + (productPage.PerPage) - 1) / productPage.PerPage
 
 	paginationPages := pagination.GetPagination(productPage.Page, productPage.TotalPages, 5)
 	productPage.Pagination = make(map[uint64]pages.PaginationItem)

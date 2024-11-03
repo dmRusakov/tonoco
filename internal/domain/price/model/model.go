@@ -31,7 +31,7 @@ type Storage interface {
 	makeGetStatement(*Filter) sq.SelectBuilder
 	makeStatementByFilter(*Filter) sq.SelectBuilder
 	makeCountStatementByFilter(*Filter) sq.SelectBuilder
-	scanOneRow(context.Context, sq.RowScanner) (*Item, error)
+	scanRow(context.Context, sq.RowScanner) (*Item, error)
 	makeInsertStatement(context.Context, *Item) (*sq.InsertBuilder, *uuid.UUID)
 	makeUpdateStatement(context.Context, *Item) sq.UpdateBuilder
 	makePatchStatement(context.Context, *uuid.UUID, *map[string]interface{}) sq.UpdateBuilder
@@ -63,7 +63,7 @@ func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	}
 
 	// return the Item
-	return m.scanOneRow(ctx, row)
+	return m.scanRow(ctx, row)
 }
 
 func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {
@@ -81,7 +81,7 @@ func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, 
 	warehouseIDs := make([]uuid.UUID, 0)
 	storeIDs := make([]uuid.UUID, 0)
 	for rows.Next() {
-		item, err := m.scanOneRow(ctx, rows)
+		item, err := m.scanRow(ctx, rows)
 		if err != nil {
 			return nil, err
 		}

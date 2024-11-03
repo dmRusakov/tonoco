@@ -34,7 +34,7 @@ type Storage interface {
 	makeGetStatement(*Filter) sq.SelectBuilder
 	makeStatementByFilter(*Filter) sq.SelectBuilder
 	makeCountStatementByFilter(*Filter) sq.SelectBuilder
-	scanOneRow(context.Context, sq.RowScanner) (*Item, error)
+	scanRow(context.Context, sq.RowScanner) (*Item, error)
 	makeInsertStatement(context.Context, *Item) (*sq.InsertBuilder, *uuid.UUID)
 	makeUpdateStatement(context.Context, *Item) sq.UpdateBuilder
 	makePatchStatement(context.Context, *uuid.UUID, *map[string]interface{}) sq.UpdateBuilder
@@ -66,7 +66,7 @@ func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	}
 
 	// return the Item
-	return m.scanOneRow(ctx, row)
+	return m.scanRow(ctx, row)
 }
 
 func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {
@@ -81,7 +81,7 @@ func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, 
 	ids := make([]uuid.UUID, 0)
 	urls := make([]string, 0)
 	for rows.Next() {
-		item, err := m.scanOneRow(ctx, rows)
+		item, err := m.scanRow(ctx, rows)
 		if err != nil {
 			return nil, err
 		}
@@ -258,26 +258,26 @@ func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 	// OrderBy
 	if filter.OrderBy == nil {
-		filter.OrderBy = pointer.StringPtr("SortOrder")
+		filter.OrderBy = pointer.StringToPtr("SortOrder")
 	}
 
 	// OrderDir
 	if filter.OrderDir == nil {
-		filter.OrderDir = pointer.StringPtr("ASC")
+		filter.OrderDir = pointer.StringToPtr("ASC")
 	}
 
 	// PerPage
 	if filter.PerPage == nil {
 		if filter.Page == nil {
-			filter.PerPage = pointer.Uint64Ptr(999999999999999999)
+			filter.PerPage = pointer.UintTo64Ptr(999999999999999999)
 		} else {
-			filter.PerPage = pointer.Uint64Ptr(10)
+			filter.PerPage = pointer.UintTo64Ptr(10)
 		}
 	}
 
 	// Page
 	if filter.Page == nil {
-		filter.Page = pointer.Uint64Ptr(1)
+		filter.Page = pointer.UintTo64Ptr(1)
 	}
 
 	// Build query
@@ -371,13 +371,13 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 	return statement
 }
 
-func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, error) {
+func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 	var id, name, url, parentID, createdBy, updatedBy sql.NullString
 	var sortOrder sql.NullInt64
 	var active sql.NullBool
 	var createdAt, updatedAt sql.NullTime
 
-	err := rows.Scan(
+	err := row.Scan(
 		&id,
 		&name,
 		&url,
@@ -436,10 +436,10 @@ func (m *Model) scanOneRow(ctx context.Context, rows sq.RowScanner) (*Item, erro
 	return &item, nil
 }
 
-func (m *Model) scanCountRow(ctx context.Context, rows sq.RowScanner) (*uint64, error) {
+func (m *Model) scanCountRow(ctx context.Context, row sq.RowScanner) (*uint64, error) {
 	var count uint64
 
-	err := rows.Scan(&count)
+	err := row.Scan(&count)
 	if err != nil {
 		err = psql.ErrScan(psql.ParsePgError(err))
 		tracing.Error(ctx, err)

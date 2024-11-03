@@ -79,8 +79,8 @@ func (s *Service) GetDefaultIds(name string) (*db.DefaultTagTypes, error) {
 
 		var err error
 		tagTypeFilter := &db.TagTypeFilter{
-			OrderBy:        pointer.StringPtr("SortOrder"),
-			OrderDir:       pointer.StringPtr("ASC"),
+			OrderBy:        pointer.StringToPtr("SortOrder"),
+			OrderDir:       pointer.StringToPtr("ASC"),
 			ListItem:       pointer.BoolPtr(true),
 			Active:         pointer.BoolPtr(true),
 			IsCount:        pointer.BoolPtr(false),

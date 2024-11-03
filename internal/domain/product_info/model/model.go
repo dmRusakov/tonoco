@@ -18,6 +18,7 @@ type Filter = db.ProductInfoFilter
 type Storage interface {
 	Get(context.Context, *Filter) (*Item, error)
 	List(context.Context, *Filter) (*map[uuid.UUID]Item, error)
+	Ids(context.Context, *Filter) (*[]uuid.UUID, error)
 	Create(context.Context, *Item) (*uuid.UUID, error)
 	Update(context.Context, *Item) error
 	Patch(context.Context, *uuid.UUID, *map[string]interface{}) error
@@ -28,9 +29,11 @@ type Storage interface {
 
 	makeStatement() sq.SelectBuilder
 	makeGetStatement(*Filter) sq.SelectBuilder
-	makeStatementByFilter(*Filter) sq.SelectBuilder
+	makeStatementByFilter(*Filter, bool) sq.SelectBuilder
 	makeCountStatementByFilter(*Filter) sq.SelectBuilder
-	scanOneRow(context.Context, sq.RowScanner) (*Item, error)
+	scanRow(context.Context, sq.RowScanner) (*Item, error)
+	scanIdRow(context.Context, sq.RowScanner) (*uuid.UUID, error)
+	scanCountRow(context.Context, sq.RowScanner) (*uint64, error)
 	makeInsertStatement(context.Context, *Item) (*sq.InsertBuilder, *uuid.UUID)
 	makeUpdateStatement(context.Context, *Item) sq.UpdateBuilder
 	makePatchStatement(context.Context, *uuid.UUID, *map[string]interface{}) sq.UpdateBuilder
@@ -62,11 +65,11 @@ func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	}
 
 	// return the Item
-	return m.scanOneRow(ctx, row)
+	return m.scanRow(ctx, row)
 }
 
 func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {
-	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter))
+	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter, true))
 	if err != nil {
 		return nil, errors.AddCode(err, "411588")
 	}
@@ -77,7 +80,7 @@ func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, 
 	ids := make([]uuid.UUID, 0)
 	urls := make([]string, 0)
 	for rows.Next() {
-		item, err := m.scanOneRow(ctx, rows)
+		item, err := m.scanRow(ctx, rows)
 		if err != nil {
 			return nil, err
 		}
@@ -117,6 +120,44 @@ func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, 
 
 	// return the Items
 	return &items, nil
+}
+
+func (m *Model) Ids(ctx context.Context, filter *Filter) (*[]uuid.UUID, error) {
+	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(filter, false))
+	if err != nil {
+		return nil, errors.AddCode(err, "25738")
+	}
+	defer rows.Close()
+
+	// iterate over the result set
+	ids := make([]uuid.UUID, 0)
+	for rows.Next() {
+		id, err := m.scanIdRow(ctx, rows)
+		if err != nil {
+			return nil, err
+		}
+
+		ids = append(ids, *id)
+	}
+
+	// count the number of rows
+	if filter.IsCount != nil && *filter.IsCount == true {
+		rows, err = psql.List(ctx, m.client, m.makeCountStatementByFilter(filter))
+		if err != nil {
+			return nil, errors.AddCode(err, "221257")
+		}
+
+		defer rows.Close()
+		for rows.Next() {
+			filter.Count, err = m.scanCountRow(ctx, rows)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return &ids, nil
+
 }
 
 func (m *Model) Create(ctx context.Context, item *Item) (*uuid.UUID, error) {
