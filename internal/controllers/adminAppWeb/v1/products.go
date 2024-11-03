@@ -46,7 +46,7 @@ func (c Controller) RenderProducts(
 	consoleMessage := pages.ConsoleMessage{}
 
 	// get products
-	products, err := c.productUseCase.GetProductList(ctx, &url.Params)
+	products, ids, err := c.productUseCase.GetProductList(ctx, &url.Params)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -56,8 +56,9 @@ func (c Controller) RenderProducts(
 	productPage := pages.ProductPage{
 		Name: "Range Hoods",
 
-		Items: products,
-		Url:   url.Url,
+		ItemIds: *ids,
+		Items:   products,
+		Url:     url.Url,
 
 		Page:       pointer.PtrToUint64(url.Params.Page),
 		PerPage:    pointer.PtrToUint64(url.Params.PerPage),

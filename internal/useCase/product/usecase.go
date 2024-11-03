@@ -12,7 +12,7 @@ import (
 func (u *UseCase) GetProductList(
 	ctx context.Context,
 	parameters *pages.ProductsPageUrlParams,
-) (*map[uuid.UUID]*pages.ProductGridItem, error) {
+) (*map[uuid.UUID]*pages.ProductGridItem, *[]uuid.UUID, error) {
 
 	var wg sync.WaitGroup
 	var mu sync.Mutex
@@ -38,7 +38,7 @@ func (u *UseCase) GetProductList(
 
 	// check errors
 	if len(errs) > 0 {
-		return nil, fmt.Errorf("GetProductList: %v", errs)
+		return nil, nil, fmt.Errorf("GetProductList: %v", errs)
 	}
 
 	// dto
@@ -64,8 +64,8 @@ func (u *UseCase) GetProductList(
 
 	// check errors
 	if len(errs) > 0 {
-		return nil, fmt.Errorf("GetProductList: %v", errs)
+		return nil, nil, fmt.Errorf("GetProductList: %v", errs)
 	}
 
-	return &productsDto, nil
+	return &productsDto, itemIds, nil
 }
