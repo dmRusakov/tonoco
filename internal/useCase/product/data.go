@@ -39,6 +39,7 @@ func (u *UseCase) fetchProductIds(ctx context.Context, parameters *pages.Product
 		return itemIds
 	}
 
+	// get product ids
 	var productIds *[]uuid.UUID
 	productIdsFilter := db.ProductInfoFilter{
 		Page:    parameters.Page,
