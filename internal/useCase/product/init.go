@@ -15,9 +15,12 @@ import (
 	tag_select_service "github.com/dmRusakov/tonoco/internal/domain/tag_select/service"
 	tag_type_service "github.com/dmRusakov/tonoco/internal/domain/tag_type/service"
 	warehouse_service "github.com/dmRusakov/tonoco/internal/domain/warehouse/service"
+	"github.com/dmRusakov/tonoco/internal/entity/pages"
+	"github.com/google/uuid"
 )
 
 type UseCase struct {
+	// services
 	currency      *currency_service.Service
 	file          *file_service.Service
 	folder        *folder_service.Service
@@ -32,6 +35,13 @@ type UseCase struct {
 	warehouse     *warehouse_service.Service
 	image         *image_service.Service
 	productImage  *product_image_service.Service
+
+	// cache
+	gridItemCache map[uuid.UUID]*pages.ProductGridItem
+	itemIdsCache  map[uuid.UUID]struct {
+		ids   *[]uuid.UUID
+		count *uint64
+	}
 }
 
 func NewUseCase(
@@ -51,6 +61,7 @@ func NewUseCase(
 	productImageService *product_image_service.Service,
 ) *UseCase {
 	return &UseCase{
+		// services
 		currency:      currencyService,
 		file:          fileService,
 		folder:        folderService,
@@ -65,5 +76,12 @@ func NewUseCase(
 		warehouse:     warehouseService,
 		image:         imageService,
 		productImage:  productImageService,
+
+		// cache
+		gridItemCache: make(map[uuid.UUID]*pages.ProductGridItem),
+		itemIdsCache: make(map[uuid.UUID]struct {
+			ids   *[]uuid.UUID
+			count *uint64
+		}),
 	}
 }

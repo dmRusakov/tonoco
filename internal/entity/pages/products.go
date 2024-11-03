@@ -9,7 +9,7 @@ type ProductPage struct {
 	Name             string
 	ShortDescription string
 	Description      string
-	Items            *map[uuid.UUID]*ProductListItem
+	Items            *map[uuid.UUID]*ProductGridItem
 	Url              string
 	Page             uint64
 	PerPage          uint64
@@ -19,7 +19,7 @@ type ProductPage struct {
 	ConsoleMessage   ConsoleMessage
 }
 
-type ProductListItem struct {
+type ProductGridItem struct {
 	Id               uuid.UUID                     `json:"id" db:"id"`
 	No               int32                         `json:"no" db:"no"`
 	Sku              string                        `json:"sku" db:"sku"`

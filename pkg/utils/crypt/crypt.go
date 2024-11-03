@@ -2,9 +2,9 @@ package crypt
 
 import (
 	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -18,21 +18,13 @@ func GeneratePasswordHash(password string) (string, error) {
 	return string(hash), nil
 }
 
-func Hash(s string) string {
+func Hash(s string) uuid.UUID {
 	hash := sha256.Sum256([]byte(s))
-	return hex.EncodeToString(hash[:])
+	bytes, _ := uuid.FromBytes(hash[:16])
+	return bytes
 }
 
-func HashFilter(filter interface{}) (string, error) {
-	// Convert the filter to a JSON string
-	jsonFilter, err := json.Marshal(filter)
-	if err != nil {
-		return "", err
-	}
-
-	// Compute the SHA256 hash of the JSON string
-	hash := sha256.Sum256(jsonFilter)
-
-	// Convert the hash to a hexadecimal string
-	return hex.EncodeToString(hash[:]), nil
+func HashFilter(filter interface{}) uuid.UUID {
+	jsonFilter, _ := json.Marshal(filter)
+	return Hash(string(jsonFilter))
 }
