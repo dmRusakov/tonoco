@@ -226,17 +226,12 @@ func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 		createdAt, updatedAt                                                                                                                                     sql.NullTime
 	)
 
-	// check row
-	if row == nil {
-		err := errors.New("row is nil")
-		return nil, errors.AddCode(err, "350644")
-	}
-
 	err := row.Scan(
 		&id, &sku, &brand, &name, &shortDescription, &description, &sortOrder, &url, &isTaxable, &isTrackStock,
 		&shippingWeight, &shippingWidth, &shippingHeight, &shippingLength, &seoTitle, &seoDescription, &gtin,
 		&googleProductCategory, &googleProductType, &createdAt, &createdBy, &updatedAt, &updatedBy,
 	)
+
 	if err != nil {
 		tracing.Error(ctx, psql.ErrScan(psql.ParsePgError(err)))
 		return nil, errors.AddCode(err, "752006")

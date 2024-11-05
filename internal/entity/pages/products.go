@@ -9,8 +9,7 @@ type ProductPage struct {
 	Name             string
 	ShortDescription string
 	Description      string
-	ItemIds          []uuid.UUID
-	Items            *map[uuid.UUID]*ProductGridItem
+	Items            []ProductGridItem
 	Url              string
 	Page             uint64
 	PerPage          uint64

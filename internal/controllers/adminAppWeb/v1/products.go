@@ -6,6 +6,7 @@ import (
 	"github.com/dmRusakov/tonoco/pkg/common/pagination"
 	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	"github.com/dmRusakov/tonoco/pkg/utils/standart"
+	"github.com/google/uuid"
 	"html/template"
 	"net/http"
 	"reflect"
@@ -21,68 +22,126 @@ func (c Controller) RenderProducts(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
-	// add user to context TODO make it right
-	ctx = context.WithValue(ctx, "user_id", "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
-
 	var wg sync.WaitGroup
+	var errs []error
+
+	/* first round loading */
+	wg.Add(3)
+
+	// make template
 	var tmpl *template.Template
-	var url *pages.ProductsPageUrl
-
-	wg.Add(2)
-
 	go func() {
 		defer wg.Done()
 		tmpl = c.makeTemplate("products.page.gohtml")
 	}()
 
+	// read url params
+	var url *pages.ProductsPageUrl
 	go func() {
 		defer wg.Done()
 		url = c.readProductUrlParam(r)
 	}()
 
+	// add user to context
+	go func() {
+		defer wg.Done()
+		ctx = c.addUserToContext(ctx)
+	}()
+
 	wg.Wait()
 
-	// get products
-	consoleMessage := pages.ConsoleMessage{}
+	/* second round loading */
+	wg.Add(2)
+
+	// make page
+	productPage := &pages.ProductPage{}
+	go func() {
+		defer wg.Done()
+		productPage.Name = "Range Hoods"
+		productPage.Url = url.Url
+		productPage.Page = pointer.PtrToUint64(url.Params.Page)
+		productPage.PerPage = pointer.PtrToUint64(url.Params.PerPage)
+		productPage.ConsoleMessage = pages.ConsoleMessage{}
+	}()
 
 	// get products
-	products, ids, err := c.productUseCase.GetProductList(ctx, &url.Params)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	var products *map[uuid.UUID]*pages.ProductGridItem
+	var ids *[]uuid.UUID
+	go func() {
+		defer wg.Done()
+		var err error
+		products, ids, err = c.productUseCase.GetProductList(ctx, &url.Params)
+		if err != nil {
+			errs = append(errs, err)
+		}
+		productPage.TotalItems = pointer.PtrToUint64(url.Params.Count)
+	}()
+
+	wg.Wait()
+
+	// check for errors
+	if len(errs) > 0 {
+		http.Error(w, errs[0].Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// page info
-	productPage := pages.ProductPage{
-		Name: "Range Hoods",
+	/* third round loading */
+	wg.Add(2)
 
-		ItemIds: *ids,
-		Items:   products,
-		Url:     url.Url,
-
-		Page:       pointer.PtrToUint64(url.Params.Page),
-		PerPage:    pointer.PtrToUint64(url.Params.PerPage),
-		TotalItems: pointer.PtrToUint64(url.Params.Count),
-
-		ConsoleMessage: consoleMessage,
-	}
-
-	// total pages
-	productPage.TotalPages = ((productPage.TotalItems) + (productPage.PerPage) - 1) / productPage.PerPage
-
-	paginationPages := pagination.GetPagination(productPage.Page, productPage.TotalPages, 5)
-	productPage.Pagination = make(map[uint64]pages.PaginationItem)
-	for _, page := range paginationPages {
-		newUrl := *url
-		newUrl.Params.Page = &page
-		productPage.Pagination[page] = pages.PaginationItem{
-			Page:        page,
-			Url:         c.MakeProductPageUrl(newUrl),
-			CurrentPage: *url.Params.Page,
+	// add a product
+	productPage.Items = make([]pages.ProductGridItem, 0)
+	go func() {
+		defer wg.Done()
+		for _, id := range *ids {
+			product := (*products)[id]
+			productPage.Items = append(productPage.Items, pages.ProductGridItem{
+				Id:               product.Id,
+				No:               product.No,
+				Sku:              product.Sku,
+				Brand:            product.Brand,
+				Name:             product.Name,
+				ShortDescription: product.ShortDescription,
+				Url:              product.Url,
+				SalePrice:        product.SalePrice,
+				Price:            product.Price,
+				Currency:         product.Currency,
+				Quantity:         product.Quantity,
+				Status:           product.Status,
+				IsTaxable:        product.IsTaxable,
+				SeoTitle:         product.SeoTitle,
+				SeoDescription:   product.SeoDescription,
+				Categories:       product.Categories,
+				Tags:             product.Tags,
+				MainImage:        product.MainImage,
+				HoverImage:       product.HoverImage,
+			})
 		}
-	}
+	}()
 
-	// render page
+	// total pages and pagination
+	go func() {
+		defer wg.Done()
+		// total pages
+		productPage.TotalPages = ((productPage.TotalItems) + (productPage.PerPage) - 1) / productPage.PerPage
+
+		paginationPages := pagination.GetPagination((*productPage).Page, (*productPage).TotalPages, 5)
+		productPage.Pagination = make(map[uint64]pages.PaginationItem)
+		for _, page := range paginationPages {
+			newUrl := *url
+			newUrl.Params.Page = &page
+			productPage.Pagination[page] = pages.PaginationItem{
+				Page:        page,
+				Url:         c.MakeProductPageUrl(newUrl),
+				CurrentPage: *url.Params.Page,
+			}
+		}
+	}()
+
+	wg.Wait()
+
+	/* fourth round loading */
+
+	// render template
 	if err := tmpl.Execute(w, productPage); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -156,10 +215,7 @@ func (c Controller) MakeProductPageUrl(urlParams pages.ProductsPageUrl) string {
 	return strings.TrimRight(url, "&?")
 }
 
-func (c Controller) addUserToContext(
-	ctx context.Context,
-	r *http.Request,
-) (context.Context, error) {
-	ctx = context.WithValue(ctx, "user_id", "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
-	return ctx, nil
+func (c Controller) addUserToContext(ctx context.Context) context.Context {
+	// TODO make it right
+	return context.WithValue(ctx, "user_id", "0e95efda-f9e2-4fac-8184-3ce2e8b7e0e1")
 }
