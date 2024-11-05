@@ -124,6 +124,7 @@ func (c Controller) RenderProducts(
 		// total pages
 		productPage.TotalPages = ((productPage.TotalItems) + (productPage.PerPage) - 1) / productPage.PerPage
 
+		// pagination
 		paginationPages := pagination.GetPagination((*productPage).Page, (*productPage).TotalPages, 5)
 		productPage.Pagination = make(map[uint64]pages.PaginationItem)
 		for _, page := range paginationPages {
