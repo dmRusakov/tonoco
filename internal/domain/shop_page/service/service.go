@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"github.com/dmRusakov/tonoco/internal/domain/shop_pages/model"
+	"github.com/dmRusakov/tonoco/internal/domain/shop_page/model"
 	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/google/uuid"
 	"time"

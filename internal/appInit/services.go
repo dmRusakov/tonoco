@@ -18,6 +18,8 @@ import (
 	product_image_service "github.com/dmRusakov/tonoco/internal/domain/product_image/service"
 	product_info_model "github.com/dmRusakov/tonoco/internal/domain/product_info/model"
 	product_info_service "github.com/dmRusakov/tonoco/internal/domain/product_info/service"
+	shop_page_model "github.com/dmRusakov/tonoco/internal/domain/shop_page/model"
+	shop_page_service "github.com/dmRusakov/tonoco/internal/domain/shop_page/service"
 	stock_quantity_model "github.com/dmRusakov/tonoco/internal/domain/stock_quantity/model"
 	stock_quantity_service "github.com/dmRusakov/tonoco/internal/domain/stock_quantity/service"
 	store_model "github.com/dmRusakov/tonoco/internal/domain/store/model"
@@ -45,6 +47,7 @@ type Services struct {
 	PriceType           *price_type_service.Service
 	ProductImageService *product_image_service.Service
 	ProductInfo         *product_info_service.Service
+	ShopPage            *shop_page_service.Service
 	StockQuantity       *stock_quantity_service.Service
 	Store               *store_service.Service
 	Tag                 *tag_service.Service
@@ -126,6 +129,16 @@ func (a *App) ServicesInit(cfg *config.Config) error {
 		productInfoStorage := product_info_model.NewStorage(a.SqlDB)
 		mu.Lock()
 		services.ProductInfo = product_info_service.NewService(productInfoStorage)
+		mu.Unlock()
+	}()
+
+	// shop page
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		model := shop_page_model.NewStorage(a.SqlDB)
+		mu.Lock()
+		services.ShopPage = shop_page_service.NewService(model)
 		mu.Unlock()
 	}()
 
