@@ -7,6 +7,7 @@ import (
 
 type ProductPage struct {
 	Name             string
+	SeoTitle         string
 	ShortDescription string
 	Description      string
 	Items            []ProductGridItem

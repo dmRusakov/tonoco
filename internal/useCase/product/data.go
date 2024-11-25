@@ -2,6 +2,7 @@ package product
 
 import (
 	"context"
+	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/dmRusakov/tonoco/internal/entity/pages"
 	"github.com/dmRusakov/tonoco/pkg/utils/crypt"
@@ -42,9 +43,13 @@ func (u *UseCase) fetchProductIds(ctx context.Context, parameters *pages.Product
 	// get product ids
 	var productIds *[]uuid.UUID
 	productIdsFilter := db.ProductInfoFilter{
-		Page:    parameters.Page,
-		PerPage: parameters.PerPage,
-		IsCount: pointer.BoolPtr(true),
+		DataPagination: &entity.DataPagination{
+			Page:    parameters.Page,
+			PerPage: parameters.PerPage,
+		},
+		DataConfig: &entity.DataConfig{
+			IsCount: pointer.BoolPtr(true),
+		},
 	}
 	productIds, err := u.productInfo.Ids(ctx, &productIdsFilter)
 	if err != nil {
@@ -52,7 +57,7 @@ func (u *UseCase) fetchProductIds(ctx context.Context, parameters *pages.Product
 		return nil
 	}
 
-	parameters.Count = productIdsFilter.Count
+	parameters.Count = productIdsFilter.DataConfig.Count
 
 	// save to cache
 	go u.setItemIdsCache(hash, productIds, parameters.Count)

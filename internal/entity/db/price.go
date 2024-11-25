@@ -27,7 +27,8 @@ type Price struct {
 }
 
 type PriceFilter struct {
-	Ids          *[]uuid.UUID `json:"id"`
+	Ids *[]uuid.UUID `json:"id"`
+
 	ProductIds   *[]uuid.UUID `json:"product_id"`
 	PriceTypeIds *[]uuid.UUID `json:"price_type_id"`
 	CurrencyIds  *[]uuid.UUID `json:"currency_id"`

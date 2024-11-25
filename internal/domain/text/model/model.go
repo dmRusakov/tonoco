@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-type Item = db.ProductInfo
-type Filter = db.ProductInfoFilter
+type Item = db.Text
+type Filter = db.TextFilter
 
 type Storage interface {
 	Get(context.Context, *Filter) (*Item, error)
@@ -51,31 +51,18 @@ func NewStorage(client psql.Client) *Model {
 	return &Model{
 		qb:     sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		client: client,
-		table:  "product_info",
+		table:  "text",
 		dbField: map[string]string{
-			"Id":                    "id",
-			"Sku":                   "sku",
-			"Brand":                 "brand",
-			"Name":                  "name",
-			"ShortDescription":      "short_description",
-			"Description":           "description",
-			"SortOrder":             "sort_order",
-			"Url":                   "url",
-			"IsTaxable":             "is_taxable",
-			"IsTrackStock":          "is_track_stock",
-			"ShippingWeight":        "shipping_weight",
-			"ShippingWidth":         "shipping_width",
-			"ShippingHeight":        "shipping_height",
-			"ShippingLength":        "shipping_length",
-			"SeoTitle":              "seo_title",
-			"SeoDescription":        "seo_description",
-			"GTIN":                  "gtin",
-			"GoogleProductCategory": "google_product_category",
-			"GoogleProductType":     "google_product_type",
-			"CreatedAt":             "created_at",
-			"CreatedBy":             "created_by",
-			"UpdatedAt":             "updated_at",
-			"UpdatedBy":             "updated_by",
+			"Id":        "id",
+			"Language":  "language",
+			"Source":    "source",
+			"SourceId":  "source_id",
+			"Text":      "text",
+			"Active":    "active",
+			"CreatedAt": "created_at",
+			"CreatedBy": "created_by",
+			"UpdatedAt": "updated_at",
+			"UpdatedBy": "updated_by",
 		},
 	}
 }
@@ -93,61 +80,44 @@ func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
 func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {
 	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(m.makeStatement(), filter))
 	if err != nil {
-		return nil, errors.AddCode(err, "411588")
+		return nil, errors.AddCode(err, "501103")
 	}
 	defer rows.Close()
-
 	// iterate over the result set
 	items := make(map[uuid.UUID]Item)
 	ids := make([]uuid.UUID, 0)
-	urls := make([]string, 0)
 	for rows.Next() {
 		item, err := m.scanRow(ctx, rows)
 		if err != nil {
-			return nil, err
+			return nil, errors.AddCode(err, "501104")
 		}
-
-		if filter.DataConfig.IsIdsOnly == nil || !*filter.DataConfig.IsIdsOnly {
-			items[item.Id] = *item
-		}
-
-		// update filters if needed
-		if filter.DataConfig.IsUpdateFilter != nil && *filter.DataConfig.IsUpdateFilter {
-			ids = append(ids, item.Id)
-			urls = append(urls, item.Url)
-		}
+		items[item.Id] = *item
+		ids = append(ids, item.Id)
 	}
 
 	// count the number of rows
 	if filter.DataConfig.IsCount != nil && *filter.DataConfig.IsCount == true {
 		rows, err = psql.List(ctx, m.client, m.makeCountStatementByFilter(filter))
 		if err != nil {
-			return nil, errors.AddCode(err, "221259")
+			return nil, errors.AddCode(err, "501105")
 		}
 
 		defer rows.Close()
 		for rows.Next() {
 			filter.DataConfig.Count, err = m.scanCountRow(ctx, rows)
 			if err != nil {
-				return nil, err
+				return nil, errors.AddCode(err, "501106")
 			}
 		}
 	}
 
-	// update filters if needed
-	if filter.DataConfig.IsUpdateFilter != nil && *filter.DataConfig.IsUpdateFilter {
-		filter.Ids = &ids
-		filter.Urls = &urls
-	}
-
-	// return the Items
 	return &items, nil
 }
 
 func (m *Model) Ids(ctx context.Context, filter *Filter) (*[]uuid.UUID, error) {
 	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(m.makeIdsStatement(), filter))
 	if err != nil {
-		return nil, errors.AddCode(err, "25738")
+		return nil, errors.AddCode(err, "401074")
 	}
 	defer rows.Close()
 
@@ -166,7 +136,7 @@ func (m *Model) Ids(ctx context.Context, filter *Filter) (*[]uuid.UUID, error) {
 	if filter.DataConfig.IsCount != nil && *filter.DataConfig.IsCount == true {
 		rows, err = psql.List(ctx, m.client, m.makeCountStatementByFilter(filter))
 		if err != nil {
-			return nil, errors.AddCode(err, "221257")
+			return nil, errors.AddCode(err, "145742")
 		}
 
 		defer rows.Close()
@@ -179,14 +149,13 @@ func (m *Model) Ids(ctx context.Context, filter *Filter) (*[]uuid.UUID, error) {
 	}
 
 	return &ids, nil
-
 }
 
 func (m *Model) Create(ctx context.Context, item *Item) (*uuid.UUID, error) {
 	statement, id := m.makeInsertStatement(ctx, item)
 	err := psql.Create(ctx, m.client, statement)
 	if err != nil {
-		return nil, errors.AddCode(err, "739938")
+		return nil, errors.AddCode(err, "235885")
 	}
 
 	return id, nil
@@ -200,7 +169,7 @@ func (m *Model) Update(ctx context.Context, item *Item) error {
 	)
 
 	if err != nil {
-		return errors.AddCode(err, "424614")
+		return errors.AddCode(err, "873950")
 	}
 
 	return nil
@@ -214,7 +183,7 @@ func (m *Model) Patch(ctx context.Context, id *uuid.UUID, fields *map[string]int
 	)
 
 	if err != nil {
-		return errors.AddCode(err, "521629")
+		return errors.AddCode(err, "942433")
 	}
 
 	return nil
@@ -228,24 +197,10 @@ func (m *Model) Delete(ctx context.Context, id *uuid.UUID) error {
 	)
 
 	if err != nil {
-		return errors.AddCode(err, "973681")
+		return errors.AddCode(err, "192133")
 	}
 
 	return nil
-}
-
-func (m *Model) UpdatedAt(ctx context.Context, id *uuid.UUID) (*time.Time, error) {
-	at, err := psql.UpdatedAt(
-		ctx,
-		m.client,
-		m.qb.Select(m.mapFieldToDBColumn("UpdatedAt")).From(m.table).Where("id = ?", id),
-	)
-
-	if err != nil {
-		return nil, errors.AddCode(err, "387816")
-	}
-
-	return at, nil
 }
 
 func (m *Model) TableIndexCount(ctx context.Context) (*uint64, error) {
@@ -256,12 +211,11 @@ func (m *Model) TableIndexCount(ctx context.Context) (*uint64, error) {
 	)
 
 	if err != nil {
-		return nil, errors.AddCode(err, "388684")
+		return nil, errors.AddCode(err, "792552")
 	}
 
 	return count, nil
 }
-
 func (m *Model) MaxSortOrder(ctx context.Context) (*uint64, error) {
 	order, err := psql.MaxSortOrder(
 		ctx,
@@ -271,8 +225,16 @@ func (m *Model) MaxSortOrder(ctx context.Context) (*uint64, error) {
 	)
 
 	if err != nil {
-		return nil, errors.AddCode(err, "65777")
+		return nil, errors.AddCode(err, "936425")
 	}
 
 	return order, nil
+}
+
+func (m *Model) UpdatedAt(ctx context.Context, u *uuid.UUID) (*time.Time, error) {
+	return psql.UpdatedAt(
+		ctx,
+		m.client,
+		m.qb.Select(m.mapFieldToDBColumn("UpdatedAt")).From(m.table).Where(fmt.Sprintf("%s = ?", m.mapFieldToDBColumn("Id")), u),
+	)
 }

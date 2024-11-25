@@ -28,6 +28,8 @@ import (
 	tag_select_service "github.com/dmRusakov/tonoco/internal/domain/tag_select/service"
 	tag_type_model "github.com/dmRusakov/tonoco/internal/domain/tag_type/model"
 	tag_type_service "github.com/dmRusakov/tonoco/internal/domain/tag_type/service"
+	text_model "github.com/dmRusakov/tonoco/internal/domain/text/model"
+	text_service "github.com/dmRusakov/tonoco/internal/domain/text/service"
 	warehouse_model "github.com/dmRusakov/tonoco/internal/domain/warehouse/model"
 	warehouse_service "github.com/dmRusakov/tonoco/internal/domain/warehouse/service"
 	"github.com/dmRusakov/tonoco/internal/entity/db"
@@ -48,6 +50,7 @@ type Services struct {
 	Tag                 *tag_service.Service
 	TagSelect           *tag_select_service.Service
 	TagType             *tag_type_service.Service
+	Text                *text_service.Service
 	Warehouse           *warehouse_service.Service
 }
 
@@ -163,6 +166,16 @@ func (a *App) ServicesInit(cfg *config.Config) error {
 		tagTypeStorage := tag_type_model.NewStorage(a.SqlDB)
 		mu.Lock()
 		services.TagType = tag_type_service.NewService(tagTypeStorage)
+		mu.Unlock()
+	}()
+
+	// text
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		textStorage := text_model.NewStorage(a.SqlDB)
+		mu.Lock()
+		services.Text = text_service.NewService(textStorage)
 		mu.Unlock()
 	}()
 

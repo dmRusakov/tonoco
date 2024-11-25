@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-type Item = db.ProductInfo
-type Filter = db.ProductInfoFilter
+type Item = db.StorePage
+type Filter = db.StorePageFilter
 
 type Storage interface {
 	Get(context.Context, *Filter) (*Item, error)
@@ -53,29 +53,22 @@ func NewStorage(client psql.Client) *Model {
 		client: client,
 		table:  "product_info",
 		dbField: map[string]string{
-			"Id":                    "id",
-			"Sku":                   "sku",
-			"Brand":                 "brand",
-			"Name":                  "name",
-			"ShortDescription":      "short_description",
-			"Description":           "description",
-			"SortOrder":             "sort_order",
-			"Url":                   "url",
-			"IsTaxable":             "is_taxable",
-			"IsTrackStock":          "is_track_stock",
-			"ShippingWeight":        "shipping_weight",
-			"ShippingWidth":         "shipping_width",
-			"ShippingHeight":        "shipping_height",
-			"ShippingLength":        "shipping_length",
-			"SeoTitle":              "seo_title",
-			"SeoDescription":        "seo_description",
-			"GTIN":                  "gtin",
-			"GoogleProductCategory": "google_product_category",
-			"GoogleProductType":     "google_product_type",
-			"CreatedAt":             "created_at",
-			"CreatedBy":             "created_by",
-			"UpdatedAt":             "updated_at",
-			"UpdatedBy":             "updated_by",
+			"Id":               "id",
+			"Name":             "name",
+			"SeoTitle":         "seo_title",
+			"ShortDescription": "short_description",
+			"Description":      "description",
+			"Url":              "url",
+			"ImageId":          "image_id",
+			"HoverImageId":     "hover_image_id",
+			"Page":             "page",
+			"PerPage":          "per_page",
+			"SortOrder":        "sort_order",
+			"Active":           "active",
+			"CreatedAt":        "created_at",
+			"CreatedBy":        "created_by",
+			"UpdatedAt":        "updated_at",
+			"UpdatedBy":        "updated_by",
 		},
 	}
 }
@@ -93,7 +86,7 @@ func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
 func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {
 	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(m.makeStatement(), filter))
 	if err != nil {
-		return nil, errors.AddCode(err, "411588")
+		return nil, errors.AddCode(err, "523414")
 	}
 	defer rows.Close()
 
@@ -122,7 +115,7 @@ func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, 
 	if filter.DataConfig.IsCount != nil && *filter.DataConfig.IsCount == true {
 		rows, err = psql.List(ctx, m.client, m.makeCountStatementByFilter(filter))
 		if err != nil {
-			return nil, errors.AddCode(err, "221259")
+			return nil, errors.AddCode(err, "420456")
 		}
 
 		defer rows.Close()
@@ -147,7 +140,7 @@ func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, 
 func (m *Model) Ids(ctx context.Context, filter *Filter) (*[]uuid.UUID, error) {
 	rows, err := psql.List(ctx, m.client, m.makeStatementByFilter(m.makeIdsStatement(), filter))
 	if err != nil {
-		return nil, errors.AddCode(err, "25738")
+		return nil, errors.AddCode(err, "415826")
 	}
 	defer rows.Close()
 
@@ -166,7 +159,7 @@ func (m *Model) Ids(ctx context.Context, filter *Filter) (*[]uuid.UUID, error) {
 	if filter.DataConfig.IsCount != nil && *filter.DataConfig.IsCount == true {
 		rows, err = psql.List(ctx, m.client, m.makeCountStatementByFilter(filter))
 		if err != nil {
-			return nil, errors.AddCode(err, "221257")
+			return nil, errors.AddCode(err, "22284")
 		}
 
 		defer rows.Close()
@@ -186,7 +179,7 @@ func (m *Model) Create(ctx context.Context, item *Item) (*uuid.UUID, error) {
 	statement, id := m.makeInsertStatement(ctx, item)
 	err := psql.Create(ctx, m.client, statement)
 	if err != nil {
-		return nil, errors.AddCode(err, "739938")
+		return nil, errors.AddCode(err, "459081")
 	}
 
 	return id, nil
@@ -200,7 +193,7 @@ func (m *Model) Update(ctx context.Context, item *Item) error {
 	)
 
 	if err != nil {
-		return errors.AddCode(err, "424614")
+		return errors.AddCode(err, "213982")
 	}
 
 	return nil
@@ -214,7 +207,7 @@ func (m *Model) Patch(ctx context.Context, id *uuid.UUID, fields *map[string]int
 	)
 
 	if err != nil {
-		return errors.AddCode(err, "521629")
+		return errors.AddCode(err, "706373")
 	}
 
 	return nil
@@ -228,7 +221,7 @@ func (m *Model) Delete(ctx context.Context, id *uuid.UUID) error {
 	)
 
 	if err != nil {
-		return errors.AddCode(err, "973681")
+		return errors.AddCode(err, "566352")
 	}
 
 	return nil
@@ -242,7 +235,7 @@ func (m *Model) UpdatedAt(ctx context.Context, id *uuid.UUID) (*time.Time, error
 	)
 
 	if err != nil {
-		return nil, errors.AddCode(err, "387816")
+		return nil, errors.AddCode(err, "351796")
 	}
 
 	return at, nil
@@ -256,7 +249,7 @@ func (m *Model) TableIndexCount(ctx context.Context) (*uint64, error) {
 	)
 
 	if err != nil {
-		return nil, errors.AddCode(err, "388684")
+		return nil, errors.AddCode(err, "212061")
 	}
 
 	return count, nil
@@ -271,7 +264,7 @@ func (m *Model) MaxSortOrder(ctx context.Context) (*uint64, error) {
 	)
 
 	if err != nil {
-		return nil, errors.AddCode(err, "65777")
+		return nil, errors.AddCode(err, "98560")
 	}
 
 	return order, nil

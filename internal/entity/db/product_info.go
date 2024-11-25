@@ -1,6 +1,7 @@
 package db
 
 import (
+	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/google/uuid"
 	"time"
 )
@@ -40,15 +41,6 @@ type ProductInfoFilter struct {
 	Active *bool   `json:"active"`
 	Search *string `json:"search"`
 
-	OrderBy  *string `json:"order_by"`
-	OrderDir *string `json:"order_dir"`
-	Page     *uint64 `json:"page"`
-	PerPage  *uint64 `json:"per_page"`
-
-	Count *uint64 `json:"count"`
-
-	IsIdsOnly      *bool `json:"is_ids_only"`
-	IsCount        *bool `json:"is_count"`
-	IsUpdateFilter *bool `json:"is_update_filter"`
-	IsKeepIdsOrder *bool `json:"is_keep_ids_order"`
+	DataPagination *entity.DataPagination
+	DataConfig     *entity.DataConfig
 }

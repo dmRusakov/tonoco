@@ -58,6 +58,7 @@ func (c Controller) RenderProducts(
 	go func() {
 		defer wg.Done()
 		productPage.Name = "Range Hoods"
+		productPage.SeoTitle = "Designer Italian kitchen range hoods"
 		productPage.Url = url.Url
 		productPage.Page = pointer.PtrToUint64(url.Params.Page)
 		productPage.PerPage = pointer.PtrToUint64(url.Params.PerPage)
