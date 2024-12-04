@@ -22,6 +22,7 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 		m.mapFieldToDBColumn("Id"),
 		m.mapFieldToDBColumn("Language"),
 		m.mapFieldToDBColumn("Source"),
+		m.mapFieldToDBColumn("SubSource"),
 		m.mapFieldToDBColumn("SourceId"),
 		m.mapFieldToDBColumn("Text"),
 		m.mapFieldToDBColumn("Active"),
@@ -52,6 +53,10 @@ func (m *Model) filterToStatement(statement sq.SelectBuilder, filter *Filter) sq
 	// Source
 	if filter.Source != nil {
 		statement = statement.Where(m.mapFieldToDBColumn("Source")+" IN (?)", *filter.Source)
+	}
+	// SubSource
+	if filter.SubSource != nil {
+		statement = statement.Where(m.mapFieldToDBColumn("SubSource")+" IN (?)", *filter.SubSource)
 	}
 
 	// SourceId
@@ -92,6 +97,11 @@ func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 		statement = statement.Where(m.mapFieldToDBColumn("Source")+" IN (?)", *filter.Source)
 	}
 
+	// SubSource
+	if filter.SubSource != nil {
+		statement = statement.Where(m.mapFieldToDBColumn("SubSource")+" IN (?)", *filter.SubSource)
+	}
+
 	// SourceId
 	if filter.SourceId != nil {
 		statement = statement.Where(m.mapFieldToDBColumn("SourceId")+" IN (?)", *filter.SourceId)
@@ -119,13 +129,13 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 	var (
-		item                                                       = Item{}
-		id, language, source, sourceId, text, createdBy, updatedBy sql.NullString
-		active                                                     sql.NullBool
-		createdAt, updatedAt                                       sql.NullTime
+		item                                                                   = Item{}
+		id, language, source, sub_source, sourceId, text, createdBy, updatedBy sql.NullString
+		active                                                                 sql.NullBool
+		createdAt, updatedAt                                                   sql.NullTime
 	)
 
-	err := row.Scan(&id, &language, &source, &sourceId, &text, &active, &createdAt, &createdBy, &updatedAt, &updatedBy)
+	err := row.Scan(&id, &language, &source, &sub_source, &sourceId, &text, &active, &createdAt, &createdBy, &updatedAt, &updatedBy)
 	if err != nil {
 		tracing.Error(ctx, psql.ErrScan(psql.ParsePgError(err)))
 		return nil, errors.AddCode(err, "854475")
@@ -141,6 +151,10 @@ func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 
 	if source.Valid {
 		item.Source = source.String
+	}
+
+	if sub_source.Valid {
+		item.SubSource = sub_source.String
 	}
 
 	if sourceId.Valid {
@@ -217,6 +231,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 			m.mapFieldToDBColumn("Id"),
 			m.mapFieldToDBColumn("Language"),
 			m.mapFieldToDBColumn("Source"),
+			m.mapFieldToDBColumn("SubSource"),
 			m.mapFieldToDBColumn("SourceId"),
 			m.mapFieldToDBColumn("Text"),
 			m.mapFieldToDBColumn("Active"),
@@ -229,6 +244,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 			item.Id,
 			item.Language,
 			item.Source,
+			item.SubSource,
 			item.SourceId,
 			item.Text,
 			item.Active,
@@ -249,6 +265,7 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 		SetMap(map[string]interface{}{
 			m.mapFieldToDBColumn("Language"):  item.Language,
 			m.mapFieldToDBColumn("Source"):    item.Source,
+			m.mapFieldToDBColumn("SubSource"): item.SubSource,
 			m.mapFieldToDBColumn("SourceId"):  item.SourceId,
 			m.mapFieldToDBColumn("Text"):      item.Text,
 			m.mapFieldToDBColumn("Active"):    item.Active,

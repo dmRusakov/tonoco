@@ -2,6 +2,7 @@ package admin_app_web_v1
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 )
 
@@ -10,14 +11,16 @@ func (c Controller) router(ctx context.Context) {
 		path    string
 		handler func(http.ResponseWriter, *http.Request)
 	}{
+		// home page
 		{"/", func(w http.ResponseWriter, r *http.Request) { c.Render(w, "dashboard.page.gohtml") }},
+
+		// shop pages
+		{fmt.Sprintf("/%s/", c.cfg.ShopPageUrl), func(w http.ResponseWriter, r *http.Request) { c.RenderShopPage(r.Context(), w, r, c.cfg.ShopPageUrl) }},
+
 		{"/orders/", func(w http.ResponseWriter, r *http.Request) { c.Render(w, "orders.page.gohtml") }},
 		{"/order/", func(w http.ResponseWriter, r *http.Request) { c.Render(w, "order.page.gohtml") }},
-		{"/products/", func(w http.ResponseWriter, r *http.Request) { c.RenderProducts(r.Context(), w, r) }},
-		{"/range-hood", func(w http.ResponseWriter, r *http.Request) { c.RenderProducts(r.Context(), w, r) }},
+
 		{"/product/", func(w http.ResponseWriter, r *http.Request) { c.Render(w, "product.page.gohtml") }},
-		{"/categories/", func(w http.ResponseWriter, r *http.Request) { c.Render(w, "categories.page.gohtml") }},
-		{"/category/", func(w http.ResponseWriter, r *http.Request) { c.Render(w, "category.page.gohtml") }},
 		{"/specifications/", func(w http.ResponseWriter, r *http.Request) { c.Render(w, "specifications.page.gohtml") }},
 		{"/specification/", func(w http.ResponseWriter, r *http.Request) { c.Render(w, "tag.page.gohtml") }},
 		{"/pages/", func(w http.ResponseWriter, r *http.Request) { c.Render(w, "pages.page.gohtml") }},

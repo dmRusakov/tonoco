@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/jackc/pgx/v5"
 	"strconv"
@@ -57,7 +58,7 @@ func Get(ctx context.Context, client Client, statement sq.SelectBuilder) (pgx.Ro
 	defer rows.Close()
 
 	if !rows.Next() {
-		err = ErrNoRows()
+		err = errors.AddCode(ErrNoRows(), "457790")
 		tracing.Error(ctx, err)
 		return nil, err
 	}

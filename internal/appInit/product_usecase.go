@@ -1,11 +1,12 @@
 package appInit
 
 import (
-	product_usecase "github.com/dmRusakov/tonoco/internal/useCase/product"
+	product_usecase "github.com/dmRusakov/tonoco/internal/useCase/shop_page"
 )
 
 func (a *App) ProductUseCaseInit() error {
 	a.ProductUseCase = product_usecase.NewUseCase(
+		a.Cfg,
 		a.Services.Currency,
 		a.Services.File,
 		a.Services.Folder,
@@ -15,8 +16,10 @@ func (a *App) ProductUseCaseInit() error {
 		a.Services.Tag,
 		a.Services.TagType,
 		a.Services.TagSelect,
+		a.Services.Text,
 		a.Services.StockQuantity,
 		a.Services.Store,
+		a.Services.ShopPage,
 		a.Services.Warehouse,
 		a.Services.ImageService,
 		a.Services.ProductImageService,

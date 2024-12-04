@@ -1,82 +1,82 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    ad.hd = {} //hd == header
+    this.hd = {} //hd == header
 
     /** Dom **/
-    ad.hd.dom = {}
-    ad.hd.dom.header = document.querySelector(".mmHeader")
-    ad.hd.dom.topHeader = document.querySelector(".mmTopHeader")
-    ad.hd.dom.mobileMenu = ad.hd.dom.header.querySelector(".mmMobileMenu")
-    ad.hd.dom.menu = ad.hd.dom.header.querySelector("nav.menu")
-    ad.hd.dom.dashboardTab = ad.hd.dom.menu.querySelector("a#mmDashboard")
-    ad.hd.dom.orderTab = ad.hd.dom.menu.querySelector("a#mmOrders")
-    ad.hd.dom.productTab = ad.hd.dom.menu.querySelector("a#mmProducts")
-    ad.hd.dom.categoryTab = ad.hd.dom.menu.querySelector("a#mmCategories")
-    ad.hd.dom.pagesTab = ad.hd.dom.menu.querySelector("a#mmPages")
-    ad.hd.dom.integrationTab = ad.hd.dom.menu.querySelector("a#mmIntegration")
-    ad.hd.dom.cuponTab = ad.hd.dom.menu.querySelector("a#mmCoupon")
-    ad.hd.dom.mediaTab = ad.hd.dom.menu.querySelector("a#mmMedia")
-    ad.hd.dom.settingsTab = ad.hd.dom.menu.querySelector("a#mmSettings")
+    this.hd.dom = {}
+    this.hd.dom.header = document.querySelector(".mmHeader")
+    this.hd.dom.topHeader = document.querySelector(".mmTopHeader")
+    this.hd.dom.mobileMenu = this.hd.dom.header.querySelector(".mmMobileMenu")
+    this.hd.dom.menu = this.hd.dom.header.querySelector("nav.menu")
+    this.hd.dom.dashboardTab = this.hd.dom.menu.querySelector("a#mmDashboard")
+    this.hd.dom.orderTab = this.hd.dom.menu.querySelector("a#mmOrders")
+    this.hd.dom.productTab = this.hd.dom.menu.querySelector("a#mmProducts")
+    this.hd.dom.categoryTab = this.hd.dom.menu.querySelector("a#mmCategories")
+    this.hd.dom.pagesTab = this.hd.dom.menu.querySelector("a#mmPages")
+    this.hd.dom.integrationTab = this.hd.dom.menu.querySelector("a#mmIntegration")
+    this.hd.dom.cuponTab = this.hd.dom.menu.querySelector("a#mmCoupon")
+    this.hd.dom.mediaTab = this.hd.dom.menu.querySelector("a#mmMedia")
+    this.hd.dom.settingsTab = this.hd.dom.menu.querySelector("a#mmSettings")
 
     /** Functions **/
-    ad.hd.func = {}
+    this.hd.func = {}
 
     // make header element active
-    ad.hd.func.activePage = async () => {
-        switch (ad.param.url.pathname) {
+    this.hd.func.activePage = async () => {
+        switch (this.param.url.pathname) {
             case '/':
-                ad.hd.dom.dashboardTab.classList.add("active")
+                this.hd.dom.dashboardTab.classList.add("active")
                 break
             case '/orders':
-                ad.hd.dom.orderTab.classList.add("active")
+                this.hd.dom.orderTab.classList.add("active")
                 break
             case '/grid':
-                ad.hd.dom.productTab.classList.add("active")
+                this.hd.dom.productTab.classList.add("active")
                 break
             case '/categories':
-                ad.hd.dom.categoryTab.classList.add("active")
+                this.hd.dom.categoryTab.classList.add("active")
                 break
             case '/pages':
                 ad.hd.dom.pagesTab.classList.add("active")
                 break
             case '/integration':
-                ad.hd.dom.integrationTab.classList.add("active")
+                this.hd.dom.integrationTab.classList.add("active")
                 break
             case '/coupon':
-                ad.hd.dom.cuponTab.classList.add("active")
+                this.hd.dom.cuponTab.classList.add("active")
                 break
             case '/media':
-                ad.hd.dom.mediaTab.classList.add("active")
+                this.hd.dom.mediaTab.classList.add("active")
                 break
             case '/settings':
-                ad.hd.dom.settingsTab.classList.add("active")
+                this.hd.dom.settingsTab.classList.add("active")
                 break
         }
     }
 
     // toggle mobile menu
-    ad.hd.func.toggleMobileMenu = async (action = null) => {
+    this.hd.func.toggleMobileMenu = async (action = null) => {
         switch (action) {
             case "show":
-                ad.hd.dom.menu.style.display = "block"
-                ad.hd.dom.mobileMenu.classList.add("active")
+                this.hd.dom.menu.style.display = "block"
+                this.hd.dom.mobileMenu.classList.add("active")
                 break
             case "hide":
-                ad.hd.dom.menu.style.display = "none"
-                ad.hd.dom.mobileMenu.classList.remove("active")
+                this.hd.dom.menu.style.display = "none"
+                this.hd.dom.mobileMenu.classList.remove("active")
                 break
             default:
-                if (ad.hd.dom.menu.style.display == "none") {
-                    ad.hd.func.toggleMobileMenu("show")
+                if (this.hd.dom.menu.style.display === "none") {
+                    this.hd.func.toggleMobileMenu("show")
                 } else {
-                    ad.hd.func.toggleMobileMenu("hide")
+                    this.hd.func.toggleMobileMenu("hide")
                 }
         }
     }
 
     /** Actions **/
     // add active class to header element
-    ad.hd.func.activePage()
-    ad.hd.dom.mobileMenu.addEventListener("click", ad.hd.func.toggleMobileMenu, false)
+    this.hd.func.activePage()
+    this.hd.dom.mobileMenu.addEventListener("click", this.hd.func.toggleMobileMenu, false)
 
     // update Item count in cart(gridItems)
 

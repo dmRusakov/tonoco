@@ -10,8 +10,9 @@ type Text struct {
 	Id       uuid.UUID
 	Language string
 
-	Source   string
-	SourceId uuid.UUID
+	Source    string
+	SubSource string
+	SourceId  uuid.UUID
 
 	Text   string
 	Active bool
@@ -26,8 +27,9 @@ type TextFilter struct {
 	Ids      *[]uuid.UUID
 	Language *string
 
-	Source   *[]string
-	SourceId *[]uuid.UUID
+	Source    *string
+	SubSource *string
+	SourceId  *[]uuid.UUID
 
 	Active *bool
 	Search *string

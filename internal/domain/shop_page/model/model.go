@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-type Item = db.StorePage
-type Filter = db.StorePageFilter
+type Item = db.ShopPage
+type Filter = db.ShopPageFilter
 
 type Storage interface {
 	Get(context.Context, *Filter) (*Item, error)
@@ -51,7 +51,7 @@ func NewStorage(client psql.Client) *Model {
 	return &Model{
 		qb:     sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		client: client,
-		table:  "product_info",
+		table:  "shop_page",
 		dbField: map[string]string{
 			"Id":               "id",
 			"Name":             "name",
@@ -65,6 +65,7 @@ func NewStorage(client psql.Client) *Model {
 			"PerPage":          "per_page",
 			"SortOrder":        "sort_order",
 			"Active":           "active",
+			"Prime":            "prime",
 			"CreatedAt":        "created_at",
 			"CreatedBy":        "created_by",
 			"UpdatedAt":        "updated_at",
@@ -78,8 +79,6 @@ func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// return the Item
 	return m.scanRow(ctx, row)
 }
 
@@ -172,7 +171,6 @@ func (m *Model) Ids(ctx context.Context, filter *Filter) (*[]uuid.UUID, error) {
 	}
 
 	return &ids, nil
-
 }
 
 func (m *Model) Create(ctx context.Context, item *Item) (*uuid.UUID, error) {

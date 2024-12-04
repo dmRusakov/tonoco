@@ -18,6 +18,9 @@ type ProductPage struct {
 	TotalItems       uint64
 	Pagination       map[uint64]PaginationItem
 	ConsoleMessage   ConsoleMessage
+
+	// url
+	ShopPageUrl string
 }
 
 type ProductGridItem struct {

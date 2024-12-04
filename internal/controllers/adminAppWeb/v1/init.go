@@ -2,7 +2,7 @@ package admin_app_web_v1
 
 import (
 	"github.com/dmRusakov/tonoco/internal/config"
-	productUseCase "github.com/dmRusakov/tonoco/internal/useCase/product"
+	productUseCase "github.com/dmRusakov/tonoco/internal/useCase/shop_page"
 	"github.com/dmRusakov/tonoco/pkg/appCacheService"
 	"github.com/dmRusakov/tonoco/pkg/userCacheService"
 )
@@ -16,7 +16,7 @@ func NewWebServer(
 	return &Controller{
 		cfg:              cfg,
 		tmlPath:          "./assets/templates/",
-		productUseCase:   productUseCase,
+		shopPageUseCase:  productUseCase,
 		appCacheService:  appCacheService,
 		userCacheService: userCacheService,
 	}, nil

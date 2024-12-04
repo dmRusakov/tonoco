@@ -17,15 +17,17 @@ import (
 
 // URL params for products page
 
-func (c Controller) RenderProducts(
+func (c Controller) RenderShopPage(
 	ctx context.Context,
 	w http.ResponseWriter,
 	r *http.Request,
+	page string,
 ) {
 	var wg sync.WaitGroup
 	var errs []error
 
 	/* first round loading */
+
 	wg.Add(3)
 
 	// make template
@@ -51,27 +53,52 @@ func (c Controller) RenderProducts(
 	wg.Wait()
 
 	/* second round loading */
-	wg.Add(2)
 
-	// make page
+	// get shop page
+	wg.Add(1)
 	productPage := &pages.ProductPage{}
 	go func() {
 		defer wg.Done()
-		productPage.Name = "Range Hoods"
-		productPage.SeoTitle = "Designer Italian kitchen range hoods"
-		productPage.Url = url.Url
-		productPage.Page = pointer.PtrToUint64(url.Params.Page)
-		productPage.PerPage = pointer.PtrToUint64(url.Params.PerPage)
+		shopPage, e := c.shopPageUseCase.GetShopPage(ctx, page)
+		if e != nil {
+			errs = append(errs, e...)
+		}
+
+		productPage.Name = shopPage.Name
+		productPage.SeoTitle = shopPage.SeoTitle
+		productPage.Url = shopPage.Url
 		productPage.ConsoleMessage = pages.ConsoleMessage{}
+
+		// page
+		if url.Params.Page == nil {
+			productPage.Page = shopPage.Page
+			url.Params.Page = &shopPage.Page
+		} else {
+			productPage.Page = pointer.PtrToUint64(url.Params.Page)
+		}
+
+		// PerPage
+		if url.Params.PerPage == nil {
+			productPage.PerPage = shopPage.PerPage
+			url.Params.PerPage = &shopPage.PerPage
+		} else {
+			productPage.PerPage = pointer.PtrToUint64(url.Params.PerPage)
+		}
+
+		// url
+		productPage.ShopPageUrl = c.cfg.ShopPageUrl
 	}()
+
+	wg.Wait()
 
 	// get products
 	var products *map[uuid.UUID]*pages.ProductGridItem
+	wg.Add(1)
 	var ids *[]uuid.UUID
 	go func() {
 		defer wg.Done()
 		var err error
-		products, ids, err = c.productUseCase.GetProductList(ctx, &url.Params)
+		products, ids, err = c.shopPageUseCase.GetProductList(ctx, &url.Params)
 		if err != nil {
 			errs = append(errs, err)
 		}

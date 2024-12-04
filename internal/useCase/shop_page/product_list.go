@@ -1,7 +1,8 @@
-package product
+package shop_page
 
 import (
 	"context"
+	"fmt"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/dmRusakov/tonoco/internal/entity/pages"
@@ -12,24 +13,65 @@ import (
 	"sync"
 )
 
-func (u *UseCase) getCurrency(ctx context.Context, parameters *pages.ProductsPageUrlParams, errs *[]error) *db.Currency {
-	var currency *db.Currency
-	var err error
+func (u *UseCase) GetProductList(
+	ctx context.Context,
+	parameters *pages.ProductsPageUrlParams,
+) (*map[uuid.UUID]*pages.ProductGridItem, *[]uuid.UUID, error) {
 
-	// get default currency
-	defaultCurrency := u.currency.GetDefault()
-	if (parameters.Currency == nil) || (*parameters.Currency == "" || *parameters.Currency == defaultCurrency.Url) {
-		currency = defaultCurrency
-	} else {
-		// get currency by url
-		currency, err = u.currency.Get(ctx, &db.CurrencyFilter{
-			Urls: &[]string{*parameters.Currency},
-		})
-		if err != nil {
-			*errs = append(*errs, err)
-		}
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	var errs []error
+
+	// get product ids
+	var itemIds *[]uuid.UUID
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		itemIds = u.fetchProductIds(ctx, parameters, &errs)
+	}()
+
+	// currency
+	var currency *db.Currency
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		currency = u.getCurrency(ctx, parameters, &errs)
+	}()
+
+	wg.Wait()
+
+	// check errors
+	if len(errs) > 0 {
+		return nil, nil, fmt.Errorf("GetProductList: %v", errs)
 	}
-	return currency
+
+	// dto
+	productsDto := make(map[uuid.UUID]*pages.ProductGridItem)
+
+	for _, itemId := range *itemIds {
+		wg.Add(1)
+		go func(itemId uuid.UUID) {
+			defer wg.Done()
+			item := u.fetchProductDetails(ctx, itemId, currency, &errs, &mu)
+			mu.Lock()
+			productsDto[itemId] = item
+			mu.Unlock()
+
+			// check errors
+			if len(errs) > 0 {
+				return
+			}
+		}(itemId)
+	}
+
+	wg.Wait()
+
+	// check errors
+	if len(errs) > 0 {
+		return nil, nil, fmt.Errorf("GetProductList: %v", errs)
+	}
+
+	return &productsDto, itemIds, nil
 }
 
 func (u *UseCase) fetchProductIds(ctx context.Context, parameters *pages.ProductsPageUrlParams, errs *[]error) *[]uuid.UUID {

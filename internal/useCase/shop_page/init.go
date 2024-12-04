@@ -1,6 +1,7 @@
-package product
+package shop_page
 
 import (
+	"github.com/dmRusakov/tonoco/internal/config"
 	currency_service "github.com/dmRusakov/tonoco/internal/domain/currency/service"
 	file_service "github.com/dmRusakov/tonoco/internal/domain/file/service"
 	folder_service "github.com/dmRusakov/tonoco/internal/domain/folder/service"
@@ -9,17 +10,22 @@ import (
 	price_type_service "github.com/dmRusakov/tonoco/internal/domain/price_type/service"
 	product_image_service "github.com/dmRusakov/tonoco/internal/domain/product_image/service"
 	product_info_service "github.com/dmRusakov/tonoco/internal/domain/product_info/service"
+	shop_page_service "github.com/dmRusakov/tonoco/internal/domain/shop_page/service"
 	stock_quantity_service "github.com/dmRusakov/tonoco/internal/domain/stock_quantity/service"
 	store_service "github.com/dmRusakov/tonoco/internal/domain/store/service"
 	tag_service "github.com/dmRusakov/tonoco/internal/domain/tag/service"
 	tag_select_service "github.com/dmRusakov/tonoco/internal/domain/tag_select/service"
 	tag_type_service "github.com/dmRusakov/tonoco/internal/domain/tag_type/service"
+	text_service "github.com/dmRusakov/tonoco/internal/domain/text/service"
 	warehouse_service "github.com/dmRusakov/tonoco/internal/domain/warehouse/service"
 	"github.com/dmRusakov/tonoco/internal/entity/pages"
 	"github.com/google/uuid"
 )
 
 type UseCase struct {
+	// config
+	cfg *config.Config
+
 	// services
 	currency      *currency_service.Service
 	file          *file_service.Service
@@ -30,8 +36,10 @@ type UseCase struct {
 	tag           *tag_service.Service
 	tagType       *tag_type_service.Service
 	tagSelect     *tag_select_service.Service
+	text          *text_service.Service
 	stockQuantity *stock_quantity_service.Service
 	store         *store_service.Service
+	shopPage      *shop_page_service.Service
 	warehouse     *warehouse_service.Service
 	image         *image_service.Service
 	productImage  *product_image_service.Service
@@ -45,6 +53,7 @@ type UseCase struct {
 }
 
 func NewUseCase(
+	cfg *config.Config,
 	currencyService *currency_service.Service,
 	fileService *file_service.Service,
 	folderService *folder_service.Service,
@@ -54,13 +63,18 @@ func NewUseCase(
 	tagService *tag_service.Service,
 	tagTypeService *tag_type_service.Service,
 	tagSelect *tag_select_service.Service,
+	text *text_service.Service,
 	stockQuantity *stock_quantity_service.Service,
 	storeService *store_service.Service,
+	shopPageService *shop_page_service.Service,
 	warehouseService *warehouse_service.Service,
 	imageService *image_service.Service,
 	productImageService *product_image_service.Service,
 ) *UseCase {
 	return &UseCase{
+		// config
+		cfg: cfg,
+
 		// services
 		currency:      currencyService,
 		file:          fileService,
@@ -71,8 +85,10 @@ func NewUseCase(
 		tag:           tagService,
 		tagType:       tagTypeService,
 		tagSelect:     tagSelect,
+		text:          text,
 		stockQuantity: stockQuantity,
 		store:         storeService,
+		shopPage:      shopPageService,
 		warehouse:     warehouseService,
 		image:         imageService,
 		productImage:  productImageService,

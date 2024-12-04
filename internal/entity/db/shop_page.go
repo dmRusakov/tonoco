@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type StorePage struct {
+type ShopPage struct {
 	Id               uuid.UUID
 	Name             uuid.UUID
 	SeoTitle         uuid.UUID
@@ -15,21 +15,23 @@ type StorePage struct {
 	Url              string
 	ImageId          uuid.UUID
 	HoverImageId     uuid.UUID
-	Page             int
-	PerPage          int
+	Page             uint64
+	PerPage          uint64
 	SortOrder        int
 	Active           bool
+	Prime            bool
 	CreatedAt        time.Time
 	CreatedBy        uuid.UUID
 	UpdatedAt        time.Time
 	UpdatedBy        uuid.UUID
 }
 
-type StorePageFilter struct {
+type ShopPageFilter struct {
 	Ids  *[]uuid.UUID `json:"ids"`
 	Urls *[]string    `json:"urls"`
 
 	Active *bool   `json:"active"`
+	Prime  *bool   `json:"prime"`
 	Search *string `json:"search"`
 
 	DataPagination *entity.DataPagination

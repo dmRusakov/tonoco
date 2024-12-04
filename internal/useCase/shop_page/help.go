@@ -1,4 +1,4 @@
-package product
+package shop_page
 
 import (
 	"github.com/dmRusakov/tonoco/internal/entity/pages"

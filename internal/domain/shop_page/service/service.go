@@ -3,13 +3,14 @@ package service
 import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/domain/shop_page/model"
+	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/google/uuid"
 	"time"
 )
 
-type Item = db.StorePage
-type Filter = db.StorePageFilter
+type Item = db.ShopPage
+type Filter = db.ShopPageFilter
 
 type Repository interface {
 	Get(ctx context.Context, filter *Filter) (*Item, error)
@@ -26,12 +27,28 @@ type Repository interface {
 
 type Service struct {
 	repository model.Storage
+	urls       map[uuid.UUID]string
 }
 
 func NewService(repository *model.Model) *Service {
-	return &Service{
+	service := &Service{
 		repository: repository,
+		urls:       make(map[uuid.UUID]string),
 	}
+	list, err := service.repository.List(context.Background(), &Filter{
+		DataPagination: &entity.DataPagination{},
+		DataConfig:     &entity.DataConfig{},
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	for _, item := range *list {
+		service.urls[item.Id] = item.Url
+	}
+
+	return service
 }
 
 func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {

@@ -6,7 +6,7 @@ import (
 	"github.com/dmRusakov/tonoco/internal/config"
 	webController "github.com/dmRusakov/tonoco/internal/controllers/adminAppWeb/v1"
 	currencyUsecase "github.com/dmRusakov/tonoco/internal/useCase/currency"
-	productUsecase "github.com/dmRusakov/tonoco/internal/useCase/product"
+	productUsecase "github.com/dmRusakov/tonoco/internal/useCase/shop_page"
 	"github.com/dmRusakov/tonoco/pkg/appCacheService"
 	"github.com/dmRusakov/tonoco/pkg/common/core/clock"
 	"github.com/dmRusakov/tonoco/pkg/common/core/identity"

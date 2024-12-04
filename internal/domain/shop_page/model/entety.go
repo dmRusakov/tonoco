@@ -30,6 +30,7 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 		m.mapFieldToDBColumn("PerPage"),
 		m.mapFieldToDBColumn("SortOrder"),
 		m.mapFieldToDBColumn("Active"),
+		m.mapFieldToDBColumn("Prime"),
 		m.mapFieldToDBColumn("CreatedAt"),
 		m.mapFieldToDBColumn("CreatedBy"),
 		m.mapFieldToDBColumn("UpdatedAt"),
@@ -59,6 +60,11 @@ func (m *Model) filterToStatement(statement sq.SelectBuilder, filter *Filter) sq
 		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Active"): *filter.Active})
 	}
 
+	// Prime
+	if filter.Prime != nil {
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Prime"): *filter.Prime})
+	}
+
 	return statement
 }
 
@@ -80,6 +86,7 @@ func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 }
 
 func (m *Model) makeStatementByFilter(statement sq.SelectBuilder, filter *Filter) sq.SelectBuilder {
+
 	entity.CheckDataPagination(filter.DataPagination)
 	statement = m.filterToStatement(statement, filter)
 	return statement.OrderBy(m.mapFieldToDBColumn(*filter.DataPagination.OrderBy) + " " + *filter.DataPagination.OrderDir).
@@ -96,11 +103,11 @@ func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 		item                                                                                                = Item{}
 		id, name, seoTitle, shortDescription, description, url, imageId, hoverImageId, createdBy, updatedBy sql.NullString
 		page, perPage, sortOrder                                                                            sql.NullInt64
-		active                                                                                              sql.NullBool
+		active, prime                                                                                       sql.NullBool
 		createdAt, updatedAt                                                                                sql.NullTime
 	)
 
-	err := row.Scan(&id, &name, &seoTitle, &shortDescription, &description, &url, &imageId, &hoverImageId, &createdBy, &createdAt, &updatedBy, &updatedAt)
+	err := row.Scan(&id, &name, &seoTitle, &shortDescription, &description, &url, &imageId, &hoverImageId, &page, &perPage, &sortOrder, &active, &prime, &createdAt, &createdBy, &updatedAt, &updatedBy)
 	if err != nil {
 		tracing.Error(ctx, psql.ErrScan(psql.ParsePgError(err)))
 		return nil, errors.AddCode(err, "396647")
@@ -139,11 +146,11 @@ func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 	}
 
 	if page.Valid {
-		item.Page = int(page.Int64)
+		item.Page = uint64(page.Int64)
 	}
 
 	if perPage.Valid {
-		item.PerPage = int(perPage.Int64)
+		item.PerPage = uint64(perPage.Int64)
 	}
 
 	if sortOrder.Valid {
@@ -152,6 +159,10 @@ func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 
 	if active.Valid {
 		item.Active = active.Bool
+	}
+
+	if prime.Valid {
+		item.Prime = prime.Bool
 	}
 
 	if createdAt.Valid {
@@ -224,6 +235,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 			m.mapFieldToDBColumn("PerPage"),
 			m.mapFieldToDBColumn("SortOrder"),
 			m.mapFieldToDBColumn("Active"),
+			m.mapFieldToDBColumn("Prime"),
 			m.mapFieldToDBColumn("CreatedAt"),
 			m.mapFieldToDBColumn("CreatedBy"),
 			m.mapFieldToDBColumn("UpdatedAt"),
@@ -242,6 +254,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 			item.PerPage,
 			item.SortOrder,
 			item.Active,
+			item.Prime,
 			"NOW()",
 			by,
 			"NOW()",
@@ -268,6 +281,7 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 			m.mapFieldToDBColumn("PerPage"):          item.PerPage,
 			m.mapFieldToDBColumn("SortOrder"):        item.SortOrder,
 			m.mapFieldToDBColumn("Active"):           item.Active,
+			m.mapFieldToDBColumn("Prime"):            item.Prime,
 			m.mapFieldToDBColumn("UpdatedAt"):        "NOW()",
 			m.mapFieldToDBColumn("UpdatedBy"):        by,
 		}).Where(m.mapFieldToDBColumn("Id")+" = ?", item.Id)

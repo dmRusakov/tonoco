@@ -56,6 +56,7 @@ func NewStorage(client psql.Client) *Model {
 			"Id":        "id",
 			"Language":  "language",
 			"Source":    "source",
+			"SubSource": "sub_source",
 			"SourceId":  "source_id",
 			"Text":      "text",
 			"Active":    "active",
