@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/dmRusakov/tonoco/internal/entity/pages"
 	"github.com/dmRusakov/tonoco/pkg/common/pagination"
+	"github.com/dmRusakov/tonoco/pkg/utils/html"
 	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	"github.com/dmRusakov/tonoco/pkg/utils/standart"
 	"github.com/google/uuid"
@@ -57,13 +58,11 @@ func (c Controller) RenderShopPage(
 			errs = append(errs, e...)
 		}
 
-		shopPage.Name = shop.Name
-		shopPage.SeoTitle = shop.SeoTitle
+		shopPage.Name = html.GetTemplate(shop.Name)
+		shopPage.SeoTitle = html.GetTemplate(shop.SeoTitle)
 		shopPage.Url = shop.Url
-		shopPage.ShortDescription = shop.ShortDescription
-		shopPage.Description = shop.Description
-		// get HTML from description
-		shopPage.DescriptionHtml = template.HTML(standart.GetHtmlFromMarkdown(shop.Description))
+		shopPage.ShortDescription = html.GetTemplate(shop.ShortDescription)
+		shopPage.Description = html.GetTemplate(shop.Description)
 
 		shopPage.ConsoleMessage = pages.ConsoleMessage{}
 

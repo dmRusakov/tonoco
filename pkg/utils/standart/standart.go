@@ -1,8 +1,6 @@
 package standart
 
 import (
-	"github.com/gomarkdown/markdown"
-	"github.com/gomarkdown/markdown/html"
 	"strconv"
 )
 
@@ -18,12 +16,4 @@ func GetUint64Value(param *uint64, defaultValue *uint64) string {
 		return strconv.FormatUint(*param, 10)
 	}
 	return ""
-}
-
-func GetHtmlFromMarkdown(markdownContent string) string {
-	// Convert Markdown to HTML
-	htmlContent := markdown.ToHTML([]byte(markdownContent), nil, html.NewRenderer(html.RendererOptions{
-		Flags: html.CommonFlags,
-	}))
-	return string(htmlContent)
 }

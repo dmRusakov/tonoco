@@ -7,11 +7,10 @@ import (
 )
 
 type ShopPage struct {
-	Name             string
-	SeoTitle         string
-	ShortDescription string
-	Description      string
-	DescriptionHtml  template.HTML
+	Name             template.HTML
+	SeoTitle         template.HTML
+	ShortDescription template.HTML
+	Description      template.HTML
 	Items            []ProductGridItem
 	Url              string
 	Page             uint64
