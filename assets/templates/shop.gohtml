@@ -1,0 +1,13 @@
+{{template "base" .}}
+
+{{define "content" }}
+    <div class="contentBody">
+        <div class="header">
+            <h1>{{.Name}}</h1>
+        </div>
+        {{template "products_grid" .}}
+        <div class="description">
+            {{.DescriptionHtml}}
+        </div>
+    </div>
+{{end}}

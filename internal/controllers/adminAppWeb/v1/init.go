@@ -16,7 +16,7 @@ func NewWebServer(
 	return &Controller{
 		cfg:              cfg,
 		tmlPath:          "./assets/templates/",
-		shopPageUseCase:  productUseCase,
+		shopUseCase:      productUseCase,
 		appCacheService:  appCacheService,
 		userCacheService: userCacheService,
 	}, nil

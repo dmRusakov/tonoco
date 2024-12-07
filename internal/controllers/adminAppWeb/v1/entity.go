@@ -18,7 +18,7 @@ type Controller struct {
 		handler func(http.ResponseWriter, *http.Request)
 	}
 	tmlPath          string
-	shopPageUseCase  *shop_page.UseCase
+	shopUseCase      *shop_page.UseCase
 	appCacheService  *appCacheService.Service
 	userCacheService *userCacheService.Service
 }

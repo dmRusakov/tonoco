@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type ShopPage struct {
+type Shop struct {
 	Id               uuid.UUID
 	Name             uuid.UUID
 	SeoTitle         uuid.UUID
@@ -26,7 +26,7 @@ type ShopPage struct {
 	UpdatedBy        uuid.UUID
 }
 
-type ShopPageFilter struct {
+type ShopFilter struct {
 	Ids  *[]uuid.UUID `json:"ids"`
 	Urls *[]string    `json:"urls"`
 

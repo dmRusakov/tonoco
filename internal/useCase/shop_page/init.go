@@ -10,7 +10,7 @@ import (
 	price_type_service "github.com/dmRusakov/tonoco/internal/domain/price_type/service"
 	product_image_service "github.com/dmRusakov/tonoco/internal/domain/product_image/service"
 	product_info_service "github.com/dmRusakov/tonoco/internal/domain/product_info/service"
-	shop_page_service "github.com/dmRusakov/tonoco/internal/domain/shop_page/service"
+	shop_page_service "github.com/dmRusakov/tonoco/internal/domain/shop/service"
 	stock_quantity_service "github.com/dmRusakov/tonoco/internal/domain/stock_quantity/service"
 	store_service "github.com/dmRusakov/tonoco/internal/domain/store/service"
 	tag_service "github.com/dmRusakov/tonoco/internal/domain/tag/service"

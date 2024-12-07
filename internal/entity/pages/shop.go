@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type ShopPage struct {
+type Shop struct {
 	Id               uuid.UUID
 	Name             string
 	SeoTitle         string

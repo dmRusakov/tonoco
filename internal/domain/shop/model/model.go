@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-type Item = db.ShopPage
-type Filter = db.ShopPageFilter
+type Item = db.Shop
+type Filter = db.ShopFilter
 
 type Storage interface {
 	Get(context.Context, *Filter) (*Item, error)
@@ -51,7 +51,7 @@ func NewStorage(client psql.Client) *Model {
 	return &Model{
 		qb:     sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		client: client,
-		table:  "shop_page",
+		table:  "shop",
 		dbField: map[string]string{
 			"Id":               "id",
 			"Name":             "name",

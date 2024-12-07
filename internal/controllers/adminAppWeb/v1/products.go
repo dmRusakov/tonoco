@@ -28,16 +28,8 @@ func (c Controller) RenderShopPage(
 
 	/* first round loading */
 
-	wg.Add(3)
-
-	// make template
-	var tmpl *template.Template
-	go func() {
-		defer wg.Done()
-		tmpl = c.makeTemplate("products.page.gohtml")
-	}()
-
 	// read url params
+	wg.Add(1)
 	var url *pages.ProductsPageUrl
 	go func() {
 		defer wg.Done()
@@ -45,6 +37,7 @@ func (c Controller) RenderShopPage(
 	}()
 
 	// add user to context
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		ctx = c.addUserToContext(ctx)
@@ -56,40 +49,47 @@ func (c Controller) RenderShopPage(
 
 	// get shop page
 	wg.Add(1)
-	productPage := &pages.ProductPage{}
+	shopPage := &pages.ShopPage{}
 	go func() {
 		defer wg.Done()
-		shopPage, e := c.shopPageUseCase.GetShopPage(ctx, page)
+		shop, e := c.shopUseCase.GetShopPage(ctx, page)
 		if e != nil {
 			errs = append(errs, e...)
 		}
 
-		productPage.Name = shopPage.Name
-		productPage.SeoTitle = shopPage.SeoTitle
-		productPage.Url = shopPage.Url
-		productPage.ConsoleMessage = pages.ConsoleMessage{}
+		shopPage.Name = shop.Name
+		shopPage.SeoTitle = shop.SeoTitle
+		shopPage.Url = shop.Url
+		shopPage.ShortDescription = shop.ShortDescription
+		shopPage.Description = shop.Description
+		// get HTML from description
+		shopPage.DescriptionHtml = template.HTML(standart.GetHtmlFromMarkdown(shop.Description))
+
+		shopPage.ConsoleMessage = pages.ConsoleMessage{}
 
 		// page
 		if url.Params.Page == nil {
-			productPage.Page = shopPage.Page
-			url.Params.Page = &shopPage.Page
+			shopPage.Page = shop.Page
+			url.Params.Page = &shop.Page
 		} else {
-			productPage.Page = pointer.PtrToUint64(url.Params.Page)
+			shopPage.Page = pointer.PtrToUint64(url.Params.Page)
 		}
 
 		// PerPage
 		if url.Params.PerPage == nil {
-			productPage.PerPage = shopPage.PerPage
-			url.Params.PerPage = &shopPage.PerPage
+			shopPage.PerPage = shop.PerPage
+			url.Params.PerPage = &shop.PerPage
 		} else {
-			productPage.PerPage = pointer.PtrToUint64(url.Params.PerPage)
+			shopPage.PerPage = pointer.PtrToUint64(url.Params.PerPage)
 		}
 
 		// url
-		productPage.ShopPageUrl = c.cfg.ShopPageUrl
+		shopPage.ShopPageUrl = c.cfg.ShopPageUrl
 	}()
 
 	wg.Wait()
+
+	/* third round loading */
 
 	// get products
 	var products *map[uuid.UUID]*pages.ProductGridItem
@@ -98,14 +98,16 @@ func (c Controller) RenderShopPage(
 	go func() {
 		defer wg.Done()
 		var err error
-		products, ids, err = c.shopPageUseCase.GetProductList(ctx, &url.Params)
+		products, ids, err = c.shopUseCase.GetProductList(ctx, &url.Params)
 		if err != nil {
 			errs = append(errs, err)
 		}
-		productPage.TotalItems = pointer.PtrToUint64(url.Params.Count)
+		shopPage.TotalItems = pointer.PtrToUint64(url.Params.Count)
 	}()
 
 	wg.Wait()
+
+	/* fourth round loading */
 
 	// check for errors
 	if len(errs) > 0 {
@@ -113,16 +115,15 @@ func (c Controller) RenderShopPage(
 		return
 	}
 
-	/* third round loading */
 	wg.Add(2)
 
 	// add a product
-	productPage.Items = make([]pages.ProductGridItem, 0)
+	shopPage.Items = make([]pages.ProductGridItem, 0)
 	go func() {
 		defer wg.Done()
 		for _, id := range *ids {
 			product := (*products)[id]
-			productPage.Items = append(productPage.Items, pages.ProductGridItem{
+			shopPage.Items = append(shopPage.Items, pages.ProductGridItem{
 				Id:               product.Id,
 				No:               product.No,
 				Sku:              product.Sku,
@@ -150,15 +151,15 @@ func (c Controller) RenderShopPage(
 	go func() {
 		defer wg.Done()
 		// total pages
-		productPage.TotalPages = ((productPage.TotalItems) + (productPage.PerPage) - 1) / productPage.PerPage
+		shopPage.TotalPages = ((shopPage.TotalItems) + (shopPage.PerPage) - 1) / shopPage.PerPage
 
 		// pagination
-		paginationPages := pagination.GetPagination((*productPage).Page, (*productPage).TotalPages, 5)
-		productPage.Pagination = make(map[uint64]pages.PaginationItem)
+		paginationPages := pagination.GetPagination((*shopPage).Page, (*shopPage).TotalPages, 5)
+		shopPage.Pagination = make(map[uint64]pages.PaginationItem)
 		for _, page := range paginationPages {
 			newUrl := *url
 			newUrl.Params.Page = &page
-			productPage.Pagination[page] = pages.PaginationItem{
+			shopPage.Pagination[page] = pages.PaginationItem{
 				Page:        page,
 				Url:         c.MakeProductPageUrl(newUrl),
 				CurrentPage: *url.Params.Page,
@@ -167,11 +168,25 @@ func (c Controller) RenderShopPage(
 	}()
 
 	wg.Wait()
-
 	/* fourth round loading */
 
+	// make template
+	var tmpl *template.Template
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var err error
+		tmpl, err = c.makeTemplate("shop.gohtml")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}()
+
+	wg.Wait()
+
 	// render template
-	if err := tmpl.Execute(w, productPage); err != nil {
+	if err := tmpl.Execute(w, shopPage); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 

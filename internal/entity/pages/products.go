@@ -3,13 +3,15 @@ package pages
 import (
 	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/google/uuid"
+	"html/template"
 )
 
-type ProductPage struct {
+type ShopPage struct {
 	Name             string
 	SeoTitle         string
 	ShortDescription string
 	Description      string
+	DescriptionHtml  template.HTML
 	Items            []ProductGridItem
 	Url              string
 	Page             uint64

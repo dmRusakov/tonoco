@@ -2,15 +2,15 @@ package service
 
 import (
 	"context"
-	"github.com/dmRusakov/tonoco/internal/domain/shop_page/model"
+	"github.com/dmRusakov/tonoco/internal/domain/shop/model"
 	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/google/uuid"
 	"time"
 )
 
-type Item = db.ShopPage
-type Filter = db.ShopPageFilter
+type Item = db.Shop
+type Filter = db.ShopFilter
 
 type Repository interface {
 	Get(ctx context.Context, filter *Filter) (*Item, error)

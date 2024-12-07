@@ -9,12 +9,12 @@ import (
 	"sync"
 )
 
-func (u *UseCase) GetShopPage(ctx context.Context, pageUrl string) (*pages.ShopPage, []error) {
+func (u *UseCase) GetShopPage(ctx context.Context, pageUrl string) (*pages.Shop, []error) {
 	var wg sync.WaitGroup
 	var errs []error
 
 	// ger shop page by url
-	pageIds, err := u.shopPage.Get(ctx, &db.ShopPageFilter{
+	pageIds, err := u.shopPage.Get(ctx, &db.ShopFilter{
 		Urls: &[]string{pageUrl},
 	})
 
@@ -23,7 +23,7 @@ func (u *UseCase) GetShopPage(ctx context.Context, pageUrl string) (*pages.ShopP
 		return nil, errs
 	}
 
-	page := pages.ShopPage{
+	page := pages.Shop{
 		Id:        pageIds.Id,
 		Url:       pageIds.Url,
 		Page:      pageIds.Page,
@@ -50,7 +50,7 @@ func (u *UseCase) GetShopPage(ctx context.Context, pageUrl string) (*pages.ShopP
 
 		// get text
 		text, e := u.text.Get(ctx, &db.TextFilter{
-			Source:    pointer.StringToPtr("shop_page"),
+			Source:    pointer.StringToPtr("shop"),
 			SubSource: pointer.StringToPtr("name"),
 			Language:  pointer.StringToPtr(u.cfg.AppDefaultLanguage),
 			Ids:       &[]uuid.UUID{pageIds.Name},
@@ -78,7 +78,7 @@ func (u *UseCase) GetShopPage(ctx context.Context, pageUrl string) (*pages.ShopP
 
 		// get text
 		text, e := u.text.Get(ctx, &db.TextFilter{
-			Source:    pointer.StringToPtr("shop_page"),
+			Source:    pointer.StringToPtr("shop"),
 			SubSource: pointer.StringToPtr("seo_title"),
 			Language:  pointer.StringToPtr(u.cfg.AppDefaultLanguage),
 			Ids:       &[]uuid.UUID{pageIds.SeoTitle},
@@ -105,7 +105,7 @@ func (u *UseCase) GetShopPage(ctx context.Context, pageUrl string) (*pages.ShopP
 		}
 
 		text, e := u.text.Get(ctx, &db.TextFilter{
-			Source:    pointer.StringToPtr("shop_page"),
+			Source:    pointer.StringToPtr("shop"),
 			SubSource: pointer.StringToPtr("short_description"),
 			Language:  pointer.StringToPtr(u.cfg.AppDefaultLanguage),
 			Ids:       &[]uuid.UUID{pageIds.ShortDescription},
@@ -132,7 +132,7 @@ func (u *UseCase) GetShopPage(ctx context.Context, pageUrl string) (*pages.ShopP
 		}
 
 		text, e := u.text.Get(ctx, &db.TextFilter{
-			Source:    pointer.StringToPtr("shop_page"),
+			Source:    pointer.StringToPtr("shop"),
 			SubSource: pointer.StringToPtr("description"),
 			Language:  pointer.StringToPtr(u.cfg.AppDefaultLanguage),
 			Ids:       &[]uuid.UUID{pageIds.Description},
