@@ -3,7 +3,13 @@
 {{define "content" }}
     <div class="contentBody">
         <div class="header">
-            <h1>{{.Name}}</h1>
+            <div class="title">
+                <h1>{{.Name}}</h1>
+                <p>{{.ShortDescription}}</p>
+            </div>
+            <div class="filters">
+
+            </div>
         </div>
         {{template "products_grid" .}}
         <div class="description">
