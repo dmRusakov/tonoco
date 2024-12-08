@@ -12,6 +12,11 @@ package pagination
 func GetPagination(page, totalPages, count uint64) []uint64 {
 	var pagination []uint64
 
+	// add page if first or last
+	if page == 1 || page == totalPages {
+		count++
+	}
+
 	if totalPages <= count {
 		// If the total number of pages is less than or equal to the count, display all pages.
 		for i := uint64(1); i <= totalPages; i++ {
