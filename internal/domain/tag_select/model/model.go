@@ -80,8 +80,8 @@ func (m *Model) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, 
 	tagTypeIds := make([]uuid.UUID, 0)
 
 	for rows.Next() {
-		item, err := m.scanRow(ctx, rows)
-		if err != nil {
+		item, e := m.scanRow(ctx, rows)
+		if e != nil {
 			return nil, err
 		}
 

@@ -23,6 +23,10 @@ func (u *UseCase) GetProductList(
 	var mu sync.Mutex
 	var errs []error
 
+	var gridTagTypes pages.ProductGridTagTypes
+	tagOrder := make(map[uuid.UUID]uint64)
+	gridTagTypes.TagOrder = &tagOrder
+
 	// get product ids
 	var itemIds *[]uuid.UUID
 	wg.Add(1)
@@ -41,13 +45,13 @@ func (u *UseCase) GetProductList(
 
 	// tags on the grid item
 	wg.Add(1)
-	var gridTagTypes db.GridTagTypes
 	go func() {
 		defer wg.Done()
 		// get tag types ids
 		filter := db.ShopTagTypeFilter{
 			ShopIds: &[]uuid.UUID{*shopId},
 			Active:  pointer.BoolPtr(true),
+			Sources: &[]string{"grid-tag"},
 			DataConfig: &entity.DataConfig{
 				IsCount:        pointer.BoolPtr(false),
 				IsUpdateFilter: pointer.BoolPtr(true),
@@ -59,18 +63,15 @@ func (u *UseCase) GetProductList(
 			errs = append(errs, err)
 			return
 		}
-
-		tagOrder := make(map[uuid.UUID]uint64)
-		gridTagTypes.TagOrder = &tagOrder
+		gridTagTypes.TagTypesIds = filter.TagTypeIds
 		for _, item := range *shopTagTypes {
 			(*gridTagTypes.TagOrder)[item.TagTypeId] = item.SortOrder
 		}
 
-		gridTagTypes.TagTypesIds = filter.TagTypeIds
-
 		// get tag types
 		gridTagTypes.TagTypes, err = u.tagType.List(ctx, &(db.TagTypeFilter{
-			Ids: filter.TagTypeIds,
+			Ids:    filter.TagTypeIds,
+			Active: pointer.BoolPtr(true),
 		}))
 
 		if err != nil {
@@ -159,7 +160,7 @@ func (u *UseCase) fetchProductDetails(
 	currency *db.Currency,
 	errs *[]error,
 	mu *sync.Mutex,
-	gridTagTypes db.GridTagTypes,
+	gridTagTypes pages.ProductGridTagTypes,
 ) *pages.ProductGridItem {
 	// Check cache
 	if item := u.getGridItemCache(itemId); item != nil {
@@ -286,17 +287,16 @@ func (u *UseCase) fetchProductDetails(
 			}
 
 			if tag.TagSelectId != uuid.Nil {
-				tagSelect, err := u.tagSelect.List(ctx, &(db.TagSelectFilter{
-					// omitted for brevity
+				tagSelect, e := u.tagSelect.Get(ctx, &(db.TagSelectFilter{
+					Ids: &[]uuid.UUID{tag.TagSelectId},
 				}))
-				if err != nil {
+				if e != nil {
 					isOk = false
-					*errs = append(*errs, err)
+					*errs = append(*errs, e)
 					return
 				}
 
-				selectName := (*tagSelect)[tag.TagSelectId].Name
-				itemTag.Value = selectName
+				itemTag.Value = tagSelect.Name
 			} else {
 				itemTag.Value = tag.Value
 			}

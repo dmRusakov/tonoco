@@ -25,3 +25,10 @@ type Shop struct {
 	UpdatedAt        time.Time
 	UpdatedBy        uuid.UUID
 }
+
+type ShopPageFilter struct {
+	TagUrlMap *map[string]uuid.UUID                     // map[url]tagTypeId
+	TagTypes  *map[uuid.UUID]db.TagType                 // map[tagTypeId]tagType
+	TagOrder  *map[uint64]uuid.UUID                     // map[sortOrder]tagTypeId
+	TagSelect *map[uuid.UUID]map[uuid.UUID]db.TagSelect // map[tagTypeId]map[tagSelectId]tagSelect
+}

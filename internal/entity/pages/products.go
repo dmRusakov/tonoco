@@ -13,6 +13,7 @@ type ShopPage struct {
 	ShortDescription template.HTML
 	Description      template.HTML
 	Items            []ProductGridItem
+	Filter           *ShopPageFilter
 	Url              string
 	Page             uint64
 	PerPage          uint64
@@ -73,4 +74,10 @@ type ProductListItemTag struct {
 	Name  string
 	Url   string
 	Value string
+}
+
+type ProductGridTagTypes struct {
+	TagTypes    *map[uuid.UUID]db.TagType
+	TagOrder    *map[uuid.UUID]uint64
+	TagTypesIds *[]uuid.UUID
 }

@@ -43,9 +43,3 @@ type TagTypeFilter struct {
 	IsUpdateFilter *bool `json:"is_update_filter"`
 	IsKeepIdsOrder *bool `json:"is_keep_ids_order"`
 }
-
-type GridTagTypes struct {
-	TagTypes    *map[uuid.UUID]TagType
-	TagOrder    *map[uuid.UUID]uint64
-	TagTypesIds *[]uuid.UUID
-}

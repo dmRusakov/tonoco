@@ -64,7 +64,6 @@ func (c Controller) RenderShopPage(
 		shopPage.Url = shop.Url
 		shopPage.ShortDescription = html.GetTemplate(shop.ShortDescription)
 		shopPage.Description = html.GetTemplate(shop.Description)
-
 		shopPage.ConsoleMessage = pages.ConsoleMessage{}
 
 		// page
@@ -103,6 +102,17 @@ func (c Controller) RenderShopPage(
 			errs = append(errs, err)
 		}
 		shopPage.TotalItems = pointer.PtrToUint64(url.Params.Count)
+	}()
+
+	// get filters tag for shop page
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var err error
+		shopPage.Filter, err = c.shopUseCase.GetShopPageFilter(ctx, &url.Params, &shopPage.Id)
+		if err != nil {
+			errs = append(errs, err)
+		}
 	}()
 
 	wg.Wait()
