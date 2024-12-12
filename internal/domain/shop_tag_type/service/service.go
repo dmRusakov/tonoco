@@ -2,19 +2,19 @@ package service
 
 import (
 	"context"
-	"github.com/dmRusakov/tonoco/internal/domain/tag_type/model"
-	"github.com/dmRusakov/tonoco/internal/entity"
+	"github.com/dmRusakov/tonoco/internal/domain/shop_tag_type/model"
 	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/google/uuid"
 	"time"
 )
 
-type Item = db.TagType
-type Filter = db.TagTypeFilter
+type Item = db.ShopTagType
+type Filter = db.ShopTagTypeFilter
 
 type Repository interface {
 	Get(ctx context.Context, filter *Filter) (*Item, error)
 	List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error)
+	Ids(ctx context.Context, filter *Filter) (*[]uuid.UUID, error)
 	Create(ctx context.Context, item *Item) (*uuid.UUID, error)
 	Update(ctx context.Context, item *Item) error
 	Patch(ctx context.Context, id *uuid.UUID, fields *map[string]interface{}) error
@@ -26,26 +26,27 @@ type Repository interface {
 
 type Service struct {
 	repository model.Storage
+	urls       map[uuid.UUID]string
 }
 
 func NewService(repository *model.Model) *Service {
-	return &Service{
+	service := &Service{
 		repository: repository,
 	}
+
+	return service
 }
 
 func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {
-	if filter == nil {
-		return nil, entity.ErrFilterIsNil
-	}
 	return s.repository.Get(ctx, filter)
 }
 
 func (s *Service) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {
-	if filter == nil {
-		return nil, entity.ErrFilterIsNil
-	}
 	return s.repository.List(ctx, filter)
+}
+
+func (s *Service) Ids(ctx context.Context, filter *Filter) (*[]uuid.UUID, error) {
+	return s.repository.Ids(ctx, filter)
 }
 
 func (s *Service) Create(ctx context.Context, item *Item) (*uuid.UUID, error) {

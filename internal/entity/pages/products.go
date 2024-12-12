@@ -7,6 +7,7 @@ import (
 )
 
 type ShopPage struct {
+	Id               uuid.UUID
 	Name             template.HTML
 	SeoTitle         template.HTML
 	ShortDescription template.HTML

@@ -40,11 +40,7 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 		m.mapFieldToDBColumn("Url"),
 		m.mapFieldToDBColumn("ShortDescription"),
 		m.mapFieldToDBColumn("Description"),
-		m.mapFieldToDBColumn("Required"),
 		m.mapFieldToDBColumn("Active"),
-		m.mapFieldToDBColumn("Prime"),
-		m.mapFieldToDBColumn("ListItem"),
-		m.mapFieldToDBColumn("Filter"),
 		m.mapFieldToDBColumn("SortOrder"),
 		m.mapFieldToDBColumn("Type"),
 		m.mapFieldToDBColumn("Prefix"),
@@ -134,21 +130,6 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Active"): *filter.Active})
 	}
 
-	// Prime
-	if filter.Prime != nil {
-		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Prime"): *filter.Prime})
-	}
-
-	// ListItem
-	if filter.ListItem != nil {
-		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("ListItem"): *filter.ListItem})
-	}
-
-	// Filter
-	if filter.Filter != nil {
-		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Filter"): *filter.Filter})
-	}
-
 	// Type
 	if filter.Type != nil {
 		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Type"): *filter.Type})
@@ -198,21 +179,6 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Active"): *filter.Active})
 	}
 
-	// Prime
-	if filter.Prime != nil {
-		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Prime"): *filter.Prime})
-	}
-
-	// ListItem
-	if filter.ListItem != nil {
-		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("ListItem"): *filter.ListItem})
-	}
-
-	// Filter
-	if filter.Filter != nil {
-		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Filter"): *filter.Filter})
-	}
-
 	// Type
 	if filter.Type != nil {
 		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Type"): *filter.Type})
@@ -235,7 +201,7 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 
 func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 	var id, name, url, shortDescription, description, typeField, prefix, suffix, createdBy, updatedBy sql.NullString
-	var required, active, prime, listItem, filter sql.NullBool
+	var active sql.NullBool
 	var sortOrder sql.NullInt64
 	var createdAt, updatedAt sql.NullTime
 
@@ -245,11 +211,7 @@ func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 		&url,
 		&shortDescription,
 		&description,
-		&required,
 		&active,
-		&prime,
-		&listItem,
-		&filter,
 		&sortOrder,
 		&typeField,
 		&prefix,
@@ -283,20 +245,8 @@ func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 	if description.Valid {
 		item.Description = description.String
 	}
-	if required.Valid {
-		item.Required = required.Bool
-	}
 	if active.Valid {
 		item.Active = active.Bool
-	}
-	if prime.Valid {
-		item.Prime = prime.Bool
-	}
-	if listItem.Valid {
-		item.ListItem = listItem.Bool
-	}
-	if filter.Valid {
-		item.Filter = filter.Bool
 	}
 	if sortOrder.Valid {
 		item.SortOrder = uint64(sortOrder.Int64)
@@ -358,11 +308,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		m.mapFieldToDBColumn("Url"),
 		m.mapFieldToDBColumn("ShortDescription"),
 		m.mapFieldToDBColumn("Description"),
-		m.mapFieldToDBColumn("Required"),
 		m.mapFieldToDBColumn("Active"),
-		m.mapFieldToDBColumn("Prime"),
-		m.mapFieldToDBColumn("ListItem"),
-		m.mapFieldToDBColumn("Filter"),
 		m.mapFieldToDBColumn("SortOrder"),
 		m.mapFieldToDBColumn("Type"),
 		m.mapFieldToDBColumn("Prefix"),
@@ -377,11 +323,7 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		item.Url,
 		item.ShortDescription,
 		item.Description,
-		item.Required,
 		item.Active,
-		item.Prime,
-		item.ListItem,
-		item.Filter,
 		item.SortOrder,
 		item.Type,
 		item.Prefix,
@@ -404,11 +346,7 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 		Set(m.mapFieldToDBColumn("Url"), item.Url).
 		Set(m.mapFieldToDBColumn("ShortDescription"), item.ShortDescription).
 		Set(m.mapFieldToDBColumn("Description"), item.Description).
-		Set(m.mapFieldToDBColumn("Required"), item.Required).
 		Set(m.mapFieldToDBColumn("Active"), item.Active).
-		Set(m.mapFieldToDBColumn("Prime"), item.Prime).
-		Set(m.mapFieldToDBColumn("ListItem"), item.ListItem).
-		Set(m.mapFieldToDBColumn("Filter"), item.Filter).
 		Set(m.mapFieldToDBColumn("SortOrder"), item.SortOrder).
 		Set(m.mapFieldToDBColumn("Type"), item.Type).
 		Set(m.mapFieldToDBColumn("Prefix"), item.Prefix).

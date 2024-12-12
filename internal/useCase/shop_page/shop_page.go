@@ -14,7 +14,7 @@ func (u *UseCase) GetShopPage(ctx context.Context, pageUrl string) (*pages.Shop,
 	var errs []error
 
 	// ger shop page by url
-	pageIds, err := u.shopPage.Get(ctx, &db.ShopFilter{
+	pageIds, err := u.shop.Get(ctx, &db.ShopFilter{
 		Urls: &[]string{pageUrl},
 	})
 

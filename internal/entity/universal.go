@@ -12,11 +12,6 @@ type DataPagination struct {
 }
 
 func CheckDataPagination(d *DataPagination) {
-	// check if d is nil
-	if d == nil {
-		d = &DataPagination{}
-	}
-
 	// OrderBy
 	if d.OrderBy == nil {
 		d.OrderBy = pointer.StringToPtr("SortOrder")

@@ -16,6 +16,7 @@ import (
 func (u *UseCase) GetProductList(
 	ctx context.Context,
 	parameters *pages.ProductsPageUrlParams,
+	shopId *uuid.UUID,
 ) (*map[uuid.UUID]*pages.ProductGridItem, *[]uuid.UUID, error) {
 
 	var wg sync.WaitGroup
@@ -38,6 +39,47 @@ func (u *UseCase) GetProductList(
 		currency = u.getCurrency(ctx, parameters, &errs)
 	}()
 
+	// tags on the grid item
+	wg.Add(1)
+	var gridTagTypes db.GridTagTypes
+	go func() {
+		defer wg.Done()
+		// get tag types ids
+		filter := db.ShopTagTypeFilter{
+			ShopIds: &[]uuid.UUID{*shopId},
+			Active:  pointer.BoolPtr(true),
+			DataConfig: &entity.DataConfig{
+				IsCount:        pointer.BoolPtr(false),
+				IsUpdateFilter: pointer.BoolPtr(true),
+				IsKeepIdsOrder: pointer.BoolPtr(true),
+			},
+		}
+		shopTagTypes, err := u.shopTagType.List(ctx, &filter)
+		if err != nil {
+			errs = append(errs, err)
+			return
+		}
+
+		tagOrder := make(map[uuid.UUID]uint64)
+		gridTagTypes.TagOrder = &tagOrder
+		for _, item := range *shopTagTypes {
+			(*gridTagTypes.TagOrder)[item.TagTypeId] = item.SortOrder
+		}
+
+		gridTagTypes.TagTypesIds = filter.TagTypeIds
+
+		// get tag types
+		gridTagTypes.TagTypes, err = u.tagType.List(ctx, &(db.TagTypeFilter{
+			Ids: filter.TagTypeIds,
+		}))
+
+		if err != nil {
+			errs = append(errs, err)
+			return
+		}
+
+	}()
+
 	wg.Wait()
 
 	// check errors
@@ -52,7 +94,7 @@ func (u *UseCase) GetProductList(
 		wg.Add(1)
 		go func(itemId uuid.UUID) {
 			defer wg.Done()
-			item := u.fetchProductDetails(ctx, itemId, currency, &errs, &mu)
+			item := u.fetchProductDetails(ctx, itemId, currency, &errs, &mu, gridTagTypes)
 			mu.Lock()
 			productsDto[itemId] = item
 			mu.Unlock()
@@ -74,7 +116,11 @@ func (u *UseCase) GetProductList(
 	return &productsDto, itemIds, nil
 }
 
-func (u *UseCase) fetchProductIds(ctx context.Context, parameters *pages.ProductsPageUrlParams, errs *[]error) *[]uuid.UUID {
+func (u *UseCase) fetchProductIds(
+	ctx context.Context,
+	parameters *pages.ProductsPageUrlParams,
+	errs *[]error,
+) *[]uuid.UUID {
 	// hash parameters
 	hash := crypt.HashFilter(parameters)
 	if itemIds, count := u.getItemIdsCache(hash); itemIds != nil {
@@ -107,7 +153,14 @@ func (u *UseCase) fetchProductIds(ctx context.Context, parameters *pages.Product
 	return productIds
 }
 
-func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, currency *db.Currency, errs *[]error, mu *sync.Mutex) *pages.ProductGridItem {
+func (u *UseCase) fetchProductDetails(
+	ctx context.Context,
+	itemId uuid.UUID,
+	currency *db.Currency,
+	errs *[]error,
+	mu *sync.Mutex,
+	gridTagTypes db.GridTagTypes,
+) *pages.ProductGridItem {
 	// Check cache
 	if item := u.getGridItemCache(itemId); item != nil {
 		return item
@@ -210,16 +263,10 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		defaultTagTypes, err := u.tagType.GetDefaultIds("list")
-		if err != nil {
-			isOk = false
-			*errs = append(*errs, err)
-			return
-		}
 
 		tags, err := u.tag.List(ctx, &(db.TagFilter{
 			ProductIds: &[]uuid.UUID{itemId},
-			TagTypeIds: defaultTagTypes.TagTypesIds,
+			TagTypeIds: gridTagTypes.TagTypesIds,
 			OrderBy:    pointer.StringToPtr("TagTypeId"),
 			OrderDir:   pointer.StringToPtr("ASC"),
 			Active:     pointer.BoolPtr(true),
@@ -234,8 +281,8 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 
 		for _, tag := range *tags {
 			itemTag := pages.ProductListItemTag{
-				Name: (*defaultTagTypes.TagTypes)[tag.TagTypeId].Name,
-				Url:  (*defaultTagTypes.TagTypes)[tag.TagTypeId].Url,
+				Name: (*gridTagTypes.TagTypes)[tag.TagTypeId].Name,
+				Url:  (*gridTagTypes.TagTypes)[tag.TagTypeId].Url,
 			}
 
 			if tag.TagSelectId != uuid.Nil {
@@ -254,7 +301,7 @@ func (u *UseCase) fetchProductDetails(ctx context.Context, itemId uuid.UUID, cur
 				itemTag.Value = tag.Value
 			}
 
-			tagOrder := *defaultTagTypes.TagOrder
+			tagOrder := *gridTagTypes.TagOrder
 			itemTags[tagOrder[tag.TagTypeId]] = itemTag
 		}
 

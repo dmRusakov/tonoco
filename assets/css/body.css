@@ -229,11 +229,15 @@ h3, h4, h5, h6 {
                         display: none;
                     }
 
-                    /* hide with if first div are category */
-
-                    &:nth-child(2) .width {
+                    &:nth-child(3) .category {
                         display: none;
                     }
+
+                    /* hide with if first div are category */
+
+                    /*&:nth-child(2) .width {*/
+                    /*    display: none;*/
+                    /*}*/
                 }
             }
         }

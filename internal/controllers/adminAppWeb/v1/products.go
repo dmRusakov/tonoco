@@ -58,6 +58,7 @@ func (c Controller) RenderShopPage(
 			errs = append(errs, e...)
 		}
 
+		shopPage.Id = shop.Id
 		shopPage.Name = html.GetTemplate(shop.Name)
 		shopPage.SeoTitle = html.GetTemplate(shop.SeoTitle)
 		shopPage.Url = shop.Url
@@ -97,7 +98,7 @@ func (c Controller) RenderShopPage(
 	go func() {
 		defer wg.Done()
 		var err error
-		products, ids, err = c.shopUseCase.GetProductList(ctx, &url.Params)
+		products, ids, err = c.shopUseCase.GetProductList(ctx, &url.Params, &shopPage.Id)
 		if err != nil {
 			errs = append(errs, err)
 		}
@@ -114,9 +115,8 @@ func (c Controller) RenderShopPage(
 		return
 	}
 
-	wg.Add(2)
-
 	// add a product
+	wg.Add(1)
 	shopPage.Items = make([]pages.ProductGridItem, 0)
 	go func() {
 		defer wg.Done()
@@ -147,6 +147,7 @@ func (c Controller) RenderShopPage(
 	}()
 
 	// total pages and pagination
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		// total pages

@@ -20,6 +20,8 @@ import (
 	product_info_service "github.com/dmRusakov/tonoco/internal/domain/product_info/service"
 	shop_page_model "github.com/dmRusakov/tonoco/internal/domain/shop/model"
 	shop_page_service "github.com/dmRusakov/tonoco/internal/domain/shop/service"
+	shop_tag_type_model "github.com/dmRusakov/tonoco/internal/domain/shop_tag_type/model"
+	shop_tag_type_service "github.com/dmRusakov/tonoco/internal/domain/shop_tag_type/service"
 	stock_quantity_model "github.com/dmRusakov/tonoco/internal/domain/stock_quantity/model"
 	stock_quantity_service "github.com/dmRusakov/tonoco/internal/domain/stock_quantity/service"
 	store_model "github.com/dmRusakov/tonoco/internal/domain/store/model"
@@ -47,7 +49,8 @@ type Services struct {
 	PriceType           *price_type_service.Service
 	ProductImageService *product_image_service.Service
 	ProductInfo         *product_info_service.Service
-	ShopPage            *shop_page_service.Service
+	Shop                *shop_page_service.Service
+	ShopTagType         *shop_tag_type_service.Service
 	StockQuantity       *stock_quantity_service.Service
 	Store               *store_service.Service
 	Tag                 *tag_service.Service
@@ -138,7 +141,17 @@ func (a *App) ServicesInit(cfg *config.Config) error {
 		defer wg.Done()
 		model := shop_page_model.NewStorage(a.SqlDB)
 		mu.Lock()
-		services.ShopPage = shop_page_service.NewService(model)
+		services.Shop = shop_page_service.NewService(model)
+		mu.Unlock()
+	}()
+
+	// shop tag type
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		shopTagTypeStorage := shop_tag_type_model.NewStorage(a.SqlDB)
+		mu.Lock()
+		services.ShopTagType = shop_tag_type_service.NewService(shopTagTypeStorage)
 		mu.Unlock()
 	}()
 
