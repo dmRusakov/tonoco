@@ -50,6 +50,21 @@ func (u *UseCase) setShopPageFilterCache(id uuid.UUID, value *pages.ShopPageFilt
 	u.shopPageFilterCache[id] = value
 }
 
+// grid tag types cache
+func (u *UseCase) getGridTagTypesCache(id uuid.UUID) *pages.ProductGridTagTypes {
+	cache, ok := u.gridTagTypesCache[id]
+	if !ok {
+		return nil
+	}
+	return cache
+}
+
+func (u *UseCase) setGridTagTypesCache(id uuid.UUID, value *pages.ProductGridTagTypes) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	u.gridTagTypesCache[id] = value
+}
+
 // item ids cache
 func (u *UseCase) getItemIdsCache(id uuid.UUID) (*[]uuid.UUID, *uint64) {
 	cache, ok := u.itemIdsCache[id]

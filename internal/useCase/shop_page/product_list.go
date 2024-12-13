@@ -40,42 +40,10 @@ func (u *UseCase) GetProductList(
 
 	// tags on the grid item
 	var gridTagTypes pages.ProductGridTagTypes
-	tagOrder := make(map[uuid.UUID]uint64)
-	gridTagTypes.TagOrder = &tagOrder
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		// get tag types ids
-		filter := db.ShopTagTypeFilter{
-			ShopIds: &[]uuid.UUID{*shopId},
-			Active:  pointer.BoolPtr(true),
-			Sources: &[]string{"grid-tag"},
-			DataConfig: &entity.DataConfig{
-				IsCount:        pointer.BoolPtr(false),
-				IsUpdateFilter: pointer.BoolPtr(true),
-				IsKeepIdsOrder: pointer.BoolPtr(true),
-			},
-		}
-		shopTagTypes, err := u.shopTagType.List(ctx, &filter)
-		if err != nil {
-			errs = append(errs, err)
-			return
-		}
-		gridTagTypes.TagTypesIds = filter.TagTypeIds
-		for _, item := range *shopTagTypes {
-			(*gridTagTypes.TagOrder)[item.TagTypeId] = item.SortOrder
-		}
-
-		// get tag types
-		gridTagTypes.TagTypes, err = u.tagType.List(ctx, &(db.TagTypeFilter{
-			Ids:    filter.TagTypeIds,
-			Active: pointer.BoolPtr(true),
-		}))
-
-		if err != nil {
-			errs = append(errs, err)
-			return
-		}
+		gridTagTypes = *u.fetchGridTags(ctx, shopId, &errs)
 	}()
 
 	wg.Wait()
@@ -112,6 +80,68 @@ func (u *UseCase) GetProductList(
 	}
 
 	return &productsDto, itemIds, nil
+}
+
+func (u *UseCase) fetchGridTags(
+	ctx context.Context,
+	shopId *uuid.UUID,
+	errs *[]error,
+) *pages.ProductGridTagTypes {
+	// get cache
+	if cache := u.getGridTagTypesCache(*shopId); cache != nil {
+		return cache
+	}
+
+	// get tag types
+	var gridTagTypes pages.ProductGridTagTypes
+	tagOrder := make(map[uuid.UUID]uint64)
+	gridTagTypes.TagOrder = &tagOrder
+
+	// get tag types ids
+	filter := db.ShopTagTypeFilter{
+		ShopIds: &[]uuid.UUID{*shopId},
+		Active:  pointer.BoolPtr(true),
+		Sources: &[]string{"grid-tag"},
+		DataConfig: &entity.DataConfig{
+			IsCount:        pointer.BoolPtr(false),
+			IsUpdateFilter: pointer.BoolPtr(true),
+			IsKeepIdsOrder: pointer.BoolPtr(true),
+		},
+	}
+	shopTagTypes, err := u.shopTagType.List(ctx, &filter)
+	if err != nil {
+		*errs = append(*errs, err)
+		return nil
+	}
+	if shopTagTypes == nil {
+		*errs = append(*errs, fmt.Errorf("shopTagTypes is nil"))
+		return nil
+	}
+
+	// get tag types
+	gridTagTypes.TagTypesIds = filter.TagTypeIds
+	for _, item := range *shopTagTypes {
+		(*gridTagTypes.TagOrder)[item.TagTypeId] = item.SortOrder
+	}
+
+	gridTagTypes.TagTypes, err = u.tagType.List(ctx, &(db.TagTypeFilter{
+		Ids:    filter.TagTypeIds,
+		Active: pointer.BoolPtr(true),
+	}))
+	if err != nil {
+		*errs = append(*errs, err)
+		return nil
+	}
+	if gridTagTypes.TagTypes == nil {
+		*errs = append(*errs, fmt.Errorf("gridTagTypes.TagTypes is nil"))
+		return nil
+	}
+
+	// save to cache
+	go u.setGridTagTypesCache(*shopId, &gridTagTypes)
+
+	// return
+	return &gridTagTypes
 }
 
 func (u *UseCase) fetchProductIds(
