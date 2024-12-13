@@ -48,8 +48,10 @@ type UseCase struct {
 	productImage  *product_image_service.Service
 
 	// cache
-	gridItemCache map[uuid.UUID]*pages.ProductGridItem
-	itemIdsCache  map[uuid.UUID]struct {
+	shopPageCache       map[string]*pages.Shop
+	shopPageFilterCache map[uuid.UUID]*pages.ShopPageFilter
+	gridItemCache       map[uuid.UUID]*pages.ProductGridItem
+	itemIdsCache        map[uuid.UUID]struct {
 		ids   *[]uuid.UUID
 		count *uint64
 	}
@@ -102,7 +104,9 @@ func NewUseCase(
 		productImage:  productImageService,
 
 		// cache
-		gridItemCache: make(map[uuid.UUID]*pages.ProductGridItem),
+		shopPageCache:       make(map[string]*pages.Shop),
+		shopPageFilterCache: make(map[uuid.UUID]*pages.ShopPageFilter),
+		gridItemCache:       make(map[uuid.UUID]*pages.ProductGridItem),
 		itemIdsCache: make(map[uuid.UUID]struct {
 			ids   *[]uuid.UUID
 			count *uint64

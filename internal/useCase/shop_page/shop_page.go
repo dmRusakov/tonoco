@@ -10,6 +10,13 @@ import (
 )
 
 func (u *UseCase) GetShopPage(ctx context.Context, pageUrl string) (*pages.Shop, []error) {
+	// try to get cache
+	cache := u.getShopPageCache(pageUrl)
+	if cache != nil {
+		return cache, nil
+	}
+
+	// create vars
 	var wg sync.WaitGroup
 	var errs []error
 
@@ -194,5 +201,14 @@ func (u *UseCase) GetShopPage(ctx context.Context, pageUrl string) (*pages.Shop,
 	// wait for all goroutines
 	wg.Wait()
 
+	// check for errors
+	if len(errs) > 0 {
+		return nil, errs
+	}
+
+	// set cache
+	go u.setShopPageCache(pageUrl, &page)
+
+	// return page
 	return &page, nil
 }

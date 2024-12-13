@@ -18,7 +18,6 @@ func (u *UseCase) GetProductList(
 	parameters *pages.ProductsPageUrlParams,
 	shopId *uuid.UUID,
 ) (*map[uuid.UUID]*pages.ProductGridItem, *[]uuid.UUID, error) {
-
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	var errs []error
@@ -78,7 +77,6 @@ func (u *UseCase) GetProductList(
 			errs = append(errs, err)
 			return
 		}
-
 	}()
 
 	wg.Wait()

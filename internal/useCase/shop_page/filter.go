@@ -11,9 +11,15 @@ import (
 
 func (u *UseCase) GetShopPageFilter(
 	ctx context.Context,
-	parameters *pages.ProductsPageUrlParams,
 	shopId *uuid.UUID,
 ) (*pages.ShopPageFilter, error) {
+	// get cache
+	cache := u.getShopPageFilterCache(*shopId)
+	if cache != nil {
+		return cache, nil
+	}
+
+	// make vars
 	var shopPageFilter pages.ShopPageFilter
 	urlMapping := make(map[string]uuid.UUID)
 	shopPageFilter.TagUrlMap = &urlMapping
@@ -71,5 +77,9 @@ func (u *UseCase) GetShopPageFilter(
 		}
 	}
 
+	// set cache
+	go u.setShopPageFilterCache(*shopId, &shopPageFilter)
+
+	// return
 	return &shopPageFilter, nil
 }
