@@ -4,33 +4,16 @@ import (
 	"context"
 	"database/sql"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/dmRusakov/tonoco/internal/entity"
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	psql "github.com/dmRusakov/tonoco/pkg/postgresql"
 	"github.com/dmRusakov/tonoco/pkg/tracing"
 	"github.com/dmRusakov/tonoco/pkg/utils/pointer"
 	"github.com/google/uuid"
-	"reflect"
 )
 
 func (m *Model) mapFieldToDBColumn(field string) string {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	// check if field is in the cash
-	if dbField, ok := m.dbFieldCash[field]; ok {
-		return dbField
-	}
-
-	// get field from struct
-	typeOf := reflect.TypeOf(Item{})
-	byName, _ := typeOf.FieldByName(field)
-	dbField := byName.Tag.Get("db")
-
-	// set field to cash
-	m.dbFieldCash[field] = dbField
-
-	// done
-	return dbField
+	return m.dbField[field]
 }
 
 func (m *Model) makeStatement() sq.SelectBuilder {
@@ -39,8 +22,6 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 		m.mapFieldToDBColumn("TagTypeId"),
 		m.mapFieldToDBColumn("Name"),
 		m.mapFieldToDBColumn("Url"),
-		m.mapFieldToDBColumn("ShortDescription"),
-		m.mapFieldToDBColumn("Description"),
 		m.mapFieldToDBColumn("Active"),
 		m.mapFieldToDBColumn("SortOrder"),
 		m.mapFieldToDBColumn("CreatedAt"),
@@ -48,6 +29,58 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 		m.mapFieldToDBColumn("UpdatedAt"),
 		m.mapFieldToDBColumn("UpdatedBy"),
 	).From(m.table + " p")
+}
+
+func (m *Model) filterDTO(filter *Filter) {
+	if filter == nil {
+		filter = &Filter{}
+	}
+
+	// check DataConfig
+	if filter.DataConfig == nil {
+		filter.DataConfig = &entity.DataConfig{}
+	}
+
+	// check DataPagination
+	if filter.DataPagination == nil {
+		filter.DataPagination = &entity.DataPagination{}
+	}
+
+	entity.CheckDataPagination(filter.DataPagination)
+}
+
+func (m *Model) filterToStatement(statement sq.SelectBuilder, filter *Filter) sq.SelectBuilder {
+	// Ids
+	if filter.Ids != nil && len(*filter.Ids) > 0 {
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Id"): *filter.Ids})
+	}
+
+	// Urls
+	if filter.Urls != nil && len(*filter.Urls) > 0 {
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Url"): *filter.Urls})
+	}
+
+	// TagTypeIds
+	if filter.TagTypeIds != nil && len(*filter.TagTypeIds) > 0 {
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("TagTypeId"): *filter.TagTypeIds})
+	}
+
+	// Active
+	if filter.Active != nil {
+		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Active"): *filter.Active})
+	}
+
+	// Search
+	if filter.Search != nil {
+		statement = statement.Where(
+			sq.Or{
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+				sq.Expr("LOWER("+m.mapFieldToDBColumn("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
+			},
+		)
+	}
+
+	return statement
 }
 
 func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
@@ -67,180 +100,31 @@ func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 	return statement
 }
 
-func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
-	// OrderBy
-	if filter.OrderBy == nil {
-		filter.OrderBy = pointer.StringToPtr("SortOrder")
-	}
-
-	// OrderDir
-	if filter.OrderDir == nil {
-		filter.OrderDir = pointer.StringToPtr("ASC")
-	}
-
-	// PerPage
-	if filter.PerPage == nil {
-		if filter.Page == nil {
-			filter.PerPage = pointer.UintTo64Ptr(999999999999999999)
-		} else {
-			filter.PerPage = pointer.UintTo64Ptr(10)
-		}
-	}
-
-	// Page
-	if filter.Page == nil {
-		filter.Page = pointer.UintTo64Ptr(1)
-	}
-
-	// Build query
-	statement := m.makeStatement()
-
-	// Ids
-	if filter.Ids != nil {
-		countIds := len(*filter.Ids)
-
-		if countIds > 0 {
-			statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Id"): *filter.Ids})
-		}
-
-		*filter.Page = 1
-		if (*filter.PerPage) > uint64(countIds) {
-			*filter.PerPage = uint64(countIds)
-		}
-	}
-
-	// Urls
-	if filter.Urls != nil {
-		countUrls := len(*filter.Urls)
-
-		if countUrls > 0 {
-			statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Url"): *filter.Urls})
-		}
-
-		*filter.Page = 1
-		if (*filter.PerPage) > uint64(countUrls) {
-			*filter.PerPage = uint64(countUrls)
-		}
-	}
-
-	// TagTypeId
-	if filter.TagTypeIds != nil {
-		countTagTypeIds := len(*filter.TagTypeIds)
-
-		if countTagTypeIds > 0 {
-			statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("TagTypeId"): *filter.TagTypeIds})
-		}
-
-		*filter.Page = 1
-		if (*filter.PerPage) > uint64(countTagTypeIds) {
-			*filter.PerPage = uint64(countTagTypeIds)
-		}
-
-	}
-
-	// Active
-	if filter.Active != nil {
-		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Active"): *filter.Active})
-	}
-
-	// Search
-	if filter.Search != nil {
-		statement = statement.Where(
-			sq.Or{
-				sq.Expr("LOWER("+m.mapFieldToDBColumn("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.mapFieldToDBColumn("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.mapFieldToDBColumn("ShortDescription")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.mapFieldToDBColumn("Description")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-			},
-		)
-	}
-
-	// Add OrderBy, OrderDir, Page, Limit and return
-	return statement.OrderBy(m.mapFieldToDBColumn(*filter.OrderBy) + " " + *filter.OrderDir).
-		Offset((*filter.Page - 1) * *filter.PerPage).Limit(*filter.PerPage)
+func (m *Model) makeStatementByFilter(statement sq.SelectBuilder, filter *Filter) sq.SelectBuilder {
+	statement = m.filterToStatement(statement, filter)
+	return statement.OrderBy(m.mapFieldToDBColumn(*filter.DataPagination.OrderBy) + " " + *filter.DataPagination.OrderDir).
+		Offset((*filter.DataPagination.Page - 1) * *filter.DataPagination.PerPage).Limit(*filter.DataPagination.PerPage)
 }
 
 func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
-	// Build query
-	statement := m.makeStatement()
-
-	// Ids
-	if filter.Ids != nil {
-		countIds := len(*filter.Ids)
-
-		if countIds > 0 {
-			statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Id"): *filter.Ids})
-		}
-
-		*filter.Page = 1
-		if (*filter.PerPage) > uint64(countIds) {
-			*filter.PerPage = uint64(countIds)
-		}
-	}
-
-	// Urls
-	if filter.Urls != nil {
-		countUrls := len(*filter.Urls)
-
-		if countUrls > 0 {
-			statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Url"): *filter.Urls})
-		}
-
-		*filter.Page = 1
-		if (*filter.PerPage) > uint64(countUrls) {
-			*filter.PerPage = uint64(countUrls)
-		}
-	}
-
-	// TagTypeId
-	if filter.TagTypeIds != nil {
-		countTagTypeIds := len(*filter.TagTypeIds)
-
-		if countTagTypeIds > 0 {
-			statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("TagTypeId"): *filter.TagTypeIds})
-		}
-
-		*filter.Page = 1
-		if (*filter.PerPage) > uint64(countTagTypeIds) {
-			*filter.PerPage = uint64(countTagTypeIds)
-		}
-
-	}
-
-	// Active
-	if filter.Active != nil {
-		statement = statement.Where(sq.Eq{m.mapFieldToDBColumn("Active"): *filter.Active})
-	}
-
-	// Search
-	if filter.Search != nil {
-		statement = statement.Where(
-			sq.Or{
-				sq.Expr("LOWER("+m.mapFieldToDBColumn("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.mapFieldToDBColumn("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.mapFieldToDBColumn("ShortDescription")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.mapFieldToDBColumn("Description")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-			},
-		)
-	}
-
-	return statement
+	statement := m.qb.Select("COUNT(*) as count").From(m.table + " p")
+	return m.filterToStatement(statement, filter)
 }
 
 func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
-	var tagSelect = &Item{}
-	var id, tagTypeId, name, url, shortDescription, description, createdBy, updatedBy sql.NullString
-	var active sql.NullBool
-	var sortOrder sql.NullInt64
-	var createdAt, updatedAt sql.NullTime
+	var (
+		item                                           = Item{}
+		id, tagTypeId, name, url, createdBy, updatedBy sql.NullString
+		active                                         sql.NullBool
+		sortOrder                                      sql.NullInt64
+		createdAt, updatedAt                           sql.NullTime
+	)
 
 	err := row.Scan(
 		&id,
 		&tagTypeId,
 		&name,
 		&url,
-		&shortDescription,
-		&description,
 		&active,
 		&sortOrder,
 		&createdAt,
@@ -256,43 +140,72 @@ func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 	}
 
 	if id.Valid {
-		tagSelect.Id = uuid.MustParse(id.String)
-	}
-	if tagTypeId.Valid {
-		tagSelect.TagTypeId = uuid.MustParse(tagTypeId.String)
-	}
-	if name.Valid {
-		tagSelect.Name = name.String
-	}
-	if url.Valid {
-		tagSelect.Url = url.String
-	}
-	if shortDescription.Valid {
-		tagSelect.ShortDescription = shortDescription.String
-	}
-	if description.Valid {
-		tagSelect.Description = description.String
-	}
-	if active.Valid {
-		tagSelect.Active = active.Bool
-	}
-	if sortOrder.Valid {
-		tagSelect.SortOrder = uint64(sortOrder.Int64)
-	}
-	if createdAt.Valid {
-		tagSelect.CreatedAt = createdAt.Time
-	}
-	if createdBy.Valid {
-		tagSelect.CreatedBy = uuid.MustParse(createdBy.String)
-	}
-	if updatedAt.Valid {
-		tagSelect.UpdatedAt = updatedAt.Time
-	}
-	if updatedBy.Valid {
-		tagSelect.UpdatedBy = uuid.MustParse(updatedBy.String)
+		item.Id = uuid.MustParse(id.String)
 	}
 
-	return tagSelect, nil
+	if tagTypeId.Valid {
+		item.TagTypeId = uuid.MustParse(tagTypeId.String)
+	}
+
+	if name.Valid {
+		item.Name = name.String
+	}
+
+	if url.Valid {
+		item.Url = url.String
+	}
+
+	if active.Valid {
+		item.Active = active.Bool
+	}
+
+	if sortOrder.Valid {
+		item.SortOrder = uint64(sortOrder.Int64)
+	}
+
+	if createdAt.Valid {
+		item.CreatedAt = createdAt.Time
+	}
+
+	if createdBy.Valid {
+		item.CreatedBy = uuid.MustParse(createdBy.String)
+	}
+
+	if updatedAt.Valid {
+		item.UpdatedAt = updatedAt.Time
+	}
+
+	if updatedBy.Valid {
+		item.UpdatedBy = uuid.MustParse(updatedBy.String)
+	}
+
+	return &item, nil
+}
+
+func (m *Model) scanIdRow(ctx context.Context, row sq.RowScanner) (*uuid.UUID, error) {
+	var id sql.NullString
+
+	err := row.Scan(&id)
+	if err != nil {
+		err = psql.ErrScan(psql.ParsePgError(err))
+		tracing.Error(ctx, err)
+		return nil, errors.AddCode(err, "222149")
+	}
+
+	return pointer.StringToUUID(id.String), nil
+}
+
+func (m *Model) scanCountRow(ctx context.Context, row sq.RowScanner) (*uint64, error) {
+	var count uint64
+
+	err := row.Scan(&count)
+	if err != nil {
+		err = psql.ErrScan(psql.ParsePgError(err))
+		tracing.Error(ctx, err)
+		return nil, errors.AddCode(err, "491602")
+	}
+
+	return &count, nil
 }
 
 func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.InsertBuilder, *uuid.UUID) {
@@ -310,8 +223,6 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		m.mapFieldToDBColumn("TagTypeId"),
 		m.mapFieldToDBColumn("Name"),
 		m.mapFieldToDBColumn("Url"),
-		m.mapFieldToDBColumn("ShortDescription"),
-		m.mapFieldToDBColumn("Description"),
 		m.mapFieldToDBColumn("Active"),
 		m.mapFieldToDBColumn("SortOrder"),
 		m.mapFieldToDBColumn("CreatedAt"),
@@ -323,8 +234,6 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		item.TagTypeId,
 		item.Name,
 		item.Url,
-		item.ShortDescription,
-		item.Description,
 		item.Active,
 		item.SortOrder,
 		"NOW()",
@@ -344,8 +253,6 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 		Set(m.mapFieldToDBColumn("TagTypeId"), item.TagTypeId).
 		Set(m.mapFieldToDBColumn("Name"), item.Name).
 		Set(m.mapFieldToDBColumn("Url"), item.Url).
-		Set(m.mapFieldToDBColumn("ShortDescription"), item.ShortDescription).
-		Set(m.mapFieldToDBColumn("Description"), item.Description).
 		Set(m.mapFieldToDBColumn("Active"), item.Active).
 		Set(m.mapFieldToDBColumn("SortOrder"), item.SortOrder).
 		Set(m.mapFieldToDBColumn("UpdatedAt"), "NOW()").

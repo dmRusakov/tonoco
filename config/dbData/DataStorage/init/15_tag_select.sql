@@ -8,8 +8,6 @@ CREATE TABLE IF NOT EXISTS public.tag_select
     tag_type_id         UUID,
     name                VARCHAR(255)            NOT NULL,
     url                 VARCHAR(255)            NOT NULL,
-    short_description   VARCHAR(255)            DEFAULT NULL,
-    description         VARCHAR(6000)           DEFAULT NULL,
     active              BOOLEAN                 DEFAULT TRUE,
     sort_order          INTEGER                 DEFAULT NULL,
 
@@ -35,8 +33,6 @@ COMMENT ON COLUMN public.tag_select.id IS 'Unique identifier for product tag';
 COMMENT ON COLUMN public.tag_select.tag_type_id IS 'Reference to tag type';
 COMMENT ON COLUMN public.tag_select.name IS 'Name of product tag';
 COMMENT ON COLUMN public.tag_select.url IS 'URL of product tag';
-COMMENT ON COLUMN public.tag_select.short_description IS 'Short description of product tag';
-COMMENT ON COLUMN public.tag_select.description IS 'Description of product tag';
 COMMENT ON COLUMN public.tag_select.active IS 'Active status of product tag';
 COMMENT ON COLUMN public.tag_select.sort_order IS 'Sort order of product tag';
 COMMENT ON COLUMN public.tag_select.created_at IS 'Creation time of product tag';

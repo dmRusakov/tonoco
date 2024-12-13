@@ -21,6 +21,7 @@ import (
 	warehouse_service "github.com/dmRusakov/tonoco/internal/domain/warehouse/service"
 	"github.com/dmRusakov/tonoco/internal/entity/pages"
 	"github.com/google/uuid"
+	"sync"
 )
 
 type UseCase struct {
@@ -52,6 +53,9 @@ type UseCase struct {
 		ids   *[]uuid.UUID
 		count *uint64
 	}
+
+	// mutex
+	mu sync.Mutex
 }
 
 func NewUseCase(
@@ -103,5 +107,8 @@ func NewUseCase(
 			ids   *[]uuid.UUID
 			count *uint64
 		}),
+
+		// mutex
+		mu: sync.Mutex{},
 	}
 }

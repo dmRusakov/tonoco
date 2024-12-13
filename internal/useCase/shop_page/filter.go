@@ -54,26 +54,22 @@ func (u *UseCase) GetShopPageFilter(
 	if err != nil {
 		return nil, err
 	}
-	//
-	// // get tag select
-	// for _, tagTypesId := range *shopPageFilter.TagOrder {
-	// 	(*shopPageFilter.TagSelect)[tagTypesId] = make(map[uuid.UUID]db.TagSelect)
-	// 	// _, e = u.tagSelect.List(ctx, &(db.TagSelectFilter{
-	// 	// 	TagTypeIds: &[]uuid.UUID{tagTypesId},
-	// 	// 	Active:     pointer.BoolPtr(true),
-	// 	// }))
-	// 	// if e != nil {
-	// 	// 	return nil, err
-	// 	// }
-	//
-	// 	// fmt.Println(tagSelect, "filter:71")
-	// }
 
-	// fmt.Println(shopPageFilter.TagSelect, "filter:52")
-	// fmt.Println(shopPageFilter.TagTypes, "filter:52")
-	// fmt.Println(shopPageFilter.TagUrlMap, "filter:52")
-	// fmt.Println(shopPageFilter.TagTypesIds, "filter:52")
-	// fmt.Println(shopPageFilter.TagOrder, "filter:52")
+	// get tag select
+	for _, tagTypesId := range *shopPageFilter.TagOrder {
+		(*shopPageFilter.TagSelect)[tagTypesId] = make(map[uuid.UUID]db.TagSelect)
+		data, e := u.tagSelect.List(ctx, &(db.TagSelectFilter{
+			TagTypeIds: &[]uuid.UUID{tagTypesId},
+			Active:     pointer.BoolPtr(true),
+		}))
+		if e != nil {
+			return nil, err
+		}
+
+		for _, item := range *data {
+			(*shopPageFilter.TagSelect)[tagTypesId][item.Id] = item
+		}
+	}
 
 	return &shopPageFilter, nil
 }

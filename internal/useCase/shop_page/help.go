@@ -9,8 +9,10 @@ func (u *UseCase) getGridItemCache(itemID uuid.UUID) *pages.ProductGridItem {
 	return u.gridItemCache[itemID]
 }
 
-func (u *UseCase) setGridItemCache(itemID uuid.UUID, item *pages.ProductGridItem) {
-	u.gridItemCache[itemID] = item
+func (u *UseCase) setGridItemCache(key uuid.UUID, value *pages.ProductGridItem) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	u.gridItemCache[key] = value
 }
 
 func (u *UseCase) getItemIdsCache(id uuid.UUID) (*[]uuid.UUID, *uint64) {
@@ -23,6 +25,8 @@ func (u *UseCase) getItemIdsCache(id uuid.UUID) (*[]uuid.UUID, *uint64) {
 }
 
 func (u *UseCase) setItemIdsCache(id uuid.UUID, item *[]uuid.UUID, count *uint64) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
 	u.itemIdsCache[id] = struct {
 		ids   *[]uuid.UUID
 		count *uint64
@@ -30,4 +34,5 @@ func (u *UseCase) setItemIdsCache(id uuid.UUID, item *[]uuid.UUID, count *uint64
 		ids:   item,
 		count: count,
 	}
+
 }

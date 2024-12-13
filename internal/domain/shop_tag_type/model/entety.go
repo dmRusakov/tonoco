@@ -102,7 +102,6 @@ func (m *Model) makeGetStatement(filter *Filter) sq.SelectBuilder {
 }
 
 func (m *Model) makeStatementByFilter(statement sq.SelectBuilder, filter *Filter) sq.SelectBuilder {
-
 	statement = m.filterToStatement(statement, filter)
 	return statement.OrderBy(m.mapFieldToDBColumn(*filter.DataPagination.OrderBy) + " " + *filter.DataPagination.OrderDir).
 		Offset((*filter.DataPagination.Page - 1) * *filter.DataPagination.PerPage).Limit(*filter.DataPagination.PerPage)

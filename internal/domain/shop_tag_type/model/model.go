@@ -76,6 +76,8 @@ func (m *Model) Get(ctx context.Context, filter *Filter) (*Item, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// return the Item
 	return m.scanRow(ctx, row)
 }
 
