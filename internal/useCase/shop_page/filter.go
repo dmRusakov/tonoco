@@ -14,8 +14,7 @@ func (u *UseCase) GetShopPageFilter(
 	shopId *uuid.UUID,
 ) (*pages.ShopPageFilter, error) {
 	// get cache
-	cache := u.getShopPageFilterCache(*shopId)
-	if cache != nil {
+	if cache := u.getShopPageFilterCache(*shopId); cache != nil {
 		return cache, nil
 	}
 

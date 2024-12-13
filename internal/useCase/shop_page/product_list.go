@@ -22,10 +22,6 @@ func (u *UseCase) GetProductList(
 	var mu sync.Mutex
 	var errs []error
 
-	var gridTagTypes pages.ProductGridTagTypes
-	tagOrder := make(map[uuid.UUID]uint64)
-	gridTagTypes.TagOrder = &tagOrder
-
 	// get product ids
 	var itemIds *[]uuid.UUID
 	wg.Add(1)
@@ -43,6 +39,9 @@ func (u *UseCase) GetProductList(
 	}()
 
 	// tags on the grid item
+	var gridTagTypes pages.ProductGridTagTypes
+	tagOrder := make(map[uuid.UUID]uint64)
+	gridTagTypes.TagOrder = &tagOrder
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -122,6 +121,8 @@ func (u *UseCase) fetchProductIds(
 ) *[]uuid.UUID {
 	// hash parameters
 	hash := crypt.HashFilter(parameters)
+
+	// check cache
 	if itemIds, count := u.getItemIdsCache(hash); itemIds != nil {
 		parameters.Count = count
 		return itemIds

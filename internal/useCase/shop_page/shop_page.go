@@ -11,8 +11,7 @@ import (
 
 func (u *UseCase) GetShopPage(ctx context.Context, pageUrl string) (*pages.Shop, []error) {
 	// try to get cache
-	cache := u.getShopPageCache(pageUrl)
-	if cache != nil {
+	if cache := u.getShopPageCache(pageUrl); cache != nil {
 		return cache, nil
 	}
 
