@@ -7,8 +7,6 @@ CREATE TABLE IF NOT EXISTS public.tag_type
     id                UUID UNIQUE DEFAULT uuid_generate_v4() NOT NULL,
     name              varchar(255)  DEFAULT NULL,
     url               varchar(255)  DEFAULT NULL,
-    short_description VARCHAR(255)  DEFAULT NULL,
-    description       VARCHAR(6000) DEFAULT NULL,
     active            BOOLEAN       DEFAULT TRUE,
     sort_order        INTEGER       DEFAULT NULL,
     type              VARCHAR(50)   DEFAULT NULL,
@@ -37,8 +35,6 @@ COMMENT ON TABLE  public.tag_type IS 'Tag type table';
 COMMENT ON COLUMN public.tag_type.id IS 'Unique identifier';
 COMMENT ON COLUMN public.tag_type.name IS 'Name of the tag type';
 COMMENT ON COLUMN public.tag_type.url IS 'URL of the tag type';
-COMMENT ON COLUMN public.tag_type.short_description IS 'Short description of the tag type';
-COMMENT ON COLUMN public.tag_type.description IS 'Description of the tag type';
 COMMENT ON COLUMN public.tag_type.active IS 'Active status of the tag type';
 COMMENT ON COLUMN public.tag_type.sort_order IS 'Sort order of the tag type';
 COMMENT ON COLUMN public.tag_type.type IS 'Type of the tag type';

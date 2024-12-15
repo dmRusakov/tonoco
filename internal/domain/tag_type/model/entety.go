@@ -38,8 +38,6 @@ func (m *Model) makeStatement() sq.SelectBuilder {
 		m.mapFieldToDBColumn("Id"),
 		m.mapFieldToDBColumn("Name"),
 		m.mapFieldToDBColumn("Url"),
-		m.mapFieldToDBColumn("ShortDescription"),
-		m.mapFieldToDBColumn("Description"),
 		m.mapFieldToDBColumn("Active"),
 		m.mapFieldToDBColumn("SortOrder"),
 		m.mapFieldToDBColumn("Type"),
@@ -141,8 +139,6 @@ func (m *Model) makeStatementByFilter(filter *Filter) sq.SelectBuilder {
 			sq.Or{
 				sq.Expr("LOWER("+m.mapFieldToDBColumn("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+m.mapFieldToDBColumn("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.mapFieldToDBColumn("ShortDescription")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.mapFieldToDBColumn("Description")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 			},
 		)
 	}
@@ -190,8 +186,6 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 			sq.Or{
 				sq.Expr("LOWER("+m.mapFieldToDBColumn("Name")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 				sq.Expr("LOWER("+m.mapFieldToDBColumn("Url")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.mapFieldToDBColumn("ShortDescription")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
-				sq.Expr("LOWER("+m.mapFieldToDBColumn("Description")+") ILIKE LOWER(?)", "%"+*filter.Search+"%"),
 			},
 		)
 	}
@@ -200,7 +194,7 @@ func (m *Model) makeCountStatementByFilter(filter *Filter) sq.SelectBuilder {
 }
 
 func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
-	var id, name, url, shortDescription, description, typeField, prefix, suffix, createdBy, updatedBy sql.NullString
+	var id, name, url, typeField, prefix, suffix, createdBy, updatedBy sql.NullString
 	var active sql.NullBool
 	var sortOrder sql.NullInt64
 	var createdAt, updatedAt sql.NullTime
@@ -209,8 +203,6 @@ func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 		&id,
 		&name,
 		&url,
-		&shortDescription,
-		&description,
 		&active,
 		&sortOrder,
 		&typeField,
@@ -238,12 +230,6 @@ func (m *Model) scanRow(ctx context.Context, row sq.RowScanner) (*Item, error) {
 	}
 	if url.Valid {
 		item.Url = url.String
-	}
-	if shortDescription.Valid {
-		item.ShortDescription = shortDescription.String
-	}
-	if description.Valid {
-		item.Description = description.String
 	}
 	if active.Valid {
 		item.Active = active.Bool
@@ -321,8 +307,6 @@ func (m *Model) makeInsertStatement(ctx context.Context, item *Item) (*sq.Insert
 		item.Id,
 		item.Name,
 		item.Url,
-		item.ShortDescription,
-		item.Description,
 		item.Active,
 		item.SortOrder,
 		item.Type,
@@ -344,8 +328,6 @@ func (m *Model) makeUpdateStatement(ctx context.Context, item *Item) sq.UpdateBu
 	return m.qb.Update(m.table).
 		Set(m.mapFieldToDBColumn("Name"), item.Name).
 		Set(m.mapFieldToDBColumn("Url"), item.Url).
-		Set(m.mapFieldToDBColumn("ShortDescription"), item.ShortDescription).
-		Set(m.mapFieldToDBColumn("Description"), item.Description).
 		Set(m.mapFieldToDBColumn("Active"), item.Active).
 		Set(m.mapFieldToDBColumn("SortOrder"), item.SortOrder).
 		Set(m.mapFieldToDBColumn("Type"), item.Type).

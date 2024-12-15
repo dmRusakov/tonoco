@@ -49,7 +49,7 @@ type UseCase struct {
 
 	// cache
 	shopPageCache       map[string]*pages.Shop
-	shopPageFilterCache map[uuid.UUID]*pages.ShopPageFilter
+	shopPageFilterCache map[uuid.UUID]*map[uint64]pages.ShopPageFilterItem
 	gridItemCache       map[uuid.UUID]*pages.ProductGridItem
 	gridTagTypesCache   map[uuid.UUID]*pages.ProductGridTagTypes
 	itemIdsCache        map[uuid.UUID]struct {
@@ -106,7 +106,7 @@ func NewUseCase(
 
 		// cache
 		shopPageCache:       make(map[string]*pages.Shop),
-		shopPageFilterCache: make(map[uuid.UUID]*pages.ShopPageFilter),
+		shopPageFilterCache: make(map[uuid.UUID]*map[uint64]pages.ShopPageFilterItem),
 		gridItemCache:       make(map[uuid.UUID]*pages.ProductGridItem),
 		gridTagTypesCache:   make(map[uuid.UUID]*pages.ProductGridTagTypes),
 		itemIdsCache: make(map[uuid.UUID]struct {

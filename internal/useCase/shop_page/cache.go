@@ -36,7 +36,7 @@ func (u *UseCase) setShopPageCache(key string, value *pages.Shop) {
 }
 
 // shop page filter cache
-func (u *UseCase) getShopPageFilterCache(id uuid.UUID) *pages.ShopPageFilter {
+func (u *UseCase) getShopPageFilterCache(id uuid.UUID) *map[uint64]pages.ShopPageFilterItem {
 	cache, ok := u.shopPageFilterCache[id]
 	if !ok {
 		return nil
@@ -44,7 +44,7 @@ func (u *UseCase) getShopPageFilterCache(id uuid.UUID) *pages.ShopPageFilter {
 	return cache
 }
 
-func (u *UseCase) setShopPageFilterCache(id uuid.UUID, value *pages.ShopPageFilter) {
+func (u *UseCase) setShopPageFilterCache(id uuid.UUID, value *map[uint64]pages.ShopPageFilterItem) {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 	u.shopPageFilterCache[id] = value

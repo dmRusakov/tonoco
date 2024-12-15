@@ -199,7 +199,6 @@ func (u *UseCase) fetchProductDetails(
 	// Create new item
 	item := &pages.ProductGridItem{}
 	var wg sync.WaitGroup
-	isOk := true
 
 	// Fetch product details
 	wg.Add(1)
@@ -209,7 +208,6 @@ func (u *UseCase) fetchProductDetails(
 			Ids: &[]uuid.UUID{itemId},
 		})
 		if err != nil {
-			isOk = false
 			*errs = append(*errs, err)
 			return
 		}
@@ -230,7 +228,7 @@ func (u *UseCase) fetchProductDetails(
 		defer wg.Done()
 		typeIds, err := u.priceType.GetDefaultIds("special")
 		if err != nil {
-			isOk = false
+
 			*errs = append(*errs, err)
 			return
 		}
@@ -246,7 +244,6 @@ func (u *UseCase) fetchProductDetails(
 
 		price, err := u.price.List(ctx, &filter)
 		if err != nil {
-			isOk = false
 			*errs = append(*errs, err)
 			return
 		}
@@ -262,7 +259,7 @@ func (u *UseCase) fetchProductDetails(
 		defer wg.Done()
 		typeIds, err := u.priceType.GetDefaultIds("regular")
 		if err != nil {
-			isOk = false
+
 			*errs = append(*errs, err)
 			return
 		}
@@ -278,7 +275,6 @@ func (u *UseCase) fetchProductDetails(
 
 		price, err := u.price.List(ctx, &filter)
 		if err != nil {
-			isOk = false
 			*errs = append(*errs, err)
 			return
 		}
@@ -304,7 +300,7 @@ func (u *UseCase) fetchProductDetails(
 		}))
 
 		if err != nil {
-			isOk = false
+
 			*errs = append(*errs, err)
 			return
 		}
@@ -320,7 +316,6 @@ func (u *UseCase) fetchProductDetails(
 					Ids: &[]uuid.UUID{tag.TagSelectId},
 				}))
 				if e != nil {
-					isOk = false
 					*errs = append(*errs, e)
 					return
 				}
@@ -348,7 +343,7 @@ func (u *UseCase) fetchProductDetails(
 			IsCount:    pointer.BoolPtr(false),
 		})
 		if err != nil {
-			isOk = false
+
 			*errs = append(*errs, err)
 			return
 		}
@@ -376,7 +371,7 @@ func (u *UseCase) fetchProductDetails(
 		})
 
 		if imageInfo == nil {
-			isOk = false
+
 			return
 		}
 
@@ -385,7 +380,7 @@ func (u *UseCase) fetchProductDetails(
 		})
 
 		if err != nil {
-			isOk = false
+
 			return
 		}
 
@@ -397,7 +392,6 @@ func (u *UseCase) fetchProductDetails(
 				Compression: pointer.UintPtr(80),
 			})
 			if err != nil {
-				isOk = false
 				*errs = append(*errs, err)
 			}
 		}
@@ -414,7 +408,7 @@ func (u *UseCase) fetchProductDetails(
 		})
 
 		if imageInfo == nil {
-			isOk = false
+
 			return
 		}
 
@@ -423,7 +417,7 @@ func (u *UseCase) fetchProductDetails(
 		})
 
 		if image == nil {
-			isOk = false
+
 			return
 		}
 
@@ -435,7 +429,6 @@ func (u *UseCase) fetchProductDetails(
 				Compression: pointer.UintPtr(80),
 			})
 			if err != nil {
-				isOk = false
 				*errs = append(*errs, err)
 			}
 		}
@@ -443,10 +436,14 @@ func (u *UseCase) fetchProductDetails(
 
 	wg.Wait()
 
-	// Save to cache
-	if isOk {
-		go u.setGridItemCache(itemId, item)
+	// error
+	if len(*errs) > 0 {
+		return nil
 	}
+
+	// Save to cache
+
+	go u.setGridItemCache(itemId, item)
 
 	// Return item
 	return item

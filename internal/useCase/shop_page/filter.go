@@ -12,20 +12,11 @@ import (
 func (u *UseCase) GetShopPageFilter(
 	ctx context.Context,
 	shopId *uuid.UUID,
-) (*pages.ShopPageFilter, error) {
+) (*map[uint64]pages.ShopPageFilterItem, error) {
 	// get cache
 	if cache := u.getShopPageFilterCache(*shopId); cache != nil {
 		return cache, nil
 	}
-
-	// make vars
-	var shopPageFilter pages.ShopPageFilter
-	urlMapping := make(map[string]uuid.UUID)
-	shopPageFilter.TagUrlMap = &urlMapping
-	tagOrder := make(map[uint64]uuid.UUID)
-	shopPageFilter.TagOrder = &tagOrder
-	tagSelects := make(map[uuid.UUID]map[uuid.UUID]db.TagSelect)
-	shopPageFilter.TagSelect = &tagSelects
 
 	// get shop tag types
 	filter := db.ShopTagTypeFilter{
@@ -43,42 +34,49 @@ func (u *UseCase) GetShopPageFilter(
 	if err != nil {
 		return nil, err
 	}
-	for _, item := range *shopTagTypes {
-		(*shopPageFilter.TagOrder)[item.SortOrder] = item.TagTypeId
-	}
 
-	// get tag types
-	shopPageFilter.TagTypes, err = u.tagType.List(ctx, &(db.TagTypeFilter{
-		Ids:    filter.TagTypeIds,
-		Active: pointer.BoolPtr(true),
-	}))
-	for _, item := range *shopPageFilter.TagTypes {
-		(*shopPageFilter.TagUrlMap)[item.Url] = item.Id
-	}
+	shopPageFilters := make(map[uint64]pages.ShopPageFilterItem)
 
-	if err != nil {
-		return nil, err
-	}
+	for _, shopTagType := range *shopTagTypes {
+		shopPageFilter := pages.ShopPageFilterItem{
+			Id: shopTagType.TagTypeId,
+		}
 
-	// get tag select
-	for _, tagTypesId := range *shopPageFilter.TagOrder {
-		(*shopPageFilter.TagSelect)[tagTypesId] = make(map[uuid.UUID]db.TagSelect)
-		data, e := u.tagSelect.List(ctx, &(db.TagSelectFilter{
-			TagTypeIds: &[]uuid.UUID{tagTypesId},
-			Active:     pointer.BoolPtr(true),
-		}))
-		if e != nil {
+		// get tag type
+		tagType, err := u.tagType.Get(ctx, &db.TagTypeFilter{
+			Ids: &[]uuid.UUID{shopTagType.TagTypeId},
+		})
+		if err != nil {
 			return nil, err
 		}
 
-		for _, item := range *data {
-			(*shopPageFilter.TagSelect)[tagTypesId][item.Id] = item
+		shopPageFilter.Name = tagType.Name
+		shopPageFilter.Url = tagType.Url
+
+		// get tag select
+		tagSelects, err := u.tagSelect.List(ctx, &db.TagSelectFilter{
+			TagTypeIds: &[]uuid.UUID{shopTagType.TagTypeId},
+			Active:     pointer.BoolPtr(true),
+		})
+
+		shopPageFilter.Select = make(map[uint64]pages.ShopPageFilterSelectItem)
+		for _, tagSelect := range *tagSelects {
+			shopPageFilterSelectItem := pages.ShopPageFilterSelectItem{
+				Id:     tagSelect.Id,
+				Name:   tagSelect.Name,
+				Url:    tagSelect.Url,
+				Active: false,
+			}
+
+			shopPageFilter.Select[tagSelect.SortOrder] = shopPageFilterSelectItem
 		}
+
+		shopPageFilters[shopTagType.SortOrder] = shopPageFilter
 	}
 
 	// set cache
-	go u.setShopPageFilterCache(*shopId, &shopPageFilter)
+	go u.setShopPageFilterCache(*shopId, &shopPageFilters)
 
 	// return
-	return &shopPageFilter, nil
+	return &shopPageFilters, nil
 }

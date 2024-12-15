@@ -26,9 +26,16 @@ type Shop struct {
 	UpdatedBy        uuid.UUID
 }
 
-type ShopPageFilter struct {
-	TagUrlMap *map[string]uuid.UUID                     // map[url]tagTypeId
-	TagTypes  *map[uuid.UUID]db.TagType                 // map[tagTypeId]tagType
-	TagOrder  *map[uint64]uuid.UUID                     // map[sortOrder]tagTypeId
-	TagSelect *map[uuid.UUID]map[uuid.UUID]db.TagSelect // map[tagTypeId]map[tagSelectId]tagSelect
+type ShopPageFilterItem struct {
+	Id     uuid.UUID
+	Name   string
+	Url    string
+	Select map[uint64]ShopPageFilterSelectItem
+}
+
+type ShopPageFilterSelectItem struct {
+	Id     uuid.UUID
+	Name   string
+	Url    string
+	Active bool
 }
