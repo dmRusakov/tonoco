@@ -13,7 +13,7 @@ type ShopPage struct {
 	ShortDescription template.HTML
 	Description      template.HTML
 	Items            []ProductGridItem
-	Filter           *map[uint64]ShopPageFilterItem
+	Filters          *map[uint64]ShopPageFilterItem
 	Url              string
 	Page             uint64
 	PerPage          uint64

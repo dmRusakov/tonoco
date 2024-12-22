@@ -109,7 +109,7 @@ func (c Controller) RenderShopPage(
 	go func() {
 		defer wg.Done()
 		var err error
-		shopPage.Filter, err = c.shopUseCase.GetShopPageFilter(ctx, &shopPage.Id)
+		shopPage.Filters, err = c.shopUseCase.GetShopPageFilter(ctx, &shopPage.Id)
 		if err != nil {
 			errs = append(errs, err)
 		}

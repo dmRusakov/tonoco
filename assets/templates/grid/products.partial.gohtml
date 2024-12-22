@@ -1,6 +1,6 @@
 {{define "products_grid"}}
-    <div class="grid">
-        <div class="gridItems">
+    <div id="products">
+        <div class="grid">
             {{range .Items}}
                 {{template "product_grid" .}}
             {{end}}

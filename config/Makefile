@@ -20,7 +20,12 @@ restart:
 
 delete:
 	docker-compose --env-file ./dev.env down --volumes
-	sudo ./deleteDbData.sh
+	sudo chmod -R 777 ./dbData/DataStorage/data/
+	sudo chmod -R 777 ./dbData/Cassandra/data/
+	sudo chmod -R 777 ./dbData/MqBroker/data/
+	rm -rf ./dbData/DataStorage/data/*
+	rm -rf ./dbData/CacheStorage/data/*
+	rm -rf ./dbData/MqBroker/data/*
 	sleep 1 # wait 1 sec for db to be deleted
 	@echo "Deleted"
 

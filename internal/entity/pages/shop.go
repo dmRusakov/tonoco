@@ -27,10 +27,10 @@ type Shop struct {
 }
 
 type ShopPageFilterItem struct {
-	Id     uuid.UUID
-	Name   string
-	Url    string
-	Select map[uint64]ShopPageFilterSelectItem
+	Id      uuid.UUID
+	Name    string
+	Url     string
+	Options map[uint64]ShopPageFilterSelectItem
 }
 
 type ShopPageFilterSelectItem struct {

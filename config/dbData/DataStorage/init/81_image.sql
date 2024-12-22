@@ -23,6 +23,9 @@ CREATE TABLE IF NOT EXISTS public.image
 
     origin_path         VARCHAR(255)  DEFAULT NULL,
 
+    svg                 TEXT          DEFAULT NULL,
+    error               TEXT          DEFAULT NULL,
+
     created_at          TIMESTAMP     DEFAULT NOW() NOT NULL,
     created_by          UUID          DEFAULT NULL,
     updated_at          TIMESTAMP     DEFAULT NOW() NOT NULL,

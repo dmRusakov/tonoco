@@ -1,54 +1,49 @@
 {{define "product_grid"}}
-    <a class="gridItem" data-id="{{.Id}}" href="/{{.Url}}">
-        <div class="tag-container">
-            {{/*for each all tag as id=>name*/}}
+    <a id="{{.Id}}" href="/{{.Url}}">
+        <div class="tags">
             {{range .Tags}}
                 {{if .Value }}
                     <div class="tag">
-                        <p class="tag-body {{.Url}}">
-                            <span class="tag-name">{{.Name}}</span>
-                            <span class="tag-value">{{.Value}}</span>
+                        <p class="t {{.Url}}">
+                            <span class="name">{{.Name}}</span>
+                            <span class="value">{{.Value}}</span>
                         </p>
                     </div>
                 {{end}}
             {{end}}
         </div>
         {{if and .MainImage .MainImage.IsCompressed .HoverImage .HoverImage.IsCompressed}}
-            <div class="image-container with-hover">
-                <picture>
-                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_grid.webp" type="image/webp">
-                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_grid.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
-                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_medium.webp" type="image/webp">
-                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_medium.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
-                    <img class="main" src="/assets/images/web/{{.MainImage.FileName}}_grid.webp" title="{{.MainImage.Title}}" alt="{{.MainImage.AltText}}" copyright="{{.MainImage.CopyRight}}" author="{{.MainImage.Creator}}">
-                </picture>
-                <picture>
-                    <source srcset="/assets/images/web/{{.HoverImage.FileName}}_grid.webp" type="image/webp">
-                    <source srcset="/assets/images/web/{{.HoverImage.FileName}}_grid.{{.HoverImage.Extension}}" type="image/{{.HoverImage.Extension}}">
-                    <source srcset="/assets/images/web/{{.HoverImage.FileName}}_medium.webp" type="image/webp">
-                    <source srcset="/assets/images/web/{{.HoverImage.FileName}}_medium.{{.HoverImage.Extension}}" type="image/{{.HoverImage.Extension}}">
-                    <img class="hover" style="display: none;" src="/assets/images/web/{{.HoverImage.FileName}}_grid.webp" title="{{.HoverImage.Title}}" alt="{{.HoverImage.AltText}}" copyright="{{.HoverImage.CopyRight}}" author="{{.HoverImage.Creator}}">
-                </picture>
-            </div>
+            <picture>
+                <source srcset="/assets/images/web/{{.MainImage.FileName}}_grid.webp" type="image/webp">
+                <source srcset="/assets/images/web/{{.MainImage.FileName}}_grid.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
+                <source srcset="/assets/images/web/{{.MainImage.FileName}}_medium.webp" type="image/webp">
+                <source srcset="/assets/images/web/{{.MainImage.FileName}}_medium.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
+                <img src="/assets/images/web/{{.MainImage.FileName}}_grid.webp" title="{{.MainImage.Title}}" alt="{{.MainImage.AltText}}" copyright="{{.MainImage.CopyRight}}" author="{{.MainImage.Creator}}">
+            </picture>
+            <picture>
+                <source srcset="/assets/images/web/{{.HoverImage.FileName}}_grid.webp" type="image/webp">
+                <source srcset="/assets/images/web/{{.HoverImage.FileName}}_grid.{{.HoverImage.Extension}}" type="image/{{.HoverImage.Extension}}">
+                <source srcset="/assets/images/web/{{.HoverImage.FileName}}_medium.webp" type="image/webp">
+                <source srcset="/assets/images/web/{{.HoverImage.FileName}}_medium.{{.HoverImage.Extension}}" type="image/{{.HoverImage.Extension}}">
+                <img src="/assets/images/web/{{.HoverImage.FileName}}_grid.webp" title="{{.HoverImage.Title}}" alt="{{.HoverImage.AltText}}" copyright="{{.HoverImage.CopyRight}}" author="{{.HoverImage.Creator}}">
+            </picture>
         {{else if and .MainImage .MainImage.IsCompressed}}
-            <div class="image-container">
-                <picture>
-                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_grid.webp" type="image/webp">
-                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_grid.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
-                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_medium.webp" type="image/webp">
-                    <source srcset="/assets/images/web/{{.MainImage.FileName}}_medium.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
-                    <img class="main" src="/assets/images/web/{{.MainImage.FileName}}_grid.webp" title="{{.MainImage.Title}}" alt="{{.MainImage.AltText}}" copyright="{{.MainImage.CopyRight}}" author="{{.MainImage.Creator}}">
-                </picture>
-            </div>
+            <picture class="one">
+                <source srcset="/assets/images/web/{{.MainImage.FileName}}_grid.webp" type="image/webp">
+                <source srcset="/assets/images/web/{{.MainImage.FileName}}_grid.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
+                <source srcset="/assets/images/web/{{.MainImage.FileName}}_medium.webp" type="image/webp">
+                <source srcset="/assets/images/web/{{.MainImage.FileName}}_medium.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
+                <img src="/assets/images/web/{{.MainImage.FileName}}_grid.webp" title="{{.MainImage.Title}}" alt="{{.MainImage.AltText}}" copyright="{{.MainImage.CopyRight}}" author="{{.MainImage.Creator}}">
+            </picture>
         {{else}}
-            <div class="image-container">
-                <img src="/assets/images/elements/no-image.svg" title="{{.SeoTitle}}" alt="{{.SeoDescription}}">
-            </div>
+                <img class="placeholder" src="/assets/images/elements/no-image.svg" title="{{.SeoTitle}}" alt="{{.SeoDescription}}">
         {{end}}
-        <h2>{{.Brand}}</h2>
-        <h3>{{.Name}}</h3>
-        <p class="text">{{.ShortDescription}}</p>
-        <div class="detail-container">
+        <h2>
+            <span>{{.Brand}}</span>
+            <span>{{.Name}}</span>
+        </h2>
+        <p class="shortDescription">{{.ShortDescription}}</p>
+        <div class="dataContainer">
             {{if eq .Status "discontinued"}}
                 <p class="placeholder"></p><p class="details">Discontinued</p>
             {{else if eq .Status "pre_order"}}
@@ -61,14 +56,14 @@
 
             {{if or .SalePrice .Price}}
                 <p class="price{{if .SalePrice}} sale{{end}}">
-                    {{if .SalePrice}}<span class="sale-price">{{.Currency}}{{.SalePrice}}</span>{{end}}
-                    {{if .Price}}<span class="regular-price">{{.Currency}}{{.Price}}</span>{{end}}
+                    {{if .SalePrice}}<span class="salePrice">{{.Currency}}{{.SalePrice}}</span>{{end}}
+                    {{if .Price}}<span class="regularPrice">{{.Currency}}{{.Price}}</span>{{end}}
                 </p>
             {{end}}
         </div>
-        <div class="sku-container">
+        <div class="skuContainer">
             <p class="sku">{{.Sku}}<span> (TTY/TTD-{{.Quantity}})</span></p>
-            <p class="itemNo"></p>
+            <p class="itemCounter"></p>
         </div>
     </a>
 {{end}}

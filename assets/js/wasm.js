@@ -1,6 +1,6 @@
 const folderPath = "/assets/wasm/";
 const appFileName = "adminApp.wasm";
-const appFileVersion = "1.007";
+const appFileVersion = "1.008";
 
 if (!WebAssembly.instantiateStreaming) { // polyfill
     WebAssembly.instantiateStreaming = async (resp, importObject) => {

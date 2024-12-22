@@ -1,18 +1,29 @@
 {{template "base" .}}
 
 {{define "content" }}
-    <div class="shop contentBody">
-        <div class="header">
-            <div class="title">
+    <div class="shop">
+        <div class="h">
+            <div id="title">
                 <h1>{{.Name}}</h1>
                 <p>{{.ShortDescription}}</p>
             </div>
-            <div class="filters">
-
+            <div id="filter" style="display: none">
+                {{range .Filters}}
+                    <div class="f">
+                        <label>{{.Name}}</label>
+                        <select name="{{.Url}}">
+                         <option value=""></option>
+                        {{range .Options}}
+                            <option value="{{.Url}}" value-id="{{.Id}}">{{.Name}}</option>
+                        {{end}}
+                        </select>
+                    </div>
+                {{end}}
+                <div class="f-i"></div>
             </div>
         </div>
         {{template "products_grid" .}}
-        <div class="description">
+        <div id="description">
             {{.Description}}
         </div>
     </div>

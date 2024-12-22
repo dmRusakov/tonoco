@@ -19,6 +19,10 @@
     --tagWithBgColor: #266282;
     --saleColor: #299529;
 
+    /* menu */
+    --menuIconColor: #000;
+    --menuIconHoverColor: #266282;
+
     /* pagination */
     --paginationColor: #fff;
     --paginationBgColor: #000;

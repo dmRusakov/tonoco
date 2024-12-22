@@ -59,7 +59,7 @@ func (u *UseCase) GetShopPageFilter(
 			Active:     pointer.BoolPtr(true),
 		})
 
-		shopPageFilter.Select = make(map[uint64]pages.ShopPageFilterSelectItem)
+		shopPageFilter.Options = make(map[uint64]pages.ShopPageFilterSelectItem)
 		for _, tagSelect := range *tagSelects {
 			shopPageFilterSelectItem := pages.ShopPageFilterSelectItem{
 				Id:     tagSelect.Id,
@@ -68,7 +68,7 @@ func (u *UseCase) GetShopPageFilter(
 				Active: false,
 			}
 
-			shopPageFilter.Select[tagSelect.SortOrder] = shopPageFilterSelectItem
+			shopPageFilter.Options[tagSelect.SortOrder] = shopPageFilterSelectItem
 		}
 
 		shopPageFilters[shopTagType.SortOrder] = shopPageFilter
