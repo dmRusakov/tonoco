@@ -55,7 +55,7 @@ func NewService(repository *model.Model) *Service {
 			"full":   {2000, 2000},
 			"medium": {1000, 1000},
 			"grid":   {500, 500},
-			"thumb":  {250, 250},
+			"thumb":  {300, 300},
 		},
 	}
 }
@@ -319,7 +319,25 @@ func (s *Service) Compression(ctx context.Context, param *db.ImageCompression) e
 }
 
 func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {
-	return s.repository.Get(ctx, filter)
+	item, err := s.repository.Get(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	//// compress item
+	//if !item.IsCompressed {
+	//	compression := uint(80)
+	//	ids := []uuid.UUID{item.Id}
+	//	err = s.Compression(ctx, &db.ImageCompression{
+	//		Ids:         &ids,
+	//		Compression: &compression,
+	//	})
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//}
+
+	return item, nil
 }
 
 func (s *Service) List(ctx context.Context, filter *Filter) (*map[uuid.UUID]Item, error) {
