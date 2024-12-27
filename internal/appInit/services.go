@@ -91,7 +91,7 @@ func (a *App) ServicesInit(cfg *config.Config) error {
 		defer wg.Done()
 		imageStorage := image_model.NewStorage(a.SqlDB)
 		mu.Lock()
-		services.ImageService = image_service.NewService(imageStorage)
+		services.ImageService = image_service.NewService(imageStorage, cfg)
 		mu.Unlock()
 	}()
 

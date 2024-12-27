@@ -48,14 +48,3 @@ type ImageFilter struct {
 	IsUpdateFilter *bool `json:"is_update_filter"`
 	IsKeepIdsOrder *bool `json:"is_keep_ids_order"`
 }
-
-type ImageCompression struct {
-	Ids         *[]uuid.UUID `json:"id"`
-	FileName    *string      `json:"file_name"`
-	Title       *string      `json:"title"`
-	AltText     *string      `json:"alt_text"`
-	CopyRight   *string      `json:"copy_right"`
-	Creator     *string      `json:"creator"`
-	Rating      *float32     `json:"rating"`
-	Compression *uint        `json:"compression"`
-}

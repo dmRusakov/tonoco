@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 	"github.com/chai2010/webp"
+	"github.com/dmRusakov/tonoco/internal/config"
 	"github.com/dmRusakov/tonoco/internal/domain/image/model"
 	"github.com/dmRusakov/tonoco/internal/entity/db"
 	"github.com/dmRusakov/tonoco/pkg/common/errors"
 	"github.com/google/uuid"
 	"github.com/nfnt/resize"
-	"image"
+	imagePkg "image"
 	"image/color"
 	"image/jpeg"
 	"net/http"
@@ -43,47 +44,28 @@ type Service struct {
 	webFilesPath      string
 	feedFilesPath     string
 	sizes             map[string][]uint
+	compression       int
 }
 
-func NewService(repository *model.Model) *Service {
+func NewService(repository *model.Model, cfg *config.Config) *Service {
 	return &Service{
 		repository:        repository,
 		originalFilesPath: "assets/images/original/",
 		webFilesPath:      "assets/images/web/",
 		feedFilesPath:     "assets/images/feed/",
 		sizes: map[string][]uint{
-			"full":   {2000, 2000},
-			"medium": {1000, 1000},
-			"grid":   {500, 500},
-			"thumb":  {300, 300},
+			"full":   {cfg.Image.FullWidth, cfg.Image.FullHeight},
+			"medium": {cfg.Image.MediumWidth, cfg.Image.MediumHeight},
+			"grid":   {cfg.Image.GridWidth, cfg.Image.GridHeight},
+			"thumb":  {cfg.Image.ThumbWidth, cfg.Image.ThumbHeight},
 		},
+		compression: cfg.Image.CompressionQuality,
 	}
 }
 
-func (s *Service) Compression(ctx context.Context, param *db.ImageCompression) error {
-	// Get the image from the repository
-	img, err := s.Get(ctx, &Filter{
-		Ids: param.Ids,
-	})
-	if err != nil {
-		return err
-	}
-
-	// update image
-	if param.FileName != nil {
-		img.FileName = *param.FileName
-	}
-
-	if param.Title != nil {
-		img.Title = *param.Title
-	}
-
-	if param.AltText != nil {
-		img.AltText = *param.AltText
-	}
-
+func (s *Service) Compression(ctx context.Context, image *Item) error {
 	// Open the original image file
-	originalFilePath := s.originalFilesPath + img.OriginPath
+	originalFilePath := s.originalFilesPath + image.OriginPath
 	file, err := os.Open(originalFilePath)
 	if err != nil {
 		return err
@@ -123,33 +105,33 @@ func (s *Service) Compression(ctx context.Context, param *db.ImageCompression) e
 		// create feed image
 		resizedImage := resize.Resize(s.sizes["full"][0], s.sizes["full"][1], srcImage, resize.Lanczos3)
 
-		fileName := fmt.Sprintf("%s.%s", img.FileName, img.Extension)
+		fileName := fmt.Sprintf("%s.%s", image.FileName, image.Extension)
 		outFile, err := os.Create(s.feedFilesPath + fileName)
 		if err != nil {
 			return errors.AddCode(err, "375715")
 		}
 
-		err = jpeg.Encode(outFile, resizedImage, &jpeg.Options{Quality: int(*param.Compression)})
+		err = jpeg.Encode(outFile, resizedImage, &jpeg.Options{Quality: s.compression})
 		if err != nil {
 			return errors.AddCode(err, "334924")
 		}
-		fileName = fmt.Sprintf("%s.%s", img.FileName, "webp")
+		fileName = fmt.Sprintf("%s.%s", image.FileName, "webp")
 		webpFile, err := os.Create(s.feedFilesPath + fileName)
 		if err != nil {
 			return errors.AddCode(err, "849211")
 		}
 
-		err = webp.Encode(webpFile, resizedImage, &webp.Options{Lossless: false, Quality: float32(*param.Compression)})
+		err = webp.Encode(webpFile, resizedImage, &webp.Options{Lossless: false, Quality: float32(s.compression)})
 		if err != nil {
 			return errors.AddCode(err, "89555")
 		}
 
 		// add watermark
-		if img.CopyRight != "" {
-			srcImage, err = func(srcImage image.Image) (image.Image, error) {
+		if image.CopyRight != "" {
+			srcImage, err = func(srcImage imagePkg.Image) (*imagePkg.RGBA, error) {
 				// Create a new image with the same size as the original image
 				b := srcImage.Bounds()
-				watermark := image.NewRGBA(image.Rect(0, 0, b.Dx(), b.Dy()))
+				watermark := imagePkg.NewRGBA(imagePkg.Rect(0, 0, b.Dx(), b.Dy()))
 
 				// Draw the original image onto the new image
 				draw.Draw(watermark, watermark.Bounds(), srcImage, b.Min, draw.Src)
@@ -189,17 +171,17 @@ func (s *Service) Compression(ctx context.Context, param *db.ImageCompression) e
 				// Create a new image with the watermark text
 				col := color.RGBA{0, 0, 0, 128} // Black color with transparency
 				point := fixed.Point26_6{
-					X: fixed.I(b.Dx())/2 - width(face, img.CopyRight)/2,
+					X: fixed.I(b.Dx())/2 - width(face, image.CopyRight)/2,
 					Y: fixed.I(b.Dy() - 30),
 				}
 
 				d := &font.Drawer{
 					Dst:  watermark,
-					Src:  image.NewUniform(col),
+					Src:  imagePkg.NewUniform(col),
 					Face: face,
 					Dot:  point,
 				}
-				d.DrawString(img.CopyRight)
+				d.DrawString(image.CopyRight)
 
 				return watermark, nil
 			}(srcImage)
@@ -207,108 +189,108 @@ func (s *Service) Compression(ctx context.Context, param *db.ImageCompression) e
 
 		// full size
 		resizedImage = resize.Resize(s.sizes["full"][0], s.sizes["full"][1], srcImage, resize.Lanczos3)
-		fileName = fmt.Sprintf("%s.%s", img.FileName, img.Extension)
+		fileName = fmt.Sprintf("%s.%s", image.FileName, image.Extension)
 		outFile, err = os.Create(s.webFilesPath + fileName)
 		if err != nil {
 			return errors.AddCode(err, "800791")
 		}
 
-		err = jpeg.Encode(outFile, resizedImage, &jpeg.Options{Quality: int(*param.Compression)})
+		err = jpeg.Encode(outFile, resizedImage, &jpeg.Options{Quality: s.compression})
 		if err != nil {
 			return errors.AddCode(err, "968402")
 		}
 
-		fileName = fmt.Sprintf("%s.%s", img.FileName, "webp")
+		fileName = fmt.Sprintf("%s.%s", image.FileName, "webp")
 		webpFile, err = os.Create(s.webFilesPath + fileName)
 		if err != nil {
 			return errors.AddCode(err, "674161")
 		}
 
-		err = webp.Encode(webpFile, resizedImage, &webp.Options{Lossless: false, Quality: float32(*param.Compression)})
+		err = webp.Encode(webpFile, resizedImage, &webp.Options{Lossless: false, Quality: float32(s.compression)})
 		if err != nil {
 			return errors.AddCode(err, "132457")
 		}
 
 		// medium size
 		resizedImage = resize.Resize(s.sizes["medium"][0], s.sizes["medium"][1], srcImage, resize.Lanczos3)
-		fileName = fmt.Sprintf("%s_medium.%s", img.FileName, img.Extension)
+		fileName = fmt.Sprintf("%s_medium.%s", image.FileName, image.Extension)
 		outFile, err = os.Create(s.webFilesPath + fileName)
 		if err != nil {
 			return errors.AddCode(err, "182763")
 		}
 
-		err = jpeg.Encode(outFile, resizedImage, &jpeg.Options{Quality: int(*param.Compression)})
+		err = jpeg.Encode(outFile, resizedImage, &jpeg.Options{Quality: int(s.compression)})
 		if err != nil {
 			return errors.AddCode(err, "283746")
 		}
 
-		fileName = fmt.Sprintf("%s_medium.%s", img.FileName, "webp")
+		fileName = fmt.Sprintf("%s_medium.%s", image.FileName, "webp")
 		webpFile, err = os.Create(s.webFilesPath + fileName)
 		if err != nil {
 			return errors.AddCode(err, "384756")
 		}
 
-		err = webp.Encode(webpFile, resizedImage, &webp.Options{Lossless: false, Quality: float32(*param.Compression)})
+		err = webp.Encode(webpFile, resizedImage, &webp.Options{Lossless: false, Quality: float32(s.compression)})
 		if err != nil {
 			return errors.AddCode(err, "485763")
 		}
 
 		// grid size
 		resizedImage = resize.Resize(s.sizes["grid"][0], s.sizes["grid"][1], srcImage, resize.Lanczos3)
-		fileName = fmt.Sprintf("%s_grid.%s", img.FileName, img.Extension)
+		fileName = fmt.Sprintf("%s_grid.%s", image.FileName, image.Extension)
 		outFile, err = os.Create(s.webFilesPath + fileName)
 		if err != nil {
 			return errors.AddCode(err, "586374")
 		}
 
-		err = jpeg.Encode(outFile, resizedImage, &jpeg.Options{Quality: int(*param.Compression)})
+		err = jpeg.Encode(outFile, resizedImage, &jpeg.Options{Quality: int(s.compression)})
 		if err != nil {
 			return errors.AddCode(err, "687465")
 		}
 
-		fileName = fmt.Sprintf("%s_grid.%s", img.FileName, "webp")
+		fileName = fmt.Sprintf("%s_grid.%s", image.FileName, "webp")
 		webpFile, err = os.Create(s.webFilesPath + fileName)
 		if err != nil {
 			return errors.AddCode(err, "788465")
 		}
 
-		err = webp.Encode(webpFile, resizedImage, &webp.Options{Lossless: false, Quality: float32(*param.Compression)})
+		err = webp.Encode(webpFile, resizedImage, &webp.Options{Lossless: false, Quality: float32(s.compression)})
 		if err != nil {
 			return errors.AddCode(err, "889465")
 		}
 
 		// thumb size
 		resizedImage = resize.Resize(s.sizes["thumb"][0], s.sizes["thumb"][1], srcImage, resize.Lanczos3)
-		fileName = fmt.Sprintf("%s_thumb.%s", img.FileName, img.Extension)
+		fileName = fmt.Sprintf("%s_thumb.%s", image.FileName, image.Extension)
 		outFile, err = os.Create(s.webFilesPath + fileName)
 		if err != nil {
 			return errors.AddCode(err, "990465")
 		}
 
-		err = jpeg.Encode(outFile, resizedImage, &jpeg.Options{Quality: int(*param.Compression)})
+		err = jpeg.Encode(outFile, resizedImage, &jpeg.Options{Quality: int(s.compression)})
 		if err != nil {
 			return errors.AddCode(err, "100465")
 		}
 
-		fileName = fmt.Sprintf("%s_thumb.%s", img.FileName, "webp")
+		fileName = fmt.Sprintf("%s_thumb.%s", image.FileName, "webp")
 		webpFile, err = os.Create(s.webFilesPath + fileName)
 		if err != nil {
 			return errors.AddCode(err, "110465")
 		}
 
-		err = webp.Encode(webpFile, resizedImage, &webp.Options{Lossless: false, Quality: float32(*param.Compression)})
+		err = webp.Encode(webpFile, resizedImage, &webp.Options{Lossless: false, Quality: float32(s.compression)})
 		if err != nil {
 			return errors.AddCode(err, "120465")
 		}
 
 		// update image
-		img.IsCompressed = true
-		img.IsWebp = true
+		image.IsCompressed = true
+		image.IsWebp = true
 
 		// update image in the repository
-		err = s.Update(ctx, img)
+		err = s.Update(ctx, image)
 		if err != nil {
-			return errors.AddCode(err, "8076")
+			return errors.AddCode(err, "807336")
 		}
 
 	default:
@@ -324,18 +306,13 @@ func (s *Service) Get(ctx context.Context, filter *Filter) (*Item, error) {
 		return nil, err
 	}
 
-	//// compress item
-	//if !item.IsCompressed {
-	//	compression := uint(80)
-	//	ids := []uuid.UUID{item.Id}
-	//	err = s.Compression(ctx, &db.ImageCompression{
-	//		Ids:         &ids,
-	//		Compression: &compression,
-	//	})
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//}
+	// compress item
+	if !item.IsCompressed {
+		err = s.Compression(ctx, item)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return item, nil
 }

@@ -18,7 +18,21 @@ type Config struct {
 	StoreWarehouses []string `env:"STORE_WAREHOUSES" env-required:"true"`
 	StoreCurrency   string   `env:"STORE_CURRENCY" env-required:"true"`
 
+	Image ImageConfig
+
 	CacheStorage    CacheStorage
 	DataStorage     DataStorage
 	ProductListener ServerProductListener
+}
+
+type ImageConfig struct {
+	CompressionQuality int  `env:"APP_IMAGE_COMPRESSION_QUALITY" env-required:"true"`
+	FullWidth          uint `env:"APP_IMAGE_FULL_WIDTH" env-required:"true"`
+	FullHeight         uint `env:"APP_IMAGE_FULL_HEIGHT" env-required:"true"`
+	MediumWidth        uint `env:"APP_IMAGE_MEDIUM_WIDTH" env-required:"true"`
+	MediumHeight       uint `env:"APP_IMAGE_MEDIUM_HEIGHT" env-required:"true"`
+	GridWidth          uint `env:"APP_IMAGE_GRID_WIDTH" env-required:"true"`
+	GridHeight         uint `env:"APP_IMAGE_GRID_HEIGHT" env-required:"true"`
+	ThumbWidth         uint `env:"APP_IMAGE_THUMB_WIDTH" env-required:"true"`
+	ThumbHeight        uint `env:"APP_IMAGE_THUMB_HEIGHT" env-required:"true"`
 }

@@ -386,15 +386,15 @@ func (u *UseCase) fetchProductDetails(
 
 		item.MainImage = image
 
-		if !image.IsCompressed {
-			err := u.image.Compression(ctx, &db.ImageCompression{
-				Ids:         &[]uuid.UUID{imageInfo.ImageId},
-				Compression: pointer.UintPtr(80),
-			})
-			if err != nil {
-				*errs = append(*errs, err)
-			}
-		}
+		//if !image.IsCompressed {
+		//	err := u.image.Compression(ctx, &db.ImageCompression{
+		//		Ids:         &[]uuid.UUID{imageInfo.ImageId},
+		//		Compression: pointer.UintPtr(80),
+		//	})
+		//	if err != nil {
+		//		*errs = append(*errs, err)
+		//	}
+		//}
 	}()
 
 	// Fetch product hover image
@@ -423,15 +423,15 @@ func (u *UseCase) fetchProductDetails(
 
 		item.HoverImage = image
 
-		if !image.IsCompressed && image.Id != uuid.Nil {
-			err := u.image.Compression(ctx, &db.ImageCompression{
-				Ids:         &[]uuid.UUID{image.Id},
-				Compression: pointer.UintPtr(80),
-			})
-			if err != nil {
-				*errs = append(*errs, err)
-			}
-		}
+		//if !image.IsCompressed && image.Id != uuid.Nil {
+		//	err := u.image.Compression(ctx, &db.ImageCompression{
+		//		Ids:         &[]uuid.UUID{image.Id},
+		//		Compression: pointer.UintPtr(80),
+		//	})
+		//	if err != nil {
+		//		*errs = append(*errs, err)
+		//	}
+		//}
 	}()
 
 	wg.Wait()
