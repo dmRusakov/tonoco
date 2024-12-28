@@ -422,7 +422,6 @@ func (u *UseCase) fetchProductDetails(
 	}
 
 	// Save to cache
-
 	go u.setGridItemCache(itemId, item)
 
 	// Return item

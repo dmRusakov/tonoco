@@ -1,4 +1,5 @@
 CONFIG_FOLDER=`basename $(CURDIR)`
+MIN_JS_FILE = /home/dm/.config/JetBrains/GoLand2024.3/node/versions/22.12.0/bin/uglifyjs
 
 admin:
 
@@ -46,11 +47,11 @@ makeWebAssembly:
 		sed -i "s/appFileVersion = .*/appFileVersion = \"$(VERSION)\";/g" ./../assets/js/wasm.js ; \
 	fi
 
-
+# minify js files. For Jetbrains IDEs, need to add to Tools -> File Watchers for automatic minification
 minJSFiles:
 	# minify all js files in the assets/js folder
 	$(foreach file, $(filter-out %.min.js, $(wildcard ./../assets/js/*.js)), \
-		uglifyjs $(file) > $(subst .js,.tmp.min.js,$(file)); \
+		$(MIN_JS_FILE) $(file) -o $(subst .js,.tmp.min.js,$(file)) || { echo "uglifyjs failed for $(file)"; exit 1; }; \
 		if cmp -s $(subst .js,.tmp.min.js,$(file)) $(subst .js,.min.js,$(file)); then \
 	  		rm $(subst .js,.tmp.min.js,$(file)); \
 		else \
@@ -59,11 +60,13 @@ minJSFiles:
 			$(eval FILENAME := $(shell echo $(FILENAME) | sed 's/.*\///')) \
 			$(eval FILENAME := $(shell echo $(FILENAME) | sed 's/\.js//')) \
 			$(eval Id := "$(FILENAME)-js") \
-			FILENAME=$(FILENAME)  make updateCJsVersion; \
+			FILENAME=$(FILENAME); \
+			make updateJsVersion; \
 		fi; \
 	)
 
-updateCJsVersion:
+# minify js files. For Jetbrains IDEs, need to add to Tools -> File Watchers for automatic minification
+updateJsVersion:
 	# delete all min.js files
 	$(eval Id := "$(FILENAME)-js")
 	@echo $(Id)
@@ -112,3 +115,14 @@ updateCssVersion:
 	sed -i 's/\(link id=$(Id).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/footer_file_imports.partial.gohtml
 	sed -i 's/\(link id=$(Id).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/prod_footer_file_imports.partial.gohtml
 	sed -i 's/\(link id=$(Id).*href="\)[^"]*"/\1'"\/assets\/css\/"$(FILENAME)".min.css?v="$(VERSION)'"/' ./../assets/templates/element/prod_footer_file_imports.partial.gohtml
+
+installNode:
+	# Install Node.js and npm
+	curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+	sudo apt-get install -y nodejs
+
+installNodeDependencies:
+	# Install all node app dependencies
+	npm install -g uglifycss
+	npm install -g uglify-js
+	npm install -g uglifyjs

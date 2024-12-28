@@ -11,14 +11,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const headerReady = a.func.makeHeader(a.header)
 
 
-
-
-
+    console.log("6")
 
 
 
     // wait all ready
      await Promise.all([topHeaderReady, headerReady])
-
-    console.log(a.header.menu["mmProducts"])
 }, false);
