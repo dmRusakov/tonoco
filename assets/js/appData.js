@@ -4,8 +4,8 @@ const a = this // a == applications
 a.func = {}
 
 // make top header
-a.func.makeTopHeader = async (dom) => {
-    // dom
+a.func.makeTopHeader = async () => {
+    const dom = a.dom.querySelector(".topHeader")
     dom.pageTitile = dom.querySelector(".title")
     dom.menu = dom.querySelector(".menu")
 
@@ -19,8 +19,9 @@ a.func.makeTopHeader = async (dom) => {
 }
 
 // make header
-a.func.makeHeader = async (dom) => {
-    // dom
+a.func.makeHeader = async () => {
+    const dom = a.dom.querySelector(".header")
+
     dom.mobileMenu = dom.querySelector(".mobileMenu")
     dom.menu = dom.querySelector("nav.menu ul")
     dom.iconSize = dom.menu.querySelector("li a svg").getBoundingClientRect().width
@@ -41,7 +42,6 @@ a.func.makeHeader = async (dom) => {
             a.icon.style.width = dom.iconSize + "px"
             a.icon.style.margin = "auto"
             a.icon.style.fill = "var(--menuIconColor)"
-
         })
     })
 
