@@ -1,5 +1,7 @@
 const a = this // a == applications
 
+a.func = {}
+
 // make top header
 a.makeTopHeader = async () => {
     const dom = a.dom.querySelector(".topHeader")
@@ -53,6 +55,20 @@ a.makeHeader = async () => {
 a.makeShopPage = async () => {
     const dom = a.dom.querySelector(".shop")
     if (!dom) return false
+
+    // dom
+    dom.title = dom.querySelector(".header h1")
+    dom.shortDescription = dom.querySelector(".header p")
+    dom.filters = dom.querySelector(".filters")
+    dom.products = dom.querySelector("#products")
+    dom.description = dom.querySelector(".description")
+
+    // filters
+    dom.filters.style.removeProperty("display")
+
+
+
+
 
 
 

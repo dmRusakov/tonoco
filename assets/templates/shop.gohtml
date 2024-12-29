@@ -7,15 +7,15 @@
                 <h1>{{.Name}}</h1>
                 <p>{{.ShortDescription}}</p>
             </div>
-            <div id="filter" style="display: none">
+            <div id="filter" class="filters" style="display: none">
                 {{range .Filters}}
                     <div class="filter">
                         <label>{{.Name}}</label>
                         <select name="{{.Url}}">
-                         <option value=""></option>
-                        {{range .Options}}
-                            <option value="{{.Url}}" value-id="{{.Id}}">{{.Name}}</option>
-                        {{end}}
+                            <option value=""></option>
+                            {{range .Options}}
+                                <option value="{{.Url}}" value-id="{{.Id}}">{{.Name}}</option>
+                            {{end}}
                         </select>
                     </div>
                 {{end}}
