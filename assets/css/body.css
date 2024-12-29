@@ -344,13 +344,15 @@ h3, h4, h5, h6 {
     padding: 0 20px;
     margin-bottom: 40px;
 
-    .h { /* header */
+    .header {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 10px;
         margin: 10px 0;
+        background-color: transparent;
+        color: var(--deAccentText);
 
-        #title { /* title container */
+        #title {
 
             h1, p {
                 margin: 0;
@@ -364,12 +366,12 @@ h3, h4, h5, h6 {
             }
         }
 
-        #filter { /* filters */
+        #filter { /*dsfd*/
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 10px;
 
-            .f { /* filter  */
+            .filter {
                 label, select {
                     width: 100%;
                     display: inline-block;
@@ -390,7 +392,7 @@ h3, h4, h5, h6 {
                 }
             }
 
-            .f-i { /* filter icon */
+            .filterIcon {
 
             }
         }

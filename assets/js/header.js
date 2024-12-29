@@ -3,8 +3,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     a.dom = document
 
     await Promise.all([
-        a.func.makeTopHeader(),
-        a.func.makeHeader(),
+        a.makeTopHeader(),
+        a.makeHeader(),
+        a.makeShopPage()
     ]);
 
 }, false);

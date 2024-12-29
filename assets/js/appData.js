@@ -1,11 +1,10 @@
 const a = this // a == applications
 
-// functions
-a.func = {}
-
 // make top header
-a.func.makeTopHeader = async () => {
+a.makeTopHeader = async () => {
     const dom = a.dom.querySelector(".topHeader")
+    if (!dom) return false
+
     dom.pageTitile = dom.querySelector(".title")
     dom.menu = dom.querySelector(".menu")
 
@@ -19,8 +18,9 @@ a.func.makeTopHeader = async () => {
 }
 
 // make header
-a.func.makeHeader = async () => {
+a.makeHeader = async () => {
     const dom = a.dom.querySelector(".header")
+    if (!dom) return false
 
     dom.mobileMenu = dom.querySelector(".mobileMenu")
     dom.menu = dom.querySelector("nav.menu ul")
@@ -44,6 +44,17 @@ a.func.makeHeader = async () => {
             a.icon.style.fill = "var(--menuIconColor)"
         })
     })
+
+    // done
+    return true
+}
+
+// make shop page
+a.makeShopPage = async () => {
+    const dom = a.dom.querySelector(".shop")
+    if (!dom) return false
+
+
 
     // done
     return true

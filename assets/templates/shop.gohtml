@@ -2,14 +2,14 @@
 
 {{define "content" }}
     <div class="shop">
-        <div class="h">
+        <div class="header">
             <div id="title">
                 <h1>{{.Name}}</h1>
                 <p>{{.ShortDescription}}</p>
             </div>
             <div id="filter" style="display: none">
                 {{range .Filters}}
-                    <div class="f">
+                    <div class="filter">
                         <label>{{.Name}}</label>
                         <select name="{{.Url}}">
                          <option value=""></option>
@@ -19,7 +19,7 @@
                         </select>
                     </div>
                 {{end}}
-                <div class="f-i"></div>
+                <div class="filterIcon"></div>
             </div>
         </div>
         {{template "products_grid" .}}

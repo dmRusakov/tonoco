@@ -1,5 +1,6 @@
 CONFIG_FOLDER=`basename $(CURDIR)`
 MIN_JS_FILE = /home/dm/.config/JetBrains/GoLand2024.3/node/versions/22.12.0/bin/uglifyjs
+MIN_CSS_FILE = /home/dm/.config/JetBrains/GoLand2024.3/node/versions/22.12.0/bin/uglifycss
 
 admin:
 
@@ -82,7 +83,7 @@ minCssFiles:
  	# minify all css files in the assets/css folder
 	$(foreach file, $(filter-out %.min.css, $(wildcard ./../assets/css/*.css)), \
 		if [ $(file) != $(subst .css,.min.css,$(file)) ]; then \
-			uglifycss $(file) > $(subst .css,.tmp.min.css,$(file)); \
+			$(MIN_CSS_FILE) $(file) > $(subst .css,.tmp.min.css,$(file)); \
 			if cmp -s $(subst .css,.tmp.min.css,$(file)) $(subst .css,.min.css,$(file)); then \
 		  		rm $(subst .css,.tmp.min.css,$(file)); \
 			else \
