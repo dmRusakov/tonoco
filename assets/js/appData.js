@@ -127,49 +127,39 @@ a.makeShopPage = async () => {
                 // item count
                 itemDom.querySelector(".skuContainer .itemCounter").innerHTML = "Item # " + (i + 1)
 
-                // hover event
+                // mouse in event
                 itemDom.addEventListener("mouseover", () => {
-                    const picture = itemDom.querySelector("picture")
-                    if (picture.classList.contains("hover")) return false
+                    const picture = itemDom.querySelector("picture");
+                    if (picture.classList.contains("hover")) return;
                     picture.classList.replace("main", "hover");
 
                     picture.querySelectorAll("source").forEach((imgSource) => {
-                        const source = imgSource.getAttribute("source")
-                        if (["main-webp", "main"].includes(source)) {
-                            const src = imgSource.getAttribute("srcset") ?? null
-                            if (!src) return false
-                            imgSource.setAttribute("main-srcset", src)
-                            imgSource.removeAttribute("srcset")
-                        } else if (["hover-webp", "hover"].includes(source)) {
-                            const src = imgSource.getAttribute("hover-srcset") ?? null
-                            if (!src) return false
-                            imgSource.setAttribute("srcset", src)
-                            imgSource.removeAttribute("hover-srcset")
+                        const source = imgSource.getAttribute("source");
+                        const [attr, newAttr] = ["main-webp", "main"].includes(source) ? ["srcset", "main-srcset"] : ["hover-srcset", "srcset"];
+                        const src = imgSource.getAttribute(attr);
+                        if (src) {
+                            imgSource.setAttribute(newAttr, src);
+                            imgSource.removeAttribute(attr);
                         }
-                    })
-                })
+                    });
+                });
 
-                // out event
+                // mouse out event
                 itemDom.addEventListener("mouseout", () => {
-                    const picture = itemDom.querySelector("picture")
-                    if (picture.classList.contains("main")) return false
+                    const picture = itemDom.querySelector("picture");
+                    if (picture.classList.contains("main")) return;
                     picture.classList.replace("hover", "main");
 
                     picture.querySelectorAll("source").forEach((imgSource) => {
-                        const source = imgSource.getAttribute("source")
-                        if (["main-webp", "main"].includes(source)) {
-                            const src = imgSource.getAttribute("main-srcset") ?? null
-                            if (!src) return false
-                            imgSource.setAttribute("srcset", src)
-                            imgSource.removeAttribute("main-srcset")
-                        } else if (["hover-webp", "hover"].includes(source)) {
-                            const src = imgSource.getAttribute("srcset") ?? null
-                            if (!src) return false
-                            imgSource.setAttribute("hover-srcset", src)
-                            imgSource.removeAttribute("srcset")
+                        const source = imgSource.getAttribute("source");
+                        const [attr, newAttr] = ["main-webp", "main"].includes(source) ? ["main-srcset", "srcset"] : ["srcset", "hover-srcset"];
+                        const src = imgSource.getAttribute(attr);
+                        if (src) {
+                            imgSource.setAttribute(newAttr, src);
+                            imgSource.removeAttribute(attr);
                         }
-                    })
-                })
+                    });
+                });
 
             })
         }),
