@@ -30,16 +30,21 @@
             <span>{{.Name}}</span>
         </h2>
         <p class="shortDescription">{{.ShortDescription}}</p>
-        <div class="dataContainer" status="{{.Status}}">
-            {{if or .SalePrice .Price}}
-                <p class="price{{if .SalePrice}} sale{{end}}">
-                    {{if .SalePrice}}<span class="salePrice">{{.Currency}}{{.SalePrice}}</span>{{end}}
-                    {{if .Price}}<span class="regularPrice">{{.Currency}}{{.Price}}</span>{{end}}
-                </p>
+        <div class="dataContainer" status="{{.Status}}" tty="A{{.Quantity}}">
+            <p class="info"></p>
+            {{if eq .Status "discontinued"}}
+                <p class="discontinued">Discontinued</p>
+            {{else}}
+                {{if or .SalePrice .Price}}
+                    <p class="price{{if .SalePrice}} sale{{end}}">
+                        {{if .SalePrice}}<span class="salePrice">{{.Currency}}{{.SalePrice}}</span>{{end}}
+                        {{if .Price}}<span class="regularPrice">{{.Currency}}{{.Price}}</span>{{end}}
+                    </p>
+                {{end}}
             {{end}}
         </div>
         <div class="skuContainer">
-            <p class="sku">{{.Sku}}<span> (TTY/TTD-{{.Quantity}})</span></p>
+            <p class="sku">{{.Sku}}<span></span></p>
             <p class="itemCounter"></p>
         </div>
     </a>

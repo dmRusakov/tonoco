@@ -212,7 +212,7 @@ h3, h4, h5, h6 {
                 }
 
                 .sku span {
-                    display: none;
+                    color: var(--deAccentText1);
                 }
             }
         }
@@ -241,11 +241,6 @@ h3, h4, h5, h6 {
                         font-weight: bold;
                     }
                 }
-            }
-
-            .skuContainer .sku span {
-                display: inline;
-                color: var(--deAccentText1);
             }
         }
     }

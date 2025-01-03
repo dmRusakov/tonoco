@@ -104,14 +104,14 @@ a.makeShopPage = async () => {
             dom.products = dom.querySelector("#products .grid")
             dom.products.querySelectorAll("a").forEach(async (itemDom, i) => {
                 const item = {
-                    id: itemDom.getAttribute("id"),
-                    brand: itemDom.querySelectorAll("h2 span")[0].innerHTML,
-                    name: itemDom.querySelectorAll("h2 span")[1].innerHTML,
+                    id: itemDom.getAttribute("id") || null,
+                    brand: itemDom.querySelectorAll("h2 span")[0]?.innerHTML || null,
+                    name: itemDom.querySelectorAll("h2 span")[1]?.innerHTML || null,
                     shortDescription: itemDom.querySelector("p.shortDescription").innerHTML,
-                    status: itemDom.querySelector(".dataContainer").getAttribute("status"),
-                    salePrice: itemDom.querySelector(".dataContainer .salePrice").innerHTML || null,
-                    regularPrice: itemDom.querySelector(".dataContainer .regularPrice").innerHTML || null,
-                    sku: itemDom.querySelector(".skuContainer .sku").innerHTML,
+                    status: itemDom.querySelector(".dataContainer")?.getAttribute("status"),
+                    salePrice: itemDom.querySelector(".dataContainer .salePrice")?.innerHTML || null,
+                    regularPrice: itemDom.querySelector(".dataContainer .regularPrice")?.innerHTML || null,
+                    sku: itemDom.querySelector(".skuContainer .sku")?.innerHTML || null,
                 }
 
                 // images
@@ -129,6 +129,7 @@ a.makeShopPage = async () => {
 
                 // mouse in event
                 itemDom.addEventListener("mouseover", () => {
+                    // picture
                     const picture = itemDom.querySelector("picture");
                     if (picture.classList.contains("hover")) return;
                     picture.classList.replace("main", "hover");
@@ -142,10 +143,15 @@ a.makeShopPage = async () => {
                             imgSource.removeAttribute(attr);
                         }
                     });
+
+                    // status
+                    const status = itemDom.querySelector(".dataContainer").getAttribute("status") ?? null
+                    console.log(status)
                 });
 
                 // mouse out event
                 itemDom.addEventListener("mouseout", () => {
+                    // picture
                     const picture = itemDom.querySelector("picture");
                     if (picture.classList.contains("main")) return;
                     picture.classList.replace("hover", "main");
