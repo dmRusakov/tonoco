@@ -12,23 +12,15 @@
                 {{end}}
             {{end}}
         </div>
-        <picture>
+        <picture class="main">
             {{if .MainImage}}
-                <source source="main-thumb-webp" srcset="/assets/images/web/{{.MainImage.FileName}}_thumb.webp" type="image/webp">
-                <source source="main-thumb" srcset="/assets/images/web/{{.MainImage.FileName}}_thumb.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
-                <source source="main-grid-webp" srcset="/assets/images/web/{{.MainImage.FileName}}_grid.webp" type="image/webp">
-                <source source="main-grid" srcset="/assets/images/web/{{.MainImage.FileName}}_grid.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
-                <source source="main-medium-webp" srcset="/assets/images/web/{{.MainImage.FileName}}_medium.webp" type="image/webp">
-                <source source="main-medium" srcset="/assets/images/web/{{.MainImage.FileName}}_medium.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
+                <source source="main-webp" srcset="/assets/images/web/{{.MainImage.FileName}}_grid.webp" type="image/webp">
+                <source source="main" srcset="/assets/images/web/{{.MainImage.FileName}}_grid.{{.MainImage.Extension}}" type="image/{{.MainImage.Extension}}">
                 {{if .HoverImage}}
-                    <source source="hover-thumb-webp" srcset="/assets/images/web/{{.HoverImage.FileName}}_thumb.webp" type="image/webp">
-                    <source source="hover-thumb" srcset="/assets/images/web/{{.HoverImage.FileName}}_thumb.{{.HoverImage.Extension}}" type="image/{{.HoverImage.Extension}}">
-                    <source source="hover-grid-webp" srcset="/assets/images/web/{{.HoverImage.FileName}}_grid.webp" type="image/webp">
-                    <source source="hover-grid" srcset="/assets/images/web/{{.HoverImage.FileName}}_grid.{{.HoverImage.Extension}}" type="image/{{.HoverImage.Extension}}">
-                    <source source="hover-medium-webp" srcset="/assets/images/web/{{.HoverImage.FileName}}_medium.webp" type="image/webp">
-                    <source source="hover-medium" srcset="/assets/images/web/{{.HoverImage.FileName}}_medium.{{.HoverImage.Extension}}" type="image/{{.HoverImage.Extension}}">
+                    <source source="hover-webp" hover-srcset="/assets/images/web/{{.HoverImage.FileName}}_grid.webp" type="image/webp">
+                    <source source="hover" hover-srcset="/assets/images/web/{{.HoverImage.FileName}}_grid.{{.HoverImage.Extension}}" type="image/{{.HoverImage.Extension}}">
                 {{end}}
-                <img src="/assets/images/web/{{.MainImage.FileName}}_grid.webp" title="{{.MainImage.Title}}" alt="{{.MainImage.AltText}}" copyright="{{.MainImage.CopyRight}}" author="{{.MainImage.Creator}}">
+                <img class="main" src="/assets/images/web/{{.MainImage.FileName}}_grid.webp" title="{{.MainImage.Title}}" alt="{{.MainImage.AltText}}" copyright="{{.MainImage.CopyRight}}" author="{{.MainImage.Creator}}">
             {{else}}
                 <img class="placeholder" src="/assets/images/elements/no-image.svg" title="{{.SeoTitle}}" alt="{{.SeoDescription}}">
             {{end}}

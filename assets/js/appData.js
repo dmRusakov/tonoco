@@ -1,6 +1,26 @@
 const a = this // a == applications
 
+// functions
 a.func = {}
+
+// cache
+a.cache = {}
+a.cache.grid = {}
+
+// browser
+a.browser = (() => {
+    return {
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        isSupportWebp: (() => {
+            const elem = document.createElement('canvas');
+            if (!!(elem.getContext && elem.getContext('2d'))) {
+                return elem.toDataURL('image/webp').indexOf('data:image/webp') == 0;
+            }
+            return false;
+        })(),
+    }
+})()
 
 // make top header
 a.makeTopHeader = async () => {
@@ -56,15 +76,117 @@ a.makeShopPage = async () => {
     const dom = a.dom.querySelector(".shop")
     if (!dom) return false
 
-    // dom
-    dom.title = dom.querySelector(".header h1")
-    dom.shortDescription = dom.querySelector(".header p")
-    dom.filters = dom.querySelector(".filters")
-    dom.products = dom.querySelector("#products")
-    dom.description = dom.querySelector(".description")
+    await Promise.all([
 
-    // filters
-    dom.filters.style.removeProperty("display")
+        // title
+        Promise.resolve().then(() => {
+            dom.title = dom.querySelector(".header h1");
+        }),
+
+        // short description
+        Promise.resolve().then(() => {
+            dom.shortDescription = dom.querySelector(".header p");
+        }),
+
+        // description
+        Promise.resolve().then(() => {
+            dom.description = dom.querySelector("#description");
+        }),
+
+        // filters
+        Promise.resolve().then(() => {
+            dom.filters = dom.querySelector(".filters")
+            dom.filters.style.removeProperty("display")
+        }),
+
+        // products grid
+        Promise.resolve().then(() => {
+            dom.products = dom.querySelector("#products .grid")
+            dom.products.querySelectorAll("a").forEach(async (itemDom, i) => {
+                const item = {
+                    id: itemDom.getAttribute("id"),
+                    brand: itemDom.querySelectorAll("h2 span")[0].innerHTML,
+                    name: itemDom.querySelectorAll("h2 span")[1].innerHTML,
+                    shortDescription: itemDom.querySelector("p.shortDescription").innerHTML,
+                    status: itemDom.querySelector(".dataContainer").getAttribute("status"),
+                    salePrice: itemDom.querySelector(".dataContainer .salePrice").innerHTML || null,
+                    regularPrice: itemDom.querySelector(".dataContainer .regularPrice").innerHTML || null,
+                    sku: itemDom.querySelector(".skuContainer .sku").innerHTML,
+                }
+
+                // images
+                item.images = {}
+                itemDom.images = {}
+                itemDom.querySelector("picture").querySelectorAll("source").forEach((img) => {
+                    item.images[img.getAttribute("source")] = img.getAttribute("srcset")
+                })
+
+                // save to cache
+                a.cache.grid[item.id] = item
+
+                // item count
+                itemDom.querySelector(".skuContainer .itemCounter").innerHTML = "Item # " + (i + 1)
+
+                // hover event
+                itemDom.addEventListener("mouseover", () => {
+                    const picture = itemDom.querySelector("picture")
+                    if (picture.classList.contains("hover")) return false
+                    picture.classList.replace("main", "hover");
+
+                    picture.querySelectorAll("source").forEach((imgSource) => {
+                        const source = imgSource.getAttribute("source")
+                        if (["main-webp", "main"].includes(source)) {
+                            const src = imgSource.getAttribute("srcset") ?? null
+                            if (!src) return false
+                            imgSource.setAttribute("main-srcset", src)
+                            imgSource.removeAttribute("srcset")
+                        } else if (["hover-webp", "hover"].includes(source)) {
+                            const src = imgSource.getAttribute("hover-srcset") ?? null
+                            if (!src) return false
+                            imgSource.setAttribute("srcset", src)
+                            imgSource.removeAttribute("hover-srcset")
+                        }
+                    })
+                })
+
+                // out event
+                itemDom.addEventListener("mouseout", () => {
+                    const picture = itemDom.querySelector("picture")
+                    if (picture.classList.contains("main")) return false
+                    picture.classList.replace("hover", "main");
+
+                    picture.querySelectorAll("source").forEach((imgSource) => {
+                        const source = imgSource.getAttribute("source")
+                        if (["main-webp", "main"].includes(source)) {
+                            const src = imgSource.getAttribute("main-srcset") ?? null
+                            if (!src) return false
+                            imgSource.setAttribute("srcset", src)
+                            imgSource.removeAttribute("main-srcset")
+                        } else if (["hover-webp", "hover"].includes(source)) {
+                            const src = imgSource.getAttribute("srcset") ?? null
+                            if (!src) return false
+                            imgSource.setAttribute("hover-srcset", src)
+                            imgSource.removeAttribute("srcset")
+                        }
+                    })
+                })
+
+            })
+        }),
+
+        // products grid footer (pagination, count on page)
+        Promise.resolve().then(() => {
+            dom.productsFooter = dom.querySelector("#products .gridFooter")
+        }),
+
+
+        Promise.resolve().then(() => {}),
+    ]);
+
+    // dom
+
+
+
 
 
 
