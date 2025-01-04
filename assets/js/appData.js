@@ -108,15 +108,15 @@ a.makeShopPage = async () => {
                     brand: itemDom.querySelectorAll("h2 span")[0]?.innerHTML || null,
                     name: itemDom.querySelectorAll("h2 span")[1]?.innerHTML || null,
                     shortDescription: itemDom.querySelector("p.shortDescription").innerHTML,
-                    status: itemDom.querySelector(".dataContainer")?.getAttribute("status"),
-                    salePrice: itemDom.querySelector(".dataContainer .salePrice")?.innerHTML || null,
-                    regularPrice: itemDom.querySelector(".dataContainer .regularPrice")?.innerHTML || null,
-                    sku: itemDom.querySelector(".skuContainer .sku")?.innerHTML || null,
+                    status: itemDom.querySelector("div.dataContainer")?.getAttribute("status") || null,
+                    salePrice: itemDom.querySelector("div.dataContainer span.salePrice")?.innerHTML || null,
+                    regularPrice: itemDom.querySelector("div.dataContainer span.regularPrice")?.innerHTML || null,
+                    sku: itemDom.querySelector("div.skuContainer p.sku")?.innerHTML || null,
+                    tty: itemDom.querySelector("div.dataContainer")?.getAttribute("tty") || null,
                 }
 
                 // images
                 item.images = {}
-                itemDom.images = {}
                 itemDom.querySelector("picture").querySelectorAll("source").forEach((img) => {
                     item.images[img.getAttribute("source")] = img.getAttribute("srcset")
                 })
@@ -126,6 +126,8 @@ a.makeShopPage = async () => {
 
                 // item count
                 itemDom.querySelector(".skuContainer .itemCounter").innerHTML = "Item # " + (i + 1)
+
+                const statusDom = itemDom.querySelector("div.dataContainer p.info")
 
                 // mouse in event
                 itemDom.addEventListener("mouseover", () => {
@@ -145,8 +147,11 @@ a.makeShopPage = async () => {
                     });
 
                     // status
-                    const status = itemDom.querySelector(".dataContainer").getAttribute("status") ?? null
-                    console.log(status)
+                    statusDom.innerHTML = item.status === "in_stock"
+                        ? "Order now"
+                        : item.status === "pre_order"
+                            ? "Pre-order"
+                            : "";
                 });
 
                 // mouse out event
@@ -165,6 +170,9 @@ a.makeShopPage = async () => {
                             imgSource.removeAttribute(attr);
                         }
                     });
+
+                    // status
+                    statusDom.innerHTML = ""
                 });
 
             })
