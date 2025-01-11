@@ -1,29 +1,29 @@
 services:
   DataStorage:
-      container_name: 'DataStorage'
-      image: 'postgres:14.2'
-      ports:
-        - "5432:5432"
-      command: [ "sh", "-c", "chmod -R 777 /var/lib/postgresql/data && docker-entrypoint.sh postgres" ]
-      deploy:
-        mode: replicated
-        replicas: 1
-      environment:
-        HOST: ${DATA_STORAGE_HOST}
-        POSTGRES_USER: ${DATA_STORAGE_USER}
-        POSTGRES_PASSWORD: ${DATA_STORAGE_PASSWORD}
-        POSTGRES_DB: ${DATA_STORAGE_DB}
-        PORT: ${DATA_STORAGE_PORT}
-        SSL_MODE: ${DATA_STORAGE_SSL_MODE}
-        TZ: ${DATA_STORAGE_TZ}
-        CONNECT_TIMEOUT: ${DATA_STORAGE_CONNECT_TIMEOUT}
-      volumes:
-        - './dbData/DataStorage/data/:/var/lib/postgresql/data'
-        - './dbData/DataStorage/init/:/docker-entrypoint-initdb.d/'
-      networks:
-        - tonoco
-      user: root
-      privileged: true
+    container_name: 'DataStorage'
+    image: 'postgres:14.2'
+    ports:
+      - "5432:5432"
+    command: [ "sh", "-c", "chmod -R 777 /var/lib/postgresql/data && docker-entrypoint.sh postgres" ]
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      HOST: ${DATA_STORAGE_HOST}
+      POSTGRES_USER: ${DATA_STORAGE_USER}
+      POSTGRES_PASSWORD: ${DATA_STORAGE_PASSWORD}
+      POSTGRES_DB: ${DATA_STORAGE_DB}
+      PORT: ${DATA_STORAGE_PORT}
+      SSL_MODE: ${DATA_STORAGE_SSL_MODE}
+      TZ: ${DATA_STORAGE_TZ}
+      CONNECT_TIMEOUT: ${DATA_STORAGE_CONNECT_TIMEOUT}
+    volumes:
+      - './dbData/DataStorage/data/:/var/lib/postgresql/data'
+      - './dbData/DataStorage/init/:/docker-entrypoint-initdb.d/'
+    networks:
+      - tonoco
+    user: root
+    privileged: true
 
   CacheStorage:
     container_name: 'CacheStorage'
@@ -64,6 +64,17 @@ services:
       - tonoco
     user: root
     privileged: true
+
+  AdminApp:
+    container_name: 'AdminApp'
+    image: 'tonoco/admin-app:latest'
+    ports:
+      - "8080:8080"
+    deploy:
+      mode: replicated
+      replicas: 1
+    env_file:
+      - ./.env
 
 networks:
   tonoco:
