@@ -48,7 +48,7 @@ type Service struct {
 }
 
 func NewService(repository *model.Model, cfg *config.Config) *Service {
-	return &Service{
+	service := &Service{
 		repository:        repository,
 		originalFilesPath: "assets/images/original/",
 		webFilesPath:      "assets/images/web/",
@@ -61,6 +61,21 @@ func NewService(repository *model.Model, cfg *config.Config) *Service {
 		},
 		compression: cfg.Image.CompressionQuality,
 	}
+
+	// create directories if not exist
+	if _, err := os.Stat(service.originalFilesPath); os.IsNotExist(err) {
+		os.MkdirAll(service.originalFilesPath, os.ModePerm)
+	}
+
+	if _, err := os.Stat(service.webFilesPath); os.IsNotExist(err) {
+		os.MkdirAll(service.webFilesPath, os.ModePerm)
+	}
+
+	if _, err := os.Stat(service.feedFilesPath); os.IsNotExist(err) {
+		os.MkdirAll(service.feedFilesPath, os.ModePerm)
+	}
+
+	return service
 }
 
 func (s *Service) Compression(ctx context.Context, image *Item) error {

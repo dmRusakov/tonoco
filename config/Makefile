@@ -1,6 +1,8 @@
 CONFIG_FOLDER=`basename $(CURDIR)`
-MIN_JS_FILE = /home/dm/.config/JetBrains/GoLand2024.3/node/versions/22.12.0/bin/uglifyjs
+MIN_JS_FILE = /bin/uglifyjs
 MIN_CSS_FILE = /home/dm/.config/JetBrains/GoLand2024.3/node/versions/22.12.0/bin/uglifycss
+JS_FILE_LOCATION = ./../assets/js/
+CSS_FILE_LOCATION = ./../assets/css/
 
 admin:
 
@@ -46,6 +48,12 @@ makeWebAssembly:
 		$(eval VERSION := $(shell echo "$(VERSION) + 0.001" | bc))\
 		sed -i "s/appFileVersion = .*/appFileVersion = \"$(VERSION)\";/g" ./../assets/js/wasm.js ; \
 	fi
+
+minJSFile: # make minJSFile file=<filename.js>
+	# check if file provided
+	$(if $(file),,$(error file is not set))
+	/bin/uglifyjs $(JS_FILE_LOCATION)$(file) -o $(subst .js,.min.js,$(file)) || { echo "uglifyjs failed for $(file)"; exit 1; }
+
 
 # minify js files. For Jetbrains IDEs, need to add to Tools -> File Watchers for automatic minification
 minJSFiles:
@@ -117,9 +125,9 @@ updateCssVersion:
 	sed -i 's/\(link id=$(Id).*href="\)[^"]*"/\1'"\/assets\/css\/"$(FILENAME)".min.css?v="$(VERSION)'"/' ./../assets/templates/element/prod_footer_file_imports.partial.gohtml
 
 installNode:
-	# Install Node.js and npm
-	curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-	sudo apt-get install -y nodejs
+	sudo dnf install nodejs
+	sudo dnf install npm
+
 
 installNodeDependencies:
 	# Install all node app dependencies
