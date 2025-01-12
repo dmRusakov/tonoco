@@ -25,4 +25,5 @@ DO $$
 
 -- product image
 delete from public.product_image where product_id is null or image_id is null;
-UPDATE public.image SET origin_path = 'Built-In-Range-Hood-Decorsa-Wall-36-inch-model-Futuro-Futuro-brand-17.jpg' WHERE id = '84496ca0-170e-44d5-a664-699c2773445b'
+UPDATE public.image SET origin_path = 'Built-In-Range-Hood-Decorsa-Wall-36-inch-model-Futuro-Futuro-brand-17.jpg' WHERE id = '84496ca0-170e-44d5-a664-699c2773445b';
+update image set origin_path = replace(origin_path, 'http://futurostaging6.wpengine.com/wp-content/uploads/', '') where origin_path like '%http://futurostaging6.wpengine.com/wp-content/uploads/%';

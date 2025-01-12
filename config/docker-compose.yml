@@ -65,16 +65,16 @@ services:
     user: root
     privileged: true
 
-  AdminApp:
-    container_name: 'AdminApp'
-    image: 'tonoco/admin-app:latest'
-    ports:
-      - "8080:8080"
-    deploy:
-      mode: replicated
-      replicas: 1
-    env_file:
-      - ./.env
+#  AdminApp:
+#    container_name: 'AdminApp'
+#    image: 'tonoco/admin-app:latest'
+#    ports:
+#      - "8080:8080"
+#    deploy:
+#      mode: replicated
+#      replicas: 1
+#    env_file:
+#      - ./.env
 
 networks:
   tonoco:

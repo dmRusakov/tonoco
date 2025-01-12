@@ -5,7 +5,6 @@ MIN_CSS_FILE = /home/dm/.config/JetBrains/GoLand2024.3/node/versions/22.12.0/bin
 admin:
 
 up: down
-	#chmod -R 777 ./dbData/DataStorage/data/
 	docker-compose --env-file ./dev.env up -d
 	@echo "Started"
 
