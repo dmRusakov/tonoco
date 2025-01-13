@@ -342,6 +342,12 @@ h3, h4, h5, h6 {
                     transition: background-color 0.3s, color 0.3s;
                     padding: 4px;
                 }
+
+                .choices {
+                    .choices__inner {
+                        min-height: 30px !important;
+                    }
+                }
             }
 
             .filterIcon {
