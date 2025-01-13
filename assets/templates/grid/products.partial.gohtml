@@ -7,16 +7,16 @@
         </div>
         <div class="gridFooter">
             <div class="countItems">
-                <div class="show">
+                <div>
                     Show
-                    <select id="perPage" name="perPage" onchange="window.location.href = this.value;">
+                    <select onchange="window.location.href = this.value;">
                         <option value="{{.Url}}?perpage=6" {{if eq .PerPage 6}}selected{{end}}>6</option>
                         <option value="{{.Url}}?perpage=12" {{if eq .PerPage 12}}selected{{end}}>12</option>
                         <option value="{{.Url}}?perpage=18" {{if eq .PerPage 18}}selected{{end}}>18</option>
                         <option value="{{.Url}}?perpage=24" {{if eq .PerPage 24}}selected{{end}}>24</option>
                         <option value="{{.Url}}?perpage=48" {{if eq .PerPage 48}}selected{{end}}>48</option>
                     </select>
-                    <br>Of {{if .TotalItems}}{{.TotalItems}}{{end}} items.</div>
+                    <br>Of <span>{{if .TotalItems}}{{.TotalItems}}{{end}}</span> items.</div>
             </div>
             <div class="pagination">
                 {{range .Pagination}}

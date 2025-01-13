@@ -123,10 +123,30 @@ class Shop {
 
             // count items
             new Promise((resolve) => {
-                const dom = this.filters = this.header.querySelector(".filters");
+                const dom = this.footer = this.header.querySelector(".countItems");
+                dom.perPage = this.footer.querySelector("select");
+                dom.perPage.set = async (t) => {
+                    dom.perPage.value = t;
+                }
+                dom.perPage.get = async () => {
+                    return dom.perPage.value;
+                }
+                dom.onPage = this.footer.querySelector("span");
+                dom.onPage.set = async (t) => {
+                    dom.onPage.innerHTML = t;
+                }
+                resolve();
+            }),
 
-
-
+            // pagination
+            new Promise((resolve) => {
+                const dom = this.footer = this.header.querySelector(".pagination");
+                dom.pages = dom.querySelectorAll("a");
+                dom.pages.forEach((page) => {
+                    page.set = async (t) => {
+                        page.innerHTML = t;
+                    }
+                })
                 resolve();
             }),
         ])
