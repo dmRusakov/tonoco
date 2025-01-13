@@ -121,26 +121,31 @@ class Shop {
                 resolve();
             }),
 
-            // count items
+            // perPage
             new Promise((resolve) => {
-                const dom = this.footer = this.header.querySelector(".countItems");
-                dom.perPage = this.footer.querySelector("select");
-                dom.perPage.set = async (t) => {
-                    dom.perPage.value = t;
+                const dom = this.perPage = this.footer.querySelector("select");
+                dom.set = async (t) => {
+                    dom.value = t;
                 }
-                dom.perPage.get = async () => {
-                    return dom.perPage.value;
+                dom.get = async () => {
+                    return dom.value;
                 }
-                dom.onPage = this.footer.querySelector("span");
-                dom.onPage.set = async (t) => {
-                    dom.onPage.innerHTML = t;
+                resolve();
+            }),
+
+            // onPage
+            new Promise((resolve) => {
+                const dom = this.onPage = this.footer.querySelector("span");
+                console.log(dom)
+                dom.set = async (t) => {
+                    dom.value = t;
                 }
                 resolve();
             }),
 
             // pagination
             new Promise((resolve) => {
-                const dom = this.footer = this.header.querySelector(".pagination");
+                const dom = this.pagination = this.header.querySelector(".pagination");
                 dom.pages = dom.querySelectorAll("a");
                 dom.pages.forEach((page) => {
                     page.set = async (t) => {
