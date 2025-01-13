@@ -38,6 +38,9 @@ class Shop {
             new Promise((resolve) => {
                 const dom = this.filters = this.header.querySelector(".filters");
                 dom.style.removeProperty("display");
+
+                // this.filters.querySelectorAll("select").forEach((select) => {
+
                 resolve();
             }),
 
@@ -136,7 +139,6 @@ class Shop {
             // onPage
             new Promise((resolve) => {
                 const dom = this.onPage = this.footer.querySelector("span");
-                console.log(dom)
                 dom.set = async (t) => {
                     dom.value = t;
                 }
@@ -145,7 +147,7 @@ class Shop {
 
             // pagination
             new Promise((resolve) => {
-                const dom = this.pagination = this.header.querySelector(".pagination");
+                const dom = this.pagination = this.footer.querySelector(".pagination");
                 dom.pages = dom.querySelectorAll("a");
                 dom.pages.forEach((page) => {
                     page.set = async (t) => {
