@@ -1,5 +1,9 @@
 // class Shop
 class Shop {
+    constructor() {
+        self.shop = this
+    }
+
     async init() {
         this.dom = document.querySelector('.shop')
         this.header = this.dom.querySelector('.header')
@@ -58,7 +62,7 @@ class Shop {
                     })
 
                     // save to cache
-                    self.cache.filter[filter.id] = filter
+                    self.app.setFilterCache(filter.id, filter)
                     isFileterExist = true;
                 })
 
@@ -91,7 +95,7 @@ class Shop {
                 resolve();
             }),
 
-            // products
+            // grid
             new Promise((resolve) => {
                 const dom = this.products = this.dom.querySelector("#products .grid");
                 dom.querySelectorAll("a").forEach(async (itemDom, i) => {
@@ -114,7 +118,7 @@ class Shop {
                     })
 
                     // save to cache
-                    self.cache.grid[item.id] = item
+                    self.app.setGridCache(item.id, item)
 
                     // item count
                     itemDom.querySelector(".skuContainer .itemCounter").innerHTML = "Item # " + (i + 1)
@@ -207,7 +211,7 @@ class Shop {
     }
 }
 
-const shop = self.shop = new Shop()
+new Shop()
 document.addEventListener('DOMContentLoaded', async () => {
-    await shop.init()
+    await self.shop.init()
 })
