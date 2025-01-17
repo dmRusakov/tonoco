@@ -11,7 +11,7 @@
                 {{range .Filters}}
                     <div class="filter">
                         <label>{{.Name}}</label>
-                        <select name="{{.Url}}">
+                        <select name="{{.Url}}" multiple>
                             <option value=""></option>
                             {{range .Options}}
                                 <option value="{{.Url}}" value-id="{{.Id}}">{{.Name}}</option>

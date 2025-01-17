@@ -1,6 +1,6 @@
 CONFIG_FOLDER=`basename $(CURDIR)`
 MIN_JS_FILE = /bin/uglifyjs
-MIN_CSS_FILE = /home/dm/.config/JetBrains/GoLand2024.3/node/versions/22.12.0/bin/uglifycss
+MIN_CSS_FILE = uglifycss
 JS_FILE_LOCATION = ./../assets/js/
 CSS_FILE_LOCATION = ./../assets/css/
 
@@ -54,24 +54,11 @@ minJSFile: # make minJSFile file=<filename.js>
 	$(if $(file),,$(error file is not set))
 	/bin/uglifyjs $(JS_FILE_LOCATION)$(file) -o $(subst .js,.min.js,$(file)) || { echo "uglifyjs failed for $(file)"; exit 1; }
 
-
-# minify js files. For Jetbrains IDEs, need to add to Tools -> File Watchers for automatic minification
-minJSFiles:
-	# minify all js files in the assets/js folder
-	$(foreach file, $(filter-out %.min.js, $(wildcard ./../assets/js/*.js)), \
-		$(MIN_JS_FILE) $(file) -o $(subst .js,.tmp.min.js,$(file)) || { echo "uglifyjs failed for $(file)"; exit 1; }; \
-		if cmp -s $(subst .js,.tmp.min.js,$(file)) $(subst .js,.min.js,$(file)); then \
-	  		rm $(subst .js,.tmp.min.js,$(file)); \
-		else \
-			mv $(subst .js,.tmp.min.js,$(file)) $(subst .js,.min.js,$(file)); \
-			$(eval FILENAME := $(file)) \
-			$(eval FILENAME := $(shell echo $(FILENAME) | sed 's/.*\///')) \
-			$(eval FILENAME := $(shell echo $(FILENAME) | sed 's/\.js//')) \
-			$(eval Id := "$(FILENAME)-js") \
-			FILENAME=$(FILENAME); \
-			make updateJsVersion; \
-		fi; \
-	)
+ # make compressCssFile file=<filename.css>. For Jetbrains IDEs, need to add to Tools -> File Watchers for automatic minification
+compressCssFile:
+	# check if file provided
+	$(if $(file),,$(error file is not set))
+	$(MIN_CSS_FILE) $(CSS_FILE_LOCATION)$(file) > $(CSS_FILE_LOCATION)$(subst .css,.min.css,$(file)) || { echo "uglifycss failed for $(file)"; exit 1; }
 
 # minify js files. For Jetbrains IDEs, need to add to Tools -> File Watchers for automatic minification
 updateJsVersion:

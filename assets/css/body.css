@@ -320,10 +320,12 @@ h3, h4, h5, h6 {
 
         .filters {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(30%, 1fr));
             gap: 10px;
 
             .filter {
+                margin-top: -10px;
+
                 label, select {
                     width: 100%;
                     display: inline-block;
@@ -336,8 +338,8 @@ h3, h4, h5, h6 {
                     display: inline-block;
                 }
                 select {
-                    border: 1px solid var(--paginationBgColor);
-                    background-color: var(--paginationBgColor);
+                    border: 1px solid var(--accentBG);
+                    background-color: var(--accentBG);
                     color: var(--paginationColor);
                     transition: background-color 0.3s, color 0.3s;
                     padding: 4px;
@@ -345,7 +347,17 @@ h3, h4, h5, h6 {
 
                 .choices {
                     .choices__inner {
-                        min-height: 30px !important;
+                        min-height: 25px !important;
+                        padding: 4px 8px;
+
+                        .choices__item {
+                            padding: 2px 5px;
+                            border-radius: 3px;
+                        }
+                    }
+
+                    .choices__list {
+                        color: var(--accentText);
                     }
                 }
             }

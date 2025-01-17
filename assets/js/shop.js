@@ -35,11 +35,58 @@ class Shop {
             }),
 
             // filters
-            new Promise((resolve) => {
+            new Promise(async (resolve) => {
                 const dom = this.filters = this.header.querySelector(".filters");
                 dom.style.removeProperty("display");
+                let isFileterExist = false;
 
-                // this.filters.querySelectorAll("select").forEach((select) => {
+                this.filters.querySelectorAll(".filter").forEach((filterDom) => {
+                    const filter = {
+                        id: filterDom.querySelector("select").getAttribute("name"),
+                        title: filterDom.querySelector("label").innerHTML,
+                        options: {}
+                    }
+
+                    filterDom.querySelector("select").querySelectorAll("option").forEach((optionDom) => {
+                        const option = {
+                            id: optionDom.getAttribute("value-id"),
+                            title: optionDom.innerHTML,
+                            key: optionDom.getAttribute("value"),
+                        }
+
+                        filter.options[option.id] = option;
+                    })
+
+                    // save to cache
+                    self.cache.filter[filter.id] = filter
+                    isFileterExist = true;
+                })
+
+                // Choices
+                if (isFileterExist) {
+                    // add Choices CDN to header
+                    const head = document.head;
+                    const link = document.createElement("link");
+                    link.rel = "stylesheet";
+                    link.href = "https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css";
+                    head.appendChild(link);
+
+                    const script = document.createElement("script");
+                    script.src = "https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js";
+                    head.appendChild(script);
+
+                    // wait for Choices
+                    await new Promise((resolve) => {
+                        script.onload = resolve;
+                    });
+
+                    this.filters.querySelectorAll(".filter select").forEach((filterDom) => {
+                        new Choices(filterDom, {
+                            removeItemButton: true,
+                            placeholder: true,
+                        });
+                    })
+                }
 
                 resolve();
             }),
@@ -67,7 +114,7 @@ class Shop {
                     })
 
                     // save to cache
-                    a.cache.grid[item.id] = item
+                    self.cache.grid[item.id] = item
 
                     // item count
                     itemDom.querySelector(".skuContainer .itemCounter").innerHTML = "Item # " + (i + 1)
@@ -163,5 +210,4 @@ class Shop {
 const shop = self.shop = new Shop()
 document.addEventListener('DOMContentLoaded', async () => {
     await shop.init()
-    console.log(shop)
 })

@@ -1,11 +1,9 @@
 const a = this // a == applications
 
-// functions
-a.func = {}
-
 // cache
-a.cache = {}
-a.cache.grid = {}
+self.cache = {}
+self.cache.grid = {}
+self.cache.filter = {}
 
 // browser
 a.browser = (() => {
