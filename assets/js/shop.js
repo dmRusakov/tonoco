@@ -88,6 +88,7 @@ class Shop {
                         new Choices(filterDom, {
                             removeItemButton: true,
                             placeholder: true,
+                            label: 'Select an option',
                         });
                     })
                 }

@@ -1,29 +1,40 @@
+//go:build js && wasm
+// +build js,wasm
+
 package main
 
-import "syscall/js"
+import (
+	"github.com/dmRusakov/tonoco/pkg/utils/random"
+	"syscall/js"
+)
 
-func add(this js.Value, i []js.Value) interface{} {
-	js.Global().Set("output", js.ValueOf(i[0].Int()+i[1].Int()))
-	println(js.ValueOf(i[0].Int() + i[1].Int()).String())
-	return nil
-}
-
-func subtract(this js.Value, i []js.Value) interface{} {
-	js.Global().Set("output", js.ValueOf(i[0].Int()-i[1].Int()))
-	println(js.ValueOf(i[0].Int() - i[1].Int()).String())
-	return nil
-}
-
-func registerCallbacks() {
-	js.Global().Set("add", js.FuncOf(add))
-	js.Global().Set("subtract", js.FuncOf(subtract))
-}
-
+// This calls a JS function from Go.
 func main() {
-	c := make(chan struct{}, 0)
+	println("WebAssembly module loaded.")
+}
 
-	println("Web Assembly Ready")
-	// register functions
-	registerCallbacks()
-	<-c
+//export add
+func add(x, y int) int {
+	val := x + y
+	uuid, err := random.Int(10000)
+
+	if err != nil {
+		js.Global().Get("sessionStorage").Call("setItem", "error", err.Error())
+		return 0
+	}
+
+	js.Global().Get("sessionStorage").Call("setItem", uuid, val)
+	return uuid
+}
+
+//export hi
+func hi() string {
+	return "Hello from Go!"
+}
+
+//export getService
+func getService() *map[string]string {
+	person := map[string]string{"Service": "Alice!", "Aria": "30", "Serviced": "Go"}
+
+	return &person
 }

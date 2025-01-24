@@ -10,8 +10,8 @@
             <div id="filter" class="filters" style="display: none">
                 {{range .Filters}}
                     <div class="filter">
-                        <label>{{.Name}}</label>
-                        <select name="{{.Url}}" multiple>
+                        <label for="{{.Url}}">{{.Name}}</label>
+                        <select id="{{.Url}}" multiple>
                             <option value=""></option>
                             {{range .Options}}
                                 <option value="{{.Url}}" value-id="{{.Id}}">{{.Name}}</option>

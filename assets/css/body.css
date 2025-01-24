@@ -354,6 +354,10 @@ h3, h4, h5, h6 {
                             padding: 2px 5px;
                             border-radius: 3px;
                         }
+
+                        .choices__input {
+                            margin-bottom: 0;
+                        }
                     }
 
                     .choices__list {

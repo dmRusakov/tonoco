@@ -1,5 +1,6 @@
+APP_PATH = $(shell pwd)/..
 CONFIG_FOLDER=`basename $(CURDIR)`
-MIN_JS_FILE = /bin/uglifyjs
+MIN_JS_FILE = uglifyjs
 MIN_CSS_FILE = uglifycss
 JS_FILE_LOCATION = ./../assets/js/
 CSS_FILE_LOCATION = ./../assets/css/
@@ -32,13 +33,17 @@ delete:
 	sleep 1 # wait 1 sec for db to be deleted
 	@echo "Deleted"
 
-webAssembly: makeWebAssembly minJSFiles
+webAssembly: makeTinyGoWebAssembly makeWebAssemblyJS
 	@echo "WebAssembly builded"
 
 makeWebAssembly:
-	# build wasm
-	GOOS=js GOARCH=wasm go build -o ./../bin/adminApp.wasm ./../cmd/adminAppWebAssembly/main.go
-	if cmp -s ./../bin/adminApp.wasm ./../assets/wasm/adminApp.wasm; then \
+	GOOS=js GOARCH=wasm go build -o $(APP_PATH)/bin/adminApp.wasm $(APP_PATH)/cmd/adminAppWebAssembly/main.go
+
+makeTinyGoWebAssembly:
+	GOOS=js GOARCH=wasm tinygo build -target wasm -opt=s -o $(APP_PATH)/bin/adminApp.wasm $(APP_PATH)/cmd/adminAppWebAssembly/main.go
+
+makeWebAssemblyJS:
+	if cmp -s $(APP_PATH)/bin/adminApp.wasm $(APP_PATH)/assets/wasm/adminApp.wasm; then \
 		echo "same size"; \
 		rm ./../bin/adminApp.wasm; \
 	else \
@@ -47,12 +52,13 @@ makeWebAssembly:
 		$(if $(VERSION),,$(eval VERSION := 1.0))\
 		$(eval VERSION := $(shell echo "$(VERSION) + 0.001" | bc))\
 		sed -i "s/appFileVersion = .*/appFileVersion = \"$(VERSION)\";/g" ./../assets/js/wasm.js ; \
+		make minJSFile file=wasm.js; \
 	fi
 
 minJSFile: # make minJSFile file=<filename.js>
 	# check if file provided
 	$(if $(file),,$(error file is not set))
-	/bin/uglifyjs $(JS_FILE_LOCATION)$(file) -o $(subst .js,.min.js,$(file)) || { echo "uglifyjs failed for $(file)"; exit 1; }
+	$(MIN_JS_FILE) $(JS_FILE_LOCATION)$(file) -o $(JS_FILE_LOCATION)$(subst .js,.min.js,$(file)) || { echo "uglifyjs failed for $(file)"; exit 1; }
 
  # make compressCssFile file=<filename.css>. For Jetbrains IDEs, need to add to Tools -> File Watchers for automatic minification
 compressCssFile:
@@ -60,38 +66,38 @@ compressCssFile:
 	$(if $(file),,$(error file is not set))
 	$(MIN_CSS_FILE) $(CSS_FILE_LOCATION)$(file) > $(CSS_FILE_LOCATION)$(subst .css,.min.css,$(file)) || { echo "uglifycss failed for $(file)"; exit 1; }
 
-# minify js files. For Jetbrains IDEs, need to add to Tools -> File Watchers for automatic minification
-updateJsVersion:
-	# delete all min.js files
-	$(eval Id := "$(FILENAME)-js")
-	@echo $(Id)
-	$(eval VERSION := $(shell grep '<script.*id=$(Id)' "./../assets/templates/element/head_file_imports.partial.gohtml" | sed -n 's/.*version="\([^"]*\)".*/\1/p'))
-	$(if $(VERSION),,$(eval VERSION := 1.0))
-	$(eval VERSION := $(shell echo "$(VERSION) + 0.001" | bc))
-	@echo $(VERSION)
-	sed -i 's/\(script id=$(Id).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/head_file_imports.partial.gohtml
-	sed -i 's/\(script id=$(Id).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/prod_head_file_imports.partial.gohtml
-	sed -i 's/\(script id=$(Id).*src="\)[^"]*"/\1'"\/assets\/js\/"$(FILENAME)".min.js?v="$(VERSION)'"/' ./../assets/templates/element/prod_head_file_imports.partial.gohtml
-
-minCssFiles:
- 	# minify all css files in the assets/css folder
-	$(foreach file, $(filter-out %.min.css, $(wildcard ./../assets/css/*.css)), \
-		if [ $(file) != $(subst .css,.min.css,$(file)) ]; then \
-			$(MIN_CSS_FILE) $(file) > $(subst .css,.tmp.min.css,$(file)); \
-			if cmp -s $(subst .css,.tmp.min.css,$(file)) $(subst .css,.min.css,$(file)); then \
-		  		rm $(subst .css,.tmp.min.css,$(file)); \
-			else \
-				mv $(subst .css,.tmp.min.css,$(file)) $(subst .css,.min.css,$(file)); \
-				$(eval FILENAME := $(file)) \
-				$(eval FILENAME := $(shell echo $(FILENAME) | sed 's/.*\///')) \
-				$(eval FILENAME := $(shell echo $(FILENAME) | sed 's/\.css//')) \
-				$(eval Id := "$(FILENAME)-css") \
-				FILENAME=$(FILENAME)  make updateCssVersion; \
-			fi; \
-		fi; \
-	)
-	# delete all min.min.css files
-	rm -f ./../assets/css/*.min.min.css
+## minify js files. For Jetbrains IDEs, need to add to Tools -> File Watchers for automatic minification
+#updateJsVersion:
+#	# delete all min.js files
+#	$(eval Id := "$(FILENAME)-js")
+#	@echo $(Id)
+#	$(eval VERSION := $(shell grep '<script.*id=$(Id)' "./../assets/templates/element/head_file_imports.partial.gohtml" | sed -n 's/.*version="\([^"]*\)".*/\1/p'))
+#	$(if $(VERSION),,$(eval VERSION := 1.0))
+#	$(eval VERSION := $(shell echo "$(VERSION) + 0.001" | bc))
+#	@echo $(VERSION)
+#	sed -i 's/\(script id=$(Id).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/head_file_imports.partial.gohtml
+#	sed -i 's/\(script id=$(Id).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/prod_head_file_imports.partial.gohtml
+#	sed -i 's/\(script id=$(Id).*src="\)[^"]*"/\1'"\/assets\/js\/"$(FILENAME)".min.js?v="$(VERSION)'"/' ./../assets/templates/element/prod_head_file_imports.partial.gohtml
+#
+#minCssFiles:
+# 	# minify all css files in the assets/css folder
+#	$(foreach file, $(filter-out %.min.css, $(wildcard ./../assets/css/*.css)), \
+#		if [ $(file) != $(subst .css,.min.css,$(file)) ]; then \
+#			$(MIN_CSS_FILE) $(file) > $(subst .css,.tmp.min.css,$(file)); \
+#			if cmp -s $(subst .css,.tmp.min.css,$(file)) $(subst .css,.min.css,$(file)); then \
+#		  		rm $(subst .css,.tmp.min.css,$(file)); \
+#			else \
+#				mv $(subst .css,.tmp.min.css,$(file)) $(subst .css,.min.css,$(file)); \
+#				$(eval FILENAME := $(file)) \
+#				$(eval FILENAME := $(shell echo $(FILENAME) | sed 's/.*\///')) \
+#				$(eval FILENAME := $(shell echo $(FILENAME) | sed 's/\.css//')) \
+#				$(eval Id := "$(FILENAME)-css") \
+#				FILENAME=$(FILENAME)  make updateCssVersion; \
+#			fi; \
+#		fi; \
+#	)
+#	# delete all min.min.css files
+#	rm -f ./../assets/css/*.min.min.css
 
 updateCssVersion:
 	$(eval Id := "$(FILENAME)-css")
@@ -114,10 +120,7 @@ updateCssVersion:
 installNode:
 	sudo dnf install nodejs
 	sudo dnf install npm
-
-
-installNodeDependencies:
-	# Install all node app dependencies
+	sudo dnf install tinygo
 	npm install -g uglifycss
 	npm install -g uglify-js
 	npm install -g uglifyjs

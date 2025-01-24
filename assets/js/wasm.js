@@ -1,27 +1,56 @@
-const folderPath = "/assets/wasm/";
-const appFileName = "adminApp.wasm";
-const appFileVersion = "1.008";
+class WebAssemblyApp {
+    constructor(appFileName) {
+        self.wa = this;
+        this._folderPath = "/assets/wasm/";
+        this._appFileName = appFileName;
+        this.appFileVersion = "1.018";
+        this._go = new Go();
+        this._mod = null;
+        this.memory = null;
+        this._inst = null;
+        this._importObject = {
+            wasi_snapshot_preview1: {
+                proc_exit: (code) => console.log(`proc_exit called with code: ${code}`),
+                ...this._go.importObject.wasi_snapshot_preview1,
+            },
+            ...this._go.importObject,
+        };
 
-if (!WebAssembly.instantiateStreaming) { // polyfill
-    WebAssembly.instantiateStreaming = async (resp, importObject) => {
-        const source = await (await resp).arrayBuffer();
-        return await WebAssembly.instantiate(source, importObject);
-    };
+        if (!WebAssembly.instantiateStreaming) {
+            WebAssembly.instantiateStreaming = async (resp, importObject) => {
+                const source = await (await resp).arrayBuffer();
+                return await WebAssembly.instantiate(source, importObject);
+            };
+        }
+    }
+
+    async init() {
+        try {
+            const wasmPath = `${this._folderPath}${this._appFileName}?v=${this.appFileVersion}`;
+            const result = await WebAssembly.instantiateStreaming(fetch(wasmPath), this._importObject);
+            this._mod = result.module;
+            this._inst = result.instance;
+            this._func = this._inst.exports;
+            await this._go.run(this._inst);
+            this.memory = new Uint8Array(this._func.memory.buffer);
+        } catch (err) {
+            console.error("Failed to initialize WebAssembly module:", err);
+        }
+    }
+
+    // test func to add two numbers
+    async add(x, y) {
+        return this._func.add(x, y);
+    }
 }
 
-const go = new Go();
-let mod, inst;
-WebAssembly.instantiateStreaming(fetch(folderPath + appFileName + "?v=" + appFileVersion), go.importObject).then( async (result) => {
-    mod = result.module;
-    inst = result.instance;
-    await run();
-    document.getElementById("runButton").disabled = false;
-}).catch((err) => {
-    console.error(err);
-});
+// Usage Example
+(async () => {
+    const wasmApp = new WebAssemblyApp("adminApp.wasm");
+    await wasmApp.init();
 
-async function run() {
-    // console.clear();
-    await go.run(inst);
-    inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
-}
+    // test
+    const uuid = await wasmApp.add(1, 2);
+    const value = sessionStorage.getItem(uuid);
+    console.log("value", value);
+})();
