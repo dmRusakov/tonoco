@@ -9,27 +9,11 @@ import (
 )
 
 // This calls a JS function from Go.
-func main() {
-	println("WebAssembly module loaded.")
-}
+func main() {}
 
-//export add
-func add(x, y int) int {
-	val := x + y
-	uuid, err := random.Int(10000)
-
-	if err != nil {
-		js.Global().Get("sessionStorage").Call("setItem", "error", err.Error())
-		return 0
-	}
-
-	js.Global().Get("sessionStorage").Call("setItem", uuid, val)
-	return uuid
-}
-
-//export hi
-func hi() string {
-	return "Hello from Go!"
+//export status
+func status() int {
+	return returnData("WebAssembly Ready.", nil)
 }
 
 //export getService
@@ -37,4 +21,21 @@ func getService() *map[string]string {
 	person := map[string]string{"Service": "Alice!", "Aria": "30", "Serviced": "Go"}
 
 	return &person
+}
+
+func returnData(data any, err error) int {
+	if err != nil {
+		js.Global().Get("sessionStorage").Call("setItem", 0, err.Error())
+		return 0
+	}
+
+	uuid, err := random.Int(10000)
+
+	if err != nil {
+		js.Global().Get("sessionStorage").Call("setItem", 0, err.Error())
+		return 0
+	}
+
+	js.Global().Get("sessionStorage").Call("setItem", uuid, data)
+	return uuid
 }

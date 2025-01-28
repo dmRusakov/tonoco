@@ -5,21 +5,16 @@ class User {
 
     init() {
         this.location = async () => {
-            try {
-                console.log(222);
-                const response = await fetch("http://ip-api.com/json/");
-                console.log(response);
-                const data =  await response.json();
-
-                console.log(data);
-
-
-                return {
-
-                }
-            } catch(error) {
-                console.error("Error fetching user data:", error);
-                return null;
+            return {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                isSupportWebp: (() => {
+                    const elem = document.createElement('canvas');
+                    if (!!(elem.getContext && elem.getContext('2d'))) {
+                        return elem.toDataURL('image/webp').indexOf('data:image/webp') == 0;
+                    }
+                    return false;
+                })(),
             }
         }
     }
