@@ -4,7 +4,7 @@ class User {
     }
 
     async init() {
-        self.user.browser = await this.getBrowserInfo()
+        this.browser = await this.getBrowserInfo()
     }
 
     async getBrowserInfo() {

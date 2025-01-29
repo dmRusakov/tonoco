@@ -4,8 +4,9 @@
 package main
 
 import (
-	"github.com/dmRusakov/tonoco/pkg/utils/random"
 	"syscall/js"
+
+	"github.com/dmRusakov/tonoco/pkg/utils/random"
 )
 
 // This function returns a UUID and stores the data in the session storage.
@@ -32,11 +33,4 @@ func main() {}
 //export status
 func status() int {
 	return returnData("WebAssembly Ready.", nil)
-}
-
-//export getService
-func getService() *map[string]string {
-	person := map[string]string{"Service": "Alice!", "Aria": "30", "Serviced": "Go"}
-
-	return &person
 }

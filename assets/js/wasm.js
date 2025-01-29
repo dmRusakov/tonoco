@@ -3,7 +3,7 @@ class WebAssemblyApp {
         self.wa = this;
         this._folderPath = "/assets/wasm/";
         this._appFileName = appFileName;
-        this.appFileVersion = "1.025";
+        this.appFileVersion = "1.031";
         this._go = new Go();
         this._mod = null;
         this.memory = null;
@@ -38,7 +38,7 @@ class WebAssemblyApp {
         }
     }
 
-    // test func to add two numbers
+    // test func get status
     async status() {
         const uuid = this._func.status();
         return sessionStorage.getItem(uuid);
