@@ -3,7 +3,7 @@ class WebAssemblyApp {
         self.wa = this;
         this._folderPath = "/assets/wasm/";
         this._appFileName = appFileName;
-        this.appFileVersion = "1.031";
+        this.appFileVersion = "1.048";
         this._go = new Go();
         this._mod = null;
         this.memory = null;
@@ -41,6 +41,7 @@ class WebAssemblyApp {
     // test func get status
     async status() {
         const uuid = this._func.status();
+        console.log(uuid)
         return sessionStorage.getItem(uuid);
     }
 }

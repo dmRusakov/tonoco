@@ -14,15 +14,6 @@ func Int64(max int64) (int64, error) {
 	return nBig.Int64(), nil
 }
 
-func Int(max uint64) (int, error) {
-	nBig, err := rand.Int(rand.Reader, big.NewInt(int64(max)))
-	if err != nil {
-		return 0, err
-	}
-
-	return int(nBig.Int64()), nil
-}
-
 func Bytes(n int) ([]byte, error) {
 	b := make([]byte, n)
 
