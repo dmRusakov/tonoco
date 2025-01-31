@@ -3,7 +3,7 @@ class WebAssemblyApp {
         self.wa = this;
         this._folderPath = "/assets/wasm/";
         this._appFileName = appFileName;
-        this.appFileVersion = "1.066";
+        this.appFileVersion = "1.071";
         this._go = new Go();
         this._mod = null;
         this.memory = null;
@@ -57,12 +57,6 @@ class WebAssemblyApp {
         const uuid = this._func.grid();
         return this.#get(uuid);
     }
-    
-    // text
-    async text() {
-        const uuid = this._func.text();
-        return this.#get(uuid);
-    }
 }
 
 // Usage Example
@@ -75,7 +69,4 @@ class WebAssemblyApp {
 
     // grid
     console.log(await wasmApp.grid());
-
-    // text
-    console.log(await wasmApp.text());
 })();

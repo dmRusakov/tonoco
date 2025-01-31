@@ -33,14 +33,9 @@ func grid() int {
 		"SalePrice":        "sale_price",
 		"Price":            "444.44",
 		"Currency":         "555.33",
-		"Quantity":         1,
+		"Quantity":         644,
 	})
 
 	js.Global().Get("sessionStorage").Call("setItem", id, js.Global().Get("JSON").Call("stringify", item))
 	return id
-}
-
-//export text
-func text() string {
-	return "Hello, WebAssembly!"
 }
