@@ -3,7 +3,7 @@ class WebAssemblyApp {
         self.wa = this;
         this._folderPath = "/assets/wasm/";
         this._appFileName = appFileName;
-        this.appFileVersion = "1.048";
+        this.appFileVersion = "1.066";
         this._go = new Go();
         this._mod = null;
         this.memory = null;
@@ -38,11 +38,30 @@ class WebAssemblyApp {
         }
     }
 
+    async #get(uuid){
+        const v =  JSON.parse(sessionStorage.getItem(uuid));
+        (async () => {
+            sessionStorage.removeItem(uuid);
+        })();
+        return v
+    }
+
     // test func get status
     async status() {
         const uuid = this._func.status();
-        console.log(uuid)
-        return sessionStorage.getItem(uuid);
+        return this.#get(uuid);
+    }
+
+    // grid
+    async grid() {
+        const uuid = this._func.grid();
+        return this.#get(uuid);
+    }
+    
+    // text
+    async text() {
+        const uuid = this._func.text();
+        return this.#get(uuid);
     }
 }
 
@@ -52,5 +71,11 @@ class WebAssemblyApp {
     await wasmApp.init();
 
     // status
-    console.log(await wasmApp.status());
+    console.log((await wasmApp.status()).status);
+
+    // grid
+    console.log(await wasmApp.grid());
+
+    // text
+    console.log(await wasmApp.text());
 })();

@@ -33,14 +33,17 @@ delete:
 	sleep 1 # wait 1 sec for db to be deleted
 	@echo "Deleted"
 
-webAssembly: makeTinyGoWebAssembly makeWebAssemblyJS
+webAssembly: makeTinyGoWebAssembly compressWasm makeWebAssemblyJS
 	@echo "WebAssembly builded"
 
 makeWebAssembly:
 	GOOS=js GOARCH=wasm go build -o $(APP_PATH)/bin/adminApp.wasm $(APP_PATH)/cmd/adminAppWebAssembly/main.go
 
 makeTinyGoWebAssembly:
-	GOOS=js GOARCH=wasm tinygo build -target wasm -opt=s -o $(APP_PATH)/bin/adminApp.wasm $(APP_PATH)/cmd/adminAppWebAssembly/main.go
+	tinygo build -target wasm -opt=s -o $(APP_PATH)/bin/adminApp.wasm $(APP_PATH)/cmd/adminAppWebAssembly/main.go
+
+compressWasm:
+	gzip -9 -k -f $(APP_PATH)/bin/adminApp.wasm
 
 makeWebAssemblyJS:
 	if cmp -s $(APP_PATH)/bin/adminApp.wasm $(APP_PATH)/assets/wasm/adminApp.wasm; then \
