@@ -23,9 +23,9 @@ type GridItem struct {
 }
 
 type ItemTag struct {
-	Name  string
-	Url   string
-	Value string
+	Name  string `json:"name" db:"name"`
+	Url   string `json:"url" db:"url"`
+	Value string `json:"value" db:"value"`
 }
 
 type Image struct {

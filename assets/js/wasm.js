@@ -3,7 +3,7 @@ class WebAssemblyApp {
         self.wa = this;
         this._folderPath = "/assets/wasm/";
         this._appFileName = appFileName;
-        this.appFileVersion = "1.071";
+        this.appFileVersion = "1.170";
         this._go = new Go();
         this._mod = null;
         this.memory = null;
@@ -35,27 +35,40 @@ class WebAssemblyApp {
             this.memory = new Uint8Array(this._func.memory.buffer);
         } catch (err) {
             console.error("Failed to initialize WebAssembly module:", err);
+
         }
     }
 
-    async #get(uuid){
-        const v =  JSON.parse(sessionStorage.getItem(uuid));
-        (async () => {
-            sessionStorage.removeItem(uuid);
-        })();
+    async #send(value = null){
+        const id = Math.floor(Math.random() * (100000 - 10000 + 1)) + 10000;
+        // check it is unique
+        if (sessionStorage.getItem(id.toString())) {
+            return this.#send(value);
+        }
+
+        // save it
+        sessionStorage.setItem(id.toString(), JSON.stringify(value));
+        return id
+    }
+
+    async #get(id){
+        const v =  JSON.parse(sessionStorage.getItem(id));
+        sessionStorage.removeItem(id);
         return v
     }
 
     // test func get status
     async status() {
-        const uuid = this._func.status();
-        return this.#get(uuid);
+        const id = await this.#send();
+        this._func.status(id);
+        return this.#get(id);
     }
 
     // grid
-    async grid() {
-        const uuid = this._func.grid();
-        return this.#get(uuid);
+    async grid(request) {
+        const id = await this.#send(request);
+        await this._func.grid(id);
+        return this.#get(id);
     }
 }
 
@@ -68,5 +81,8 @@ class WebAssemblyApp {
     console.log((await wasmApp.status()).status);
 
     // grid
-    console.log(await wasmApp.grid());
+    console.log(await wasmApp.grid({
+        Id: "123",
+        sku: "sku",
+    }));
 })();
