@@ -3,7 +3,7 @@ class WebAssemblyApp {
         self.wa = this;
         this._folderPath = "/assets/wasm/";
         this._appFileName = appFileName;
-        this.appFileVersion = "1.170";
+        this.appFileVersion = "1.211";
         this._go = new Go();
         this._mod = null;
         this.memory = null;
@@ -82,7 +82,7 @@ class WebAssemblyApp {
 
     // grid
     console.log(await wasmApp.grid({
-        Id: "123",
+        id: "123",
         sku: "sku",
     }));
 })();
