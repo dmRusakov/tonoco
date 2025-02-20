@@ -3,7 +3,7 @@ class WebAssemblyApp {
         self.wa = this;
         this._folderPath = "/assets/wasm/";
         this._appFileName = appFileName;
-        this.appFileVersion = "1.211";
+        this.appFileVersion = "1.240";
         this._go = new Go();
         this._mod = null;
         this.memory = null;

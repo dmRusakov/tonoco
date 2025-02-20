@@ -1,28 +1,10 @@
 package main
 
 import (
+	"github.com/dmRusakov/tonoco/internal/entity/api"
 	"reflect"
 	"syscall/js"
 )
-
-type GridParam struct {
-	Id  string `json:"id"`
-	Sku string `json:"sku"`
-}
-
-type GridItem struct {
-	Id               string `json:"id"`
-	No               int32  `json:"no"`
-	Sku              string `json:"sku"`
-	Brand            string `json:"brand"`
-	Name             string `json:"name"`
-	ShortDescription string `json:"short_description"`
-	Url              string `json:"url"`
-	SalePrice        string `json:"sale_price"`
-	Price            string `json:"price"`
-	Currency         string `json:"currency"`
-	Quantity         int64  `json:"quantity"`
-}
 
 type Status struct {
 	Status string `json:"status"`
@@ -62,24 +44,26 @@ func status(id int) int {
 //export grid
 func grid(id int) int {
 	json := get(id)
-	param := GridParam{
+	param := api.GridParam{
 		Id:  json.Get("id").String(),
 		Sku: json.Get("sku").String(),
 	}
 
 	// TODO get data from API
-	item := GridItem{
+	item := api.GridItem{
 		Id:               param.Id,
-		No:               3,
 		Sku:              param.Sku,
-		Brand:            "",
-		Name:             "",
-		ShortDescription: "",
-		Url:              "",
-		SalePrice:        "",
-		Price:            "",
-		Currency:         "",
-		Quantity:         4444,
+		Brand:            "Futuro",
+		Name:             "Test",
+		ShortDescription: "hfdg",
+		Url:              "wetwetr",
+		MainImage: map[string]interface{}{
+			"filename":  "test",
+			"extension": "jpg",
+			"is_webp":   false,
+			"title":     "test",
+			"alt_text":  "test",
+		},
 	}
 
 	send(id, item)
