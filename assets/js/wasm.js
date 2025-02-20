@@ -3,7 +3,7 @@ class WebAssemblyApp {
         self.wa = this;
         this._folderPath = "/assets/wasm/";
         this._appFileName = appFileName;
-        this.appFileVersion = "1.240";
+        this.appFileVersion = "1.243";
         this._go = new Go();
         this._mod = null;
         this.memory = null;
@@ -48,6 +48,7 @@ class WebAssemblyApp {
 
         // save it
         sessionStorage.setItem(id.toString(), JSON.stringify(value));
+        
         return id
     }
 
