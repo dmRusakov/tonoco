@@ -81,7 +81,7 @@ func init() {
 	// adminAppWeb server
 	app.WebServer, err = web_v1.NewWebServer(cfg, app.ProductUseCase, app.AppCacheService, app.UserCacheService)
 	if err != nil {
-		logging.WithError(ctx, err).Fatal("web_v1.NewWebServer")
+		logging.WithError(ctx, err).Fatal("web_v1.NewRpcServer")
 	}
 	logging.L(ctx).Info("Web Server initialized")
 }

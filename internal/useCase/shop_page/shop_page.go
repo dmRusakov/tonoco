@@ -211,3 +211,7 @@ func (u *UseCase) GetShopPage(ctx context.Context, pageUrl string) (*pages.Shop,
 	// return page
 	return &page, nil
 }
+
+func getGridItem() {
+
+}
