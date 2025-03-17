@@ -117,15 +117,14 @@ installNode:
 .PHONY: bufGenGrpc
 bufGenGrpc: bufFormat bufLint bufClean bufGenerateGrpc
 
-.PHONY: bufFormat
 bufFormat:
-	cd .. && PATH=$(GOPATH)/bin:$$PATH buf format --path proto/service/v1
-	cd .. && PATH=$(GOPATH)/bin:$$PATH buf format --path proto/model/v1
+	cd .. && PATH=$(GOPATH)/bin:$$PATH buf format --config=buf.yaml --path proto/service/v1
+	cd .. && PATH=$(GOPATH)/bin:$$PATH buf format --config=buf.yaml --path proto/model/v1
 
 .PHONY: bufLint
 bufLint:
-	cd .. && PATH=$(GOPATH)/bin:$$PATH buf lint --path proto/service/v1
-	cd .. && PATH=$(GOPATH)/bin:$$PATH buf lint --path proto/model/v1
+	cd .. && PATH=$(GOPATH)/bin:$$PATH buf lint --config=buf.yaml --path proto/service/v1
+	cd .. && PATH=$(GOPATH)/bin:$$PATH buf lint --config=buf.yaml --path proto/model/v1
 
 .PHONY: bufClean
 bufClean:
@@ -133,5 +132,4 @@ bufClean:
 
 .PHONY: bufGenerateGrpc
 bufGenerateGrpc:
-	cd .. && PATH=$(GOPATH)/bin:$$PATH buf generate --path proto
-
+	cd .. && PATH=$(GOPATH)/bin:$$PATH buf generate --config=buf.yaml --path proto
