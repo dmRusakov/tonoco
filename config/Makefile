@@ -115,5 +115,24 @@ installNode:
 # Protobuf
 
 .PHONY: bufGenGrpc
-bufGenGrpc:
+bufGenGrpc: format lint clean generateGrpc
 	cd .. && PATH=$(GOPATH)/bin:$$PATH buf generate --path proto/service/v1
+
+.PHONY: format
+format:
+	cd .. && PATH=$(GOPATH)/bin:$$PATH buf format --path proto/service/v1
+	cd .. && PATH=$(GOPATH)/bin:$$PATH buf format --path proto/model/v1
+
+.PHONY: lint
+lint:
+	cd .. && PATH=$(GOPATH)/bin:$$PATH buf lint --path proto/service/v1
+	cd .. && PATH=$(GOPATH)/bin:$$PATH buf lint --path proto/model/v1
+
+.PHONY: clean
+clean:
+	cd .. && rm -rf ./gen
+
+.PHONY: generateGrpc
+generateGrpc:
+	cd .. && PATH=$(GOPATH)/bin:$$PATH buf generate --path proto/service/v1
+	cd .. && PATH=$(GOPATH)/bin:$$PATH buf generate --path proto/model/v1

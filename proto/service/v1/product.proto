@@ -28,7 +28,7 @@ message GetProductGridRequest {
 }
 
 message GetProductGridResponse {
-    proto.model.v1.ProductGrid productGrid = 10;
+    proto.model.v1.ProductGrid product_grid = 10;
     optional proto.model.v1.Error error = 9999;
 }
 

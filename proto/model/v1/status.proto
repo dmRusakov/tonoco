@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package proto.model.v1;
 
-option go_package = "github.com/dmRusakov/tonoco-grpc/gen/go/proto/model/v1;model_v1";
+option go_package = "github.com/dmRusakov/tonoco/gen/go/proto/model/v1;model_v1";
 
 message Status {
   optional bool is_ok = 10;
