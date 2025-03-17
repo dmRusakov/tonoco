@@ -5,7 +5,13 @@ MIN_CSS_FILE = uglifycss
 JS_FILE_LOCATION = ./../assets/js/
 CSS_FILE_LOCATION = ./../assets/css/
 
+MAKE_PATH=$(GOPATH)/bin:/bin:/usr/bin:/usr/local/bin:$PATH
+BIN_PATH=/home/dm/App/go/bin
+BUF_VERSION=1.50.1
+
 admin:
+
+# Databases
 
 up: down
 	docker-compose --env-file ./dev.env up -d
@@ -22,16 +28,20 @@ restart:
 	docker-compose --env-file ./dev.env restart
 	@echo "Restarted"
 
-delete:
-	docker-compose --env-file ./dev.env down --volumes
-	sudo chmod -R 777 ./dbData/DataStorage/data/
-	sudo chmod -R 777 ./dbData/Cassandra/data/
-	sudo chmod -R 777 ./dbData/MqBroker/data/
-	rm -rf ./dbData/DataStorage/data/*
-	rm -rf ./dbData/CacheStorage/data/*
-	rm -rf ./dbData/MqBroker/data/*
-	sleep 1 # wait 1 sec for db to be deleted
-	@echo "Deleted"
+#delete:
+#	docker-compose --env-file ./dev.env down --volumes
+#	sudo chmod -R 777 ./dbData/DataStorage/data/
+#	sudo chmod -R 777 ./dbData/Cassandra/data/
+#	sudo chmod -R 777 ./dbData/MqBroker/data/
+#	rm -rf ./dbData/DataStorage/data/*
+#	rm -rf ./dbData/CacheStorage/data/*
+#	rm -rf ./dbData/MqBroker/data/*
+#	sleep 1 # wait 1 sec for db to be deleted
+#	@echo "Deleted"
+
+#######################################################
+### Web Assembly
+#######################################################
 
 webAssembly: makeTinyGoWebAssemblyCompressed compressWasm makeWebAssemblyJS
 	@echo "WebAssembly builded"
@@ -61,6 +71,10 @@ makeWebAssemblyJS:
 		make minJSFile file=wasm.js; \
 	fi
 
+###############
+### CSS and JS
+###############
+
 minJSFile: # make minJSFile file=<filename.js>
 	# check if file provided
 	$(if $(file),,$(error file is not set))
@@ -71,39 +85,6 @@ compressCssFile:
 	# check if file provided
 	$(if $(file),,$(error file is not set))
 	$(MIN_CSS_FILE) $(CSS_FILE_LOCATION)$(file) > $(CSS_FILE_LOCATION)$(subst .css,.min.css,$(file)) || { echo "uglifycss failed for $(file)"; exit 1; }
-
-## minify js files. For Jetbrains IDEs, need to add to Tools -> File Watchers for automatic minification
-#updateJsVersion:
-#	# delete all min.js files
-#	$(eval Id := "$(FILENAME)-js")
-#	@echo $(Id)
-#	$(eval VERSION := $(shell grep '<script.*id=$(Id)' "./../assets/templates/element/head_file_imports.partial.gohtml" | sed -n 's/.*version="\([^"]*\)".*/\1/p'))
-#	$(if $(VERSION),,$(eval VERSION := 1.0))
-#	$(eval VERSION := $(shell echo "$(VERSION) + 0.001" | bc))
-#	@echo $(VERSION)
-#	sed -i 's/\(script id=$(Id).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/head_file_imports.partial.gohtml
-#	sed -i 's/\(script id=$(Id).*version="\)[^"]*"/\1'$(VERSION)'"/' ./../assets/templates/element/prod_head_file_imports.partial.gohtml
-#	sed -i 's/\(script id=$(Id).*src="\)[^"]*"/\1'"\/assets\/js\/"$(FILENAME)".min.js?v="$(VERSION)'"/' ./../assets/templates/element/prod_head_file_imports.partial.gohtml
-#
-#minCssFiles:
-# 	# minify all css files in the assets/css folder
-#	$(foreach file, $(filter-out %.min.css, $(wildcard ./../assets/css/*.css)), \
-#		if [ $(file) != $(subst .css,.min.css,$(file)) ]; then \
-#			$(MIN_CSS_FILE) $(file) > $(subst .css,.tmp.min.css,$(file)); \
-#			if cmp -s $(subst .css,.tmp.min.css,$(file)) $(subst .css,.min.css,$(file)); then \
-#		  		rm $(subst .css,.tmp.min.css,$(file)); \
-#			else \
-#				mv $(subst .css,.tmp.min.css,$(file)) $(subst .css,.min.css,$(file)); \
-#				$(eval FILENAME := $(file)) \
-#				$(eval FILENAME := $(shell echo $(FILENAME) | sed 's/.*\///')) \
-#				$(eval FILENAME := $(shell echo $(FILENAME) | sed 's/\.css//')) \
-#				$(eval Id := "$(FILENAME)-css") \
-#				FILENAME=$(FILENAME)  make updateCssVersion; \
-#			fi; \
-#		fi; \
-#	)
-#	# delete all min.min.css files
-#	rm -f ./../assets/css/*.min.min.css
 
 updateCssVersion:
 	$(eval Id := "$(FILENAME)-css")
@@ -130,3 +111,9 @@ installNode:
 	npm install -g uglifycss
 	npm install -g uglify-js
 	npm install -g uglifyjs
+
+# Protobuf
+
+.PHONY: bufGenGrpc
+bufGenGrpc:
+	cd .. && PATH=$(GOPATH)/bin:$$PATH buf generate --path proto/service/v1

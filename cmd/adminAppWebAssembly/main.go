@@ -62,7 +62,7 @@ func grid(id int) int {
 			"extension": "jpg",
 			"is_webp":   false,
 			"title":     "test",
-			"alt_text":  "test",
+			"alt":       "test",
 		},
 	}
 

@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package proto.service.v1;
+
+option go_package = "github.com/dmRusakov/tonoco/gen/go/proto/service/v1;service_v1";
+
+import "google/api/v1/annotations.proto";
+import "proto/model/v1/product_grid.proto";
+import "proto/model/v1/status.proto";
+import "proto/model/v1/error.proto";
+
+service ProductService {
+    rpc GetProductGrid(GetProductGridRequest) returns (GetProductGridResponse) {
+        option (google.api.v1.http) = {
+            get: "/v1/product-grid/{id}"
+        };
+    }
+    rpc GetStatus(GetStatusRequest) returns (GetStatusResponse) {
+        option (google.api.v1.http) = {
+            get: "/v1/status"
+        };
+    }
+}
+
+// GetProductGrid
+message GetProductGridRequest {
+    string id = 1;
+}
+
+message GetProductGridResponse {
+    proto.model.v1.ProductGrid productGrid = 10;
+    optional proto.model.v1.Error error = 9999;
+}
+
+// GetStatus
+message GetStatusRequest {}
+
+message GetStatusResponse {
+    optional proto.model.v1.Status status = 1;
+}
