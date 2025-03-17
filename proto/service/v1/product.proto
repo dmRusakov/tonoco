@@ -4,7 +4,7 @@ package proto.service.v1;
 
 option go_package = "github.com/dmRusakov/tonoco/gen/go/proto/service/v1;service_v1";
 
-import "google/api/v1/annotations.proto";
+import "proto/google/api/v1/annotations.proto";
 import "proto/model/v1/product_grid.proto";
 import "proto/model/v1/status.proto";
 import "proto/model/v1/error.proto";
