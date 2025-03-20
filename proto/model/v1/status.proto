@@ -1,3 +1,4 @@
+// language: proto
 syntax = "proto3";
 
 package proto.model.v1;

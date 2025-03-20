@@ -2,7 +2,7 @@ package appInit
 
 import (
 	"context"
-	productServire "github.com/dmRusakov/tonoco-grpc/gen/go/proto/service/v1"
+	productServire "github.com/dmRusakov/tonoco/gen/go/proto/service/v1"
 	"golang.org/x/sync/errgroup"
 )
 

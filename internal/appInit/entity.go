@@ -2,7 +2,7 @@ package appInit
 
 import (
 	"context"
-	productServire "github.com/dmRusakov/tonoco-grpc/gen/go/proto/service/v1"
+	productServire "github.com/dmRusakov/tonoco/gen/go/proto/service/v1"
 	"github.com/dmRusakov/tonoco/internal/config"
 	webController "github.com/dmRusakov/tonoco/internal/controllers/adminAppWeb/v1"
 	currencyUsecase "github.com/dmRusakov/tonoco/internal/useCase/currency"
